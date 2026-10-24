@@ -1,3 +1,4 @@
+import { anchoredPosition } from './layout';
 import Konva from 'konva';
 import type { Caption, ImageDimensions } from '../../domain/document';
 
@@ -12,14 +13,27 @@ export function captionConfig(
   const fontSize = (edge * caption.style.fontSizePercent) / 100;
   const marginX = (edge * caption.position.marginXPercent) / 100;
   const marginY = (edge * caption.position.marginYPercent) / 100;
-  const height = text
-    ? text.split('\n').length * fontSize * caption.style.lineHeight
-    : 0;
+  const metrics = new Konva.Text({
+    text,
+    fontSize,
+    fontFamily: caption.style.fontFamily,
+    fontStyle: caption.style.fontWeight === 700 ? 'bold' : 'normal',
+    lineHeight: caption.style.lineHeight,
+    wrap: 'none',
+  });
+  const block = { width: metrics.width(), height: metrics.height() };
+  metrics.destroy();
+  const position = anchoredPosition(
+    dimensions,
+    block,
+    caption.position.anchor,
+    marginX,
+    marginY,
+  );
   return {
     text,
-    x: marginX,
-    y: dimensions.height - marginY - height,
-    width: Math.max(1, dimensions.width - marginX * 2),
+    ...position,
+    width: block.width,
     fontSize,
     fontFamily: caption.style.fontFamily,
     fontStyle: caption.style.fontWeight === 700 ? 'bold' : 'normal',

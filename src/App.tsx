@@ -118,9 +118,17 @@ export default function App() {
           <FrameNoteLogo className="h-8 w-auto text-current" />
         </a>
         {photo && (
-          <Button onClick={() => input.current?.click()} disabled={loading}>
-            Change photo
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              className="border-secondary-foreground bg-secondary text-secondary-foreground hover:bg-secondary"
+              onClick={() => input.current?.click()}
+              disabled={loading}
+            >
+              Change photo
+            </Button>
+            <div id="export-actions" />
+          </div>
         )}
       </header>
       <input
