@@ -18,7 +18,7 @@ function block(source, marker) {
   if (depth) throw new Error(`Unclosed ${marker}`);
   return { start, end, text: source.slice(start, end) };
 }
-const palette = block(css, '@theme {');
+const palette = block(css, '@theme');
 const tokens = block(css, ':root {');
 const issues = [];
 const withoutPalette = css.slice(0, palette.start) + css.slice(palette.end);

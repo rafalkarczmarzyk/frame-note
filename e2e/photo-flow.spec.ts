@@ -31,7 +31,11 @@ test('exports landscape and portrait JPGs with stable caption pixels and colors'
       }
       await expect(
         page.getByRole('spinbutton', { name: 'Font size', exact: true }),
-      ).toHaveValue('1.35');
+      ).toHaveValue('2');
+      // Keep the rendering baseline independent of the default font size.
+      await page
+        .getByRole('spinbutton', { name: 'Font size', exact: true })
+        .fill('1.35');
       await page
         .getByRole('slider', { name: 'Opacity', exact: true })
         .press('Home');

@@ -12,13 +12,13 @@ function photo(): Photo {
 }
 
 describe('photo document', () => {
-  it('keeps fractional font sizing independent of photo resolution', () => {
+  it('keeps relative font sizing independent of photo resolution', () => {
     const original = createPhotoDocument(photo());
     const cropped = createPhotoDocument({
       ...photo(),
       dimensions: { width: 3000, height: 2000 },
     });
-    expect(original.caption.style.fontSize).toBe(1.35);
+    expect(original.caption.style.fontSize).toBe(2);
     expect(cropped.caption).toEqual(original.caption);
   });
   it('does not share mutable caption settings between documents', () => {

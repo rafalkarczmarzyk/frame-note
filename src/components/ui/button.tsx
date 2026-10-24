@@ -12,6 +12,14 @@ const buttonVariants = cva(
         outline: 'control-neutral',
       },
       size: { default: 'h-10 px-4 py-2', sm: 'h-8 px-3' },
+      color: {
+        default: '',
+        violet: 'button-color-violet',
+        turquoise: 'button-color-turquoise',
+        yellow: 'button-color-yellow',
+        crimson: 'button-color-crimson',
+        'rose-brown': 'button-color-rose-brown',
+      },
     },
     defaultVariants: { variant: 'default', size: 'default' },
   },
@@ -21,6 +29,7 @@ function Button({
   className,
   variant,
   size,
+  color,
   asChild = false,
   ...props
 }: React.ComponentProps<'button'> &
@@ -30,7 +39,7 @@ function Button({
     <Comp
       type={asChild ? undefined : 'button'}
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(buttonVariants({ variant, size, color, className }))}
       {...props}
     />
   );

@@ -17,7 +17,7 @@
   font-display: swap;
 }
 
-@theme {
+@theme static {
   --font-sans: 'Montserrat Variable', sans-serif;
   --font-display: 'Advercase', Georgia, serif;
   --color-charcoal: #383f51;
@@ -25,6 +25,13 @@
   --color-charcoal-light: #454e64;
   --color-porcelain: #fdfffc;
   --color-slate: #9cafb7;
+  --color-emerald: #14cc60;
+  /* Section accents; primary remains independent. */
+  --color-violet: #731dd8;
+  --color-turquoise: #00bfb3;
+  --color-yellow: #ffd400;
+  --color-crimson: #ef233c;
+  --color-rose-brown: #8b635c;
 }
 
 /* Base palette above is also used by photo captions. UI roles below are independent. */
@@ -48,7 +55,7 @@
   );
   --tone-accent-hover: color-mix(
     in srgb,
-    var(--color-slate) 75%,
+    var(--accent-color) 75%,
     var(--color-porcelain)
   );
   --tone-text-secondary: color-mix(
@@ -66,10 +73,10 @@
   --tone-shadow: color-mix(in srgb, var(--color-charcoal) 40%, transparent);
   --tone-focus: color-mix(
     in srgb,
-    var(--color-slate) 65%,
+    var(--accent-color) 65%,
     var(--color-porcelain)
   );
-  --tone-focus-wash: color-mix(in srgb, var(--color-slate) 16%, transparent);
+  --tone-focus-wash: color-mix(in srgb, var(--accent-color) 16%, transparent);
   --tone-thumb-glass: color-mix(
     in srgb,
     var(--color-porcelain) 35%,
@@ -81,6 +88,14 @@
   --header-base: var(--app-base);
   --sidebar-base: var(--app-base);
   --workspace-base: var(--color-charcoal-dark);
+  --section-photo: var(--color-turquoise);
+  --section-caption: var(--color-rose-brown);
+  --section-typography: var(--color-violet);
+  --section-sizing: var(--color-yellow);
+  --section-position: var(--color-crimson);
+  --section-export: var(--accent-color);
+  --section-icon: var(--color-porcelain);
+  --section-icon-dark: var(--color-charcoal-dark);
   --accordion-base: var(--color-charcoal-light);
   --accordion-header-hover: var(--tone-overlay);
   --accordion-label: var(--content-primary);
@@ -101,9 +116,39 @@
   --input-focus-ring: var(--focus-ring);
   --input-unit: var(--content-secondary);
   --input-invalid-border: var(--content-primary);
-  --button-primary-base: var(--color-slate);
+  --button-violet-base: var(--color-violet);
+  --button-violet-hover: color-mix(
+    in srgb,
+    var(--button-violet-base) 85%,
+    var(--color-porcelain)
+  );
+  --button-turquoise-base: var(--color-turquoise);
+  --button-turquoise-hover: color-mix(
+    in srgb,
+    var(--button-turquoise-base) 85%,
+    var(--color-porcelain)
+  );
+  --button-yellow-base: var(--color-yellow);
+  --button-yellow-hover: color-mix(
+    in srgb,
+    var(--button-yellow-base) 85%,
+    var(--color-porcelain)
+  );
+  --button-crimson-base: var(--color-crimson);
+  --button-crimson-hover: color-mix(
+    in srgb,
+    var(--button-crimson-base) 85%,
+    var(--color-porcelain)
+  );
+  --button-rose-brown-base: var(--color-rose-brown);
+  --button-rose-brown-hover: color-mix(
+    in srgb,
+    var(--button-rose-brown-base) 85%,
+    var(--color-porcelain)
+  );
+  --button-primary-base: var(--accent-color);
   --button-primary-hover: var(--tone-accent-hover);
-  --button-primary-text: var(--app-base);
+  --button-primary-text: var(--color-charcoal-dark);
   --button-secondary-base: var(--tone-surface);
   --button-secondary-hover: var(--tone-hover);
   --button-secondary-text: var(--content-primary);
@@ -116,7 +161,7 @@
   --segment-text: var(--content-secondary);
   --segment-selected-text: var(--content-primary);
   --slider-track: var(--tone-edge);
-  --slider-fill: var(--color-slate);
+  --slider-fill: var(--accent-color);
   --slider-fill-highlight: var(--tone-accent-hover);
   --slider-thumb: var(--color-porcelain);
   --slider-thumb-drag: var(--tone-thumb-glass);
@@ -131,7 +176,7 @@
   --menu-item-hover: var(--tone-hover);
   --menu-item-selected: var(--tone-hover);
   --menu-text: var(--content-primary);
-  --accent-color: var(--color-slate);
+  --accent-color: var(--color-emerald);
   --notice-warning: var(--accent-color);
   --drop-base: var(--color-slate);
   --drop-text: var(--app-base);
@@ -164,6 +209,15 @@
 }
 
 @theme inline {
+  --color-section-photo: var(--section-photo);
+  --color-section-caption: var(--section-caption);
+  --color-section-typography: var(--section-typography);
+  --color-section-sizing: var(--section-sizing);
+  --color-section-position: var(--section-position);
+  --color-section-export: var(--section-export);
+  --color-section-icon: var(--section-icon);
+  --color-section-icon-dark: var(--section-icon-dark);
+
   --color-app-base: var(--app-base);
   --color-header-base: var(--header-base);
   --color-sidebar-base: var(--sidebar-base);
@@ -280,6 +334,31 @@
   .control-neutral {
     border: 1px solid var(--button-border);
     box-shadow: var(--button-shadow);
+  }
+  .button-color-violet {
+    --button-primary-base: var(--button-violet-base);
+    --button-primary-hover: var(--button-violet-hover);
+    --button-primary-text: var(--color-porcelain);
+  }
+  .button-color-turquoise {
+    --button-primary-base: var(--button-turquoise-base);
+    --button-primary-hover: var(--button-turquoise-hover);
+    --button-primary-text: var(--color-charcoal-dark);
+  }
+  .button-color-yellow {
+    --button-primary-base: var(--button-yellow-base);
+    --button-primary-hover: var(--button-yellow-hover);
+    --button-primary-text: var(--color-charcoal-dark);
+  }
+  .button-color-crimson {
+    --button-primary-base: var(--button-crimson-base);
+    --button-primary-hover: var(--button-crimson-hover);
+    --button-primary-text: var(--color-porcelain);
+  }
+  .button-color-rose-brown {
+    --button-primary-base: var(--button-rose-brown-base);
+    --button-primary-hover: var(--button-rose-brown-hover);
+    --button-primary-text: var(--color-porcelain);
   }
   .button-primary {
     background-color: var(--button-primary-base);

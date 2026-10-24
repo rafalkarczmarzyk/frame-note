@@ -6,7 +6,8 @@ interface SidebarSectionProps {
   id: string;
   title: string;
   icon?: ReactNode;
-  summary?: string;
+  iconTone?:
+    'photo' | 'caption' | 'typography' | 'sizing' | 'position' | 'export';
   defaultOpen?: boolean;
   persist?: boolean;
   children: ReactNode;
@@ -17,7 +18,7 @@ export function SidebarSection({
   id,
   title,
   icon,
-  summary,
+  iconTone,
   defaultOpen = true,
   persist = true,
   children,
@@ -48,7 +49,18 @@ export function SidebarSection({
         {icon && (
           <span
             aria-hidden="true"
-            className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-accordion-icon-base text-accordion-icon [&_svg]:size-4"
+            className={`flex size-7 shrink-0 items-center justify-center rounded-lg [&_svg]:size-4 ${
+              iconTone
+                ? {
+                    photo: 'bg-section-photo text-section-icon',
+                    caption: 'bg-section-caption text-section-icon',
+                    typography: 'bg-section-typography text-section-icon',
+                    sizing: 'bg-section-sizing text-section-icon-dark',
+                    position: 'bg-section-position text-section-icon',
+                    export: 'bg-section-export text-button-primary-text',
+                  }[iconTone]
+                : 'bg-accordion-icon-base text-accordion-icon'
+            }`}
           >
             {icon}
           </span>
@@ -57,11 +69,6 @@ export function SidebarSection({
           <span className="block font-display text-xl leading-6 font-normal text-accordion-label">
             {title}
           </span>
-          {!open && summary && (
-            <span className="mt-1 block break-words text-[10px] leading-4 font-normal text-content-secondary">
-              {summary}
-            </span>
-          )}
         </span>
         <ChevronDown
           aria-hidden="true"

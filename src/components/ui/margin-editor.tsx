@@ -1,3 +1,4 @@
+import { HelperText } from '@/components/ui/helper-text';
 import { useState } from 'react';
 import { NumberField } from './number-field';
 import { PhotoIcon } from '../icons/photo-icon';
@@ -134,13 +135,13 @@ export function MarginEditor({
           </div>
         </div>
       </div>
-      <p className="text-[10px] leading-4 text-content-muted">
+      <HelperText>
         {linkMode === 'all'
           ? 'All edges linked. Top is used when linking.'
           : linkMode === 'pairs'
             ? 'Top/bottom and left/right linked. Top and left are used when linking.'
             : 'Each edge is independent.'}
-      </p>
+      </HelperText>
     </fieldset>
   );
 }
