@@ -280,9 +280,9 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
           <SidebarSection
             id="photo"
             title="Photo"
+            iconTone="photo"
             icon={<PhotoIcon />}
             defaultOpen={false}
-            summary={formatBytes(photo.document.photo.byteLength)}
           >
             <h1 className="break-all text-sm font-medium">
               {photo.document.photo.name}
@@ -300,12 +300,8 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
           <SidebarSection
             id="caption"
             title="Caption"
+            iconTone="caption"
             icon={<TextQuote />}
-            summary={
-              resolved.missing.length || resolved.invalidSyntax
-                ? 'Check tokens'
-                : `${resolved.text ? resolved.text.split('\n').length : 0} lines`
-            }
           >
             <label className="sr-only" htmlFor="caption-template">
               Caption
@@ -359,8 +355,8 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
           <SidebarSection
             id="export"
             title="Export"
+            iconTone="export"
             icon={<Download />}
-            summary={`${quality === 95 ? 'Best' : quality === 75 ? 'Balanced' : quality === 60 ? 'Small' : `${quality}%`} · ${prepared.blob ? formatBytes(prepared.blob.size) : prepared.error ? 'Unavailable' : 'Calculating…'}`}
           >
             <fieldset disabled={exporting}>
               <label

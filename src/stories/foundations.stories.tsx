@@ -24,7 +24,13 @@ export const Palette: Story = {
         'charcoal',
         'charcoal-light',
         'slate',
+        'emerald',
         'porcelain',
+        'violet',
+        'turquoise',
+        'yellow',
+        'crimson',
+        'rose-brown',
       ].map((name) => (
         <div key={name} className="overflow-hidden rounded-sm border">
           <div

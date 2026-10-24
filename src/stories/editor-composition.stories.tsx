@@ -129,10 +129,10 @@ function EditorDemo({
             <SidebarSection
               id="storybook-photo"
               title="Photo"
+              iconTone="photo"
               icon={<PhotoIcon />}
               defaultOpen={false}
               persist={false}
-              summary="6.10 MB"
             >
               <p className="text-xs">
                 {photo.name} · {photo.width} × {photo.height} px
@@ -141,6 +141,7 @@ function EditorDemo({
             <SidebarSection
               id="storybook-caption"
               title="Caption"
+              iconTone="caption"
               icon={<TextQuote />}
               persist={false}
             >
@@ -177,9 +178,9 @@ function EditorDemo({
             <SidebarSection
               id="storybook-export"
               title="Export"
+              iconTone="export"
               icon={<Download />}
               persist={false}
-              summary="Best · 4.2 MB"
             >
               <div className="space-y-3">
                 <SegmentedControl

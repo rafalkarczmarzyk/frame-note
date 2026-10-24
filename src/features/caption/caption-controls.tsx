@@ -1,3 +1,4 @@
+import { HelperText } from '@/components/ui/helper-text';
 import { SidebarSection } from '@/components/layout/sidebar-section';
 import {
   AlignLeft,
@@ -53,8 +54,8 @@ export function CaptionControls({
         id={`${preferenceScope}sizing`}
         persist={persistSections}
         title="Sizing"
+        iconTone="sizing"
         icon={<Ruler />}
-        summary={unit}
       >
         <Field
           label="Sizing unit"
@@ -84,8 +85,8 @@ export function CaptionControls({
         id={`${preferenceScope}typography`}
         persist={persistSections}
         title="Typography"
+        iconTone="typography"
         icon={<Type />}
-        summary={`${caption.style.fontFamily.replace(' Variable', '')}, ${Number(caption.style.fontSize.toFixed(3))} ${unit}`}
       >
         <fieldset disabled={disabled} className="space-y-4 disabled:opacity-70">
           <Field label="Font">
@@ -172,6 +173,7 @@ export function CaptionControls({
           </div>
           <NumberField
             label="Line height"
+            hint="Multiplies the font size. For example, 1.4× with a 20 px font gives a 28 px line height."
             unit="×"
             value={caption.style.lineHeight}
             min={0.5}
@@ -211,8 +213,8 @@ export function CaptionControls({
         id={`${preferenceScope}position`}
         persist={persistSections}
         title="Position"
+        iconTone="position"
         icon={<Move />}
-        summary={caption.position.anchor.replaceAll('-', ' ')}
       >
         <fieldset disabled={disabled} className="space-y-5 disabled:opacity-70">
           <div className="space-y-2">
@@ -231,8 +233,8 @@ export function CaptionControls({
         id={`${preferenceScope}margins`}
         persist={persistSections}
         title="Margins"
+        iconTone="sizing"
         icon={<Ruler />}
-        summary={`${caption.position.marginLinkMode} · ${unit}`}
       >
         <fieldset disabled={disabled} className="space-y-4 disabled:opacity-70">
           <MarginEditor
@@ -248,10 +250,10 @@ export function CaptionControls({
               position({ margins, marginLinkMode })
             }
           />
-          <p className="text-xs leading-5 text-content-secondary">
+          <HelperText>
             Margins define the inner photo area. The anchor positions the
             caption within it.
-          </p>
+          </HelperText>
         </fieldset>
       </SidebarSection>
     </>

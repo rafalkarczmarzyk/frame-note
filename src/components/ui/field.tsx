@@ -1,5 +1,6 @@
 import { useId, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { HelperText } from './helper-text';
 
 /** Render prop passes a real label target to either native or Radix controls. */
 export function Field({
@@ -28,15 +29,17 @@ export function Field({
         {label}
       </label>
       {children(id, descriptionId)}
-      {(error || hint) && (
+      {error ? (
         <p
           id={descriptionId}
           className="text-xs leading-5 text-content-secondary"
-          role={error ? 'alert' : undefined}
+          role="alert"
         >
-          {error || hint}
+          {error}
         </p>
-      )}
+      ) : hint ? (
+        <HelperText id={descriptionId}>{hint}</HelperText>
+      ) : null}
     </div>
   );
 }

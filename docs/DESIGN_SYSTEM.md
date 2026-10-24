@@ -10,9 +10,14 @@ not a separately published npm package.
 
 ## Design tokens
 
-The five base colors live in `@theme` in `src/index.css`. They are also used by
+The five active base colors live in `@theme` in `src/index.css`. They are also used by
 photo captions; do not rename their `--color-*` variables as part of UI changes.
-All 13 shared color recipes live in `:root` as private `--tone-*` values and the
+Five section accents use semantic `section-*` roles: turquoise for Photo, rose-brown
+for Caption, violet for Typography, yellow for Sizing and Margins, crimson for Position,
+and primary for Export. They color icon badges only. Collapsed accordions show
+only their title and icon, without summaries. Primary uses emerald (`#14CC60`) through `--accent-color`, with charcoal-dark button text.
+The drag-and-drop background stays slate (`#9CAFB7`) independently of primary. Caption options remain unchanged.
+All 18 shared color recipes live in `:root` as private `--tone-*` values and the
 panel glass material. Components consume usage roles exposed by `@theme inline`.
 
 | Area                                | Tailwind examples                                                                    |
@@ -180,3 +185,7 @@ each rendered visible content with no visible Storybook error or uncaught page
 error. Select and Slider interaction stories reached their asserted states
 (Bold selected and slider value 1). This is a rendering and interaction smoke
 check, not a complete visual or accessibility audit.
+
+Filled buttons accept `color="violet"`, `"turquoise"`, `"yellow"`, `"crimson"` or
+`"rose-brown"`. Omit color to retain the current primary. Export JPG uses primary as the main application action. Color variants retain shared hover and disabled
+behavior; outline buttons remain neutral.

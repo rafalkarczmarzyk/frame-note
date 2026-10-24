@@ -118,13 +118,26 @@ Dokumentacja komponentów i rozbudowy: [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTE
 
 HEX-y są zdefiniowane tylko w `@theme` w `src/index.css`.
 
-| Paleta         | HEX     | Główne zastosowanie  |
-| -------------- | ------- | -------------------- |
-| charcoal       | #383F51 | tło i ciemny tekst   |
-| slate          | #9CAFB7 | primary, secondary   |
-| porcelain      | #FDFFFC | tekst                |
-| charcoal-dark  | #292E3B | obszar wokół zdjęcia |
-| charcoal-light | #454E64 | accordiony           |
+| Paleta         | HEX     | Główne zastosowanie      |
+| -------------- | ------- | ------------------------ |
+| charcoal       | #383F51 | tło i ciemny tekst       |
+| slate          | #9CAFB7 | tło przeciągania zdjęcia |
+| porcelain      | #FDFFFC | tekst                    |
+| charcoal-dark  | #292E3B | obszar wokół zdjęcia     |
+| charcoal-light | #454E64 | accordiony               |
+
+Kolory akcentów ikon sekcji: turquoise — Photo, rose-brown — Caption, violet — Typography,
+yellow — Sizing i Margins, crimson — Position, primary — Export.
+
+| Paleta     | HEX     |
+| ---------- | ------- |
+| violet     | #731DD8 |
+| turquoise  | #00BFB3 |
+| yellow     | #FFD400 |
+| crimson    | #EF233C |
+| rose-brown | #8B635C |
+
+Primary: emerald (`#14CC60`). Tło przeciągania zdjęcia pozostaje slate (`#9CAFB7`).
 
 Komponenty używają tokenów zastosowań, np. `bg-input-base`, `bg-accordion-base`
 i `text-content-primary`. `pnpm check:tokens` sprawdza zasady kolorów; jest też

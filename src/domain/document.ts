@@ -60,7 +60,7 @@ export function createCaption(): Caption {
     style: {
       fontFamily: 'Montserrat Variable',
       fontWeight: 400,
-      fontSize: 1.35,
+      fontSize: 2,
       color: 'porcelain',
       opacity: 1,
       lineHeight: 1.4,

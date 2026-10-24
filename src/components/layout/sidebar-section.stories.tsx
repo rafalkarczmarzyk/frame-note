@@ -12,12 +12,13 @@ const meta = {
   args: {
     id: 'storybook-section',
     title: 'Typography',
-    summary: 'Montserrat, 1.35%',
+    icon: <Type />,
+    iconTone: 'typography',
     persist: false,
     children: (
       <NumberField
         label="Size"
-        value={1.35}
+        value={2}
         onValueChange={() => {}}
         min={0.01}
         max={20}
@@ -37,15 +38,16 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 function AccordionGroup() {
   const [caption, setCaption] = useState('{exif:Artist}');
-  const [size, setSize] = useState(1.35);
+  const [size, setSize] = useState(2);
   const [anchor, setAnchor] = useState<AnchorValue>('bottom-left');
   return (
     <div className="w-full max-w-xs bg-app-base">
       <SidebarSection
         id="story-group-photo"
         title="Photo"
+        iconTone="photo"
         icon={<PhotoIcon />}
-        summary="5964 × 3976 px"
+
         defaultOpen={false}
         persist={false}
       >
@@ -58,6 +60,7 @@ function AccordionGroup() {
       <SidebarSection
         id="story-group-caption"
         title="Caption"
+        iconTone="caption"
         icon={<TextQuote />}
         persist={false}
       >
@@ -71,8 +74,9 @@ function AccordionGroup() {
       <SidebarSection
         id="story-group-typography"
         title="Typography"
+        iconTone="typography"
         icon={<Type />}
-        summary={`Montserrat, ${size}%`}
+
         persist={false}
       >
         <NumberField
@@ -86,8 +90,9 @@ function AccordionGroup() {
       <SidebarSection
         id="story-group-position"
         title="Position"
+        iconTone="position"
         icon={<Move />}
-        summary={anchor.replaceAll('-', ' ')}
+
         defaultOpen={false}
         persist={false}
       >
