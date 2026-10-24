@@ -125,3 +125,9 @@ Presety jakości nad suwakiem: Small (60%), Balanced (75%), Best (95%, domyślny
 Wspólny `SidebarSection` w `src/components/layout` odpowiada za nagłówek, chevron, odstępy i podsumowanie po zwinięciu. Korzysta z natywnego `details/summary`, dostępnego z klawiatury, i pozostawia kontrolki zamontowane po zwinięciu. Sekcje: Photo (domyślnie zwinięta), Caption, Typography, Position i Export (domyślnie otwarte). Każdą można zwijać niezależnie.
 
 Stan otwarcia zapisujemy pod kluczami `framenote.sidebar.v1.*` w localStorage; nie jest częścią ustawień zdjęcia. Pozostaje po wymianie pliku i odświeżeniu. Przy niedostępnym localStorage interfejs nadal działa. Zwijanie nie zmienia podpisu, nie przerywa przygotowania eksportu i nie zamyka osobnego panelu tagów.
+
+## Design system i Storybook
+
+`pnpm storybook` otwiera katalog komponentów na porcie 6006; `pnpm build-storybook` buduje wersję statyczną. Atomy i kompozycje korzystają z tych samych komponentów, fontów i tokenów co aplikacja. Dokumentacja architektury: [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md).
+
+Stały ToolSidebar zawiera narzędzia, a konfigurowalny FloatingPanel pokazuje tagi lub fonty nad canvasem bez zmiany jego wymiarów. Panel ma przydymione szkło z fallbackiem do pełnego tła oraz własny scroll. Fonty można teraz wybierać z podglądem w dodatkowym panelu. Pola, selecty, slider, przyciski segmentowe i anchory używają wspólnych prymitywów; select/slider/grupy korzystają z Radix.

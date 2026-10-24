@@ -1,5 +1,15 @@
+import {
+  EditorWorkspace,
+  ToolSidebar,
+} from '@/components/layout/editor-workspace';
+import { FloatingPanel } from '@/components/layout/floating-panel';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Slider } from '@/components/ui/slider';
+import { SegmentedControl } from '@/components/ui/segmented-control';
+import { PickerList } from '@/components/ui/picker-list';
 import { SidebarSection } from '@/components/layout/sidebar-section';
-import { TriangleAlert } from 'lucide-react';
+import { InlineNotice } from '@/components/ui/inline-notice';
 import { formatBytes } from '@/lib/format-bytes';
 import { usePreparedExport } from '../caption/use-prepared-export';
 import { createPortal } from 'react-dom';
@@ -20,7 +30,9 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
   const host = useRef<HTMLDivElement>(null);
   const templateInput = useRef<HTMLTextAreaElement>(null);
   const selection = useRef<TextSelection>({ start: 0, end: 0 });
-  const [tagsOpen, setTagsOpen] = useState(false);
+  const [activePanel, setActivePanel] = useState<'tags' | 'fonts' | null>(null);
+  const tagsOpen = activePanel === 'tags';
+  const [fontQuery, setFontQuery] = useState('');
   const [size, setSize] = useState({ width: 1, height: 1 });
   const [query, setQuery] = useState('');
   const [template, setTemplate] = useState(
@@ -129,7 +141,7 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
       .includes(query.toLowerCase()),
   );
   return (
-    <main className="flex min-h-0 flex-1 flex-col md:flex-row">
+    <EditorWorkspace>
       {exportTarget &&
         createPortal(
           <Button disabled={!prepared.blob || exporting} onClick={download}>
@@ -168,68 +180,100 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
           </Layer>
         </Stage>
       </div>
-      {tagsOpen && (
-        <aside
-          id="metadata-panel"
-          className="flex min-h-0 max-h-[40vh] w-full shrink-0 flex-col border-t bg-background md:max-h-none md:w-72 md:border-t-0 md:border-l"
-          aria-label="Available tags"
+      {activePanel && (
+        <FloatingPanel
+          id="auxiliary-panel"
+          title={tagsOpen ? 'Available tags' : 'Choose a font'}
+          description={
+            tagsOpen
+              ? 'Click a field to insert it into your caption.'
+              : 'Preview a font and apply it to your caption.'
+          }
+          onClose={() => setActivePanel(null)}
+          className="absolute inset-y-4 right-4 z-20 w-80 max-w-[calc(100%-2rem)] md:right-[calc(var(--tools-sidebar-width)+1rem)]"
+          toolbar={
+            tagsOpen ? (
+              <>
+                <Input
+                  aria-label="Search metadata"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Search fields or values…"
+                  className="bg-background/30"
+                />
+                <p className="mt-2 text-xs text-foreground/70">
+                  {fields.length} fields
+                </p>
+              </>
+            ) : (
+              <Input
+                aria-label="Search fonts"
+                value={fontQuery}
+                onChange={(event) => setFontQuery(event.target.value)}
+                placeholder="Search fonts…"
+                className="bg-background/30"
+              />
+            )
+          }
         >
-          <div className="shrink-0 border-b p-5">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-medium">Available tags</h2>
-              <button
-                type="button"
-                onClick={() => setTagsOpen(false)}
-                aria-label="Close tags"
-                className="text-sm"
-              >
-                ×
-              </button>
-            </div>
-            <label className="mt-6 block text-xs" htmlFor="metadata-search">
-              Search metadata
-            </label>
-            <input
-              id="metadata-search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              className="mt-2 w-full rounded-sm border bg-background px-3 py-2 text-sm outline-offset-2 focus-visible:outline-primary"
-              placeholder="Field or value…"
+          {tagsOpen ? (
+            <PickerList
+              items={fields.map((field) => ({
+                id: field.key,
+                label: field.key,
+                description: field.displayValue,
+                selected: used.has(field.key),
+              }))}
+              selectedLabel="Used"
+              onChoose={addToken}
+              emptyText="No matching metadata."
             />
-            <p className="mt-3 text-xs text-foreground/70">
-              {fields.length} fields
-            </p>
-          </div>
-          <dl className="min-h-0 flex-1 overflow-y-auto px-5 py-4 text-xs">
-            {fields.map((field) => (
-              <div key={field.key} className="mb-5">
-                <dt>
-                  <button
-                    type="button"
-                    className="break-all text-left text-foreground hover:underline aria-pressed:text-primary"
-                    title="Insert token"
-                    onClick={() => addToken(field.key)}
-                    aria-pressed={used.has(field.key)}
-                  >
-                    {field.key}
-                    {used.has(field.key) && (
-                      <span className="ml-2 text-[10px]">✓ Used</span>
-                    )}
-                  </button>
-                </dt>
-                <dd className="mt-1 whitespace-pre-wrap break-all">
-                  {field.displayValue}
-                </dd>
-              </div>
-            ))}
-            {fields.length === 0 && <p>No matching metadata.</p>}
-          </dl>
-        </aside>
+          ) : (
+            <PickerList
+              items={[
+                {
+                  id: 'Montserrat Variable',
+                  label: 'Montserrat',
+                  description: 'Sans serif · Regular / Bold',
+                  preview: (
+                    <span className="font-sans text-xl">
+                      Every frame has a story.
+                    </span>
+                  ),
+                },
+                {
+                  id: 'Advercase',
+                  label: 'Advercase',
+                  description: 'Display serif · Regular / Bold',
+                  preview: (
+                    <span className="font-display text-2xl">
+                      Every frame has a story.
+                    </span>
+                  ),
+                },
+              ]
+                .filter((font) =>
+                  font.label.toLowerCase().includes(fontQuery.toLowerCase()),
+                )
+                .map((font) => ({
+                  ...font,
+                  selected: settings.style.fontFamily === font.id,
+                }))}
+              onChoose={(id) =>
+                setSettings((value) => ({
+                  ...value,
+                  style: {
+                    ...value.style,
+                    fontFamily: id as typeof value.style.fontFamily,
+                  },
+                }))
+              }
+              emptyText="No matching fonts."
+            />
+          )}
+        </FloatingPanel>
       )}
-      <aside
-        className="flex min-h-0 max-h-[50vh] w-full shrink-0 flex-col border-t bg-background md:max-h-none md:w-80 md:border-t-0 md:border-l"
-        aria-label="Photo tools"
-      >
+      <ToolSidebar aria-label="Photo tools">
         <div className="min-h-0 flex-1 overflow-y-auto">
           <SidebarSection
             id="photo"
@@ -262,7 +306,7 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
             <label className="sr-only" htmlFor="caption-template">
               Caption
             </label>
-            <textarea
+            <Textarea
               ref={templateInput}
               id="caption-template"
               value={template}
@@ -289,8 +333,10 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
                 variant="outline"
                 className="w-full"
                 aria-expanded={tagsOpen}
-                aria-controls="metadata-panel"
-                onClick={() => setTagsOpen((value) => !value)}
+                aria-controls="auxiliary-panel"
+                onClick={() =>
+                  setActivePanel((value) => (value === 'tags' ? null : 'tags'))
+                }
               >
                 {tagsOpen ? 'Hide available tags' : 'Browse available tags'}
               </Button>
@@ -300,6 +346,9 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
             caption={settings}
             onChange={setSettings}
             disabled={exporting}
+            onBrowseFonts={() =>
+              setActivePanel((value) => (value === 'fonts' ? null : 'fonts'))
+            }
           />
 
           <SidebarSection
@@ -314,39 +363,31 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
               >
                 JPEG quality <span>{quality}%</span>
               </label>
-              <div
-                role="group"
-                aria-label="JPEG quality presets"
-                className="mt-3 flex overflow-hidden rounded-sm border"
-              >
-                {[
-                  { value: 60, label: 'Small' },
-                  { value: 75, label: 'Balanced' },
-                  { value: 95, label: 'Best' },
-                ].map((preset) => (
-                  <button
-                    key={preset.value}
-                    type="button"
-                    aria-label={`${preset.label} JPEG quality`}
-                    title={`${preset.value}%`}
-                    aria-pressed={quality === preset.value}
-                    onClick={() => setQuality(preset.value)}
-                    className="flex-1 border-r py-2 text-xs last:border-r-0 hover:bg-secondary hover:text-secondary-foreground focus-visible:z-10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary aria-pressed:bg-primary aria-pressed:text-primary-foreground"
-                  >
-                    {preset.label}
-                  </button>
-                ))}
+              <div className="mt-3">
+                <SegmentedControl
+                  label="JPEG quality presets"
+                  value={String(quality)}
+                  onValueChange={(value) => setQuality(Number(value))}
+                  disabled={exporting}
+                  options={[
+                    { value: '60', label: 'Small', title: '60%' },
+                    { value: '75', label: 'Balanced', title: '75%' },
+                    { value: '95', label: 'Best', title: '95%' },
+                  ]}
+                />
               </div>
-              <input
-                id="jpeg-quality"
-                type="range"
-                min={1}
-                max={100}
-                step={1}
-                value={quality}
-                onChange={(event) => setQuality(event.target.valueAsNumber)}
-                className="mt-3 w-full accent-primary"
-              />
+              <div className="mt-3">
+                <Slider
+                  id="jpeg-quality"
+                  label="JPEG quality"
+                  min={1}
+                  max={100}
+                  step={1}
+                  value={quality}
+                  onValueChange={setQuality}
+                  disabled={exporting}
+                />
+              </div>
               <p
                 className="mt-3 text-xs"
                 role="status"
@@ -368,19 +409,10 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
               </p>
               {prepared.blob &&
                 prepared.blob.size > photo.document.photo.byteLength && (
-                  <p
-                    className="mt-2 flex items-start gap-2 text-xs text-warning"
-                    role="status"
-                  >
-                    <TriangleAlert
-                      className="size-4 shrink-0"
-                      aria-hidden="true"
-                    />
-                    <span>
-                      Output is larger than the original. Try a lower JPEG
-                      quality.
-                    </span>
-                  </p>
+                  <InlineNotice tone="warning" className="mt-2">
+                    Output is larger than the original. Try a lower JPEG
+                    quality.
+                  </InlineNotice>
                 )}
               {prepared.error && (
                 <p role="alert" className="mt-2 text-xs">
@@ -399,7 +431,7 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
             </p>
           )}
         </div>
-      </aside>
-    </main>
+      </ToolSidebar>
+    </EditorWorkspace>
   );
 }

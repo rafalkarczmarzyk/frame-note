@@ -7,6 +7,7 @@ interface SidebarSectionProps {
   title: string;
   summary?: string;
   defaultOpen?: boolean;
+  persist?: boolean;
   children: ReactNode;
 }
 
@@ -16,9 +17,11 @@ export function SidebarSection({
   title,
   summary,
   defaultOpen = true,
+  persist = true,
   children,
 }: SidebarSectionProps) {
   const [open, setOpen] = useState(() => {
+    if (!persist) return defaultOpen;
     try {
       return readSectionOpen(window.localStorage, id, defaultOpen);
     } catch {
@@ -32,7 +35,7 @@ export function SidebarSection({
         const next = event.currentTarget.open;
         setOpen(next);
         try {
-          saveSectionOpen(window.localStorage, id, next);
+          if (persist) saveSectionOpen(window.localStorage, id, next);
         } catch {
           /* Private browsing can block localStorage. */
         }
