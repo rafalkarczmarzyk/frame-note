@@ -137,7 +137,8 @@ test('keeps caption settings when replacing landscape and portrait photos', asyn
     await expect(
       page.getByRole('button', { name: 'Export JPG', exact: true }),
     ).toBeEnabled();
-    await expect(page.getByLabel('Caption', { exact: true })).toHaveValue(
+    await expect(page.getByLabel('Caption', { exact: true })).toHaveAttribute(
+      'data-template',
       'My caption\n{exif:Artist}',
     );
     await expect(

@@ -45,6 +45,8 @@ describe('FrameNote caption helpers', () => {
       displayValue: '1/250 s · f/8 · ISO 400',
       sources: ['exif:ExposureTime', 'exif:FNumber', 'exif:ISOSpeedRatings'],
     });
+    expect(get(fields, 'iso').displayValue).toBe('ISO 400');
+    expect(get(fields, 'shutter').displayValue).toBe('1/250 s');
     expect(get(fields, 'focalLength').displayValue).toBe('100 mm');
     expect(get(fields.slice(2), 'exposure').displayValue).toBe('ISO 400');
     expect(

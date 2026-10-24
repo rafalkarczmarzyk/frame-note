@@ -38,7 +38,7 @@ export const CaptionToken = Node.create({
   addInputRules() {
     return [
       new InputRule({
-        find: /\{([^{}\s]+)\}$/,
+        find: /\{([^{}\r\n]+)\}$/,
         handler: ({ state, range, match }) => {
           state.tr.replaceWith(
             range.from,
