@@ -8,6 +8,7 @@ export interface PickerItem {
   selected?: boolean;
   preview?: ReactNode;
   leading?: ReactNode;
+  actions?: ReactNode;
 }
 export function PickerList({
   items,
@@ -25,34 +26,39 @@ export function PickerList({
   return (
     <div className="space-y-1">
       {items.map((item) => (
-        <button
-          type="button"
+        <div
           key={item.id}
-          aria-pressed={!!item.selected}
-          onClick={() => onChoose(item.id)}
+          className={`flex items-center gap-1 rounded-lg ${item.selected ? 'bg-menu-item-selected' : ''}`}
           onMouseEnter={() => onHover?.(item.id)}
           onMouseLeave={() => onHover?.(null)}
-          className="control-option control-button block w-full rounded-lg p-3 text-left aria-pressed:bg-menu-item-selected aria-pressed:text-accent-color"
         >
-          <span className="flex items-start justify-between gap-2">
-            <span className="flex min-w-0 items-center gap-3 text-xs">
-              {item.leading}
-              <span className="min-w-0 break-all">{item.label}</span>
+          <button
+            type="button"
+            aria-pressed={!!item.selected}
+            onClick={() => onChoose(item.id)}
+            className="control-option control-button block min-w-0 flex-1 rounded-lg p-3 text-left aria-pressed:text-accent-color"
+          >
+            <span className="flex items-start justify-between gap-2">
+              <span className="flex min-w-0 items-center gap-3 text-xs">
+                {item.leading}
+                <span className="min-w-0 break-all">{item.label}</span>
+              </span>
+              {item.selected && (
+                <span className="flex shrink-0 items-center gap-1 text-[10px]">
+                  <Check aria-hidden="true" className="size-3.5" />
+                  {selectedLabel}
+                </span>
+              )}
             </span>
-            {item.selected && (
-              <span className="flex shrink-0 items-center gap-1 text-[10px]">
-                <Check aria-hidden="true" className="size-3.5" />
-                {selectedLabel}
+            {item.description && (
+              <span className="mt-1 block break-all text-xs leading-5 text-content-secondary">
+                {item.description}
               </span>
             )}
-          </span>
-          {item.description && (
-            <span className="mt-1 block break-all text-xs leading-5 text-content-secondary">
-              {item.description}
-            </span>
-          )}
-          {item.preview && <span className="mt-3 block">{item.preview}</span>}
-        </button>
+            {item.preview && <span className="mt-3 block">{item.preview}</span>}
+          </button>
+          {item.actions && <div className="shrink-0 pr-2">{item.actions}</div>}
+        </div>
       ))}
       {items.length === 0 && (
         <p className="p-3 text-xs text-content-secondary">{emptyText}</p>

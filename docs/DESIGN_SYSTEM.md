@@ -276,3 +276,11 @@ Current sidebar order: Photo → Sizing → Margins → Containers → Selected 
 (Caption, Typography, Position) → Export. Global controls precede the local group.
 New containers prefer free corners counterclockwise, then edge centers, then the
 center; duplicates retain their anchor. Container rows include the anchor icon.
+
+### Auxiliary panel layout update
+
+The production tag/font/color panel now participates in the workspace flex layout
+between the preview and main sidebar, with a solid surface. Opening it resizes
+the preview host and refits the full image instead of covering it. On narrow
+screens panels stack and have a capped height with independent content scrolling.
+FloatingPanel remains a reusable primitive for existing standalone stories.
