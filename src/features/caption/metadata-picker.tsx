@@ -1,4 +1,5 @@
 import {
+  Layers,
   Camera,
   Aperture,
   Timer,
@@ -25,6 +26,8 @@ const helperIcons = {
   date: CalendarDays,
   copyright: Copyright,
   exposure: SlidersHorizontal,
+  heliconStack: SlidersHorizontal,
+  heliconStackCount: Layers,
 };
 function helperIcon(key: string) {
   const Icon = helperIcons[key as keyof typeof helperIcons];

@@ -338,3 +338,20 @@ picker, followed by a compact More colors trigger (palette and HEX stay docked).
 Text Layout groups alignment and Line spacing before a subtle separator, then
 Anchor/Custom positioning. Logo Layout contains positioning only. Global Photo,
 Sizing, Margins, Containers and Export retain their current workspace order.
+
+## Layout presets
+
+Presets precedes Photo in the main sidebar. PresetControls reuses SidebarSection,
+Field, Input, Select and Button. The saved name, explicit update/save-as actions,
+unsaved indicator and import/export remain separate from photo export.
+Errors are announced through an alert. Saved data is versioned and validated,
+including SVG artwork. The preset does not include the photo or export quality.
+
+Preset selection now opens a docked Choose a preset panel, using PickerList rows
+with sibling IconButton actions. Built-in presets allow duplication; user presets
+also allow rename and delete. Rename/create forms and file import/export live
+in the panel footer. The sidebar retains the current name and explicit save action.
+
+The sidebar uses a Saved preset dropdown for quick switching. Manage presets
+opens the docked management panel. Save as new opens it with the naming form.
+Choosing a preset keeps any currently open auxiliary panel open.

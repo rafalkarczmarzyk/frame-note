@@ -267,3 +267,29 @@ Ustawienia wybranego kontenera są zgrupowane jako **Content**, **Appearance**
 i **Layout**. Wygląd obejmuje rozmiar/font, kolor i opacity, a Layout wyrównanie,
 Line spacing i pozycję. Kolor ma szybkie próbki oraz tęczowy picker inline;
 More colors otwiera pełną paletę i graficzny picker z HEX w panelu.
+
+## Presety układu — MVP etap 6
+
+Sekcja Presets zapisuje nazwany układ w przeglądarce: wszystkie kontenery,
+szablony tagów, style, anchory i pozycje Custom, jednostkę i globalne marginesy.
+Użyte ikony oraz logo SVG są dołączane. Zdjęcie, wartości metadanych
+i jakość eksportu nie należą do presetu.
+
+Save preset tworzy zapis; Update preset nadpisuje wybrany, Save as new tworzy
+kopię. Lista przywraca układ na bieżącym zdjęciu. Zmiany wymagają jawnego zapisu;
+usunięcie presetu pozostawia bieżący układ. Export preset zapisuje bieżący układ
+w pliku `.framenote.json`, Import preset waliduje go, dodaje jako nowy preset
+i stosuje. Import nie nadpisuje istniejących zapisów.
+
+Presety pozostają po odświeżeniu w tej samej przeglądarce i pod tym samym adresem.
+Wyczyszczenie danych witryny je usuwa; plik JSON służy do kopii i przenoszenia.
+Import: wersja 1, do 5 MB, 100 kontenerów i 100 ikon; SVG przechodzą ponowną
+walidację. Storybook z przykładowym układem nie zapisuje presetów w localStorage.
+
+Wbudowane presety: **Default** odtwarza początkowy podpis author/lens/exposure;
+**Macro** dodaje w prawym dolnym rogu osobny blok `{heliconStack}` z liczbą zdjęć,
+metodą i parametrami z rozpoznanego komentarza Helicon UserComment. Wbudowane
+presety są stałe; Save as new zapisuje własną kopię. Bez rozpoznanego komentarza
+blok nie jest renderowany i zachowuje standardowe ostrzeżenie brakującego tagu.
+
+**Default dark** zachowuje układ Default i używa ciemnego koloru tekstu Charcoal.

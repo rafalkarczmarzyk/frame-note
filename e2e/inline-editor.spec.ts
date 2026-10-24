@@ -20,7 +20,10 @@ test('uploads SVG, edits atomic tokens, round-trips the clipboard and exports a 
     buffer: Buffer.from(black, 'base64'),
   });
   const editor = page.getByRole('textbox', { name: 'Caption', exact: true });
-  await editor.fill('');
+  await editor.click();
+  await editor.press('Meta+a');
+  await editor.press('Backspace');
+  await expect(editor).toHaveAttribute('data-template', '');
   await page.getByRole('button', { name: 'Browse icons', exact: true }).click();
   const upload = page.getByLabel('Upload SVG icon');
   await page.getByLabel('Icon name', { exact: true }).fill('square');
@@ -58,7 +61,6 @@ test('uploads SVG, edits atomic tokens, round-trips the clipboard and exports a 
   await page
     .getByRole('textbox', { name: 'Custom color (HEX)', exact: true })
     .fill('12ab34');
-  await page.getByRole('button', { name: 'Apply color', exact: true }).click();
   await page
     .getByRole('textbox', { name: 'Custom color (HEX)', exact: true })
     .press('Escape');

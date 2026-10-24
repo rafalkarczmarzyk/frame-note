@@ -250,3 +250,19 @@ export const StandaloneLogo: Story = {
     initialLayout: standaloneLogoLayout,
   },
 };
+
+export const Presets: Story = {
+  args: {
+    src: macroUrl,
+    name: '20261021-IMG_9959.jpg',
+    initialLayout: standaloneLogoLayout,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Save, update and transfer full layouts, including SVG logos. Presets in this story stay in memory so examples do not modify application storage.',
+      },
+    },
+  },
+};
