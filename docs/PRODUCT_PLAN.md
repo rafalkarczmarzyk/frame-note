@@ -173,7 +173,7 @@ oraz jego potwierdzenia przed przejściem dalej. Etap 1 zaakceptowano i zapisano
 | -------------------------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------- |
 | 1. Próba Tiptap            | Tekst, badge’e, ikony SVG, zaznaczanie, przeciąganie, undo/redo i schowek `{klucz}`                            | Zaakceptowana; commit `bacbda4` |
 | 2. Wiele kontenerów        | Dodawanie, duplikowanie, usuwanie; wybór z listy i canvasu; osobny styl i anchor; globalne marginesy           | Zaimplementowany; do oceny      |
-| 3. Custom position         | Przeciąganie na zdjęciu, X/Y względne do zdjęcia, przełączanie Anchor/Custom                                   | Oczekuje                        |
+| 3. Custom position         | Przeciąganie na zdjęciu, X/Y względne do zdjęcia, przełączanie Anchor/Custom                                   | Zaimplementowany; do oceny      |
 | 4. Docelowy edytor i ikony | Tiptap w sidebarze, picker metadanych, własne SVG z nazwami `{icon:aperture}`, układ tekstu i ikon w eksporcie | Oczekuje                        |
 | 5. Logo SVG                | Osobny kontener, proporcjonalne wymiary, opacity, oryginalne kolory lub jeden kolor, pozycjonowanie            | Oczekuje                        |
 | 6. Presety                 | Zapis, wybór, aktualizacja, Save as, usuwanie, trwałość lokalna, import/eksport wraz z SVG                     | Oczekuje                        |
@@ -285,3 +285,14 @@ container → Export. Nowe kontenery wybierają wolne narożniki przeciwnie do r
 wskazówek zegara, następnie środki krawędzi, na końcu środek. Duplikat zachowuje
 anchor. Pozycje na liście pokazują również ikonę kierunku. Storybook zawiera
 AllPhotos z siedmioma zdjęciami. Vite i Storybook są dostępne w LAN.
+
+### Etap 3 — swobodne pozycjonowanie
+
+Użytkownik zlecił implementację etapu 3. Kontenery można przeciągać po zdjęciu;
+tryb Custom zapisuje X/Y w procentach całego zdjęcia, zachowując ostatni anchor
+jako punkt odniesienia. Przejście Anchor → Custom nie zmienia geometrii.
+W Custom marginesy nie wpływają na pozycję. Wybór punktu siatki przywraca Anchor.
+Punkt odniesienia ograniczony do 0–100%; nie jest to gwarancja zmieszczenia całego
+bloku. Duplikowanie zachowuje pozycję Custom, nowy kontener zaczyna od anchora.
+Podgląd i eksport korzystają z tych samych obliczeń. Przykład CustomPosition
+w Storybooku. Etap pozostaje do oceny, bez zgody na etap 4 ani commit.

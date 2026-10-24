@@ -1,6 +1,6 @@
 import { toPixels } from '../../domain/sizing';
 import { jpegQuality } from './export-settings';
-import { anchoredPosition } from './layout';
+import { anchoredPosition, customPosition } from './layout';
 import Konva from 'konva';
 import type { Caption, ImageDimensions } from '../../domain/document';
 
@@ -44,12 +44,14 @@ export function captionConfig(
   });
   const block = { width: metrics.width(), height: metrics.height() };
   metrics.destroy();
-  const position = anchoredPosition(
-    dimensions,
-    block,
-    caption.position.anchor,
-    margins,
-  );
+  const position = caption.position.custom
+    ? customPosition(
+        dimensions,
+        block,
+        caption.position.anchor,
+        caption.position.custom,
+      )
+    : anchoredPosition(dimensions, block, caption.position.anchor, margins);
   return {
     text,
     ...position,

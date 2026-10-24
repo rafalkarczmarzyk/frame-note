@@ -37,8 +37,8 @@ pnpm test:e2e
 pnpm build-storybook
 ```
 
-- `check`: Prettier, kontrola tokenów kolorów, ESLint, TypeScript, 159 testów jednostkowych i build aplikacji.
-- E2E na produkcyjnym buildzie, port 4173: sześć scenariuszy w Chromium i WebKit (12 testów).
+- `check`: Prettier, kontrola tokenów kolorów, ESLint, TypeScript, 173 testów jednostkowych i build aplikacji.
+- E2E na produkcyjnym buildzie, port 4173: siedem scenariuszy w Chromium i WebKit (14 testów).
 - Przepływ eksportu sprawdza oba oryginalne JPG, wymiary, jakość, rozmiar w bajtach,
   brak źródłowych metadanych, różnice kolorów sRGB i obrót EXIF 6.
 - Regresja wizualna porównuje piksele eksportu w Chromium, bez zależności od UI.
@@ -205,8 +205,19 @@ Nowy kontener ma treść „Sample text” i kopiuje ustawienia aktywnego. Możn
 kontenery i wyeksportować samo zdjęcie. Ramka zaznaczenia nie trafia do JPG.
 
 Przykład: Storybook → **Screens/TestPhotos → MultipleCaptions**.
-Przeciąganie kontenerów, pozycja Custom i integracja Tiptap pozostają na późniejsze etapy.
+Przeciąganie i pozycja Custom są dostępne; integracja Tiptap pozostaje na etap 4.
 
 Sidebar rozdziela **Selected container** (treść, typografia, pozycja) oraz
 **Document** (wspólna jednostka i marginesy, informacje o zdjęciu).
 Marginesy są globalne i ustawiają wspólny obszar dla wszystkich anchorów.
+
+## Swobodne pozycjonowanie — MVP etap 3
+
+Przeciągnięcie kontenera na zdjęciu przełącza go do trybu Custom. X/Y wyrażają
+procent szerokości/wysokości całego zdjęcia i określają pozycję ostatnio wybranego
+anchora wewnątrz bloku. Zachowuje to wybraną krawędź przy zmianie długości tekstu.
+Custom pomija globalne marginesy; jednostka dokumentu nadal steruje fontem.
+Punkt odniesienia można ustawić w zakresie 0–100%; duży blok może wychodzić poza
+zdjęcie. Wybór anchora przywraca pozycjonowanie względem wspólnych marginesów.
+Duplikat zachowuje Custom, nowy kontener dostaje wolny anchor.
+Storybook: Screens/TestPhotos/CustomPosition.

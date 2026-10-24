@@ -196,3 +196,13 @@ export const AllPhotos: Story = {
     },
   },
 };
+
+const customLayout = structuredClone(multipleLayout);
+customLayout.containers[2]!.position.custom = { x: 65, y: 22 };
+export const CustomPosition: Story = {
+  args: {
+    src: macroUrl,
+    name: '20261021-IMG_9959.jpg',
+    initialLayout: customLayout,
+  },
+};

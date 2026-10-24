@@ -1,3 +1,4 @@
+import { customPoint, customPosition } from '../caption/layout';
 import { AnchorIcon } from '@/components/ui/anchor-picker';
 import {
   addCaption,
@@ -57,6 +58,7 @@ export function PhotoWorkspace({
   photo: LoadedPhoto;
   initialLayout?: CaptionLayout;
 }) {
+  const [draggingId, setDraggingId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const host = useRef<HTMLDivElement>(null);
@@ -294,33 +296,78 @@ export function PhotoWorkspace({
                       <Text
                         {...config}
                         listening
+                        draggable={!exporting}
+                        onDragStart={() => {
+                          selectContainer(id);
+                          setDraggingId(id);
+                        }}
+                        onDragMove={(event) => {
+                          const node = event.target;
+                          const block = {
+                            width: node.width(),
+                            height: node.height(),
+                          };
+                          const point = customPoint(
+                            { width, height },
+                            block,
+                            caption.position.anchor,
+                            node.position(),
+                          );
+                          const custom = {
+                            x: Math.min(100, Math.max(0, point.x)),
+                            y: Math.min(100, Math.max(0, point.y)),
+                          };
+                          node.position(
+                            customPosition(
+                              { width, height },
+                              block,
+                              caption.position.anchor,
+                              custom,
+                            ),
+                          );
+                          setLayout((value) => ({
+                            ...value,
+                            containers: value.containers.map((container) =>
+                              container.id === id
+                                ? {
+                                    ...container,
+                                    position: { ...container.position, custom },
+                                  }
+                                : container,
+                            ),
+                          }));
+                        }}
+                        onDragEnd={() => setDraggingId(null)}
                         onMouseEnter={() => setHoveredId(id)}
                         onMouseLeave={() => setHoveredId(null)}
                         onClick={() => selectContainer(id)}
                         onTap={() => selectContainer(id)}
                       />
-                      {(hoveredId === id || editingId === id) && text && (
-                        <Rect
-                          x={config.x - 4 / scale}
-                          y={config.y - 4 / scale}
-                          width={config.width + 8 / scale}
-                          height={
-                            Math.max(
-                              config.fontSize,
-                              text.split('\n').length *
-                                config.fontSize *
-                                config.lineHeight,
-                            ) +
-                            8 / scale
-                          }
-                          stroke={getComputedStyle(document.documentElement)
-                            .getPropertyValue('--color-porcelain')
-                            .trim()}
-                          strokeWidth={1 / scale}
-                          dash={[4 / scale, 3 / scale]}
-                          listening={false}
-                        />
-                      )}
+                      {(hoveredId === id ||
+                        editingId === id ||
+                        draggingId === id) &&
+                        text && (
+                          <Rect
+                            x={config.x - 4 / scale}
+                            y={config.y - 4 / scale}
+                            width={config.width + 8 / scale}
+                            height={
+                              Math.max(
+                                config.fontSize,
+                                text.split('\n').length *
+                                  config.fontSize *
+                                  config.lineHeight,
+                              ) +
+                              8 / scale
+                            }
+                            stroke={getComputedStyle(document.documentElement)
+                              .getPropertyValue('--color-porcelain')
+                              .trim()}
+                            strokeWidth={1 / scale}
+                            dash={[4 / scale, 3 / scale]}
+                            listening={false}
+                          />
+                        )}
                     </Group>
                   );
                 })}
@@ -511,6 +558,7 @@ export function PhotoWorkspace({
                       className="size-3.5 shrink-0"
                     />
                     <span>
+                      {container.position.custom ? 'Custom · ' : ''}
                       {container.position.anchor.replaceAll('-', ' ')}
                     </span>
                   </span>
@@ -565,6 +613,8 @@ export function PhotoWorkspace({
               layout.containers.some(
                 (container) =>
                   container.id !== activeContainer.id &&
+                  !container.position.custom &&
+                  !activeContainer.position.custom &&
                   container.position.anchor === activeContainer.position.anchor,
               ) && (
                 <InlineNotice tone="warning" className="mt-3">

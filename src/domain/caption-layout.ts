@@ -6,7 +6,7 @@ export interface CaptionContainer extends Omit<
   'sizingUnit' | 'position'
 > {
   id: string;
-  position: Pick<Caption['position'], 'anchor'>;
+  position: Pick<Caption['position'], 'anchor' | 'custom'>;
 }
 
 export interface CaptionLayout {
@@ -27,7 +27,16 @@ export function createCaptionLayout(
     margins: content.position.margins,
     marginLinkMode: content.position.marginLinkMode,
     containers: [
-      { ...content, position: { anchor: content.position.anchor }, id },
+      {
+        ...content,
+        position: {
+          anchor: content.position.anchor,
+          ...(content.position.custom
+            ? { custom: { ...content.position.custom } }
+            : {}),
+        },
+        id,
+      },
     ],
     activeId: id,
   };
@@ -67,7 +76,12 @@ export function updateCaption(
     void _unit;
     return {
       ...content,
-      position: { anchor: content.position.anchor },
+      position: {
+        anchor: content.position.anchor,
+        ...(content.position.custom
+          ? { custom: { ...content.position.custom } }
+          : {}),
+      },
       id: container.id,
     };
   });
@@ -145,6 +159,9 @@ export function addCaption(
       {
         ...content,
         position: {
+          ...(duplicate && content.position.custom
+            ? { custom: { ...content.position.custom } }
+            : {}),
           anchor:
             duplicate || !source
               ? content.position.anchor

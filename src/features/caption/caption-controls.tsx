@@ -1,3 +1,5 @@
+import { toPixels } from '@/domain/sizing';
+import { anchoredPosition, customPoint } from './layout';
 import { ColorSwatch } from '@/components/ui/color-swatch';
 import { captionColorLabel } from '@/domain/caption-colors';
 import { HelperText } from '@/components/ui/helper-text';
@@ -242,16 +244,102 @@ export function CaptionControls({
               disabled={disabled}
               className="space-y-5 disabled:opacity-70"
             >
-              <div className="space-y-2">
-                <p className="text-xs text-label">Anchor</p>
-                <div className="flex justify-center">
-                  <AnchorPicker
-                    value={caption.position.anchor}
-                    onValueChange={(anchor) => position({ anchor })}
+              <SegmentedControl
+                label="Position mode"
+                value={caption.position.custom ? 'custom' : 'anchor'}
+                disabled={disabled}
+                options={[
+                  { value: 'anchor', label: 'Anchor' },
+                  { value: 'custom', label: 'Custom' },
+                ]}
+                onValueChange={(mode) => {
+                  if (mode === 'anchor') position({ custom: undefined });
+                  else {
+                    const margins = {
+                      top: toPixels(
+                        caption.position.margins.top,
+                        caption.sizingUnit,
+                        dimensions,
+                      ),
+                      right: toPixels(
+                        caption.position.margins.right,
+                        caption.sizingUnit,
+                        dimensions,
+                      ),
+                      bottom: toPixels(
+                        caption.position.margins.bottom,
+                        caption.sizingUnit,
+                        dimensions,
+                      ),
+                      left: toPixels(
+                        caption.position.margins.left,
+                        caption.sizingUnit,
+                        dimensions,
+                      ),
+                    };
+                    position({
+                      custom: customPoint(
+                        dimensions,
+                        { width: 0, height: 0 },
+                        caption.position.anchor,
+                        anchoredPosition(
+                          dimensions,
+                          { width: 0, height: 0 },
+                          caption.position.anchor,
+                          margins,
+                        ),
+                      ),
+                    });
+                  }
+                }}
+              />
+              {caption.position.custom && (
+                <div className="grid grid-cols-2 gap-3">
+                  <NumberField
+                    label="X position"
+                    unit="%"
+                    value={caption.position.custom.x}
+                    min={0}
+                    max={100}
+                    step="any"
                     disabled={disabled}
+                    onValueChange={(x) =>
+                      position({ custom: { ...caption.position.custom!, x } })
+                    }
+                  />
+                  <NumberField
+                    label="Y position"
+                    unit="%"
+                    value={caption.position.custom.y}
+                    min={0}
+                    max={100}
+                    step="any"
+                    disabled={disabled}
+                    onValueChange={(y) =>
+                      position({ custom: { ...caption.position.custom!, y } })
+                    }
                   />
                 </div>
-              </div>
+              )}
+              <HelperText>
+                {caption.position.custom
+                  ? 'X/Y locate the last anchor point within the full photo. Global margins do not affect Custom position. Switch to Anchor mode to use the anchor grid.'
+                  : 'Drag the caption on the photo to set a custom position.'}
+              </HelperText>
+              {!caption.position.custom && (
+                <div className="space-y-2">
+                  <p className="text-xs text-label">Anchor</p>
+                  <div className="flex justify-center">
+                    <AnchorPicker
+                      value={caption.position.anchor}
+                      onValueChange={(anchor) =>
+                        position({ anchor, custom: undefined })
+                      }
+                      disabled={disabled}
+                    />
+                  </div>
+                </div>
+              )}
             </fieldset>
           </SidebarSection>
         </>
