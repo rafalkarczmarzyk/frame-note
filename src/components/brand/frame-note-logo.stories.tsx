@@ -9,5 +9,5 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
 export const Accent: Story = {
-  args: { className: 'h-12 w-auto text-primary' },
+  args: { className: 'h-8 w-auto text-primary' },
 };
