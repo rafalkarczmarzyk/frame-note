@@ -4,7 +4,7 @@ import { Check } from 'lucide-react';
 export interface PickerItem {
   id: string;
   label: string;
-  description?: string;
+  description?: ReactNode;
   selected?: boolean;
   preview?: ReactNode;
   leading?: ReactNode;
@@ -12,11 +12,13 @@ export interface PickerItem {
 export function PickerList({
   items,
   onChoose,
+  onHover,
   emptyText = 'No matches.',
   selectedLabel = 'Selected',
 }: {
   items: readonly PickerItem[];
   onChoose: (id: string) => void;
+  onHover?: (id: string | null) => void;
   emptyText?: string;
   selectedLabel?: string;
 }) {
@@ -28,6 +30,8 @@ export function PickerList({
           key={item.id}
           aria-pressed={!!item.selected}
           onClick={() => onChoose(item.id)}
+          onMouseEnter={() => onHover?.(item.id)}
+          onMouseLeave={() => onHover?.(null)}
           className="control-option control-button block w-full rounded-lg p-3 text-left aria-pressed:bg-menu-item-selected aria-pressed:text-accent-color"
         >
           <span className="flex items-start justify-between gap-2">

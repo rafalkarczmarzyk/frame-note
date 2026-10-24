@@ -1,14 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { Caption, ImageDimensions } from '../../domain/document';
+import type { ImageDimensions } from '../../domain/document';
 import { LatestJob } from '../../lib/latest-job';
-import { exportPhoto } from './render';
+import { exportPhotoCaptions, type RenderedCaption } from './render';
 
 export interface ExportRequest {
   image: HTMLImageElement;
   dimensions: ImageDimensions;
-  caption: Caption;
-  text: string;
-  color: string;
+  captions: readonly RenderedCaption[];
   quality: number;
 }
 
@@ -17,12 +15,10 @@ export function usePreparedExport(request: ExportRequest, enabled: boolean) {
     () =>
       new LatestJob<ExportRequest, Blob>(
         (input) =>
-          exportPhoto(
+          exportPhotoCaptions(
             input.image,
             input.dimensions,
-            input.caption,
-            input.text,
-            input.color,
+            input.captions,
             input.quality,
           ),
         450,

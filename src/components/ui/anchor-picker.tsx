@@ -72,3 +72,14 @@ export function AnchorPicker({
     </div>
   );
 }
+
+export function AnchorIcon({
+  value,
+  className,
+}: {
+  value: AnchorValue;
+  className?: string;
+}) {
+  const Icon = anchorIcons[value];
+  return <Icon aria-hidden="true" className={className} />;
+}

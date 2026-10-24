@@ -24,6 +24,9 @@ pnpm dev
 ```
 
 Aplikacja: http://localhost:3000. Zajęty port powoduje błąd, bez zmiany portu.
+Vite i Storybook nasłuchują na `0.0.0.0`: z innego urządzenia w tej samej sieci
+użyj `http://<IP-komputera>:3000` lub `http://<IP-komputera>:6006`.
+Adresy sieciowe są wyświetlane podczas uruchamiania.
 
 ## Kontrole
 
@@ -34,8 +37,8 @@ pnpm test:e2e
 pnpm build-storybook
 ```
 
-- `check`: Prettier, kontrola tokenów kolorów, ESLint, TypeScript, 141 testów jednostkowych i build aplikacji.
-- E2E na produkcyjnym buildzie, port 4173: pięć scenariuszy w Chromium i WebKit (10 testów).
+- `check`: Prettier, kontrola tokenów kolorów, ESLint, TypeScript, 159 testów jednostkowych i build aplikacji.
+- E2E na produkcyjnym buildzie, port 4173: sześć scenariuszy w Chromium i WebKit (12 testów).
 - Przepływ eksportu sprawdza oba oryginalne JPG, wymiary, jakość, rozmiar w bajtach,
   brak źródłowych metadanych, różnice kolorów sRGB i obrót EXIF 6.
 - Regresja wizualna porównuje piksele eksportu w Chromium, bez zależności od UI.
@@ -66,7 +69,7 @@ funkcjonalne i pomiar kolorów bez porównywania do wzorców Chromium.
 - Odczyt metadanych rozpoznawanych przez ExifReader: EXIF, IPTC, XMP i ICC.
   Dostępne pola można przeszukiwać i wstawiać z listy. Nie gwarantujemy obsługi
   każdego niestandardowego pola lub MakerNote.
-- Jeden wieloliniowy szablon z helperami FrameNote (`{author}`, `{lens}`, `{exposure}`)
+- Wiele kontenerów tekstowych z wieloliniowymi szablonami i helperami FrameNote (`{author}`, `{lens}`, `{exposure}`)
   i oryginalnymi tagami `{group:name}`, np. `{exif:Artist}`.
   Wstawianie w pozycji kursora, zastępowanie zaznaczenia, oznaczenie użytych tagów.
   Helpery są na górze w grupie FrameNote, a oryginały w grupach namespace.
@@ -104,9 +107,9 @@ funkcjonalne i pomiar kolorów bez porównywania do wzorców Chromium.
   i zmniejszania tekstu.
 - Kodowanie jest kolejkowane z opóźnieniem 450 ms i ignorowaniem spóźnionych wyników,
   ale rysowanie dużych obrazów może chwilowo obciążyć główny wątek.
-- Szablon, styl, pozycja i jakość eksportu pozostają przy wymianie zdjęcia,
+- Wszystkie kontenery, ich style i pozycje oraz jakość eksportu pozostają przy wymianie zdjęcia,
   ale nie są zapisywane między odświeżeniami aplikacji. Presety użytkownika,
-  wiele zdjęć, wiele kontenerów, parser Helicon, zoom/pan i wersja desktopowa
+  wiele zdjęć, parser Helicon, zoom/pan i wersja desktopowa
   pozostają poza pre-MVP.
 
 ## Podpisy i zdjęcia testowe
@@ -191,3 +194,19 @@ Tekst, atomowe badge’e tagów i ikon SVG, przeciąganie, undo/redo oraz schowe
 z zapisem `{author}` / `{icon:aperture}`. Pole Clipboard playground służy do
 sprawdzenia kopiowania i ponownego wklejania. Próba korzysta z przykładowych
 wartości i dwóch ikon; nie zmienia obecnego edytora zdjęć ani eksportu.
+
+## Wiele kontenerów — MVP etap 2
+
+Sekcja **Containers** pozwala dodawać, duplikować i usuwać kontenery tekstowe.
+Wybór z listy lub kliknięciem podpisu na zdjęciu zmienia aktywny kontener;
+sidebar edytuje wyłącznie jego treść, styl i anchor. Jednostka wymiarowania
+pozostaje wspólna: zmiana przelicza wszystkie kontenery, zachowując ich wygląd.
+Nowy kontener ma treść „Sample text” i kopiuje ustawienia aktywnego. Można usunąć wszystkie
+kontenery i wyeksportować samo zdjęcie. Ramka zaznaczenia nie trafia do JPG.
+
+Przykład: Storybook → **Screens/TestPhotos → MultipleCaptions**.
+Przeciąganie kontenerów, pozycja Custom i integracja Tiptap pozostają na późniejsze etapy.
+
+Sidebar rozdziela **Selected container** (treść, typografia, pozycja) oraz
+**Document** (wspólna jednostka i marginesy, informacje o zdjęciu).
+Marginesy są globalne i ustawiają wspólny obszar dla wszystkich anchorów.

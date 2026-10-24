@@ -167,17 +167,17 @@ jeszcze zatwierdzona; poniżej rozdzielamy potrzeby od propozycji implementacji.
 
 MVP: jedno zdjęcie, wiele kontenerów tekstowych i SVG, wizualny edytor treści
 oraz presety całego układu. Każdy etap wymaga oceny użytkownika, poprawek
-oraz jego potwierdzenia przed przejściem dalej. Zlecono wyłącznie etap 1.
+oraz jego potwierdzenia przed przejściem dalej. Etap 1 zaakceptowano i zapisano w commicie `bacbda4`; następnie zlecono etap 2.
 
-| Etap                       | Zakres                                                                                                         | Stan                                    |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| 1. Próba Tiptap            | Tekst, badge’e, ikony SVG, zaznaczanie, przeciąganie, undo/redo i schowek `{klucz}`                            | Zaimplementowana w Storybooku; do oceny |
-| 2. Wiele kontenerów        | Dodawanie, duplikowanie, usuwanie; wybór z listy i canvasu; osobny styl, anchor i marginesy                    | Oczekuje                                |
-| 3. Custom position         | Przeciąganie na zdjęciu, X/Y względne do zdjęcia, przełączanie Anchor/Custom                                   | Oczekuje                                |
-| 4. Docelowy edytor i ikony | Tiptap w sidebarze, picker metadanych, własne SVG z nazwami `{icon:aperture}`, układ tekstu i ikon w eksporcie | Oczekuje                                |
-| 5. Logo SVG                | Osobny kontener, proporcjonalne wymiary, opacity, oryginalne kolory lub jeden kolor, pozycjonowanie            | Oczekuje                                |
-| 6. Presety                 | Zapis, wybór, aktualizacja, Save as, usuwanie, trwałość lokalna, import/eksport wraz z SVG                     | Oczekuje                                |
-| 7. Weryfikacja             | Różne zdjęcia/orientacje, brakujące dane, presety, zgodność podglądu i JPG, Chromium/WebKit                    | Oczekuje                                |
+| Etap                       | Zakres                                                                                                         | Stan                            |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| 1. Próba Tiptap            | Tekst, badge’e, ikony SVG, zaznaczanie, przeciąganie, undo/redo i schowek `{klucz}`                            | Zaakceptowana; commit `bacbda4` |
+| 2. Wiele kontenerów        | Dodawanie, duplikowanie, usuwanie; wybór z listy i canvasu; osobny styl i anchor; globalne marginesy           | Zaimplementowany; do oceny      |
+| 3. Custom position         | Przeciąganie na zdjęciu, X/Y względne do zdjęcia, przełączanie Anchor/Custom                                   | Oczekuje                        |
+| 4. Docelowy edytor i ikony | Tiptap w sidebarze, picker metadanych, własne SVG z nazwami `{icon:aperture}`, układ tekstu i ikon w eksporcie | Oczekuje                        |
+| 5. Logo SVG                | Osobny kontener, proporcjonalne wymiary, opacity, oryginalne kolory lub jeden kolor, pozycjonowanie            | Oczekuje                        |
+| 6. Presety                 | Zapis, wybór, aktualizacja, Save as, usuwanie, trwałość lokalna, import/eksport wraz z SVG                     | Oczekuje                        |
+| 7. Weryfikacja             | Różne zdjęcia/orientacje, brakujące dane, presety, zgodność podglądu i JPG, Chromium/WebKit                    | Oczekuje                        |
 
 Nazwy kontenerów nie są wymagane: lista pokazuje fragment treści lub miniaturę SVG.
 Sidebar edytuje aktywny kontener; na canvasie wybiera się i przesuwa cały blok.
@@ -199,6 +199,21 @@ Pisanie pełnego tokenu oraz wklejanie zamienia je na elementy atomowe.
 Kopiowanie i wycinanie używa tekstu `{klucz}`; pole Clipboard playground
 pozwala sprawdzić zawartość schowka. Enter zachowuje nowe wiersze.
 Upload własnych SVG i renderowanie podpisów należą do późniejszych etapów.
+
+### Etap 2 — wiele kontenerów tekstowych
+
+Lista Containers pokazuje fragment treści oraz anchor, bez wymaganych nazw.
+Dodawanie kopiuje styl i pozycję aktywnego kontenera z treścią „Sample text”; duplikowanie
+kopiuje również treść. Usunięcie wybiera sąsiedni kontener; pusty układ jest dozwolony.
+Wybór na canvasie i z listy steruje tym samym sidebarem. Ramka zaznaczenia jest
+wyłącznie elementem podglądu. Kontenery mają osobne style i anchory; marginesy oraz jednostka
+jest wspólna i jej zmiana przelicza wszystkie bloki. Cały układ pozostaje przy
+wymianie zdjęcia; eksport uwzględnia wszystkie kontenery i ich brakujące pola.
+Storybook: Screens/TestPhotos/MultipleCaptions.
+
+Weryfikacja: 159 testów jednostkowych, 12 testów E2E (Chromium/WebKit),
+w tym wybór na canvasie, niezależne ustawienia i zmiana pikseli JPG po usunięciu
+jednego kontenera. Istniejące wzorce eksportu pozostają bez zmian.
 
 ## 5. UX i design system — zachować przy rozwoju
 
@@ -254,3 +269,19 @@ Upload własnych SVG i renderowanie podpisów należą do późniejszych etapów
 
 Przed oddaniem zmian: `pnpm check`. Dla zmian przepływu/renderowania także
 `pnpm test:e2e`; dla design systemu `pnpm build-storybook` i przegląd stories.
+
+### Korekta etapu 2 — globalne marginesy
+
+Marginesy i tryb ich łączenia należą do dokumentu, nie do kontenerów. Wszystkie
+anchory używają wspólnego obszaru wewnętrznego. Lokalna grupa Selected container
+ma jaśniejsze tło i cienką ramkę; zawiera Caption, Typography i Position.
+Poniżej Document zawiera Sizing, Margins i Photo, dostępne również bez kontenerów.
+Ramka canvasu pojawia się przy hoverze na canvasie/liście i podczas edycji treści.
+Add container tworzy widoczny Sample text. Nakładanie pod wspólnym anchorem jest
+dozwolone; lista pozwala wybrać każdy kontener, a komunikat sugeruje zmianę anchora.
+
+Aktualna kolejność sidebara: Photo → Sizing → Margins → Containers → Selected
+container → Export. Nowe kontenery wybierają wolne narożniki przeciwnie do ruchu
+wskazówek zegara, następnie środki krawędzi, na końcu środek. Duplikat zachowuje
+anchor. Pozycje na liście pokazują również ikonę kierunku. Storybook zawiera
+AllPhotos z siedmioma zdjęciami. Vite i Storybook są dostępne w LAN.

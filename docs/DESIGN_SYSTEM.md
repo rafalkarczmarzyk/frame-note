@@ -250,3 +250,29 @@ available in tooltips. Selection uses an outline. Missing metadata has a dashed
 edge and warning icon; missing SVG icons use a warning symbol. Plain text is the
 clipboard interchange format. No photo renderer or production caption controls
 are replaced in this stage.
+
+## Multiple caption containers — MVP stage 2
+
+PhotoWorkspace holds a CaptionLayout with a shared sizingUnit, an ordered collection
+of containers and the active ID. Each container stores its own text, style and anchor. Margins and their link
+mode are stored once in CaptionLayout, together with the sizing unit. Existing CaptionControls edit the active container; unit changes
+convert every container together. Containers use SidebarSection, PickerList, Button
+and IconButton; no separate naming field is required. Hovering a block on the canvas or its list row shows a thin dashed outline
+on the canvas only. Selection persists independently without a permanent outline. Clicking canvas text and list rows shares selection.
+The export adapter renders every container in list order and checks all their fonts
+and missing fields. Screens/TestPhotos/MultipleCaptions demonstrates three blocks.
+
+### Local and document settings
+
+Selected container groups Caption, Typography and Position inside a subtly lighter
+surface and a thin border (container-settings-base/container-settings-border tokens).
+Document settings below a separator contain Sizing, Margins and Photo and remain
+available for an empty layout. Global margins define the shared inset rectangle
+for all anchored captions; changing selection never changes those values. Export
+remains a separate section. CaptionControls supports local/global/all scopes so
+stories and the application reuse the same controls.
+
+Current sidebar order: Photo → Sizing → Margins → Containers → Selected container
+(Caption, Typography, Position) → Export. Global controls precede the local group.
+New containers prefer free corners counterclockwise, then edge centers, then the
+center; duplicates retain their anchor. Container rows include the anchor icon.
