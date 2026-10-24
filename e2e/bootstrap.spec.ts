@@ -10,7 +10,7 @@ test('opens the bootstrap screen without browser errors', async ({ page }) => {
   ).toBeVisible();
   await expect(
     page.getByRole('button', { name: 'Choose a photo' }),
-  ).toBeDisabled();
+  ).toBeEnabled();
   await expect(
     page.getByRole('img', { name: 'FrameNote', exact: true }),
   ).toBeVisible();

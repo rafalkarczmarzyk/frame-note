@@ -2,7 +2,7 @@
 
 Lokalny edytor podpisów fotograficznych. React + TypeScript + Vite + Tailwind CSS.
 
-## Status: etap 2 — fundamenty (do akceptacji)
+## Status: etap 3 — import i metadane (do akceptacji)
 
 Gotowe: szkielet interfejsu, konfiguracja shadcn/ui, zależności Konva i ExifReader, ESLint, Prettier, Vitest oraz Playwright. Przyciski są celowo nieaktywne. Wczytywanie zdjęć, metadane i eksport nie są jeszcze zaimplementowane. Kolejny etap wymaga akceptacji użytkownika.
 
@@ -72,3 +72,9 @@ Komponenty korzystają z ról, np. `bg-primary`, `bg-secondary`, `text-secondary
 Rozmiar fontu i oba marginesy zapisujemy jako ułamkowe procenty krótszego boku zdjęcia. Interlinia jest mnożnikiem fontu, opacity mieści się docelowo w zakresie 0–1. Kolor wskazuje nazwę palety zamiast HEX-a. Domyślne ustawienia są punktem startowym do późniejszej iteracji interfejsu. Model dokumentu nie przechowuje obiektów File, adresów blob ani elementów canvas; zasoby przeglądarki będą obsługiwane oddzielnie.
 
 `tests/fixtures.ts` udostępnia przenośną ścieżkę, oczekiwane wartości i sumę oryginalnego JPG. Test kontroluje niezmienność pliku. Testy odczytu ExifReader pojawią się wraz z adapterem w etapie 3, testy tokenów w etapie 4, geometrii w etapie 5. Nie wdrożono jeszcze importu, parsera szablonu ani renderowania podpisu.
+
+## Etap 3
+
+Przycisk i drag & drop otwierają jeden JPG. Sprawdzamy sygnaturę pliku, dekodujemy zdjęcie w przeglądarce i czytamy EXIF/IPTC/XMP/ICC przez ExifReader. Canvas dopasowuje zdjęcie do obszaru pod headerem, a prawy panel pozwala wyszukiwać pola i wartości. Wartości wyświetlamy jako tekst, bez interpretowania HTML. Obiekty URL są zwalniane przy wymianie zdjęcia i zamknięciu widoku, a spóźnione importy nie zastępują nowszych. Błąd wymiany pozostawia poprzednie zdjęcie.
+
+Sprawdzone E2E: import oryginalnego JPG, render obrazu w canvasie, pola EXIF i XMP, wyszukiwanie, drop i błędna wymiana. Edycja podpisu, wstawianie tokenów i eksport pozostają na etap 4. ExifReader i canvas są ładowane na żądanie.
