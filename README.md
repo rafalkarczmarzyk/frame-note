@@ -5,9 +5,12 @@ Konva i ExifReader. Zdjęcia są przetwarzane w przeglądarce, bez wysyłania na
 
 ## Status
 
-Etap 7, ostatni etap pre-MVP, zaimplementowany i oczekujący na ocenę użytkownika.
+Pre-MVP ukończone i zaakceptowane; ostatni etap zapisany w commicie `9a627af`.
 Cały przepływ działa: import JPG → szablon podpisu → stylowanie i podgląd → eksport.
 Przejście do kolejnych prac wymaga zatwierdzenia użytkownika.
+
+Kontekst produktu, założenia pre-MVP i propozycja MVP:
+[docs/PRODUCT_PLAN.md](docs/PRODUCT_PLAN.md).
 
 ## Uruchomienie
 
