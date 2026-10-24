@@ -45,12 +45,78 @@ export function MarginEditor({
       className="min-w-0 space-y-3"
       aria-label="Margins"
     >
+      <div className="margin-model-label text-xs text-label">
+        {hideLabel ? 'Photo margins' : 'Margins'}{' '}
+        <span className="text-content-muted">({unitLabel})</span>
+      </div>
+      <div className="margin-editor-grid">
+        {marginSides.map((side) => (
+          <div
+            key={side}
+            className="margin-model-value"
+            title={side.charAt(0).toUpperCase() + side.slice(1)}
+            style={{ gridArea: side }}
+            onMouseEnter={() => setActive(side)}
+            onMouseLeave={(event) => {
+              if (!event.currentTarget.contains(document.activeElement))
+                setActive(null);
+            }}
+            onFocusCapture={() => setActive(side)}
+            onBlurCapture={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget))
+                setActive(null);
+            }}
+          >
+            <NumberField
+              label={side.charAt(0).toUpperCase() + side.slice(1)}
+              hideLabel
+              unit={unitLabel}
+              showSteppers
+              value={value[side]}
+              min={0}
+              max={limits[side]}
+              step={unit === 'px' ? 1 : 0.1}
+              disabled={disabled}
+              onValueChange={(next) =>
+                onChange(changeMargin(value, side, next, linkMode), linkMode)
+              }
+            />
+          </div>
+        ))}
+        <div
+          className="margin-diagram"
+          aria-label="Margin edges"
+          style={{ gridArea: 'center' }}
+        >
+          <div className="margin-photo" aria-hidden="true">
+            <PhotoIcon
+              width={24}
+              height={24}
+              className="text-icon-muted"
+              aria-hidden="true"
+              focusable="false"
+            />
+            <span className="text-[10px] text-content-secondary">
+              Caption area
+            </span>
+            {marginSides.map((side) => (
+              <span
+                key={side}
+                className={cn(
+                  `margin-edge margin-edge-${side}`,
+                  active &&
+                    (linkMode === 'all' ||
+                      active === side ||
+                      (linkMode === 'pairs' &&
+                        oppositeMargin[active] === side)) &&
+                    'margin-edge-active',
+                )}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
       <div className="space-y-2">
-        {!hideLabel && (
-          <span className="text-xs text-label">
-            Margins <span className="text-content-muted">({unitLabel})</span>
-          </span>
-        )}
         <p className="text-xs text-label">Link margins</p>
         <SegmentedControl
           label="Margin linking"
@@ -75,72 +141,12 @@ export function MarginEditor({
           ]}
         />
       </div>
-      <div className="margin-editor-grid">
-        {marginSides.map((side) => (
-          <div
-            key={side}
-            style={{ gridArea: side }}
-            onMouseEnter={() => setActive(side)}
-            onMouseLeave={(event) => {
-              if (!event.currentTarget.contains(document.activeElement))
-                setActive(null);
-            }}
-            onFocusCapture={() => setActive(side)}
-            onBlurCapture={(event) => {
-              if (!event.currentTarget.contains(event.relatedTarget))
-                setActive(null);
-            }}
-          >
-            <NumberField
-              label={side.charAt(0).toUpperCase() + side.slice(1)}
-              unit={unitLabel}
-              value={value[side]}
-              min={0}
-              max={limits[side]}
-              step="any"
-              disabled={disabled}
-              onValueChange={(next) =>
-                onChange(changeMargin(value, side, next, linkMode), linkMode)
-              }
-            />
-          </div>
-        ))}
-        <div
-          className="margin-diagram"
-          aria-label="Margin edges"
-          style={{ gridArea: 'center' }}
-        >
-          <div className="margin-photo" aria-hidden="true">
-            <PhotoIcon
-              width={60}
-              height={59}
-              className="text-icon-muted"
-              aria-hidden="true"
-              focusable="false"
-            />
-            {marginSides.map((side) => (
-              <span
-                key={side}
-                className={cn(
-                  `margin-edge margin-edge-${side}`,
-                  active &&
-                    (linkMode === 'all' ||
-                      active === side ||
-                      (linkMode === 'pairs' &&
-                        oppositeMargin[active] === side)) &&
-                    'margin-edge-active',
-                )}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
       <HelperText>
         {linkMode === 'all'
           ? 'All edges linked. Top is used when linking.'
           : linkMode === 'pairs'
             ? 'Top/bottom and left/right linked. Top and left are used when linking.'
-            : 'Each edge is independent.'}
+            : 'Click a value to edit. Each edge is independent.'}
       </HelperText>
     </fieldset>
   );

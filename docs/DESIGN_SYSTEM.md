@@ -355,3 +355,13 @@ in the panel footer. The sidebar retains the current name and explicit save acti
 The sidebar uses a Saved preset dropdown for quick switching. Manage presets
 opens the docked management panel. Save as new opens it with the naming form.
 Choosing a preset keeps any currently open auxiliary panel open.
+
+## Margin box model
+
+MarginEditor uses a DevTools-inspired outer margin band around a central Caption
+area. Four numeric values sit on their corresponding edges. On focus, the input
+surface, unit and up/down steppers appear; they hide again when focus leaves. Relative units step by 0.1, pixels by 1; direct input keeps
+fractional precision. Field labels remain accessible; hover/focus highlights
+affected inner edges. None/Pairs/All
+linking sits below the model. The diagram is schematic, not a scaled preview.
+Canvas rulers and dragging margins remain outside this change.
