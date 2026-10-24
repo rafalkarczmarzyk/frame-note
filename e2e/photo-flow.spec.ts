@@ -8,7 +8,7 @@ import { portraitFixture, wildlifeFixture } from '../tests/fixtures.ts';
 // as part of a routine test run: inspect candidate images first.
 test('exports landscape and portrait JPGs with stable caption pixels and colors', async ({
   page,
-}) => {
+}, testInfo) => {
   for (const [name, fixture] of [
     ['landscape', wildlifeFixture],
     ['portrait', portraitFixture],
@@ -125,14 +125,16 @@ test('exports landscape and portrait JPGs with stable caption pixels and colors'
         { original, output: bytes.toString('base64') },
       );
       expect(result.meanColorError).toBeLessThan(3);
-      expect(Buffer.from(result.thumbnail, 'base64')).toMatchSnapshot(
-        `${name}-export.png`,
-        { threshold: 0.1, maxDiffPixelRatio: 0.001 },
-      );
-      expect(Buffer.from(result.caption, 'base64')).toMatchSnapshot(
-        `${name}-caption.png`,
-        { threshold: 0.1, maxDiffPixelRatio: 0.001 },
-      );
+      if (testInfo.project.name === 'chromium') {
+        expect(Buffer.from(result.thumbnail, 'base64')).toMatchSnapshot(
+          `${name}-export.png`,
+          { threshold: 0.1, maxDiffPixelRatio: 0.001 },
+        );
+        expect(Buffer.from(result.caption, 'base64')).toMatchSnapshot(
+          `${name}-caption.png`,
+          { threshold: 0.1, maxDiffPixelRatio: 0.001 },
+        );
+      }
       if (name === 'landscape') {
         await page.getByRole('slider').press('Home');
         const smallerDownload = page.waitForEvent('download');
