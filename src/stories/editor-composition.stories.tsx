@@ -14,22 +14,51 @@ import { Input } from '../components/ui/input';
 import { PickerList } from '../components/ui/picker-list';
 import { Slider } from '../components/ui/slider';
 import { SegmentedControl } from '../components/ui/segmented-control';
-import { FrameNoteLogo } from '../components/brand/frame-note-logo';
+import { AppHeader } from '../components/layout/app-header';
+import testPhotoUrl from '../../tests/fixtures/20260520-IMG_3843.jpg';
+import portraitPhotoUrl from '../../tests/fixtures/20261021-IMG_0469.jpg';
 
-function EditorDemo() {
+const photos = {
+  landscape: {
+    url: testPhotoUrl,
+    name: '20260520-IMG_3843.jpg',
+    width: 5964,
+    height: 3976,
+    lens: 'RF100-500mm F4.5-7.1 L IS USM + EXTENDER RF1.4x',
+  },
+  portrait: {
+    url: portraitPhotoUrl,
+    name: '20261021-IMG_0469.jpg',
+    width: 4000,
+    height: 6000,
+    lens: 'RF200-800mm F6.3-9 IS USM + EXTENDER RF1.4x',
+  },
+};
+
+function EditorDemo({
+  orientation = 'landscape',
+}: {
+  orientation?: keyof typeof photos;
+}) {
+  const photo = photos[orientation];
   const [caption, setCaption] = useState(createCaption());
   const [panel, setPanel] = useState<'tags' | 'fonts' | null>(null);
   const [quality, setQuality] = useState(95);
   return (
-    <div className="flex h-[820px] min-h-0 flex-col overflow-hidden border bg-background">
-      <header className="flex h-16 shrink-0 items-center justify-between bg-secondary px-5 text-secondary-foreground">
-        <FrameNoteLogo className="h-7 w-auto" />
+    <div className="flex h-full min-h-0 flex-col overflow-hidden bg-background text-foreground">
+      <AppHeader>
         <Button>Export JPG</Button>
-      </header>
+      </AppHeader>
       <EditorWorkspace>
-        <div className="flex min-w-0 flex-1 items-center justify-center p-6">
-          <div className="flex aspect-[3/2] w-full items-center justify-center border border-foreground/20 bg-secondary text-secondary-foreground">
-            <span className="font-display text-4xl">Your photo</span>
+        <div className="relative min-h-0 min-w-0 flex-1">
+          <div className="absolute inset-6">
+            <img
+              src={photo.url}
+              alt="Test photo by Rafal Karczmarzyk"
+              width={photo.width}
+              height={photo.height}
+              className="h-full w-full object-contain"
+            />
           </div>
         </div>
         {panel && (
@@ -52,7 +81,7 @@ function EditorDemo() {
                       {
                         id: 'exif:LensModel',
                         label: 'exif:LensModel',
-                        description: 'RF100mm F2.8 L MACRO IS USM',
+                        description: photo.lens,
                       },
                     ]
                   : [
@@ -102,7 +131,9 @@ function EditorDemo() {
               persist={false}
               summary="6.10 MB"
             >
-              <p className="text-xs">Example.jpg · 6000 × 4000 px</p>
+              <p className="text-xs">
+                {photo.name} · {photo.width} × {photo.height} px
+              </p>
             </SidebarSection>
             <SidebarSection
               id="storybook-caption"
@@ -172,12 +203,17 @@ function EditorDemo() {
 const meta = {
   title: 'Compositions/EditorWorkspace',
   component: EditorDemo,
+  args: { orientation: 'landscape' },
+  argTypes: {
+    orientation: { control: 'radio', options: ['landscape', 'portrait'] },
+  },
   parameters: {
     layout: 'fullscreen',
     docs: {
+      story: { inline: false, height: '720px' },
       description: {
         component:
-          'The production primitives composed as a desktop editor. Panels replace content without resizing the viewport. No image decoding or export runs in Storybook. Sidebar accordion preferences use a separate story namespace.',
+          'The production primitives composed as a desktop editor. Panels replace content without resizing the viewport. The selected original test photo is displayed without caption rendering or JPEG export. Sidebar accordion preferences use a separate story namespace.',
       },
     },
   },
@@ -185,3 +221,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Interactive: Story = {};
+
+export const Portrait: Story = {
+  args: { orientation: 'portrait' },
+};

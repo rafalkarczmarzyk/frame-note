@@ -7,7 +7,9 @@ import {
   useRef,
   useState,
 } from 'react';
-import { FrameNoteLogo } from '@/components/brand/frame-note-logo';
+import { AppHeader } from '@/components/layout/app-header';
+import { StartScreen } from '@/features/photo/start-screen';
+import { PhotoDropOverlay } from '@/features/photo/photo-drop-overlay';
 import { Button } from '@/components/ui/button';
 
 const PhotoWorkspace = lazy(() =>
@@ -109,14 +111,7 @@ export default function App() {
 
   return (
     <div className="flex h-svh flex-col overflow-hidden bg-background text-foreground">
-      <header className="flex h-[76px] shrink-0 items-center justify-between bg-secondary px-6 text-secondary-foreground sm:px-10">
-        <a
-          href="/"
-          aria-label="FrameNote home"
-          className="rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-        >
-          <FrameNoteLogo className="h-8 w-auto text-current" />
-        </a>
+      <AppHeader>
         {photo && (
           <div className="flex items-center gap-3">
             <Button
@@ -130,7 +125,7 @@ export default function App() {
             <div id="export-actions" />
           </div>
         )}
-      </header>
+      </AppHeader>
       <input
         ref={input}
         type="file"
@@ -167,39 +162,12 @@ export default function App() {
           />
         </Suspense>
       ) : (
-        <main className="flex flex-1 items-center justify-center px-6 py-12">
-          <section className="text-center" aria-labelledby="upload-title">
-            <h1
-              id="upload-title"
-              className="font-display text-4xl font-normal tracking-tight sm:text-5xl"
-            >
-              Every frame has a story.
-            </h1>
-            <Button
-              className="mt-8 px-6"
-              disabled={loading}
-              onClick={() => input.current?.click()}
-            >
-              Choose a photo
-            </Button>
-            <p className="mt-4 text-sm text-foreground/70">
-              or drag and drop it anywhere
-            </p>
-          </section>
-        </main>
+        <StartScreen
+          loading={loading}
+          onChoosePhoto={() => input.current?.click()}
+        />
       )}
-      {isDragging && (
-        <div
-          className="pointer-events-none fixed inset-0 z-50 bg-secondary p-5 text-secondary-foreground sm:p-8"
-          role="status"
-        >
-          <div className="flex h-full items-center justify-center rounded-3xl border-[5px] border-dashed border-secondary-foreground p-6">
-            <p className="text-center font-display text-4xl font-normal tracking-tight sm:text-6xl">
-              Drop your photo
-            </p>
-          </div>
-        </div>
-      )}
+      {isDragging && <PhotoDropOverlay />}
     </div>
   );
 }
