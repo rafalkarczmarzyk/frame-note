@@ -1,3 +1,7 @@
+import { LogoControls } from '../caption/logo-controls';
+import { logoLayout } from '../caption/logo-layout';
+import { tintedIcon } from '../caption/inline-layout';
+import { svgIcon, svgUrl } from '../caption/svg-icons';
 import { brandIcons } from '../caption/brand-icons';
 import { iconMarker } from '../caption/inline-content';
 import { builtinIcons } from '../caption/builtin-icons';
@@ -12,6 +16,7 @@ import { customPoint, customPosition } from '../caption/layout';
 import { AnchorIcon } from '@/components/ui/anchor-picker';
 import {
   addCaption,
+  addLogo,
   containerCaption,
   createCaptionLayout,
   removeCaption,
@@ -33,6 +38,7 @@ import {
   Trash2,
   Tags,
   Shapes,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { PhotoIcon } from '@/components/icons/photo-icon';
 import {
@@ -73,6 +79,7 @@ export function PhotoWorkspace({
   initialLayout?: CaptionLayout;
   initialIcons?: SvgIcon[];
 }) {
+  const [error, setError] = useState('');
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -90,18 +97,6 @@ export function PhotoWorkspace({
   const [iconImages, setIconImages] = useState<
     ReadonlyMap<string, HTMLImageElement>
   >(new Map());
-  useEffect(() => {
-    let active = true;
-    void Promise.all(
-      icons.map(async (icon) => [icon.svg, await loadIcon(icon)] as const),
-    ).then((entries) => {
-      if (active) setIconImages(new Map(entries));
-    });
-    return () => {
-      active = false;
-    };
-  }, [icons]);
-  const iconsReady = icons.every((icon) => iconImages.has(icon.svg));
   const [activePanel, setActivePanel] = useState<
     'tags' | 'fonts' | 'colors' | 'icons' | null
   >(null);
@@ -117,6 +112,71 @@ export function PhotoWorkspace({
         template: '{author}\n{lens}\n{exposure}',
       }),
   );
+  const assets = useMemo(
+    () => [
+      ...icons,
+      ...layout.containers.flatMap((container) =>
+        container.logo ? [container.logo.asset] : [],
+      ),
+    ],
+    [icons, layout.containers],
+  );
+  useEffect(() => {
+    let active = true;
+    void Promise.all(
+      assets.map(async (asset) => [asset.svg, await loadIcon(asset)] as const),
+    )
+      .then((entries) => {
+        if (active) setIconImages(new Map(entries));
+      })
+      .catch((cause: unknown) => {
+        if (active)
+          setError(
+            cause instanceof Error ? cause.message : 'Could not render SVG.',
+          );
+      });
+    return () => {
+      active = false;
+    };
+  }, [assets]);
+  const iconsReady = assets.every((asset) => iconImages.has(asset.svg));
+  const logoUpload = useRef<HTMLInputElement>(null);
+  const [logoLoading, setLogoLoading] = useState(false);
+  const uploadLogo = async (file: File, replaceId?: string) => {
+    setError('');
+    setLogoLoading(true);
+    try {
+      if (file.size > 256_000) throw Error('SVG must be smaller than 256 KB.');
+      const asset = { ...svgIcon('logo', await file.text()), name: file.name };
+      await loadIcon(asset);
+      setLayout((value) =>
+        replaceId
+          ? {
+              ...value,
+              containers: value.containers.map((container) =>
+                container.id === replaceId && container.logo
+                  ? { ...container, logo: { ...container.logo, asset } }
+                  : container,
+              ),
+            }
+          : addLogo(
+              value,
+              Array.from(crypto.getRandomValues(new Uint32Array(4)), (part) =>
+                part.toString(16).padStart(8, '0'),
+              ).join(''),
+              asset,
+              photo.document.photo.dimensions,
+            ),
+      );
+      setActivePanel(null);
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : 'Could not load SVG logo.',
+      );
+    } finally {
+      setLogoLoading(false);
+    }
+  };
   const activeContainer = layout.containers.find(
     (container) => container.id === layout.activeId,
   );
@@ -147,6 +207,8 @@ export function PhotoWorkspace({
     setSettings({ ...settings, template });
   const selectContainer = (id: string) => {
     setEditingId(null);
+    if (layout.containers.find((container) => container.id === id)?.logo)
+      setActivePanel(null);
     setLayout((value) => ({ ...value, activeId: id }));
   };
   const addContainer = (duplicate = false) => {
@@ -163,7 +225,6 @@ export function PhotoWorkspace({
   };
   const [exporting, setExporting] = useState(false);
   const [quality, setQuality] = useState(95);
-  const [error, setError] = useState('');
   const [loadedFont, setLoadedFont] = useState('');
   const fontKey = [
     ...new Set(
@@ -325,7 +386,8 @@ export function PhotoWorkspace({
                       text,
                       color,
                     );
-                    const placeholder = !caption.template.trim();
+                    const placeholder =
+                      !caption.logo && !caption.template.trim();
                     const visualColor = placeholder
                       ? getComputedStyle(document.documentElement)
                           .getPropertyValue('--color-porcelain')
@@ -346,13 +408,17 @@ export function PhotoWorkspace({
                             inlineIcons,
                           )
                         : null;
-                    const geometry = scene ?? {
-                      ...config,
-                      height:
-                        text.split('\n').length *
-                        config.fontSize *
-                        config.lineHeight,
-                    };
+                    const logoGeometry = caption.logo
+                      ? logoLayout({ width, height }, caption)
+                      : null;
+                    const geometry = logoGeometry ??
+                      scene ?? {
+                        ...config,
+                        height:
+                          text.split('\n').length *
+                          config.fontSize *
+                          config.lineHeight,
+                      };
                     return (
                       <Group key={id}>
                         <Group
@@ -418,7 +484,23 @@ export function PhotoWorkspace({
                             fill={color}
                             opacity={0}
                           />
-                          {scene ? (
+                          {caption.logo && logoGeometry ? (
+                            <CanvasImage
+                              listening={false}
+                              width={logoGeometry.width}
+                              height={logoGeometry.height}
+                              image={
+                                caption.logo.colorMode === 'single'
+                                  ? tintedIcon(
+                                      caption.logo.asset,
+                                      iconImages.get(caption.logo.asset.svg)!,
+                                      logoGeometry.height,
+                                      color,
+                                    )
+                                  : iconImages.get(caption.logo.asset.svg)
+                              }
+                            />
+                          ) : scene ? (
                             <InlinePreview
                               scene={scene}
                               caption={caption}
@@ -438,7 +520,7 @@ export function PhotoWorkspace({
                         {(hoveredId === id ||
                           editingId === id ||
                           draggingId === id) &&
-                          (text || placeholder) && (
+                          (text || placeholder || caption.logo) && (
                             <Rect
                               x={geometry.x - 4 / scale}
                               y={geometry.y - 4 / scale}
@@ -626,7 +708,7 @@ export function PhotoWorkspace({
             iconTone="caption"
             icon={<Layers />}
           >
-            <div className="mb-3 flex gap-2">
+            <div className="mb-3 flex flex-wrap gap-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -635,15 +717,55 @@ export function PhotoWorkspace({
                 <Plus aria-hidden="true" />
                 Add container
               </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={logoLoading}
+                onClick={() => logoUpload.current?.click()}
+              >
+                <ImageIcon aria-hidden="true" />
+                Add logo
+              </Button>
+              <input
+                ref={logoUpload}
+                type="file"
+                accept=".svg,image/svg+xml"
+                className="hidden"
+                aria-label="Upload SVG logo"
+                onChange={(event) => {
+                  const file = event.currentTarget.files?.[0];
+                  event.currentTarget.value = '';
+                  if (file) void uploadLogo(file);
+                }}
+              />
             </div>
+            {logoLoading && (
+              <p role="status" className="mb-3 text-xs">
+                Loading SVG…
+              </p>
+            )}
+            {error && (
+              <p role="alert" className="mb-3 text-xs">
+                {error}
+              </p>
+            )}
             <PickerList
               items={layout.containers.map((container, index) => ({
                 id: container.id,
+                leading: container.logo ? (
+                  <img
+                    src={svgUrl(container.logo.asset.svg)}
+                    alt=""
+                    className="size-6 shrink-0 rounded bg-content-primary p-0.5"
+                  />
+                ) : undefined,
                 label:
+                  container.logo?.asset.name ||
                   container.template
                     .trim()
                     .replace(/\s+/gu, ' ')
-                    .slice(0, 70) || 'Empty caption',
+                    .slice(0, 70) ||
+                  'Empty caption',
                 description: (
                   <span className="flex items-center gap-1.5">
                     <span>{index + 1} ·</span>
@@ -724,67 +846,91 @@ export function PhotoWorkspace({
               <div className="px-4 pt-3 pb-1">
                 <h2 className="text-sm font-semibold">Selected container</h2>
                 <p className="mt-1 truncate text-xs text-content-secondary">
-                  {template.trim() || 'Empty caption'}
+                  {settings.logo?.asset.name ||
+                    template.trim() ||
+                    'Empty caption'}
                 </p>
               </div>
-              <SidebarSection
-                id="caption"
-                title="Caption"
-                iconTone="caption"
-                icon={<TextQuote />}
-              >
-                <CaptionEditor
-                  value={template}
-                  fields={photo.document.photo.metadata}
-                  icons={icons}
-                  onChange={setTemplate}
-                  onFocus={() => setEditingId(activeContainer.id)}
-                  onBlur={() => setEditingId(null)}
-                  onReady={editorReady}
+              {settings.logo ? (
+                <LogoControls
+                  caption={settings}
+                  dimensions={photo.document.photo.dimensions}
+                  onChange={setSettings}
+                  onReplace={(file) => {
+                    void uploadLogo(file, activeContainer.id);
+                  }}
+                  onBrowseColors={() =>
+                    setActivePanel((value) =>
+                      value === 'colors' ? null : 'colors',
+                    )
+                  }
                 />
-                {(resolved.missing.length > 0 || resolved.invalidSyntax) && (
-                  <p className="mt-2 text-xs" role="status">
-                    {resolved.invalidSyntax ? 'Check token syntax. ' : ''}
-                    {resolved.missing.length
-                      ? `Missing fields: ${resolved.missing.join(', ')}`
-                      : ''}
-                  </p>
-                )}
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <Button
-                    variant="outline"
-                    className="min-w-0 flex-1 basis-28 whitespace-nowrap"
-                    aria-label={
-                      tagsOpen ? 'Hide available tags' : 'Browse available tags'
-                    }
-                    aria-expanded={tagsOpen}
-                    aria-controls="auxiliary-panel"
-                    onClick={() =>
-                      setActivePanel((value) =>
-                        value === 'tags' ? null : 'tags',
-                      )
-                    }
+              ) : (
+                <>
+                  <SidebarSection
+                    id="caption"
+                    title="Caption"
+                    iconTone="caption"
+                    icon={<TextQuote />}
                   >
-                    <Tags aria-hidden="true" />
-                    Tags
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="min-w-0 flex-1 basis-28 whitespace-nowrap"
-                    aria-label="Browse icons"
-                    aria-expanded={activePanel === 'icons'}
-                    onClick={() =>
-                      setActivePanel((value) =>
-                        value === 'icons' ? null : 'icons',
-                      )
-                    }
-                  >
-                    <Shapes aria-hidden="true" />
-                    Icons
-                  </Button>
-                </div>
-              </SidebarSection>
+                    <CaptionEditor
+                      value={template}
+                      fields={photo.document.photo.metadata}
+                      icons={icons}
+                      onChange={setTemplate}
+                      onFocus={() => setEditingId(activeContainer.id)}
+                      onBlur={() => setEditingId(null)}
+                      onReady={editorReady}
+                    />
+                    {(resolved.missing.length > 0 ||
+                      resolved.invalidSyntax) && (
+                      <p className="mt-2 text-xs" role="status">
+                        {resolved.invalidSyntax ? 'Check token syntax. ' : ''}
+                        {resolved.missing.length
+                          ? `Missing fields: ${resolved.missing.join(', ')}`
+                          : ''}
+                      </p>
+                    )}
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <Button
+                        variant="outline"
+                        className="min-w-0 flex-1 basis-28 whitespace-nowrap"
+                        aria-label={
+                          tagsOpen
+                            ? 'Hide available tags'
+                            : 'Browse available tags'
+                        }
+                        aria-expanded={tagsOpen}
+                        aria-controls="auxiliary-panel"
+                        onClick={() =>
+                          setActivePanel((value) =>
+                            value === 'tags' ? null : 'tags',
+                          )
+                        }
+                      >
+                        <Tags aria-hidden="true" />
+                        Tags
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="min-w-0 flex-1 basis-28 whitespace-nowrap"
+                        aria-label="Browse icons"
+                        aria-expanded={activePanel === 'icons'}
+                        onClick={() =>
+                          setActivePanel((value) =>
+                            value === 'icons' ? null : 'icons',
+                          )
+                        }
+                      >
+                        <Shapes aria-hidden="true" />
+                        Icons
+                      </Button>
+                    </div>
+                  </SidebarSection>
+                </>
+              )}
               <CaptionControls
+                hideTypography={!!settings.logo}
                 scope="local"
                 dimensions={photo.document.photo.dimensions}
                 caption={settings}
@@ -886,11 +1032,6 @@ export function PhotoWorkspace({
               </p>
             </fieldset>
           </SidebarSection>
-          {error && (
-            <p role="alert" className="p-5 text-xs">
-              {error}
-            </p>
-          )}
         </div>
       </ToolSidebar>
     </EditorWorkspace>

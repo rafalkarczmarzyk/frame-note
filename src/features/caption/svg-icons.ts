@@ -1,8 +1,5 @@
-export interface SvgIcon {
-  name: string;
-  svg: string;
-  aspect: number;
-}
+import type { SvgAsset } from '../../domain/svg-asset';
+export type SvgIcon = SvgAsset;
 
 export function svgIcon(name: string, source: string): SvgIcon {
   if (!/^[a-z][a-z0-9-]{0,47}$/u.test(name))

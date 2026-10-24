@@ -1,5 +1,11 @@
 import { createCaption, type Caption, type ImageDimensions } from './document';
-import { convertSizing, type SizingUnit } from './sizing';
+import type { SvgAsset } from './svg-asset';
+import {
+  convertSizing,
+  toPixels,
+  pixelsPerUnit,
+  type SizingUnit,
+} from './sizing';
 
 export interface CaptionContainer extends Omit<
   Caption,
@@ -167,6 +173,7 @@ export function addCaption(
               ? content.position.anchor
               : nextFreeAnchor(layout, content.position.anchor),
         },
+        logo: duplicate ? content.logo : undefined,
         template: duplicate ? content.template : '',
         id,
       },
@@ -189,5 +196,31 @@ export function removeCaption(
       layout.activeId === id
         ? (containers[Math.min(index, containers.length - 1)]?.id ?? null)
         : layout.activeId,
+  };
+}
+
+export function addLogo(
+  layout: CaptionLayout,
+  id: string,
+  asset: SvgAsset,
+  dimensions: ImageDimensions,
+): CaptionLayout {
+  const next = addCaption(layout, id, false, dimensions);
+  return {
+    ...next,
+    containers: next.containers.map((container) =>
+      container.id === id
+        ? {
+            ...container,
+            logo: {
+              asset: structuredClone(asset),
+              width:
+                toPixels(15, 'short-edge', dimensions) /
+                pixelsPerUnit(layout.sizingUnit, dimensions),
+              colorMode: 'original',
+            },
+          }
+        : container,
+    ),
   };
 }

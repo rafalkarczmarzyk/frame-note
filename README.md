@@ -37,8 +37,8 @@ pnpm test:e2e
 pnpm build-storybook
 ```
 
-- `check`: Prettier, kontrola tokenów kolorów, ESLint, TypeScript, 177 testów jednostkowych i build aplikacji.
-- E2E na produkcyjnym buildzie, port 4173: osiem scenariuszy w Chromium i WebKit (16 testów).
+- `check`: Prettier, kontrola tokenów kolorów, ESLint, TypeScript, 181 testów jednostkowych i build aplikacji.
+- E2E na produkcyjnym buildzie, port 4173: dziewięć scenariuszy w Chromium i WebKit (18 testów).
 - Przepływ eksportu sprawdza oba oryginalne JPG, wymiary, jakość, rozmiar w bajtach,
   brak źródłowych metadanych, różnice kolorów sRGB i obrót EXIF 6.
 - Regresja wizualna porównuje piksele eksportu w Chromium, bez zależności od UI.
@@ -237,7 +237,7 @@ bez skryptów, osadzonych obrazów, zewnętrznych zasobów i arkuszy stylów; te
 zamienić na krzywe. Ikony zachowują proporcje i dziedziczą kolor, rozmiar i opacity
 kontenera. Podgląd i eksport korzystają z tych samych pomiarów i układu tekstu/SVG.
 Wgrane ikony pozostają przy wymianie zdjęcia w sesji; trwały zapis zasobów dojdzie
-w etapie presetów. Samodzielny blok logo SVG pozostaje na etap 5.
+w etapie presetów. Samodzielny blok logo SVG jest dostępny w etapie 5.
 
 Storybook: **Screens/TestPhotos/InlineIcons** pokazuje edytor i eksport z ikonami
 aperture i camera. Test E2E sprawdza upload, odrzucenie skryptu, schowek, brakującą
@@ -247,3 +247,18 @@ Puste kontenery pokazują przyciemnione logo FrameNote i ramkę wyłącznie na c
 Zaślepka nie trafia do schowka ani JPG i znika przy pierwszej treści. W edytorze
 widoczna jest podpowiedź. Built-in zawiera też `{icon:framenote-logo}` (pełne logo)
 i `{icon:framenote-icon}` (znak marki); ich świadome wstawienie trafia do eksportu.
+
+## Logo SVG — MVP etap 5
+
+**Add logo** dodaje samodzielny blok SVG. Na liście jest miniatura i nazwa pliku;
+wybór na liście lub canvasie otwiera kontrolki Logo SVG i Position. Width/Height
+zachowują proporcje i używają wspólnej jednostki dokumentu. Original colors zachowuje
+kolory SVG; Single color korzysta z tego samego pickera co podpis. Opacity działa
+w obu trybach. Anchor i globalne marginesy oraz przeciąganie/Custom działają tak
+jak dla tekstu. Replace SVG zachowuje szerokość, styl i pozycję; wysokość wynika
+z proporcji nowej grafiki. Nieudany upload pozostawia poprzednie logo.
+
+Logo można duplikować i usuwać w swoim wierszu. Zmiana jednostki zachowuje wygląd,
+a wymiana zdjęcia zachowuje cały układ. Zasób SVG jest częścią modelu kontenera;
+trwały zapis dojdzie w etapie presetów. Obowiązują te same limity i wymagania SVG
+co dla ikon inline. Storybook: **Screens/TestPhotos/StandaloneLogo**.

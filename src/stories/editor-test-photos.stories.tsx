@@ -1,3 +1,4 @@
+import { brandIcons } from '@/features/caption/brand-icons';
 import { Aperture, Camera } from 'lucide-react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import type { SvgIcon } from '@/features/caption/svg-icons';
@@ -7,6 +8,7 @@ import { createCaption } from '@/domain/document';
 import {
   createCaptionLayout,
   addCaption,
+  addLogo,
   type CaptionLayout,
 } from '@/domain/caption-layout';
 import xmpPortraitUrl from '../../tests/fixtures/Agata-104.jpg';
@@ -230,5 +232,21 @@ export const InlineIcons: Story = {
     name: '20261021-IMG_9959.jpg',
     initialLayout: inlineLayoutExample,
     initialIcons: inlineIcons,
+  },
+};
+
+const standaloneLogoLayout = addLogo(
+  createCaptionLayout({ ...createCaption(), template: '{author}' }),
+  'logo-demo',
+  { ...brandIcons[0]!, name: 'FrameNote.svg' },
+  { width: 3908, height: 2605 },
+);
+standaloneLogoLayout.containers[1]!.logo!.colorMode = 'single';
+standaloneLogoLayout.containers[1]!.logo!.width = 25;
+export const StandaloneLogo: Story = {
+  args: {
+    src: macroUrl,
+    name: '20261021-IMG_9959.jpg',
+    initialLayout: standaloneLogoLayout,
   },
 };

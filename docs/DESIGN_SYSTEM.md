@@ -307,3 +307,14 @@ Preview/export share inlineLayout, text measurements and tinted SVG rasterizatio
 Plain-text captions retain their original export rendering path. Caption selection
 and dragging use the whole measured block, including inline icons. Examples:
 Screens/TestPhotos/InlineIcons and the original CaptionEditorPrototype.
+
+## Standalone SVG logo — MVP stage 5
+
+Add logo uploads a validated SVG into the same ordered container collection.
+LogoContent stores artwork, width in document units and original/single color mode;
+height follows the source aspect ratio. Shared color/opacity live in caption style.
+LogoControls reuses NumberField, SegmentedControl, Slider, Field, Button and the
+color picker; CaptionControls hides Typography and provides the shared Position UI.
+The list shows a thumbnail and filename with the same per-row actions and hover.
+logoLayout computes the same geometry for canvas and JPG, including Custom.
+Screens/TestPhotos/StandaloneLogo demonstrates a logo alongside a text caption.
