@@ -28,7 +28,7 @@ export function PickerList({
       {items.map((item) => (
         <div
           key={item.id}
-          className={`flex items-center gap-1 rounded-lg ${item.selected ? 'bg-menu-item-selected' : ''}`}
+          className={`flex items-center gap-1 rounded-lg hover:bg-menu-item-hover ${item.selected ? 'bg-menu-item-selected' : ''}`}
           onMouseEnter={() => onHover?.(item.id)}
           onMouseLeave={() => onHover?.(null)}
         >
@@ -36,14 +36,14 @@ export function PickerList({
             type="button"
             aria-pressed={!!item.selected}
             onClick={() => onChoose(item.id)}
-            className="control-option control-button block min-w-0 flex-1 rounded-lg p-3 text-left aria-pressed:text-accent-color"
+            className="control-button block min-w-0 flex-1 rounded-lg p-3 text-left aria-pressed:text-accent-color"
           >
             <span className="flex items-start justify-between gap-2">
               <span className="flex min-w-0 items-center gap-3 text-xs">
                 {item.leading}
                 <span className="min-w-0 break-all">{item.label}</span>
               </span>
-              {item.selected && (
+              {item.selected && selectedLabel && (
                 <span className="flex shrink-0 items-center gap-1 text-[10px]">
                   <Check aria-hidden="true" className="size-3.5" />
                   {selectedLabel}

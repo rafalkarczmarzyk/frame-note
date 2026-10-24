@@ -556,6 +556,7 @@ export function PhotoWorkspace({
                   </div>
                 ),
               }))}
+              selectedLabel=""
               onChoose={selectContainer}
               onHover={setHoveredId}
               emptyText="Add a text container to begin."
