@@ -155,10 +155,8 @@ export default function App() {
             </p>
           }
         >
-          <PhotoWorkspace
-            key={photo.document.photo.name + photo.document.photo.byteLength}
-            photo={photo}
-          />
+          {/* Keep editor settings mounted when replacing the photo. */}
+          <PhotoWorkspace photo={photo} />
         </Suspense>
       ) : (
         <StartScreen

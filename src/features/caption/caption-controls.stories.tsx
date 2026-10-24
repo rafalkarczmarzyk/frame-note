@@ -13,6 +13,7 @@ const meta = {
     disabled: false,
     onChange: () => {},
     onBrowseFonts: () => {},
+    onBrowseColors: () => {},
     persistSections: false,
     preferenceScope: 'controls-demo-',
   },

@@ -25,6 +25,16 @@
   --color-charcoal-light: #454e64;
   --color-porcelain: #fdfffc;
   --color-slate: #9cafb7;
+  /* Caption presets, independent of UI roles. */
+  --color-caption-silver: #dedede;
+  --color-caption-gray: #a3a3a3;
+  --color-caption-black: #181818;
+  --color-caption-ivory: #f3ecdf;
+  --color-caption-sand: #d9c9b2;
+  --color-caption-blush: #e4c6c3;
+  --color-caption-sage: #c4d2bf;
+  --color-caption-mist: #c3d4df;
+  --color-caption-lavender: #d2c9df;
   --color-emerald: #14cc60;
   /* Section accents; primary remains independent. */
   --color-violet: #731dd8;
