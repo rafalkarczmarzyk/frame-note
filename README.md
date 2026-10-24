@@ -182,3 +182,12 @@ pakowany. Advercase Regular/Bold z archiwum użytkownika znajduje się w
 - `src/lib`: kolejka zadań, formatowanie rozmiaru i preferencje sekcji.
 - `tests/fixtures`: oryginalne zdjęcia poziome i pionowe; unity sprawdzają ich sumy.
 - `e2e`: testy Playwright i wzorce eksportu.
+
+## Próba edytora MVP — etap 1
+
+Storybook → **Screens/CaptionEditorPrototype → Playground**:
+[otwórz próbę](http://localhost:6006/?path=/story/screens-captioneditorprototype--playground).
+Tekst, atomowe badge’e tagów i ikon SVG, przeciąganie, undo/redo oraz schowek
+z zapisem `{author}` / `{icon:aperture}`. Pole Clipboard playground służy do
+sprawdzenia kopiowania i ponownego wklejania. Próba korzysta z przykładowych
+wartości i dwóch ikon; nie zmienia obecnego edytora zdjęć ani eksportu.

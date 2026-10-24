@@ -238,3 +238,15 @@ remain insertable for portable templates. Search covers keys, values, namespaces
 and helper sources, retaining headings only for matching groups.
 
 Helper source precedence and template examples: [Caption tags](CAPTION_TAGS.md).
+
+## MVP caption editor prototype
+
+Screens/CaptionEditorPrototype/Playground is an isolated Tiptap evaluation.
+Its feature components live in `features/caption/editor-prototype`; it uses shared
+Button, Textarea, HelperText and existing control/color tokens. Atomic inline
+nodes render metadata badges and bare inline SVG icons sized to the surrounding
+text. Icons have no visible label or surface; their names remain accessible and
+available in tooltips. Selection uses an outline. Missing metadata has a dashed
+edge and warning icon; missing SVG icons use a warning symbol. Plain text is the
+clipboard interchange format. No photo renderer or production caption controls
+are replaced in this stage.
