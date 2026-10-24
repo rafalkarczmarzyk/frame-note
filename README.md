@@ -2,9 +2,9 @@
 
 Lokalny edytor podpisów fotograficznych. React + TypeScript + Vite + Tailwind CSS.
 
-## Status: etap 3 — import i metadane (do akceptacji)
+## Status: etap 4 — podpis i podstawowy eksport (do akceptacji)
 
-Gotowe: szkielet interfejsu, konfiguracja shadcn/ui, zależności Konva i ExifReader, ESLint, Prettier, Vitest oraz Playwright. Przyciski są celowo nieaktywne. Wczytywanie zdjęć, metadane i eksport nie są jeszcze zaimplementowane. Kolejny etap wymaga akceptacji użytkownika.
+Gotowe: import jednego JPG, podgląd canvas, odczyt i wyszukiwanie metadanych, szablon podpisu z tokenami i podstawowy eksport. Każdy etap czeka na ocenę użytkownika przed przejściem dalej.
 
 ## Uruchomienie
 
@@ -78,3 +78,11 @@ Rozmiar fontu i oba marginesy zapisujemy jako ułamkowe procenty krótszego boku
 Przycisk i drag & drop otwierają jeden JPG. Sprawdzamy sygnaturę pliku, dekodujemy zdjęcie w przeglądarce i czytamy EXIF/IPTC/XMP/ICC przez ExifReader. Canvas dopasowuje zdjęcie do obszaru pod headerem, a prawy panel pozwala wyszukiwać pola i wartości. Wartości wyświetlamy jako tekst, bez interpretowania HTML. Obiekty URL są zwalniane przy wymianie zdjęcia i zamknięciu widoku, a spóźnione importy nie zastępują nowszych. Błąd wymiany pozostawia poprzednie zdjęcie.
 
 Sprawdzone E2E: import oryginalnego JPG, render obrazu w canvasie, pola EXIF i XMP, wyszukiwanie, drop i błędna wymiana. Edycja podpisu, wstawianie tokenów i eksport pozostają na etap 4. ExifReader i canvas są ładowane na żądanie.
+
+## Etap 4
+
+Jeden wieloliniowy szablon z tokenami `{group:name}`. Kliknięcie pola wstawia token w pozycji kursora (lub zastępuje zaznaczenie). Brakujące pola są raportowane, a puste linie usuwane. Eksport nierozwiązanych tokenów wymaga potwierdzenia. Metadane są traktowane jak tekst.
+
+Podgląd i eksport używają wspólnej geometrii Konva: Montserrat, 1,35% krótszego boku, lewy dolny róg i marginesy 3%. Kontrolki stylu i anchorów pozostają na etap 5. Eksport JPG ma oryginalne wymiary i jakość 0,95, nazwę `*-framenote.jpg`. Font jest ładowany przed renderowaniem. Na tym etapie metadane nie są kopiowane, a zachowanie źródłowego profilu kolorów nie jest zapewnione; eksport przeglądarkowy ponownie koduje zdjęcie.
+
+Testy: unity tokenów, brakujących pól, składni i geometrii; jeden funkcjonalny E2E od importu do pobranego JPG, z kontrolą wymiarów i obecności tekstu w pikselach. To nie jest jeszcze regresja wizualna z zaakceptowanym wzorcem (etap 6). Wcześniejsze testy zależne od szczegółów UI zostały zastąpione tym przepływem.
