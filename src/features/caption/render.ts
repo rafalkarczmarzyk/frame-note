@@ -1,3 +1,4 @@
+import { jpegQuality } from './export-settings';
 import { anchoredPosition } from './layout';
 import Konva from 'konva';
 import type { Caption, ImageDimensions } from '../../domain/document';
@@ -52,7 +53,9 @@ export async function exportPhoto(
   caption: Caption,
   text: string,
   color: string,
+  qualityPercent = 95,
 ): Promise<Blob> {
+  const quality = jpegQuality(qualityPercent);
   await document.fonts.load(
     `${caption.style.fontWeight} 16px "${caption.style.fontFamily}"`,
   );
@@ -76,10 +79,10 @@ export async function exportPhoto(
     layer.draw();
     const blob = await stage.toBlob({
       mimeType: 'image/jpeg',
-      quality: 0.95,
+      quality,
       pixelRatio: 1,
     });
-    if (!blob || blob.size === 0)
+    if (!blob || blob.size === 0 || blob.type !== 'image/jpeg')
       throw new Error('The browser could not export this photo.');
     return blob;
   } finally {
