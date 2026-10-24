@@ -15,3 +15,19 @@ export const wildlifeFixture = {
     ISOSpeedRatings: '20000',
   },
 } as const;
+
+export const portraitFixture = {
+  path: fileURLToPath(
+    new URL('./fixtures/20261021-IMG_0469.jpg', import.meta.url),
+  ),
+  sha256: '9f652d99e098c448d8568b87e2a1cf1cbea133bb917f70182dc589c1417e36c2',
+  dimensions: { width: 4000, height: 6000 },
+  expectedExif: {
+    Artist: 'Rafal Karczmarzyk',
+    Model: 'Canon EOS R6m2',
+    LensModel: 'RF200-800mm F6.3-9 IS USM + EXTENDER RF1.4x',
+    ExposureTime: '1/1250',
+    FNumber: 'f/13',
+    ISOSpeedRatings: '1000',
+  },
+} as const;

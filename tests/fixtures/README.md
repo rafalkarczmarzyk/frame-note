@@ -23,3 +23,14 @@ SHA-256:
 ```
 
 Oryginału nie nadpisujemy wynikami testów. Pliki eksportowane i obrazy różnic zapisujemy w ignorowanym katalogu `test-results`.
+
+## 20261021-IMG_0469.jpg
+
+Oryginalny pionowy JPG użytkownika, skopiowany bez zmian. Wymiary 4000 × 6000 px; brak odczytanego tagu EXIF Orientation. Jest to pionowy raster, a nie przypadek obrotu przez tag orientacji. Do sprawdzania dopasowania pionowych zdjęć i skalowania podpisów.
+
+- Autor: Rafal Karczmarzyk.
+- Aparat: Canon EOS R6m2.
+- Obiektyw: RF200-800mm F6.3-9 IS USM + EXTENDER RF1.4x.
+- Ekspozycja: 1/1250 s, f/13, ISO 1000.
+- Profil: sRGB IEC61966-2.1.
+- SHA-256: `9f652d99e098c448d8568b87e2a1cf1cbea133bb917f70182dc589c1417e36c2`.
