@@ -16,11 +16,13 @@ export function ColorPickerPanel({
   onChange,
   onClose,
   className,
+  surface = 'glass',
 }: {
   value: string;
   onChange: (color: string) => void;
   onClose: () => void;
   className?: string;
+  surface?: 'glass' | 'solid';
 }) {
   const [query, setQuery] = useState('');
   const [draft, setDraft] = useState(() =>
@@ -61,6 +63,7 @@ export function ColorPickerPanel({
       description="Neutrals and soft tones for your caption."
       onClose={onClose}
       className={className}
+      surface={surface}
       toolbar={
         <Input
           autoFocus

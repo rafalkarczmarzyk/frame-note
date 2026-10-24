@@ -9,7 +9,7 @@ export function EditorWorkspace({
   return (
     <main
       className={cn(
-        'relative flex min-h-0 flex-1 flex-col [--tools-sidebar-width:20rem] md:flex-row',
+        'relative flex min-h-0 flex-1 flex-col [--tools-sidebar-width:24rem] md:flex-row',
         className,
       )}
       {...props}

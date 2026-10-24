@@ -78,7 +78,7 @@ test('edits independent containers, selects on canvas and exports the whole layo
   await page.getByRole('button', { name: /First caption/ }).click();
   const both = await downloadImage();
   await page
-    .getByRole('button', { name: 'Delete container', exact: true })
+    .getByRole('button', { name: 'Delete container 1', exact: true })
     .click();
   await expect(caption).toHaveValue('Second caption');
   const secondOnly = await downloadImage();
@@ -124,16 +124,16 @@ test('edits independent containers, selects on canvas and exports the whole layo
   expect(changes.bottomLeft).toBeGreaterThan(100);
   expect(changes.topRight).toBe(0);
   await page
-    .getByRole('button', { name: 'Duplicate container', exact: true })
+    .getByRole('button', { name: 'Duplicate container 1', exact: true })
     .click();
   await expect(
     page.getByRole('button', { name: /Second caption/ }),
   ).toHaveCount(2);
   await page
-    .getByRole('button', { name: 'Delete container', exact: true })
+    .getByRole('button', { name: 'Delete container 1', exact: true })
     .click();
   await page
-    .getByRole('button', { name: 'Delete container', exact: true })
+    .getByRole('button', { name: 'Delete container 1', exact: true })
     .click();
   await expect(page.getByText('Add a text container to begin.')).toBeVisible();
   await expect(globalLeft).toHaveValue('100');

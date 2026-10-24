@@ -338,7 +338,8 @@ export function PhotoWorkspace({
             }))
           }
           onClose={() => setActivePanel(null)}
-          className="absolute inset-y-4 right-4 z-20 w-80 max-w-[calc(100%-2rem)] md:right-[calc(var(--tools-sidebar-width)+1rem)]"
+          surface="solid"
+          className="max-h-[40vh] w-full shrink-0 rounded-none shadow-none md:max-h-none md:w-80"
         />
       )}
       {activePanel && activePanel !== 'colors' && (
@@ -351,7 +352,8 @@ export function PhotoWorkspace({
               : 'Preview a font and apply it to your caption.'
           }
           onClose={() => setActivePanel(null)}
-          className="absolute inset-y-4 right-4 z-20 w-80 max-w-[calc(100%-2rem)] md:right-[calc(var(--tools-sidebar-width)+1rem)]"
+          surface="solid"
+          className="max-h-[40vh] w-full shrink-0 rounded-none shadow-none md:max-h-none md:w-80"
           toolbar={
             tagsOpen ? (
               <>
@@ -492,23 +494,6 @@ export function PhotoWorkspace({
                 <Plus aria-hidden="true" />
                 Add container
               </Button>
-              <IconButton
-                label="Duplicate container"
-                disabled={!activeContainer}
-                onClick={() => addContainer(true)}
-              >
-                <Copy />
-              </IconButton>
-              <IconButton
-                label="Delete container"
-                disabled={!activeContainer}
-                onClick={() => {
-                  selection.current = { start: 0, end: 0 };
-                  setLayout((value) => removeCaption(value, value.activeId!));
-                }}
-              >
-                <Trash2 />
-              </IconButton>
             </div>
             <PickerList
               items={layout.containers.map((container, index) => ({
@@ -531,6 +516,45 @@ export function PhotoWorkspace({
                   </span>
                 ),
                 selected: layout.activeId === container.id,
+                actions: (
+                  <div className="flex items-center">
+                    <IconButton
+                      label={`Duplicate container ${index + 1}`}
+                      onClick={() => {
+                        selection.current = { start: 0, end: 0 };
+                        setEditingId(null);
+                        setLayout((value) =>
+                          addCaption(
+                            { ...value, activeId: container.id },
+                            Array.from(
+                              crypto.getRandomValues(new Uint32Array(4)),
+                              (part) => part.toString(16).padStart(8, '0'),
+                            ).join(''),
+                            true,
+                            photo.document.photo.dimensions,
+                          ),
+                        );
+                      }}
+                    >
+                      <Copy />
+                    </IconButton>
+                    <IconButton
+                      label={`Delete container ${index + 1}`}
+                      onClick={() => {
+                        if (layout.activeId === container.id) {
+                          selection.current = { start: 0, end: 0 };
+                          setEditingId(null);
+                        }
+                        setHoveredId(null);
+                        setLayout((value) =>
+                          removeCaption(value, container.id),
+                        );
+                      }}
+                    >
+                      <Trash2 />
+                    </IconButton>
+                  </div>
+                ),
               }))}
               onChoose={selectContainer}
               onHover={setHoveredId}
@@ -544,7 +568,7 @@ export function PhotoWorkspace({
               ) && (
                 <InlineNotice tone="warning" className="mt-3">
                   Multiple containers use this anchor and may overlap. Select
-                  each from the list to change its anchor or margins.
+                  each from the list to change its anchor.
                 </InlineNotice>
               )}
           </SidebarSection>
