@@ -12,13 +12,13 @@ not a separately published npm package.
 
 The base colors live in `@theme` in `src/index.css`. They are also used by
 photo captions; do not rename their `--color-*` variables as part of UI changes.
-Five section accents use semantic `section-*` roles: turquoise for Photo, rose-brown
+Section accents use semantic `section-*` roles: turquoise for Photo, rose-brown
 for Caption, violet for Typography, yellow for Sizing and Margins, crimson for Position,
 and primary for Export. They color icon badges only. Collapsed accordions show
 only their title and icon, without summaries. Primary uses emerald (`#14CC60`) through `--accent-color`, with charcoal-dark button text.
-The drag-and-drop background stays slate (`#9CAFB7`) independently of primary. Caption options remain unchanged.
-All 18 shared color recipes live in `:root` as private `--tone-*` values and the
-panel glass material. Components consume usage roles exposed by `@theme inline`.
+The drag-and-drop background stays slate (`#9CAFB7`) independently of primary. Caption presets are independent of UI accents.
+All 18 shared color recipes live in `:root` as private `--tone-*` values,
+button hover recipes and the panel glass material. Components consume usage roles exposed by `@theme inline`.
 
 | Area                                | Tailwind examples                                                                    |
 | ----------------------------------- | ------------------------------------------------------------------------------------ |
@@ -70,6 +70,10 @@ interpretation of Apple surface principles, not native Liquid Glass rendering.
 - Button, IconButton: primary/outline actions, explicit icon labels, focus states.
 - Input, Textarea: shared styling with native props, refs, disabled states.
 - Field: generates a label target and optional description/error relationship.
+- HelperText: semantic `<small>` with 11 px text, an Info icon and separated
+  multiline guidance. Used by Field hints and margin instructions; errors remain
+  separate alerts.
+- ColorSwatch: shared preview for preset tokens and normalized custom HEX.
 - NumberInput: shared numeric editing with draft values, validation and disabled states.
 - DimensionInput: a numeric input with a required, always-visible unit in its own
   reserved space; used for dimensions, percentages and multipliers.
@@ -87,7 +91,7 @@ interpretation of Apple surface principles, not native Liquid Glass rendering.
   editing and edge highlighting. Link modes: None, Pairs (top/bottom and
   left/right) and All. Pairs copies top to bottom and left to right; All copies
   top to every edge, limited to preserve a one-pixel inner area. None keeps values.
-- PickerList: selectable rows, descriptions, preview content and selected labels.
+- PickerList: selectable rows, descriptions, leading content, previews and selected labels.
 - InlineNotice: informative, warning and error messages, using existing palette.
 
 All controls accept a disabled state directly or through native field semantics.
@@ -101,7 +105,8 @@ followed by the workspace Export section. Sizing owns a document-wide `sizingUni
 `px`, `short-edge` or `long-edge`. Font size and all four margins use it. Values
 refer to source-image dimensions, not the preview viewport. `domain/sizing.ts`
 converts all lengths together when the unit changes, preserving pixel geometry
-without rounding the stored values. The default remains percent of the short edge.
+without rounding the stored values. Defaults: font size 2% of the short edge, four margins of 3%, Porcelain text,
+line height 1.4× and bottom-left anchor.
 
 Four margins define an inner image rectangle; all nine anchors place the measured
 text block within that rectangle. Margin limits preserve at least one source pixel
@@ -111,8 +116,10 @@ text wrapping/resizing is still outside the current scope.
 Opacity uses a 0–100 slider and exact numeric field. Line height remains a font-size
 multiplier (`×`), independent of document units. Export quality also remains a
 percentage. The shared caption renderer applies the same sizing and inset geometry
-in preview and export. Captions are not persisted; replacing a photo still resets
-settings, including the sizing unit.
+in preview and export. Replacing a photo preserves the template, style, sizing
+unit, position, margins and export quality in the mounted editor. Relative values
+use the new photo dimensions; px values stay absolute. Reloading the application
+resets these values; only accordion open/closed preferences are persisted.
 
 Stories: Components/UI/MarginEditor covers independent, paired, fully linked, asymmetric, pixel
 and disabled variants. Components/UI/CaptionControls covers all units and both
@@ -124,7 +131,9 @@ EditorWorkspace owns layout and the shared sidebar-width variable. ToolSidebar
 participates in layout and is the permanent home of editing controls.
 SidebarSection presents separated, rounded setting groups with a quiet header and
 right-hand disclosure chevron. Titles use Advercase; the optional `icon` prop
-adds a decorative leading icon. Summaries and content retain Montserrat. It uses native details/summary; persistence
+adds a decorative leading icon; `iconTone` selects a section accent. Collapsed
+sections show only icon, title and chevron, without a summary. Content retains
+Montserrat. It uses native details/summary; persistence
 can be scoped or disabled (e.g. Storybook does not write application preferences).
 
 FloatingPanel is non-modal and absolutely positioned by its parent. Opening it
@@ -133,7 +142,7 @@ children, footer, onClose, surface and className. Header/footer stay fixed, cont
 scrolls independently. Glass has a solid fallback without backdrop-filter.
 Escape inside the panel closes it; it does not trap focus or block the editor.
 
-PhotoWorkspace owns the active content ('tags', 'fonts', or closed). Switching
+PhotoWorkspace owns the active content ('tags', 'fonts', 'colors', or closed). Switching
 content replaces the same surface. Tag search and font search have independent
 state. Caption cursor memory stays in the editor, not inside the panel.
 
@@ -152,7 +161,8 @@ Stories are organized by purpose, without Atomic Design categories:
   sidebar section component).
 - Components/Layout: workspace and panel components from `components/layout`.
 - Components/Brand: the logo from `components/brand`.
-- Screens: start screen states and editor previews with landscape/portrait photos.
+- Screens: start screen states, EditorWorkspace compositions and TestPhotos
+  stories using the real editor with original fixtures.
 
 Stories remain alongside their components; screen stories live in `src/stories`.
 Feature-specific components remain in `features`. New story titles should follow
@@ -163,8 +173,11 @@ shows props and usage; controls allow changing args. Interactive stories exercis
 select and slider behavior. The accessibility addon is available for inspecting
 components; its presence is not a claim of a complete accessibility audit.
 
-Screen previews use the same components as production. Editor stories display
-the original test photos without caption rendering or background JPEG export. Controlled examples maintain local state. Native disabled
+Screen previews use the same components as production. Screens/EditorWorkspace
+composes UI with original photos but no caption rendering or JPEG export.
+Screens/TestPhotos uses PhotoWorkspace with actual metadata, caption rendering and
+export for BrightBackground, Macro, HeliconStack, NightPortrait and XmpPortrait.
+Controlled examples maintain local state. Native disabled
 and empty states are documented separately. The glass example deliberately puts
 content behind the panel so transparency and the opaque fallback can be compared.
 
@@ -180,11 +193,11 @@ content behind the panel so transparency and the opaque fallback can be compared
 
 ## Verification
 
-The Storybook production build passes. All 40 stories were loaded in Chromium:
-each rendered visible content with no visible Storybook error or uncaught page
-error. Select and Slider interaction stories reached their asserted states
-(Bold selected and slider value 1). This is a rendering and interaction smoke
-check, not a complete visual or accessibility audit.
+Current verification: `pnpm check` passes 141 unit tests plus formatting, token
+boundaries, lint, type checking and the application build. Playwright passes five
+scenarios in Chromium and WebKit (10 tests), including custom color export and
+portable helper templates. Storybook builds; the added photo/picker compositions
+have been inspected in Chromium. This is not a complete accessibility audit.
 
 Filled buttons accept `color="violet"`, `"turquoise"`, `"yellow"`, `"crimson"` or
 `"rose-brown"`. Omit color to retain the current primary. Export JPG uses primary as the main application action. Color variants retain shared hover and disabled
@@ -223,3 +236,5 @@ as **EXIF**, **XMP**, **IPTC**, then other namespaces. All original keys remain
 insertable. Helper rows show the chosen source(s), or no-data text. Missing helpers
 remain insertable for portable templates. Search covers keys, values, namespaces
 and helper sources, retaining headings only for matching groups.
+
+Helper source precedence and template examples: [Caption tags](CAPTION_TAGS.md).

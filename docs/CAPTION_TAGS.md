@@ -1,0 +1,93 @@
+# Tagi podpisu FrameNote
+
+Stan: 24 października 2026. Helpery działają na metadanych odczytanych z bieżącego
+zdjęcia. Nie zapisują niczego w oryginalnym JPG i nie zastępują oryginalnych tagów.
+
+## Szablon
+
+Domyślny podpis w edytorze:
+
+```text
+{author}
+{lens}
+{exposure}
+```
+
+Helpery FrameNote nie mają namespace. Oryginalne pola zachowują zapis
+`{group:name}`, np. `{exif:Artist}`, `{xmp:creator}`, `{exif:UserComment}`.
+Można mieszać oba rodzaje w jednym szablonie; stare szablony nadal działają.
+Nazwy są rozróżniane wielkością liter, np. `{focalLength}`.
+
+## Dostępne helpery i źródła
+
+Źródła w tabeli są sprawdzane od lewej do prawej. Pierwsza niepusta wartość,
+którą helper potrafi sformatować, wygrywa. W razie konfliktu niczego nie scalamy
+ani nie nadpisujemy w źródłach; wybrany tag jest pokazany w panelu.
+
+| Helper          | Wynik / przykład          | Kolejność źródeł                                                                                                                         |
+| --------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `{author}`      | Autor                     | `xmp:creator` → `exif:Artist` → `iptc:By-line` → `iptc:Byline`                                                                           |
+| `{camera}`      | Canon EOS R6m2            | `exif:Model` → `xmp:Model`                                                                                                               |
+| `{lens}`        | EF-S24mm f/2.8 STM        | `exif:LensModel` → `xmp:LensModel` → `xmp:Lens`                                                                                          |
+| `{shutter}`     | `1/250 s` lub `3.2 s`     | `exif:ExposureTime` → `xmp:ExposureTime`                                                                                                 |
+| `{aperture}`    | `f/8`                     | `exif:FNumber` → `xmp:FNumber`                                                                                                           |
+| `{iso}`         | `400` — bez prefiksu ISO  | `exif:PhotographicSensitivity` → `exif:ISOSpeedRatings` → `exif:ISO` → `xmp:PhotographicSensitivity` → `xmp:ISOSpeedRatings` → `xmp:ISO` |
+| `{focalLength}` | `100 mm`                  | `exif:FocalLength` → `xmp:FocalLength`                                                                                                   |
+| `{date}`        | `2026-10-20`              | `exif:DateTimeOriginal` → `xmp:DateTimeOriginal` → `iptc:DateCreated` → `xmp:DateCreated` → `xmp:CreateDate`                             |
+| `{copyright}`   | Treść praw autorskich     | `xmp:rights` → `exif:Copyright` → `iptc:Copyright Notice` → `iptc:CopyrightNotice`                                                       |
+| `{exposure}`    | `1/250 s · f/8 · ISO 400` | Składa dostępne `{shutter}`, `{aperture}` i `{iso}`; pokazuje wszystkie użyte źródła                                                     |
+
+Czas, przysłona i ogniskowa mają już jednostki/oznaczenia. Nie dopisuj ponownie
+`s`, `f/` ani `mm`. Przy osobnym `{iso}` można wpisać `ISO {iso}`. `{exposure}`
+dodaje ten prefiks samodzielnie, pomija brakujące części i nie pozostawia pustych
+separatorów. Bez żadnych parametrów ekspozycji jest traktowany jako brak danych.
+
+Data zachowuje dzień z metadanych; nie przeliczamy jej na strefę czasową urządzenia.
+Ogniskowa oznacza wartość zapisaną w FocalLength, nie ekwiwalent 35 mm.
+Nie wyliczamy parametrów z alternatywnych wartości APEX ani nie zgadujemy modelu
+aparatu na podstawie obiektywu.
+
+## Lista tagów
+
+**Browse available tags** otwiera panel z osobnym przewijaniem:
+
+1. **FrameNote** — helpery, zawsze na górze, z wartością i źródłem.
+2. **EXIF**.
+3. **XMP**.
+4. **IPTC**.
+5. Pozostałe odczytane namespace, posortowane alfabetycznie.
+
+Wyszukiwarka sprawdza klucze, wartości, namespace i źródła helperów. Pozostawia
+nagłówki tylko dla grup zawierających wyniki. Wiersz oznaczony **Used** jest już
+w szablonie. Kliknięcie wstawia token przy zapamiętanym kursorze albo zastępuje
+zaznaczenie w textarea.
+
+Oryginalne pola są nadal widoczne i można je wstawiać niezależnie od helperów.
+Wartości pokazane przy helperach są podglądem dla aktualnego zdjęcia; zmiana
+zdjęcia ponownie je rozwiązuje, zachowując sam szablon.
+
+## Brakujące dane
+
+Helper bez wartości pokazuje **No data in this photo.** Można go wstawić, aby
+przygotować szablon używany również z innymi zdjęciami. W podpisie brakujący token
+jest pusty; całkowicie puste wiersze są pomijane. Lista brakujących pól jest widoczna
+w karcie Caption, a eksport takiego podpisu wymaga potwierdzenia.
+
+Znany helper bez danych nie jest błędem składni. Nieznana nazwa bez namespace,
+np. `{Artist}`, jest błędem składni; użyj `{author}` albo `{exif:Artist}`.
+Dowolne dosłowne separatory i tekst pozostają — automatyczne usuwanie pustych
+separatorów dotyczy tylko gotowego helpera `{exposure}`.
+
+`Agata-104.jpg` jest przypadkiem testowym z autorem i obiektywem w XMP, bez
+odczytanego modelu aparatu i parametrów ekspozycji. Brak tych wartości nie oznacza
+awarii helperów. Lista wszystkich oryginałów: [zdjęcia testowe](../tests/fixtures/README.md).
+
+## Helicon i dalsza rozbudowa
+
+Komentarz stacku jest dostępny jako `{exif:UserComment}`. Nie ma jeszcze
+`{stackCount}` ani parsera metod/parametrów Helicon. Obecny plik testowy zawiera
+`Stacked from 15 images. Method=A (R=8,S=4)`.
+
+Logika helperów i grupowania: `src/domain/caption-tags.ts`. Resolver szablonu:
+`src/features/caption/template.ts`. UI listy: `src/features/caption/metadata-picker.tsx`.
+Nowe aliasy wymagają jawnej kolejności źródeł, formatowania i testów fallbacku.

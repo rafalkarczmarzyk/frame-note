@@ -35,8 +35,8 @@ parsera i tego, jakie metadane Lightroom zachował podczas eksportu.
   desktopowe, z możliwością budowania również na Windows i Linux.
   Nie wybrano obowiązkowo Electron ani Tauri; Rust nie jest obecnie wymagany.
 - Interfejs aplikacji po angielsku; rozmowa i dokumentacja mogą być po polsku.
-- Rozmiar fontu oraz marginesy są ułamkowymi procentami krótszego boku zdjęcia,
-  niezależnymi od rozmiaru okna i skali podglądu.
+- Font i marginesy używają globalnej jednostki: px, % krótszego lub % dłuższego
+  boku zdjęcia. Domyślnie % krótszego boku, niezależnie od skali podglądu.
 - Podgląd i eksport mają korzystać z tej samej geometrii i zasad renderowania.
 - Preferujemy reużywalne komponenty UI i ich dokumentację w Storybooku.
 
@@ -83,7 +83,8 @@ Bloba. Wynik większy od wejścia jest oznaczony ostrzeżeniem.
 
 ### Znane ograniczenia
 
-- Jeden JPG i jeden blok podpisu. Wymiana zdjęcia resetuje ustawienia podpisu.
+- Jeden JPG i jeden blok podpisu. Wymiana zdjęcia zachowuje ustawienia w sesji;
+  odświeżenie aplikacji przywraca domyślne wartości.
 - Brak zapisanych presetów użytkownika i importu/eksportu presetów.
 - Brak specjalnego parsera Helicon, batcha, swobodnego przesuwania podpisu,
   zoom/pan i aplikacji desktopowej.
@@ -96,7 +97,7 @@ Bloba. Wynik większy od wejścia jest oznaczony ostrzeżeniem.
 - Zweryfikowano dostarczone zdjęcia sRGB. Inne profile wymagają osobnych testów.
 - Duże zdjęcia mogą chwilowo obciążyć główny wątek; kodowanie nie działa w workerze.
 
-### Weryfikacja przy zamknięciu
+### Historyczna weryfikacja przy zamknięciu pre-MVP
 
 - 87 testów jednostkowych: modele, metadane, tokeny, geometria, kolejka,
   format rozmiaru, preferencje i limity.
@@ -116,7 +117,32 @@ wartości z zachowaniem wyglądu na bieżącym zdjęciu. Marginesy mają wizualn
 niezależne wartości i opcję łączenia. Anchory działają względem obszaru wewnątrz
 czterech marginesów. Opacity ma slider i pole liczbowe; interlinia pozostaje
 mnożnikiem fontu. Są to uzgodnione zmiany interfejsu i modelu, nie realizacja
-proponowanych etapów MVP poniżej. Ustawienia nadal resetują się przy zmianie zdjęcia.
+proponowanych etapów MVP poniżej.
+
+Kolejne zatwierdzone dodatki:
+
+- Stan edytora pozostaje przy wymianie zdjęcia: szablon, styl, jednostka, anchory,
+  marginesy i jakość JPG. Nie jest to trwały zapis presetów.
+- Font domyślnie 2% krótszego boku, interlinia 1,4×, marginesy po 3%.
+- Kolor podpisu wybierany z listy 12 neutralnych/pastelowych odcieni lub własnego
+  HEX (3 albo 6 cyfr). Własny kolor działa także w eksporcie.
+- Helpery FrameNote bez namespace i grupowanie oryginalnych tagów według namespace.
+  Lista i reguły: [CAPTION_TAGS.md](CAPTION_TAGS.md). Domyślny szablon to
+  `{author}`, `{lens}`, `{exposure}` w osobnych liniach.
+- Helpery nie zmieniają ani nie ukrywają oryginalnych metadanych. Nie ma jeszcze
+  parsera Helicon ani `{stackCount}`; dostępny jest `{exif:UserComment}`.
+- Siedem oryginalnych zdjęć testowych; dodatkowe przypadki to jasne tło, makro,
+  stack Helicon, pionowe nocne zdjęcie oraz XMP bez danych ekspozycji.
+- Obecna weryfikacja: 141 testów jednostkowych, pięć scenariuszy w dwóch silnikach
+  (10 testów E2E), build aplikacji i Storybooka.
+
+### Odłożone i wycofane eksperymenty
+
+Edytor podpisu z przeciąganymi badge’ami tagów i jawnymi przełamaniami wierszy
+został odłożony. Obecnie pozostaje textarea z wizualnym zawijaniem tekstu; Enter
+wyznacza rzeczywiste przełamanie podpisu na zdjęciu. Rozmyte tło ze zdjęcia
+i przezroczystość całego edytora wypróbowano i wycofano jako rozpraszające.
+Nie przywracać tych zmian bez nowej decyzji użytkownika.
 
 ## 4. MVP — oczekiwania i proponowany zakres
 
@@ -142,12 +168,12 @@ jeszcze zatwierdzona; poniżej rozdzielamy potrzeby od propozycji implementacji.
 Najbliższy użyteczny przyrost to powtarzalna praca na jednym zdjęciu przy użyciu
 własnych presetów. Nie trzeba od razu budować edytora wielu kontenerów.
 
-| Proponowana kolejność                | Efekt                                                                     | Decyzje przed implementacją                                |
-| ------------------------------------ | ------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| 1. Presety użytkownika               | Zapis, nazwa, wybór, aktualizacja i usuwanie szablonu ze stylem i pozycją | Trwałość, format danych, zachowanie przy zmianie zdjęcia   |
-| 2. Przenoszenie presetów             | Import/eksport wersjonowanego pliku z walidacją                           | Czy wymagane do pierwszego MVP                             |
-| 3. Formatowanie metadanych           | Przydatne formatowanie wartości, w tym rozpoznawanie Helicon              | Składnia tokenów, fallback, zakres obsługiwanych wariantów |
-| 4. Weryfikacja codziennego przepływu | Preset działa na różnych cropach i obu orientacjach; stabilny eksport     | Reprezentatywne zdjęcia i kryteria akceptacji              |
+| Proponowana kolejność                | Efekt                                                                     | Decyzje przed implementacją                              |
+| ------------------------------------ | ------------------------------------------------------------------------- | -------------------------------------------------------- |
+| 1. Presety użytkownika               | Zapis, nazwa, wybór, aktualizacja i usuwanie szablonu ze stylem i pozycją | Trwałość, format danych, zachowanie przy zmianie zdjęcia |
+| 2. Przenoszenie presetów             | Import/eksport wersjonowanego pliku z walidacją                           | Czy wymagane do pierwszego MVP                           |
+| 3. Formatowanie metadanych           | Przydatne formatowanie wartości, w tym rozpoznawanie Helicon              | Dalsze formatowanie i zakres parsera Helicon             |
+| 4. Weryfikacja codziennego przepływu | Preset działa na różnych cropach i obu orientacjach; stabilny eksport     | Reprezentatywne zdjęcia i kryteria akceptacji            |
 
 To propozycja kolejności, nie zlecenie realizacji. Wielokontenerowy edytor,
 batch i desktop powinny dostać osobne uzgodnienie zakresu.
@@ -167,19 +193,22 @@ batch i desktop powinny dostać osobne uzgodnienie zakresu.
 
 ## 5. UX i design system — zachować przy rozwoju
 
-- Minimalistyczny ciemny interfejs, bez neonowych przycisków i nadmiaru zaokrągleń.
+- Ciemny interfejs z kontrolkami inspirowanymi powierzchniami macOS.
+  Primary emerald (`#14CC60`) wyróżnia główną akcję Export JPG.
 - Header: logo SVG, akcje; eksport w navbarze.
 - Ekran startowy: krótki angielski hero w Advercase, wybór zdjęcia i informacja o DnD.
 - Podczas przeciągania pliku: kontrastowy overlay, gruba przerywana zaokrąglona
   ramka odsunięta od krawędzi i komunikat upuszczenia.
 - Po imporcie: przestrzeń canvasu pod headerem, główne narzędzia po prawej.
-- Sekcje Photo, Caption, Typography, Position, Export zwijane niezależnie.
+- Sekcje Photo, Caption, Sizing, Typography, Position, Margins, Export zwijane niezależnie.
 - Browse available tags należy do Caption.
-- Pomocniczy panel tagów/fontów pływa nad canvasem, ma przydymione szkło i osobny
+- Pomocniczy panel tagów/fontów/kolorów pływa nad canvasem, ma przydymione szkło i osobny
   scroll. Otwarcie panelu nie może zmieniać wymiarów zdjęcia.
-- Wspólne prymitywy zamiast osobnych kopii kontrolek. Atomy i kompozycje w Storybooku.
+- Wspólne prymitywy zamiast osobnych kopii kontrolek. Podział Storybooka na Design, Components (UI/Layout/Brand) i Screens.
 - Montserrat dla interfejsu, Advercase dla ozdobnych nagłówków.
-- Paleta: charcoal (wariant bazowy, ciemny i jasny), slate, porcelain. Primary używa slate; header i sidebar mają tło charcoal. HEX tylko w definicjach
+- Paleta bazowa: charcoal (wariant bazowy, ciemny i jasny), slate, porcelain.
+  Primary używa emerald; ikony sekcji mają osobne akcenty. Tło przeciągania
+  pozostaje slate, niezależnie od primary. Header i sidebar mają tło charcoal. HEX tylko w definicjach
   `src/index.css`; komponenty korzystają z tokenów semantycznych.
 - Logo i ikony SVG dziedziczą `currentColor`; wymiary i kolor przez Tailwind.
   Ikony: Lucide.
