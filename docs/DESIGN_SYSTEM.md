@@ -78,10 +78,10 @@ content behind the panel so transparency and the opaque fallback can be compared
 6. Run `pnpm check`, `pnpm build-storybook`, and the export regression when
    caption behavior is affected. Do not regenerate export baselines for UI edits.
 
-## Pending verification
+## Verification
 
-Application checks, unit tests, export regression and the Storybook production
-build passed during implementation. The final browser review of all 40 stories
-was interrupted. A smoke script checked for the presence of `.sb-errordisplay`
-instead of its visibility, so its reports are inconclusive. Verify visible errors
-and interaction results before treating the story catalogue as fully reviewed.
+The Storybook production build passes. All 40 stories were loaded in Chromium:
+each rendered visible content with no visible Storybook error or uncaught page
+error. Select and Slider interaction stories reached their asserted states
+(Bold selected and slider value 1). This is a rendering and interaction smoke
+check, not a complete visual or accessibility audit.
