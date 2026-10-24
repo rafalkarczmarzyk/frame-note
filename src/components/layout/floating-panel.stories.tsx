@@ -3,7 +3,7 @@ import { FloatingPanel } from './floating-panel';
 import { Input } from '../ui/input';
 import { PickerList } from '../ui/picker-list';
 const meta = {
-  title: 'Layout/FloatingPanel',
+  title: 'Components/Layout/FloatingPanel',
   component: FloatingPanel,
   args: {
     title: 'Available tags',

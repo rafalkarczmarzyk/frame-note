@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { NumberField } from './number-field';
 const meta = {
-  title: 'Molecules/NumberField',
+  title: 'Components/UI/NumberField',
   component: NumberField,
   args: {
     label: 'Size (% short edge)',

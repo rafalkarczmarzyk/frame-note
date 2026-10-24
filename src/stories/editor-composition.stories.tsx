@@ -201,7 +201,7 @@ function EditorDemo({
   );
 }
 const meta = {
-  title: 'Compositions/EditorWorkspace',
+  title: 'Screens/EditorWorkspace',
   component: EditorDemo,
   args: { orientation: 'landscape' },
   argTypes: {

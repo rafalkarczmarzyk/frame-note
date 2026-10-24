@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Input } from './input';
 const meta = {
-  title: 'Atoms/Input',
+  title: 'Components/UI/Input',
   component: Input,
   args: { 'aria-label': 'Search', placeholder: 'Search metadata…' },
   parameters: {

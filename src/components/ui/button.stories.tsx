@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Button } from './button';
 const meta = {
-  title: 'Atoms/Button',
+  title: 'Components/UI/Button',
   component: Button,
   args: { children: 'Export JPG' },
   parameters: {

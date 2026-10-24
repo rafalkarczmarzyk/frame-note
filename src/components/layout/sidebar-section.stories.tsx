@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { SidebarSection } from './sidebar-section';
 import { NumberField } from '../ui/number-field';
 const meta = {
-  title: 'Layout/SidebarSection',
+  title: 'Components/Layout/SidebarSection',
   component: SidebarSection,
   args: {
     id: 'storybook-section',

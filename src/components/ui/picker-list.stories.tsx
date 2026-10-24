@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { PickerList } from './picker-list';
 const meta = {
-  title: 'Molecules/PickerList',
+  title: 'Components/UI/PickerList',
   component: PickerList,
   args: {
     items: [

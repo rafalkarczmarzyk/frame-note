@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Select } from './select';
 const meta = {
-  title: 'Atoms/Select',
+  title: 'Components/UI/Select',
   component: Select,
   args: {
     'aria-label': 'Weight',

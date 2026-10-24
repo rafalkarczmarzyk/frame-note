@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { AnchorPicker } from './anchor-picker';
 const meta = {
-  title: 'Molecules/AnchorPicker',
+  title: 'Components/UI/AnchorPicker',
   component: AnchorPicker,
   args: { value: 'bottom-left', onValueChange: () => {} },
   render: function Render(args) {

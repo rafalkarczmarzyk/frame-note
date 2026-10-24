@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { EditorWorkspace, ToolSidebar } from './editor-workspace';
 import { SidebarSection } from './sidebar-section';
 const meta = {
-  title: 'Layout/ToolSidebar',
+  title: 'Components/Layout/ToolSidebar',
   component: ToolSidebar,
   args: {
     children: (
