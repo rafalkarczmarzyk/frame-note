@@ -1,3 +1,5 @@
+import { ColorSwatch } from '@/components/ui/color-swatch';
+import { captionColorLabel } from '@/domain/caption-colors';
 import { HelperText } from '@/components/ui/helper-text';
 import { SidebarSection } from '@/components/layout/sidebar-section';
 import {
@@ -30,6 +32,7 @@ export function CaptionControls({
   onChange,
   disabled,
   onBrowseFonts,
+  onBrowseColors,
   preferenceScope = '',
   persistSections = true,
 }: {
@@ -38,6 +41,7 @@ export function CaptionControls({
   onChange: (caption: Caption) => void;
   disabled: boolean;
   onBrowseFonts: () => void;
+  onBrowseColors: () => void;
   preferenceScope?: string;
   persistSections?: boolean;
 }) {
@@ -134,17 +138,23 @@ export function CaptionControls({
           </div>
           <Field label="Color">
             {(id) => (
-              <Select
-                disabled={disabled}
+              <button
+                type="button"
                 id={id}
-                value={caption.style.color}
-                onValueChange={(color) => style({ color })}
-                options={[
-                  { value: 'porcelain', label: 'Porcelain' },
-                  { value: 'charcoal', label: 'Charcoal' },
-                  { value: 'slate', label: 'Slate' },
-                ]}
-              />
+                aria-haspopup="dialog"
+                onClick={(event) => {
+                  // Safari does not focus buttons on pointer clicks.
+                  event.currentTarget.focus({ preventScroll: true });
+                  onBrowseColors();
+                }}
+                className="control-field flex h-9 w-full items-center gap-2 px-3 text-xs"
+              >
+                <ColorSwatch value={caption.style.color} />
+                <span className="min-w-0 flex-1 truncate text-left">
+                  {captionColorLabel(caption.style.color)}
+                </span>
+                <ChevronRight className="size-3.5" aria-hidden="true" />
+              </button>
             )}
           </Field>
           <div className="grid grid-cols-[minmax(0,1fr)_5rem] items-end gap-3">

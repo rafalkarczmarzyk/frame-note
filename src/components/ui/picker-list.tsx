@@ -7,6 +7,7 @@ export interface PickerItem {
   description?: string;
   selected?: boolean;
   preview?: ReactNode;
+  leading?: ReactNode;
 }
 export function PickerList({
   items,
@@ -30,7 +31,10 @@ export function PickerList({
           className="control-option control-button block w-full rounded-lg p-3 text-left aria-pressed:bg-menu-item-selected aria-pressed:text-accent-color"
         >
           <span className="flex items-start justify-between gap-2">
-            <span className="min-w-0 break-all text-xs">{item.label}</span>
+            <span className="flex min-w-0 items-center gap-3 text-xs">
+              {item.leading}
+              <span className="min-w-0 break-all">{item.label}</span>
+            </span>
             {item.selected && (
               <span className="flex shrink-0 items-center gap-1 text-[10px]">
                 <Check aria-hidden="true" className="size-3.5" />

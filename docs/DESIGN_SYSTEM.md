@@ -10,7 +10,7 @@ not a separately published npm package.
 
 ## Design tokens
 
-The five active base colors live in `@theme` in `src/index.css`. They are also used by
+The base colors live in `@theme` in `src/index.css`. They are also used by
 photo captions; do not rename their `--color-*` variables as part of UI changes.
 Five section accents use semantic `section-*` roles: turquoise for Photo, rose-brown
 for Caption, violet for Typography, yellow for Sizing and Margins, crimson for Position,
@@ -189,3 +189,14 @@ check, not a complete visual or accessibility audit.
 Filled buttons accept `color="violet"`, `"turquoise"`, `"yellow"`, `"crimson"` or
 `"rose-brown"`. Omit color to retain the current primary. Export JPG uses primary as the main application action. Color variants retain shared hover and disabled
 behavior; outline buttons remain neutral.
+
+## Caption color picker
+
+Color opens a floating list like the font picker. It includes six neutrals and six
+soft colors, with search, swatches and a selected indicator. Nine dedicated
+`--color-caption-*` presets supplement Porcelain, Slate and Charcoal without
+changing UI roles. Custom colors accept RGB or RRGGBB HEX, with or without a hash;
+Apply color (or Enter) commits a normalized HEX value. Invalid drafts do not change
+the caption. `resolveCaptionColor` resolves both legacy palette names and custom
+HEX for the shared canvas preview/export path. The custom field stays outside the
+scrollable list. Escape closes the panel and restores focus to the trigger.

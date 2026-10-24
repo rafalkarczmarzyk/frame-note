@@ -85,3 +85,94 @@ test('recovers from invalid imports and keeps the latest photo during rapid repl
   await expect.poll(liveUrlCount).toBe(1);
   expect(errors).toEqual([]);
 });
+
+test('keeps caption settings when replacing landscape and portrait photos', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const input = page.getByLabel('Choose JPG photo');
+  await input.setInputFiles(wildlifeFixture.path);
+  await page
+    .getByLabel('Caption', { exact: true })
+    .fill('My caption\n{exif:Artist}');
+  await page.getByRole('button', { name: 'Font', exact: true }).click();
+  await page
+    .getByRole('dialog', { name: 'Choose a font' })
+    .getByRole('button', { name: /Advercase/ })
+    .click();
+  await page.getByRole('button', { name: 'Close choose a font' }).click();
+  await page
+    .getByRole('spinbutton', { name: 'Font size', exact: true })
+    .fill('4.5');
+  await page
+    .getByRole('spinbutton', { name: 'Line height', exact: true })
+    .fill('1.8');
+  await page
+    .getByRole('spinbutton', { name: 'Opacity value', exact: true })
+    .fill('65');
+  await page.getByRole('button', { name: 'Color', exact: true }).click();
+  const colors = page.getByRole('dialog', { name: 'Choose a color' });
+  await colors.getByRole('textbox', { name: 'Custom color (HEX)' }).fill('bcd');
+  await colors.getByRole('button', { name: 'Apply color' }).click();
+  await colors.getByRole('button', { name: 'Close choose a color' }).click();
+  await page.getByRole('button', { name: 'top-right', exact: true }).click();
+  await page
+    .getByRole('radiogroup', { name: 'Text align' })
+    .getByRole('radio', { name: 'Align right' })
+    .click();
+  await page
+    .getByRole('radiogroup', { name: 'Margin linking' })
+    .getByRole('radio', { name: 'Pairs', exact: true })
+    .click();
+  await page.getByRole('spinbutton', { name: 'Top', exact: true }).fill('5');
+  await page.getByRole('spinbutton', { name: 'Left', exact: true }).fill('7');
+  await page.getByRole('radio', { name: 'Balanced', exact: true }).click();
+  for (const fixture of [portraitFixture, wildlifeFixture]) {
+    await input.setInputFiles(fixture.path);
+    await expect(
+      page.getByRole('img', {
+        name: `Photo preview: ${fixture.path.split('/').at(-1)}`,
+      }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Export JPG', exact: true }),
+    ).toBeEnabled();
+    await expect(page.getByLabel('Caption', { exact: true })).toHaveValue(
+      'My caption\n{exif:Artist}',
+    );
+    await expect(
+      page.getByRole('button', { name: 'Font', exact: true }),
+    ).toContainText('Advercase');
+    await expect(
+      page.getByRole('button', { name: 'Color', exact: true }),
+    ).toContainText('#BBCCDD');
+    await expect(
+      page.getByRole('combobox', { name: 'Sizing unit', exact: true }),
+    ).toContainText('% of short edge');
+    for (const [name, value] of [
+      ['Font size', '4.5'],
+      ['Line height', '1.8'],
+      ['Opacity value', '65'],
+      ['Top', '5'],
+      ['Bottom', '5'],
+      ['Left', '7'],
+      ['Right', '7'],
+    ]) {
+      await expect(
+        page.getByRole('spinbutton', { name, exact: true }),
+      ).toHaveValue(value!);
+    }
+    await expect(
+      page.getByRole('button', { name: 'top-right', exact: true }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    await expect(
+      page.getByRole('radio', { name: 'Align right', exact: true }),
+    ).toBeChecked();
+    await expect(
+      page.getByRole('radio', { name: 'Pairs', exact: true }),
+    ).toBeChecked();
+    await expect(
+      page.getByRole('radio', { name: 'Balanced', exact: true }),
+    ).toBeChecked();
+  }
+});

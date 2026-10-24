@@ -1,3 +1,4 @@
+import { ColorPickerPanel } from '../features/caption/color-picker-panel';
 import { Download, TextQuote } from 'lucide-react';
 import { PhotoIcon } from '../components/icons/photo-icon';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -44,7 +45,7 @@ function EditorDemo({
 }) {
   const photo = photos[orientation];
   const [caption, setCaption] = useState(createCaption());
-  const [panel, setPanel] = useState<'tags' | 'fonts' | null>(null);
+  const [panel, setPanel] = useState<'tags' | 'fonts' | 'colors' | null>(null);
   const [quality, setQuality] = useState(95);
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden bg-app-base text-content-primary">
@@ -63,7 +64,20 @@ function EditorDemo({
             />
           </div>
         </div>
-        {panel && (
+        {panel === 'colors' && (
+          <ColorPickerPanel
+            value={caption.style.color}
+            onChange={(color) =>
+              setCaption((value) => ({
+                ...value,
+                style: { ...value.style, color },
+              }))
+            }
+            onClose={() => setPanel(null)}
+            className="absolute inset-y-4 right-[calc(var(--tools-sidebar-width)+1rem)] z-20 w-80"
+          />
+        )}
+        {panel && panel !== 'colors' && (
           <FloatingPanel
             title={panel === 'tags' ? 'Available tags' : 'Choose a font'}
             onClose={() => setPanel(null)}
@@ -174,6 +188,7 @@ function EditorDemo({
               onChange={setCaption}
               disabled={false}
               onBrowseFonts={() => setPanel('fonts')}
+              onBrowseColors={() => setPanel('colors')}
             />
             <SidebarSection
               id="storybook-export"

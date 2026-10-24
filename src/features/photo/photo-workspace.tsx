@@ -1,3 +1,5 @@
+import { ColorPickerPanel } from '../caption/color-picker-panel';
+import { resolveCaptionColor } from '@/domain/caption-colors';
 import { Download, TextQuote } from 'lucide-react';
 import { PhotoIcon } from '@/components/icons/photo-icon';
 import {
@@ -32,7 +34,9 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
   const host = useRef<HTMLDivElement>(null);
   const templateInput = useRef<HTMLTextAreaElement>(null);
   const selection = useRef<TextSelection>({ start: 0, end: 0 });
-  const [activePanel, setActivePanel] = useState<'tags' | 'fonts' | null>(null);
+  const [activePanel, setActivePanel] = useState<
+    'tags' | 'fonts' | 'colors' | null
+  >(null);
   const tagsOpen = activePanel === 'tags';
   const [fontQuery, setFontQuery] = useState('');
   const [size, setSize] = useState({ width: 1, height: 1 });
@@ -71,9 +75,11 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
     });
   };
   const resolved = resolveTemplate(template, photo.document.photo.metadata);
-  const color = getComputedStyle(document.documentElement)
-    .getPropertyValue(`--color-${caption.style.color}`)
-    .trim();
+  const color = resolveCaptionColor(caption.style.color, (name) =>
+    getComputedStyle(document.documentElement).getPropertyValue(
+      `--color-${name}`,
+    ),
+  );
   const exportRequest = useMemo(
     () => ({
       image: photo.image,
@@ -182,7 +188,20 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
           </Layer>
         </Stage>
       </div>
-      {activePanel && (
+      {activePanel === 'colors' && (
+        <ColorPickerPanel
+          value={settings.style.color}
+          onChange={(color) =>
+            setSettings((value) => ({
+              ...value,
+              style: { ...value.style, color },
+            }))
+          }
+          onClose={() => setActivePanel(null)}
+          className="absolute inset-y-4 right-4 z-20 w-80 max-w-[calc(100%-2rem)] md:right-[calc(var(--tools-sidebar-width)+1rem)]"
+        />
+      )}
+      {activePanel && activePanel !== 'colors' && (
         <FloatingPanel
           id="auxiliary-panel"
           title={tagsOpen ? 'Available tags' : 'Choose a font'}
@@ -347,6 +366,9 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
             caption={settings}
             onChange={setSettings}
             disabled={exporting}
+            onBrowseColors={() =>
+              setActivePanel((value) => (value === 'colors' ? null : 'colors'))
+            }
             onBrowseFonts={() =>
               setActivePanel((value) => (value === 'fonts' ? null : 'fonts'))
             }

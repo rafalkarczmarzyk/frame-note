@@ -66,7 +66,8 @@ funkcjonalne i pomiar kolorów bez porównywania do wzorców Chromium.
 - Jeden wieloliniowy szablon `{group:name}`, np. `{exif:Artist}`.
   Wstawianie w pozycji kursora, zastępowanie zaznaczenia, oznaczenie użytych tagów.
   Brakujące pola są raportowane; eksport wymaga wtedy potwierdzenia.
-- Montserrat i Advercase, Regular/Bold, kolor, opacity (slider i pole liczbowe),
+- Zmiana zdjęcia zachowuje ustawienia podpisu i jakość eksportu w bieżącej sesji.
+- Montserrat i Advercase, Regular/Bold, kolor (lista neutralnych i pastelowych odcieni oraz własny HEX), opacity (slider i pole liczbowe),
   interlinia jako mnożnik fontu oraz wyrównanie tekstu.
 - Globalna jednostka wymiarowania: px, % krótszego lub % dłuższego boku zdjęcia.
   Dotyczy rozmiaru fontu i czterech marginesów; zmiana jednostki przelicza wartości
