@@ -1,3 +1,4 @@
+import { heliconDetails, parseHeliconComment } from './helicon';
 import type { MetadataField } from './metadata';
 
 export interface CaptionTag extends MetadataField {
@@ -25,6 +26,8 @@ const definitions = {
     'xmp:DateCreated',
     'xmp:CreateDate',
   ],
+  heliconStack: ['exif:UserComment', 'xmp:UserComment'],
+  heliconStackCount: ['exif:UserComment', 'xmp:UserComment'],
   copyright: [
     'xmp:rights',
     'exif:Copyright',
@@ -56,6 +59,12 @@ function format(name: string, field: MetadataField): string {
   const text = field.displayValue.trim();
   const number = numeric(field.rawValue);
   switch (name) {
+    case 'heliconStackCount': {
+      const details = heliconDetails(text);
+      return details ? String(details.count) : '';
+    }
+    case 'heliconStack':
+      return parseHeliconComment(text) ?? '';
     case 'shutter': {
       if (number !== null && number > 0) {
         const reciprocal = 1 / number;

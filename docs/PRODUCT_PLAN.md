@@ -326,3 +326,11 @@ nie dziedziczy grafiki z aktywnego logo. Miniatura i nazwa pliku identyfikują l
 na liście. Podgląd i eksport korzystają z logoLayout; nieudany upload nie niszczy
 poprzedniego pliku. Zasoby pozostają w sesji; presety to etap 6.
 Przykład: Screens/TestPhotos/StandaloneLogo. Etap 5 pozostaje do oceny, bez commita.
+
+### Etap 6 — presety układu
+
+Zaimplementowano lokalne presety całego układu: zapis, wybór, aktualizacja,
+Save as new, usuwanie i import/eksport JSON v1 z użytymi SVG. Bez zdjęcia,
+wartości metadanych i jakości JPG. Import sprawdza strukturę, zakresy wartości
+i SVG; nie nadpisuje istniejących presetów. Etap pozostaje do oceny użytkownika;
+nie rozpoczęto etapu 7.

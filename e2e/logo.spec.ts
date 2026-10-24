@@ -81,7 +81,6 @@ test('adds and replaces a proportional SVG logo, exports original and single col
     exact: true,
   });
   await hex.fill('12ab34');
-  await page.getByRole('button', { name: 'Apply color', exact: true }).click();
   await hex.press('Escape');
   for (const pixel of await pixels()) {
     expect(Math.abs(pixel[0]! - 18)).toBeLessThan(8);

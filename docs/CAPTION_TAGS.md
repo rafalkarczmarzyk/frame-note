@@ -84,10 +84,25 @@ awarii helperów. Lista wszystkich oryginałów: [zdjęcia testowe](../tests/fix
 
 ## Helicon i dalsza rozbudowa
 
-Komentarz stacku jest dostępny jako `{exif:UserComment}`. Nie ma jeszcze
-`{stackCount}` ani parsera metod/parametrów Helicon. Obecny plik testowy zawiera
+Komentarz stacku jest dostępny jako `{exif:UserComment}` i formatowany helper
+`{heliconStack}` opisany poniżej. Obecny plik testowy zawiera
 `Stacked from 15 images. Method=A (R=8,S=4)`.
 
 Logika helperów i grupowania: `src/domain/caption-tags.ts`. Resolver szablonu:
 `src/features/caption/template.ts`. UI listy: `src/features/caption/metadata-picker.tsx`.
 Nowe aliasy wymagają jawnej kolejności źródeł, formatowania i testów fallbacku.
+
+### Helicon Focus — helper `{heliconStack}`
+
+Helper rozpoznaje pełny komentarz `Stacked from N images. Method=A (R=8,S=4)`
+z EXIF UserComment (następnie XMP UserComment). Obsługuje metody A/B/C,
+niezależnie od wielkości liter i dodatkowych spacji. Wynik:
+`Focus stack · 15 images · Method A · R=8 · S=4`.
+Nie zmienia oryginalnego UserComment. Przy braku pełnego rozpoznanego formatu
+wartość jest pusta, bez zgadywania liczby zdjęć z innego komentarza.
+Wbudowany preset Macro dodaje osobny kontener `{heliconStack}` w prawym dolnym rogu.
+
+Helper `{heliconStackCount}` korzysta z tego samego parsera i źródeł co `{heliconStack}`,
+ale zwraca wyłącznie liczbę, np. `15`. Umożliwia własny podpis:
+`Stacked {heliconStackCount} images` → `Stacked 15 images`. Bez rozpoznanego komentarza
+zachowuje standardowe oznaczenie brakującej wartości.

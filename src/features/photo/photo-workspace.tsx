@@ -1,3 +1,5 @@
+import { defaultTemplate } from '@/domain/builtin-presets';
+import { PresetControls } from '../presets/preset-controls';
 import { LogoControls } from '../caption/logo-controls';
 import { logoLayout } from '../caption/logo-layout';
 import { tintedIcon } from '../caption/inline-layout';
@@ -98,8 +100,9 @@ export function PhotoWorkspace({
     ReadonlyMap<string, HTMLImageElement>
   >(new Map());
   const [activePanel, setActivePanel] = useState<
-    'tags' | 'fonts' | 'colors' | 'icons' | null
+    'tags' | 'fonts' | 'colors' | 'icons' | 'presets' | null
   >(null);
+  const [presetHost, setPresetHost] = useState<HTMLDivElement | null>(null);
   const tagsOpen = activePanel === 'tags';
   const [fontQuery, setFontQuery] = useState('');
   const [size, setSize] = useState({ width: 1, height: 1 });
@@ -109,7 +112,7 @@ export function PhotoWorkspace({
       initialLayout ??
       createCaptionLayout({
         ...photo.document.caption,
-        template: '{author}\n{lens}\n{exposure}',
+        template: defaultTemplate,
       }),
   );
   const assets = useMemo(
@@ -542,6 +545,12 @@ export function PhotoWorkspace({
           </Layer>
         </Stage>
       </div>
+      {activePanel === 'presets' && (
+        <div
+          ref={setPresetHost}
+          className="max-h-[40vh] w-full shrink-0 md:max-h-none md:w-80"
+        />
+      )}
       {activePanel === 'icons' && (
         <IconPickerPanel
           icons={icons}
@@ -565,97 +574,121 @@ export function PhotoWorkspace({
           className="max-h-[40vh] w-full shrink-0 rounded-none shadow-none md:max-h-none md:w-80"
         />
       )}
-      {activePanel && activePanel !== 'colors' && activePanel !== 'icons' && (
-        <FloatingPanel
-          id="auxiliary-panel"
-          title={tagsOpen ? 'Available tags' : 'Choose a font'}
-          description={
-            tagsOpen
-              ? 'Click a field to insert it into your caption.'
-              : 'Preview a font and apply it to your caption.'
-          }
-          onClose={() => setActivePanel(null)}
-          surface="solid"
-          className="max-h-[40vh] w-full shrink-0 rounded-none shadow-none md:max-h-none md:w-80"
-          toolbar={
-            tagsOpen ? (
-              <>
+      {activePanel &&
+        activePanel !== 'colors' &&
+        activePanel !== 'icons' &&
+        activePanel !== 'presets' && (
+          <FloatingPanel
+            id="auxiliary-panel"
+            title={tagsOpen ? 'Available tags' : 'Choose a font'}
+            description={
+              tagsOpen
+                ? 'Click a field to insert it into your caption.'
+                : 'Preview a font and apply it to your caption.'
+            }
+            onClose={() => setActivePanel(null)}
+            surface="solid"
+            className="max-h-[40vh] w-full shrink-0 rounded-none shadow-none md:max-h-none md:w-80"
+            toolbar={
+              tagsOpen ? (
+                <>
+                  <Input
+                    aria-label="Search metadata"
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder="Search fields or values…"
+                    className="bg-preview-placeholder"
+                  />
+                  <p className="mt-2 text-xs text-content-secondary">
+                    {matchingFieldCount} tags
+                  </p>
+                </>
+              ) : (
                 <Input
-                  aria-label="Search metadata"
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Search fields or values…"
+                  aria-label="Search fonts"
+                  value={fontQuery}
+                  onChange={(event) => setFontQuery(event.target.value)}
+                  placeholder="Search fonts…"
                   className="bg-preview-placeholder"
                 />
-                <p className="mt-2 text-xs text-content-secondary">
-                  {matchingFieldCount} tags
-                </p>
-              </>
-            ) : (
-              <Input
-                aria-label="Search fonts"
-                value={fontQuery}
-                onChange={(event) => setFontQuery(event.target.value)}
-                placeholder="Search fonts…"
-                className="bg-preview-placeholder"
+              )
+            }
+          >
+            {tagsOpen ? (
+              <MetadataPicker
+                fields={fields}
+                query={query}
+                used={used}
+                onChoose={addToken}
               />
-            )
-          }
-        >
-          {tagsOpen ? (
-            <MetadataPicker
-              fields={fields}
-              query={query}
-              used={used}
-              onChoose={addToken}
-            />
-          ) : (
-            <PickerList
-              items={[
-                {
-                  id: 'Montserrat Variable',
-                  label: 'Montserrat',
-                  description: 'Sans serif · Regular / Bold',
-                  preview: (
-                    <span className="font-sans text-xl">
-                      Every frame has a story.
-                    </span>
-                  ),
-                },
-                {
-                  id: 'Advercase',
-                  label: 'Advercase',
-                  description: 'Display serif · Regular / Bold',
-                  preview: (
-                    <span className="font-display text-2xl">
-                      Every frame has a story.
-                    </span>
-                  ),
-                },
-              ]
-                .filter((font) =>
-                  font.label.toLowerCase().includes(fontQuery.toLowerCase()),
-                )
-                .map((font) => ({
-                  ...font,
-                  selected: settings.style.fontFamily === font.id,
-                }))}
-              onChoose={(id) =>
-                setSettings((value) => ({
-                  ...value,
-                  style: {
-                    ...value.style,
-                    fontFamily: id as typeof value.style.fontFamily,
+            ) : (
+              <PickerList
+                items={[
+                  {
+                    id: 'Montserrat Variable',
+                    label: 'Montserrat',
+                    description: 'Sans serif · Regular / Bold',
+                    preview: (
+                      <span className="font-sans text-xl">
+                        Every frame has a story.
+                      </span>
+                    ),
                   },
-                }))
-              }
-              emptyText="No matching fonts."
-            />
-          )}
-        </FloatingPanel>
-      )}
+                  {
+                    id: 'Advercase',
+                    label: 'Advercase',
+                    description: 'Display serif · Regular / Bold',
+                    preview: (
+                      <span className="font-display text-2xl">
+                        Every frame has a story.
+                      </span>
+                    ),
+                  },
+                ]
+                  .filter((font) =>
+                    font.label.toLowerCase().includes(fontQuery.toLowerCase()),
+                  )
+                  .map((font) => ({
+                    ...font,
+                    selected: settings.style.fontFamily === font.id,
+                  }))}
+                onChoose={(id) =>
+                  setSettings((value) => ({
+                    ...value,
+                    style: {
+                      ...value.style,
+                      fontFamily: id as typeof value.style.fontFamily,
+                    },
+                  }))
+                }
+                emptyText="No matching fonts."
+              />
+            )}
+          </FloatingPanel>
+        )}
       <ToolSidebar aria-label="Photo tools">
         <div className="min-h-0 flex-1 overflow-y-auto">
+          <PresetControls
+            panelHost={presetHost}
+            onBrowse={() => setActivePanel('presets')}
+            onClose={() => setActivePanel(null)}
+            layout={layout}
+            icons={icons}
+            disabled={exporting}
+            persist={!initialLayout}
+            onApply={(preset) => {
+              setLayout(structuredClone(preset.layout));
+              setIcons([
+                ...preset.icons,
+                ...builtinIcons.filter(
+                  (icon) =>
+                    !preset.icons.some((saved) => saved.name === icon.name),
+                ),
+              ]);
+              setHoveredId(null);
+              setEditingId(null);
+            }}
+          />
           <section aria-label="Document settings">
             <SidebarSection
               id="photo"
