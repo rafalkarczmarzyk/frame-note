@@ -15,8 +15,14 @@ const preview: Preview = {
     a11y: { test: 'todo' },
   },
   decorators: [
-    (Story) => (
-      <div className="min-h-24 bg-background p-4 font-sans text-foreground">
+    (Story, context) => (
+      <div
+        className={
+          context.parameters.layout === 'fullscreen'
+            ? 'relative isolate h-dvh min-h-0 overflow-hidden bg-background font-sans text-foreground'
+            : 'min-h-24 bg-background p-4 font-sans text-foreground'
+        }
+      >
         <Story />
       </div>
     ),
