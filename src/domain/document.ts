@@ -42,6 +42,8 @@ export interface Caption {
   };
   position: {
     anchor: Anchor;
+    /** Anchor reference point as percentages of the full photo. */
+    custom?: { x: number; y: number };
     margins: Margins;
     marginLinkMode: MarginLinkMode;
   };

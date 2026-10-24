@@ -284,3 +284,13 @@ between the preview and main sidebar, with a solid surface. Opening it resizes
 the preview host and refits the full image instead of covering it. On narrow
 screens panels stack and have a capped height with independent content scrolling.
 FloatingPanel remains a reusable primitive for existing standalone stories.
+
+## Custom positioning — MVP stage 3
+
+Position offers Anchor/Custom. Custom coordinates are percentages of full photo
+width and height and refer to the last selected anchor point of the text block.
+Selecting a grid point returns to Anchor. Global margins do not move Custom
+captions. Canvas dragging updates coordinates in source-image space, independent
+of preview scale. A dashed outline remains visible during dragging. Duplicate
+preserves Custom; adding a fresh container uses the next available anchor.
+Screens/TestPhotos/CustomPosition demonstrates this mode.

@@ -1,5 +1,10 @@
 import { expect, it } from 'vitest';
-import { anchoredPosition, anchors } from './layout';
+import {
+  anchoredPosition,
+  anchors,
+  customPoint,
+  customPosition,
+} from './layout';
 
 it.each([
   ['top-left', 10, 20],
@@ -60,4 +65,42 @@ it.each([
       { top: 30, right: 60, bottom: 70, left: 20 },
     ),
   ).toEqual({ x, y });
+});
+
+it.each(anchors)('converts %s to custom without a position jump', (anchor) => {
+  const image = { width: 2000, height: 1000 };
+  const block = { width: 300, height: 80 };
+  const margins = { top: 30, right: 60, bottom: 40, left: 20 };
+  const origin = anchoredPosition(image, block, anchor, margins);
+  const point = customPoint(image, block, anchor, origin);
+  const result = customPosition(image, block, anchor, point);
+  expect(result.x).toBeCloseTo(origin.x);
+  expect(result.y).toBeCloseTo(origin.y);
+  // Switching via the controls does not depend on the block dimensions.
+  const reference = customPoint(
+    image,
+    { width: 0, height: 0 },
+    anchor,
+    anchoredPosition(image, { width: 0, height: 0 }, anchor, margins),
+  );
+  expect(reference.x).toBeCloseTo(point.x);
+  expect(reference.y).toBeCloseTo(point.y);
+});
+it('preserves the bottom right reference as text grows and photo dimensions change', () => {
+  expect(
+    customPosition(
+      { width: 2000, height: 1000 },
+      { width: 300, height: 80 },
+      'bottom-right',
+      { x: 80, y: 90 },
+    ),
+  ).toEqual({ x: 1300, y: 820 });
+  expect(
+    customPosition(
+      { width: 1000, height: 2000 },
+      { width: 500, height: 100 },
+      'bottom-right',
+      { x: 80, y: 90 },
+    ),
+  ).toEqual({ x: 300, y: 1700 });
 });

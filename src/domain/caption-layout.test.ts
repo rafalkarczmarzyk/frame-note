@@ -179,4 +179,21 @@ describe('multiple caption containers', () => {
     const copy = addCaption(next, 'copy', true);
     expect(copy.containers.at(-1)!.position.anchor).toBe('top-right');
   });
+  it('preserves custom positions through edits, unit conversion and duplication', () => {
+    const caption = createCaption();
+    caption.position.custom = { x: 42, y: 72 };
+    const layout = createCaptionLayout(caption);
+    const changed = updateCaption(
+      layout,
+      '',
+      { ...caption, sizingUnit: 'px' },
+      dimensions,
+    );
+    expect(changed.containers[0]!.position.custom).toEqual({ x: 42, y: 72 });
+    const duplicate = addCaption(changed, 'copy', true);
+    expect(duplicate.containers[1]!.position.custom).toEqual({ x: 42, y: 72 });
+    expect(
+      addCaption(changed, 'new').containers[1]!.position.custom,
+    ).toBeUndefined();
+  });
 });
