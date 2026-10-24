@@ -66,6 +66,9 @@
   * {
     @apply border-border;
   }
+  button:not(:disabled):not([aria-disabled='true']) {
+    cursor: pointer;
+  }
   body {
     @apply m-0 bg-background font-sans antialiased;
     min-width: 320px;
