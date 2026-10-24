@@ -7,7 +7,8 @@ Konva i ExifReader. Zdjęcia są przetwarzane w przeglądarce, bez wysyłania na
 
 Pre-MVP ukończone i zaakceptowane; ostatni etap zapisany w commicie `9a627af`.
 Cały przepływ działa: import JPG → szablon podpisu → stylowanie i podgląd → eksport.
-Przejście do kolejnych prac wymaga zatwierdzenia użytkownika.
+Po zamknięciu pre-MVP dodano uzgodnione usprawnienia UI, helpery metadanych i nowe
+zdjęcia testowe. Nie oznacza to zatwierdzenia całej roadmapy MVP.
 
 Kontekst produktu, założenia pre-MVP i propozycja MVP:
 [docs/PRODUCT_PLAN.md](docs/PRODUCT_PLAN.md).
@@ -33,13 +34,15 @@ pnpm test:e2e
 pnpm build-storybook
 ```
 
-- `check`: Prettier, ESLint, TypeScript, 120 testów jednostkowych i build aplikacji.
-- E2E na produkcyjnym buildzie, port 4173: po dwa scenariusze w Chromium i WebKit.
+- `check`: Prettier, kontrola tokenów kolorów, ESLint, TypeScript, 141 testów jednostkowych i build aplikacji.
+- E2E na produkcyjnym buildzie, port 4173: pięć scenariuszy w Chromium i WebKit (10 testów).
 - Przepływ eksportu sprawdza oba oryginalne JPG, wymiary, jakość, rozmiar w bajtach,
   brak źródłowych metadanych, różnice kolorów sRGB i obrót EXIF 6.
 - Regresja wizualna porównuje piksele eksportu w Chromium, bez zależności od UI.
 - Drugi scenariusz sprawdza szybką wymianę zdjęć, błędne i puste pliki, powrót do
   pracy po błędzie oraz zwalnianie adresów Blob przy wymianie i nieudanym imporcie.
+- Pozostałe scenariusze sprawdzają zachowanie stylu przy zmianie zdjęcia, wybór
+  własnego HEX i jego piksele w JPG oraz helpery, namespace i przenośny szablon.
 - WebKit to automatyczny test silnika przeglądarki; nie zastępuje ręcznej oceny
   aplikacji Safari ani testów na innych systemach.
 
@@ -57,7 +60,7 @@ obrazów i diffu. Nie aktualizujemy wzorców eksportu przy samych zmianach UI.
 Inne platformy wymagają własnych, przejrzanych wzorców. WebKit wykonuje asercje
 funkcjonalne i pomiar kolorów bez porównywania do wzorców Chromium.
 
-## Możliwości pre-MVP
+## Aktualne możliwości
 
 - Jeden JPG: wybór pliku lub drag & drop. Błąd wymiany pozostawia poprzednie zdjęcie.
 - Odczyt metadanych rozpoznawanych przez ExifReader: EXIF, IPTC, XMP i ICC.
@@ -74,7 +77,8 @@ funkcjonalne i pomiar kolorów bez porównywania do wzorców Chromium.
   interlinia jako mnożnik fontu oraz wyrównanie tekstu.
 - Globalna jednostka wymiarowania: px, % krótszego lub % dłuższego boku zdjęcia.
   Dotyczy rozmiaru fontu i czterech marginesów; zmiana jednostki przelicza wartości
-  bez zmiany wyglądu na bieżącym zdjęciu. Domyślnie % krótszego boku.
+  bez zmiany wyglądu na bieżącym zdjęciu. Domyślnie font 2% krótszego boku,
+  marginesy po 3%, interlinia 1,4× i biały podpis (Porcelain).
 - Wizualny edytor marginesów z trybami niezależnym, parami i wszystkimi krawędziami i dziewięć anchorów względem
   obszaru wewnątrz marginesów. Limity zostawiają co najmniej 1 px tego obszaru;
   nie zapewniają dopasowania zbyt dużego bloku tekstu.
@@ -83,7 +87,7 @@ funkcjonalne i pomiar kolorów bez porównywania do wzorców Chromium.
 - Dokładny rozmiar wyniku po kodowaniu w tle, rozmiar wejścia i ostrzeżenie,
   gdy wynik jest większy. Pobierany jest gotowy Blob, bez ponownego kodowania.
 - Stały sidebar ze zwijanymi sekcjami i pamięcią otwarcia w localStorage.
-  Pływający panel tagów/fontów ma osobny scroll i nie zmienia rozmiaru zdjęcia.
+  Pływający panel tagów/fontów/kolorów ma osobny scroll i nie zmienia rozmiaru zdjęcia.
 
 ## Ograniczenia
 
@@ -100,9 +104,20 @@ funkcjonalne i pomiar kolorów bez porównywania do wzorców Chromium.
   i zmniejszania tekstu.
 - Kodowanie jest kolejkowane z opóźnieniem 450 ms i ignorowaniem spóźnionych wyników,
   ale rysowanie dużych obrazów może chwilowo obciążyć główny wątek.
-- Ustawienia podpisu resetują się przy wymianie zdjęcia. Presety użytkownika,
+- Szablon, styl, pozycja i jakość eksportu pozostają przy wymianie zdjęcia,
+  ale nie są zapisywane między odświeżeniami aplikacji. Presety użytkownika,
   wiele zdjęć, wiele kontenerów, parser Helicon, zoom/pan i wersja desktopowa
   pozostają poza pre-MVP.
+
+## Podpisy i zdjęcia testowe
+
+[Helpery i składnia podpisów](docs/CAPTION_TAGS.md) opisują dostępne nazwy,
+kolejność źródeł, formatowanie i brakujące dane. Oryginalne tagi pozostają dostępne.
+
+Siedem oryginalnych JPG obejmuje jasne i ciemne tła, dwie orientacje, komentarz
+Helicon oraz metadane XMP bez parametrów ekspozycji. Lista, wymiary i sumy plików:
+[tests/fixtures/README.md](tests/fixtures/README.md). Nie zmieniamy oryginałów
+i nie dołączamy ich do produkcyjnego builda aplikacji.
 
 ## Design system
 
@@ -112,8 +127,10 @@ pnpm build-storybook
 ```
 
 Storybook: http://localhost:6006. Podział: Design (tokeny), Components (UI, Layout,
-Brand) i Screens (ekran startowy oraz edytor ze zdjęciem poziomym i pionowym). Aplikacja oraz stories importują te same komponenty i CSS.
-Sprawdzono renderowanie wszystkich przykładów oraz interakcje Select i Slider.
+Brand) i Screens. `Screens/EditorWorkspace` pokazuje kompozycję UI ze zdjęciem
+poziomym/pionowym; `Screens/TestPhotos` uruchamia rzeczywisty edytor z odczytem
+metadanych, podglądem podpisu i eksportem na pięciu dodatkowych zdjęciach.
+Aplikacja oraz stories importują te same komponenty i CSS.
 Addon dostępności pomaga w przeglądzie; nie stanowi pełnego audytu dostępności.
 
 Dokumentacja komponentów i rozbudowy: [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md).

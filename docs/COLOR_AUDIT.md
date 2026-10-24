@@ -105,3 +105,22 @@ zmiennych; działa też w `pnpm check`.
 
 Pierwotny audyt był tylko odczytem. Powyższa sekcja opisuje późniejsze, zatwierdzone
 wdrożenie uproszczeń.
+
+## Stan po późniejszych dodatkach UI
+
+Powyższe tabele pozostają historycznym zapisem refaktoru. Po zatwierdzonych
+rozszerzeniach palety bieżący stan wynosi **20 kolorów bazowych i 18 receptur**:
+
+- 5 pierwotnych kolorów powierzchni/tekstu,
+- emerald jako primary (`#14CC60`),
+- 5 akcentów palety: violet, turquoise, yellow, crimson, rose-brown,
+- 9 dodatkowych kolorów podpisu `caption-*`.
+
+Podpis oferuje 12 presetów: 9 nowych oraz istniejące Porcelain, Slate i Charcoal.
+Własny HEX użytkownika jest wartością podpisu, a nie kolejnym stałym tokenem UI.
+Dodatkowe 5 receptur względem wyniku refaktoru to hovery kolorowych buttonów.
+Primary zasila główną akcję eksportu i ikonę Export; tło przeciągania pozostaje
+slate, niezależnie od primary. Aktualny pomiar: `pnpm check:tokens`.
+
+Eksperyment z rozmytym zdjęciem pod przezroczystym edytorem został wycofany;
+jego tokeny i komponent nie należą do obecnego design systemu.
