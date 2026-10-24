@@ -1,3 +1,4 @@
+import type { Margins, SizingUnit, MarginLinkMode } from './sizing';
 import type { MetadataField } from './metadata';
 
 export interface ImageDimensions {
@@ -27,11 +28,12 @@ export type Anchor =
 
 export interface Caption {
   template: string;
+  sizingUnit: SizingUnit;
   style: {
     fontFamily: 'Montserrat Variable' | 'Advercase';
     fontWeight: 400 | 700;
-    /** Percentage of the shorter image edge, not of the viewport. */
-    fontSizePercent: number;
+    /** Uses the document sizing unit, never the viewport. */
+    fontSize: number;
     color: string;
     opacity: number;
     /** Unitless multiplier of the font size. */
@@ -40,9 +42,8 @@ export interface Caption {
   };
   position: {
     anchor: Anchor;
-    /** Both margins are percentages of the shorter image edge. */
-    marginXPercent: number;
-    marginYPercent: number;
+    margins: Margins;
+    marginLinkMode: MarginLinkMode;
   };
 }
 
@@ -55,16 +56,21 @@ export interface PhotoDocument {
 export function createCaption(): Caption {
   return {
     template: '',
+    sizingUnit: 'short-edge',
     style: {
       fontFamily: 'Montserrat Variable',
       fontWeight: 400,
-      fontSizePercent: 1.35,
+      fontSize: 1.35,
       color: 'porcelain',
       opacity: 1,
       lineHeight: 1.4,
       textAlign: 'left',
     },
-    position: { anchor: 'bottom-left', marginXPercent: 3, marginYPercent: 3 },
+    position: {
+      anchor: 'bottom-left',
+      margins: { top: 3, right: 3, bottom: 3, left: 3 },
+      marginLinkMode: 'none',
+    },
   };
 }
 

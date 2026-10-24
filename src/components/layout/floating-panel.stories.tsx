@@ -24,10 +24,10 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <div className="relative h-[540px] w-full max-w-2xl overflow-hidden bg-secondary">
-        <div className="absolute inset-8 grid grid-cols-2 gap-6 text-secondary-foreground">
-          <div className="bg-primary p-6 text-2xl">Canvas</div>
-          <div className="bg-background p-6 text-foreground">Preview</div>
+      <div className="relative h-[540px] w-full max-w-2xl overflow-hidden bg-drop-base">
+        <div className="absolute inset-8 grid grid-cols-2 gap-6 text-drop-text">
+          <div className="bg-button-primary-base p-6 text-2xl">Canvas</div>
+          <div className="bg-app-base p-6 text-content-primary">Preview</div>
         </div>
         <div className="absolute inset-y-5 right-5 w-80">
           <Story />

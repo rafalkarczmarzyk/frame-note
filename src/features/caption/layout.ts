@@ -1,3 +1,4 @@
+import type { Margins } from '../../domain/sizing';
 import type { Anchor, ImageDimensions } from '../../domain/document';
 
 export const anchors: readonly Anchor[] = [
@@ -17,8 +18,7 @@ export function anchoredPosition(
   image: ImageDimensions,
   block: ImageDimensions,
   anchor: Anchor,
-  marginX: number,
-  marginY: number,
+  margins: Margins,
 ) {
   const column = anchor.endsWith('left')
     ? 'left'
@@ -33,15 +33,17 @@ export function anchoredPosition(
   return {
     x:
       column === 'left'
-        ? marginX
+        ? margins.left
         : column === 'right'
-          ? image.width - marginX - block.width
-          : (image.width - block.width) / 2,
+          ? image.width - margins.right - block.width
+          : margins.left +
+            (image.width - margins.left - margins.right - block.width) / 2,
     y:
       row === 'top'
-        ? marginY
+        ? margins.top
         : row === 'bottom'
-          ? image.height - marginY - block.height
-          : (image.height - block.height) / 2,
+          ? image.height - margins.bottom - block.height
+          : margins.top +
+            (image.height - margins.top - margins.bottom - block.height) / 2,
   };
 }

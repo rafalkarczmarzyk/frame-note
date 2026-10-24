@@ -8,25 +8,30 @@ export function Field({
   error,
   children,
   className,
+  hideLabel = false,
 }: {
   label: string;
   hint?: string;
   error?: string;
   children: (id: string, descriptionId: string | undefined) => ReactNode;
   className?: string;
+  hideLabel?: boolean;
 }) {
   const id = useId();
   const descriptionId = hint || error ? `${id}-description` : undefined;
   return (
     <div className={cn('space-y-2', className)}>
-      <label htmlFor={id} className="block text-xs text-foreground/75">
+      <label
+        htmlFor={id}
+        className={hideLabel ? 'sr-only' : 'block text-xs text-label'}
+      >
         {label}
       </label>
       {children(id, descriptionId)}
       {(error || hint) && (
         <p
           id={descriptionId}
-          className="text-xs leading-5 text-foreground/70"
+          className="text-xs leading-5 text-content-secondary"
           role={error ? 'alert' : undefined}
         >
           {error || hint}

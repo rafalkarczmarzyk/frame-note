@@ -1,3 +1,5 @@
+import { Download, TextQuote } from 'lucide-react';
+import { PhotoIcon } from '../components/icons/photo-icon';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import {
@@ -45,12 +47,12 @@ function EditorDemo({
   const [panel, setPanel] = useState<'tags' | 'fonts' | null>(null);
   const [quality, setQuality] = useState(95);
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden bg-background text-foreground">
+    <div className="flex h-full min-h-0 flex-col overflow-hidden bg-app-base text-content-primary">
       <AppHeader>
         <Button>Export JPG</Button>
       </AppHeader>
       <EditorWorkspace>
-        <div className="relative min-h-0 min-w-0 flex-1">
+        <div className="relative min-h-0 min-w-0 flex-1 bg-workspace-base">
           <div className="absolute inset-6">
             <img
               src={photo.url}
@@ -127,6 +129,7 @@ function EditorDemo({
             <SidebarSection
               id="storybook-photo"
               title="Photo"
+              icon={<PhotoIcon />}
               defaultOpen={false}
               persist={false}
               summary="6.10 MB"
@@ -138,6 +141,7 @@ function EditorDemo({
             <SidebarSection
               id="storybook-caption"
               title="Caption"
+              icon={<TextQuote />}
               persist={false}
             >
               <Textarea
@@ -162,6 +166,7 @@ function EditorDemo({
               </Button>
             </SidebarSection>
             <CaptionControls
+              dimensions={{ width: photo.width, height: photo.height }}
               caption={caption}
               preferenceScope="storybook-"
               persistSections={false}
@@ -172,6 +177,7 @@ function EditorDemo({
             <SidebarSection
               id="storybook-export"
               title="Export"
+              icon={<Download />}
               persist={false}
               summary="Best · 4.2 MB"
             >

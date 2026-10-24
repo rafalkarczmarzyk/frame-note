@@ -15,7 +15,7 @@ const meta = {
     (Story) => (
       <div className="flex h-96 border">
         <EditorWorkspace>
-          <div className="flex-1 p-6 text-sm text-foreground/70">
+          <div className="flex-1 p-6 text-sm text-content-secondary">
             Viewport fills the remaining space.
           </div>
           <Story />

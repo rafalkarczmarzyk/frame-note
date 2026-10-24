@@ -20,73 +20,222 @@
 @theme {
   --font-sans: 'Montserrat Variable', sans-serif;
   --font-display: 'Advercase', Georgia, serif;
-  --color-tropical-mint: #50ffb1;
   --color-charcoal: #383f51;
+  --color-charcoal-dark: #292e3b;
+  --color-charcoal-light: #454e64;
   --color-porcelain: #fdfffc;
   --color-slate: #9cafb7;
 }
 
+/* Base palette above is also used by photo captions. UI roles below are independent. */
 :root {
   color-scheme: dark;
-  --background: var(--color-charcoal);
-  --foreground: var(--color-porcelain);
-  --card: var(--color-charcoal);
-  --primary: var(--color-tropical-mint);
-  --primary-foreground: var(--color-charcoal);
-  --secondary: var(--color-slate);
-  --secondary-foreground: var(--color-charcoal);
-  --muted: var(--color-charcoal);
-  --muted-foreground: var(--color-porcelain);
-  --border: color-mix(in srgb, var(--color-slate) 24%, transparent);
-  --ring: var(--color-porcelain);
-  --accent: var(--color-slate);
-  --warning: var(--color-slate);
-  --destructive: var(--color-porcelain);
   --radius: 0.5rem;
-  --control-surface: color-mix(
+  --tone-surface: color-mix(
     in srgb,
-    var(--foreground) 6%,
-    var(--background)
+    var(--color-porcelain) 6%,
+    var(--color-charcoal)
   );
-  --control-hover: color-mix(in srgb, var(--foreground) 10%, var(--background));
-  --control-edge: color-mix(in srgb, var(--foreground) 12%, transparent);
-  --control-highlight: color-mix(in srgb, var(--foreground) 16%, transparent);
-  --control-selected: color-mix(
+  --tone-hover: color-mix(
     in srgb,
-    var(--foreground) 18%,
-    var(--background)
+    var(--color-porcelain) 10%,
+    var(--color-charcoal)
   );
-  --control-shadow: 0 2px 5px
-    color-mix(in srgb, var(--color-charcoal) 45%, transparent);
-  --control-focus: color-mix(in srgb, var(--primary) 65%, var(--foreground));
+  --tone-selected: color-mix(
+    in srgb,
+    var(--color-porcelain) 18%,
+    var(--color-charcoal)
+  );
+  --tone-accent-hover: color-mix(
+    in srgb,
+    var(--color-slate) 75%,
+    var(--color-porcelain)
+  );
+  --tone-text-secondary: color-mix(
+    in srgb,
+    var(--color-porcelain) 70%,
+    transparent
+  );
+  --tone-text-muted: color-mix(
+    in srgb,
+    var(--color-porcelain) 50%,
+    transparent
+  );
+  --tone-edge: color-mix(in srgb, var(--color-porcelain) 16%, transparent);
+  --tone-overlay: color-mix(in srgb, var(--color-porcelain) 5%, transparent);
+  --tone-shadow: color-mix(in srgb, var(--color-charcoal) 40%, transparent);
+  --tone-focus: color-mix(
+    in srgb,
+    var(--color-slate) 65%,
+    var(--color-porcelain)
+  );
+  --tone-focus-wash: color-mix(in srgb, var(--color-slate) 16%, transparent);
+  --tone-thumb-glass: color-mix(
+    in srgb,
+    var(--color-porcelain) 35%,
+    transparent
+  );
+
+  /* Usage roles: these are the public color tokens for Tailwind. */
+  --app-base: var(--color-charcoal);
+  --header-base: var(--app-base);
+  --sidebar-base: var(--app-base);
+  --workspace-base: var(--color-charcoal-dark);
+  --accordion-base: var(--color-charcoal-light);
+  --accordion-header-hover: var(--tone-overlay);
+  --accordion-label: var(--content-primary);
+  --accordion-icon: var(--content-secondary);
+  --accordion-icon-base: var(--tone-overlay);
+  --content-primary: var(--color-porcelain);
+  --content-secondary: var(--tone-text-secondary);
+  --content-muted: var(--tone-text-muted);
+  --icon-muted: var(--tone-text-muted);
+  --label: var(--content-secondary);
+  --border-subtle: var(--tone-edge);
+  --focus-ring: var(--tone-focus);
+  --input-base: var(--tone-surface);
+  --input-hover: var(--tone-hover);
+  --input-text: var(--content-primary);
+  --input-placeholder: var(--content-muted);
+  --input-border: transparent;
+  --input-focus-ring: var(--focus-ring);
+  --input-unit: var(--content-secondary);
+  --input-invalid-border: var(--content-primary);
+  --button-primary-base: var(--color-slate);
+  --button-primary-hover: var(--tone-accent-hover);
+  --button-primary-text: var(--app-base);
+  --button-secondary-base: var(--tone-surface);
+  --button-secondary-hover: var(--tone-hover);
+  --button-secondary-text: var(--content-primary);
+  --button-border: var(--border-subtle);
+  --button-quiet-hover: var(--tone-hover);
+  --segment-base: var(--tone-surface);
+  --segment-hover: var(--tone-hover);
+  --segment-selected: var(--tone-hover);
+  --segment-selected-hover: var(--tone-selected);
+  --segment-text: var(--content-secondary);
+  --segment-selected-text: var(--content-primary);
+  --slider-track: var(--tone-edge);
+  --slider-fill: var(--color-slate);
+  --slider-fill-highlight: var(--tone-accent-hover);
+  --slider-thumb: var(--color-porcelain);
+  --slider-thumb-drag: var(--tone-thumb-glass);
+  --slider-thumb-border: var(--border-subtle);
+  --slider-scale: var(--content-secondary);
+  --slider-tick: var(--content-muted);
+  --panel-base: var(--sidebar-base);
+  --panel-header-base: var(--accordion-base);
+  --panel-border: var(--border-subtle);
+  --panel-text: var(--content-primary);
+  --menu-base: var(--sidebar-base);
+  --menu-item-hover: var(--tone-hover);
+  --menu-item-selected: var(--tone-hover);
+  --menu-text: var(--content-primary);
+  --accent-color: var(--color-slate);
+  --notice-warning: var(--accent-color);
+  --drop-base: var(--color-slate);
+  --drop-text: var(--app-base);
+  --preview-placeholder: var(--tone-surface);
+
+  /* Materials and effects share recipes rather than inventing per-component colors. */
+  --panel-glass: color-mix(in srgb, var(--panel-base) 98%, transparent);
+  --menu-glass: var(--panel-glass);
+  --surface-reflection: linear-gradient(
+    to bottom,
+    var(--tone-edge),
+    transparent
+  );
+  --shadow-inset: inset 0 1px 2px var(--tone-shadow);
+  --shadow-raised: inset 0 1px 0 var(--tone-edge), 0 2px 5px var(--tone-shadow);
+  --button-reflection: var(--surface-reflection);
+  --segment-reflection: var(--surface-reflection);
+  --input-shadow: var(--shadow-inset), inset 0 -1px 0 var(--tone-edge);
+  --input-focus-shadow: 0 0 0 3px var(--tone-focus-wash);
+  --button-shadow: var(--shadow-raised);
+  --button-pressed-shadow: var(--shadow-inset);
+  --segment-shadow: var(--shadow-raised);
+  --slider-track-shadow: var(--shadow-inset);
+  --slider-thumb-shadow: var(--shadow-raised);
+  --panel-shadow:
+    inset 0 1px 0 var(--tone-edge), 0 12px 32px var(--tone-shadow);
+  --menu-shadow: var(--panel-shadow);
+  --control-disabled-opacity: 0.4;
+  --material-blur: 24px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-border: var(--border);
-  --color-accent: var(--accent);
-  --color-warning: var(--warning);
-  --color-destructive: var(--destructive);
-  --color-ring: var(--ring);
+  --color-app-base: var(--app-base);
+  --color-header-base: var(--header-base);
+  --color-sidebar-base: var(--sidebar-base);
+  --color-workspace-base: var(--workspace-base);
+  --color-accordion-base: var(--accordion-base);
+  --color-accordion-header-hover: var(--accordion-header-hover);
+  --color-accordion-label: var(--accordion-label);
+  --color-accordion-icon: var(--accordion-icon);
+  --color-accordion-icon-base: var(--accordion-icon-base);
+  --color-content-primary: var(--content-primary);
+  --color-content-secondary: var(--content-secondary);
+  --color-content-muted: var(--content-muted);
+  --color-icon-muted: var(--icon-muted);
+  --color-label: var(--label);
+  --color-border-subtle: var(--border-subtle);
+  --color-focus-ring: var(--focus-ring);
+  --color-input-base: var(--input-base);
+  --color-input-hover: var(--input-hover);
+  --color-input-text: var(--input-text);
+  --color-input-placeholder: var(--input-placeholder);
+  --color-input-border: var(--input-border);
+  --color-input-focus-ring: var(--input-focus-ring);
+  --color-input-unit: var(--input-unit);
+  --color-input-invalid-border: var(--input-invalid-border);
+  --color-button-primary-base: var(--button-primary-base);
+  --color-button-primary-hover: var(--button-primary-hover);
+  --color-button-primary-text: var(--button-primary-text);
+  --color-button-secondary-base: var(--button-secondary-base);
+  --color-button-secondary-hover: var(--button-secondary-hover);
+  --color-button-secondary-text: var(--button-secondary-text);
+  --color-button-border: var(--button-border);
+  --color-button-quiet-hover: var(--button-quiet-hover);
+  --color-segment-base: var(--segment-base);
+  --color-segment-hover: var(--segment-hover);
+  --color-segment-selected: var(--segment-selected);
+  --color-segment-selected-hover: var(--segment-selected-hover);
+  --color-segment-text: var(--segment-text);
+  --color-segment-selected-text: var(--segment-selected-text);
+  --color-slider-track: var(--slider-track);
+  --color-slider-fill: var(--slider-fill);
+  --color-slider-fill-highlight: var(--slider-fill-highlight);
+  --color-slider-thumb: var(--slider-thumb);
+  --color-slider-thumb-drag: var(--slider-thumb-drag);
+  --color-slider-thumb-border: var(--slider-thumb-border);
+  --color-slider-scale: var(--slider-scale);
+  --color-slider-tick: var(--slider-tick);
+  --color-panel-base: var(--panel-base);
+  --color-panel-header-base: var(--panel-header-base);
+  --color-panel-border: var(--panel-border);
+  --color-panel-text: var(--panel-text);
+  --color-menu-base: var(--menu-base);
+  --color-menu-item-hover: var(--menu-item-hover);
+  --color-menu-item-selected: var(--menu-item-selected);
+  --color-menu-text: var(--menu-text);
+  --color-accent-color: var(--accent-color);
+  --color-notice-warning: var(--notice-warning);
+  --color-drop-base: var(--drop-base);
+  --color-drop-text: var(--drop-text);
+  --color-preview-placeholder: var(--preview-placeholder);
+  --shadow-panel: var(--panel-shadow);
+  --shadow-menu: var(--menu-shadow);
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border-subtle;
   }
   button:not(:disabled):not([aria-disabled='true']) {
     cursor: pointer;
   }
   body {
-    @apply m-0 bg-background font-sans antialiased;
+    @apply m-0 bg-app-base font-sans antialiased;
     min-width: 320px;
   }
 }
@@ -104,26 +253,24 @@
       border-color 140ms ease;
   }
   .control-field {
-    border: 1px solid transparent;
+    border: 1px solid var(--input-border);
     border-radius: var(--radius);
-    background: var(--control-surface);
-    color: var(--foreground);
-    box-shadow:
-      inset 0 1px 2px color-mix(in srgb, var(--color-charcoal) 35%, transparent),
-      inset 0 -1px 0 var(--control-edge);
+    background: var(--input-base);
+    color: var(--input-text);
+    box-shadow: var(--input-shadow);
   }
   .control-field::placeholder {
-    color: color-mix(in srgb, var(--foreground) 48%, transparent);
+    color: var(--input-placeholder);
   }
   .control-field:hover:not(:disabled) {
-    background: var(--control-hover);
+    background: var(--input-hover);
   }
   .control-field:focus-visible {
-    border-color: var(--control-focus);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 16%, transparent);
+    border-color: var(--input-focus-ring);
+    box-shadow: var(--input-focus-shadow);
   }
   .control-field[aria-invalid='true'] {
-    border-color: var(--foreground);
+    border-color: var(--input-invalid-border);
     border-style: dashed;
   }
   .control-button {
@@ -131,91 +278,73 @@
   }
   .button-primary,
   .control-neutral {
-    border: 1px solid var(--control-edge);
-    box-shadow:
-      inset 0 1px 0 var(--control-highlight),
-      var(--control-shadow);
+    border: 1px solid var(--button-border);
+    box-shadow: var(--button-shadow);
   }
   .button-primary {
-    background-color: var(--primary);
-    background-image: linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--foreground) 15%, transparent),
-      transparent
-    );
-    color: var(--primary-foreground);
+    background-color: var(--button-primary-base);
+    background-image: var(--button-reflection);
+    color: var(--button-primary-text);
   }
   .button-primary:hover:not(:disabled) {
-    background-color: color-mix(in srgb, var(--primary) 75%, var(--foreground));
+    background-color: var(--button-primary-hover);
   }
   .control-neutral {
-    color: var(--foreground);
-    background: var(--control-surface);
+    color: var(--button-secondary-text);
+    background: var(--button-secondary-base);
   }
-  .control-neutral:hover:not(:disabled),
+  .control-neutral:hover:not(:disabled) {
+    background: var(--button-secondary-hover);
+  }
   .control-quiet:hover:not(:disabled) {
-    background: var(--control-hover);
+    background: var(--button-quiet-hover);
   }
   .control-button:active:not(:disabled) {
-    box-shadow: inset 0 1px 3px
-      color-mix(in srgb, var(--color-charcoal) 30%, transparent);
+    box-shadow: var(--button-pressed-shadow);
   }
   .control-button:focus-visible,
   .control-segment:focus-visible,
   .control-disclosure:focus-visible,
   .control-slider-thumb:focus-visible {
-    outline: 2px solid var(--control-focus);
+    outline: 2px solid var(--focus-ring);
     outline-offset: 2px;
   }
 
   .control-segments {
     border-radius: calc(var(--radius) + 4px);
-    background: color-mix(
-      in srgb,
-      var(--color-charcoal) 90%,
-      var(--color-slate)
-    );
-    box-shadow: inset 0 1px 2px
-      color-mix(in srgb, var(--color-charcoal) 45%, transparent);
+    background: var(--segment-base);
+    box-shadow: var(--shadow-inset);
   }
   .control-segment {
     border-radius: var(--radius);
-    color: color-mix(in srgb, var(--foreground) 75%, transparent);
+    color: var(--segment-text);
   }
   .control-segment:hover:not(:disabled) {
-    background-color: var(--control-hover);
-    color: var(--foreground);
+    background-color: var(--segment-hover);
+    color: var(--segment-selected-text);
   }
   .control-segment[data-state='on'],
   .control-segment.control-selected {
-    background-color: var(--control-hover);
-    background-image: linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--foreground) 8%, transparent),
-      transparent
-    );
-    color: var(--foreground);
-    box-shadow:
-      inset 0 1px 0 var(--control-highlight),
-      var(--control-shadow);
+    background-color: var(--segment-selected);
+    background-image: var(--segment-reflection);
+    color: var(--segment-selected-text);
+    box-shadow: var(--segment-shadow);
   }
 
   .control-segment[data-state='on']:hover:not(:disabled),
   .control-segment.control-selected:hover:not(:disabled) {
-    background-color: var(--control-selected);
+    background-color: var(--segment-selected-hover);
   }
 
   .control-menu {
-    border: 1px solid var(--control-edge);
+    border: 1px solid var(--border-subtle);
     border-radius: 12px;
-    background: var(--background);
-    box-shadow:
-      inset 0 1px 0 var(--control-highlight),
-      0 12px 32px color-mix(in srgb, var(--color-charcoal) 65%, transparent);
+    background: var(--menu-base);
+    box-shadow: var(--menu-shadow);
   }
   .control-option:not([data-disabled]):hover,
   .control-option[data-highlighted]:not([data-disabled]) {
-    background: var(--control-hover);
+    background: var(--menu-item-hover);
   }
 
   .slider-field {
@@ -225,7 +354,7 @@
     position: relative;
     height: 1.75rem;
     margin-inline: calc(var(--slider-thumb-width) / 2);
-    color: color-mix(in srgb, var(--foreground) 65%, transparent);
+    color: var(--slider-scale);
   }
   .slider-mark {
     position: absolute;
@@ -238,8 +367,7 @@
   .slider-tick {
     width: 1px;
     height: 5px;
-    background: currentColor;
-    opacity: 0.5;
+    background: var(--slider-tick);
   }
   .slider-mark-label {
     margin-top: 5px;
@@ -248,29 +376,26 @@
     white-space: nowrap;
   }
   .slider-field:has(.control-slider[data-disabled]) .slider-scale {
-    opacity: 0.4;
+    opacity: var(--control-disabled-opacity);
   }
   .control-slider-track {
-    background: color-mix(in srgb, var(--foreground) 15%, transparent);
-    box-shadow: inset 0 1px 2px
-      color-mix(in srgb, var(--color-charcoal) 40%, transparent);
+    background: var(--slider-track);
+    box-shadow: var(--slider-track-shadow);
   }
   .control-slider-range {
     background: linear-gradient(
       to bottom,
-      color-mix(in srgb, var(--primary) 70%, var(--foreground)),
-      var(--primary)
+      var(--slider-fill-highlight),
+      var(--slider-fill)
     );
-    box-shadow: inset 0 1px 0 var(--control-highlight);
+    box-shadow: var(--slider-track-shadow);
   }
   .control-slider-thumb {
     width: var(--slider-thumb-width);
-    background-color: var(--foreground);
-    border: 1px solid color-mix(in srgb, var(--foreground) 30%, transparent);
+    background-color: var(--slider-thumb);
+    border: 1px solid var(--slider-thumb-border);
     backdrop-filter: blur(4px);
-    box-shadow:
-      inset 0 1px 0 var(--control-highlight),
-      0 2px 4px color-mix(in srgb, var(--color-charcoal) 40%, transparent);
+    box-shadow: var(--slider-thumb-shadow);
     cursor: grab;
     transition:
       background-color 140ms ease,
@@ -278,7 +403,7 @@
   }
   .control-slider[data-dragging] .control-slider-thumb {
     transform: scale(1.1);
-    background-color: color-mix(in srgb, var(--foreground) 35%, transparent);
+    background-color: var(--slider-thumb-drag);
     cursor: grabbing;
   }
   .control-slider[data-disabled] .control-slider-thumb {
@@ -286,25 +411,21 @@
   }
   @supports not (backdrop-filter: blur(1px)) {
     .control-slider[data-dragging] .control-slider-thumb {
-      background-color: color-mix(
-        in srgb,
-        var(--foreground) 75%,
-        var(--background)
-      );
+      background-color: var(--slider-thumb);
     }
   }
   @media (prefers-reduced-transparency: reduce) {
     .control-slider .control-slider-thumb {
-      background: var(--foreground);
+      background: var(--slider-thumb);
       backdrop-filter: none;
     }
   }
 
   .control-disclosure {
-    background: color-mix(in srgb, var(--foreground) 4%, transparent);
+    background: transparent;
   }
   .control-disclosure:hover {
-    background: color-mix(in srgb, var(--foreground) 8%, transparent);
+    background: var(--accordion-header-hover);
   }
   .control-disclosure:focus-visible {
     outline-offset: -4px;
@@ -313,19 +434,19 @@
   .control-field:disabled,
   .control-button:disabled,
   .control-segment:disabled {
-    opacity: 0.4;
+    opacity: var(--control-disabled-opacity);
     cursor: not-allowed;
   }
 
   @supports (backdrop-filter: blur(1px)) {
     .control-menu {
-      background: color-mix(in srgb, var(--background) 88%, transparent);
-      backdrop-filter: blur(24px) saturate(120%);
+      background: var(--menu-glass);
+      backdrop-filter: blur(var(--material-blur)) saturate(120%);
     }
   }
   @media (prefers-reduced-transparency: reduce) {
     .control-menu {
-      background: var(--background);
+      background: var(--menu-base);
       backdrop-filter: none;
     }
   }
@@ -358,15 +479,13 @@
 
 @layer components {
   .glass-panel {
-    background: var(--background);
+    background: var(--panel-base);
   }
   @supports (backdrop-filter: blur(1px)) {
     .glass-panel {
-      background: color-mix(in srgb, var(--background) 72%, transparent);
-      backdrop-filter: blur(24px) saturate(130%);
-      box-shadow:
-        inset 0 1px 0 color-mix(in srgb, var(--foreground) 12%, transparent),
-        0 12px 40px color-mix(in srgb, var(--background) 35%, transparent);
+      background: var(--panel-glass);
+      backdrop-filter: blur(var(--material-blur)) saturate(130%);
+      box-shadow: var(--panel-shadow);
     }
   }
 }
@@ -374,8 +493,114 @@
 @layer components {
   @media (prefers-reduced-transparency: reduce) {
     .glass-panel {
-      background: var(--background);
+      background: var(--panel-base);
       backdrop-filter: none;
     }
+  }
+}
+
+@layer components {
+  .margin-editor-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-areas: '. top .' 'left center right' '. bottom .';
+    align-items: end;
+    gap: 18px 8px;
+  }
+  .margin-diagram {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+  }
+  .margin-photo {
+    position: absolute;
+    width: 60px;
+    height: 59px;
+    pointer-events: none;
+  }
+  .margin-edge {
+    position: absolute;
+    background: transparent;
+    border-radius: 2px;
+    pointer-events: none;
+  }
+  .margin-edge-top,
+  .margin-edge-bottom {
+    left: 8px;
+    right: 8px;
+    height: 2px;
+  }
+  .margin-edge-left,
+  .margin-edge-right {
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+  }
+  .margin-edge-top {
+    top: 0;
+  }
+  .margin-edge-bottom {
+    bottom: 0;
+  }
+  .margin-edge-left {
+    left: 0;
+  }
+  .margin-edge-right {
+    right: 0;
+  }
+  .margin-edge-active {
+    background: var(--accent-color);
+  }
+}
+
+@layer components {
+  .numeric-input {
+    display: flex;
+    height: 36px;
+    min-width: 0;
+    align-items: center;
+    gap: 4px;
+    padding-inline: 8px;
+  }
+  .numeric-input input {
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 0%;
+    height: 100%;
+    appearance: textfield;
+    background: transparent;
+    font-size: 12px;
+    outline: none;
+  }
+  .numeric-input input::-webkit-inner-spin-button,
+  .numeric-input input::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+  .numeric-unit {
+    flex: none;
+    white-space: nowrap;
+    font-size: 10px;
+    color: var(--input-unit);
+  }
+  .numeric-input:has(input:focus-visible) {
+    border-color: var(--input-focus-ring);
+    box-shadow: var(--input-focus-shadow);
+  }
+  .numeric-input[data-invalid] {
+    border-color: var(--input-invalid-border);
+    border-style: dashed;
+  }
+  .numeric-input[data-disabled] {
+    opacity: var(--control-disabled-opacity);
+    cursor: not-allowed;
+  }
+  .numeric-input input:disabled {
+    cursor: not-allowed;
+  }
+  .numeric-input[data-disabled]:hover {
+    background: var(--input-base);
   }
 }

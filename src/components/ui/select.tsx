@@ -44,7 +44,7 @@ export function Select({
         <SelectPrimitive.Content
           position="popper"
           sideOffset={5}
-          className="z-[100] max-h-[var(--radix-select-content-available-height)] min-w-[var(--radix-select-trigger-width)] control-menu overflow-y-auto p-1.5 text-foreground"
+          className="z-[100] max-h-[var(--radix-select-content-available-height)] min-w-[var(--radix-select-trigger-width)] control-menu overflow-y-auto p-1.5 text-menu-text"
         >
           <SelectPrimitive.Viewport>
             {options.map((option) => (

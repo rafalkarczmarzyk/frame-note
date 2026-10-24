@@ -110,7 +110,7 @@ export default function App() {
   }, [openFile]);
 
   return (
-    <div className="flex h-svh flex-col overflow-hidden bg-background text-foreground">
+    <div className="flex h-svh flex-col overflow-hidden bg-app-base text-content-primary">
       <AppHeader>
         {photo && (
           <div className="flex items-center gap-3">

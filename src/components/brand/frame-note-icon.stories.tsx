@@ -4,11 +4,11 @@ import { FrameNoteIcon } from './frame-note-icon';
 const meta = {
   title: 'Components/Brand/FrameNoteIcon',
   component: FrameNoteIcon,
-  args: { width: 32, height: 32, className: 'size-8 text-foreground' },
+  args: { width: 32, height: 32, className: 'size-8 text-content-primary' },
 } satisfies Meta<typeof FrameNoteIcon>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
 export const Accent: Story = {
-  args: { className: 'size-8 text-primary' },
+  args: { className: 'size-8 text-accent-color' },
 };

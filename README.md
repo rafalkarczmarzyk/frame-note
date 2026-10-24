@@ -33,7 +33,7 @@ pnpm test:e2e
 pnpm build-storybook
 ```
 
-- `check`: Prettier, ESLint, TypeScript, 87 testów jednostkowych i build aplikacji.
+- `check`: Prettier, ESLint, TypeScript, 120 testów jednostkowych i build aplikacji.
 - E2E na produkcyjnym buildzie, port 4173: po dwa scenariusze w Chromium i WebKit.
 - Przepływ eksportu sprawdza oba oryginalne JPG, wymiary, jakość, rozmiar w bajtach,
   brak źródłowych metadanych, różnice kolorów sRGB i obrót EXIF 6.
@@ -66,8 +66,14 @@ funkcjonalne i pomiar kolorów bez porównywania do wzorców Chromium.
 - Jeden wieloliniowy szablon `{group:name}`, np. `{exif:Artist}`.
   Wstawianie w pozycji kursora, zastępowanie zaznaczenia, oznaczenie użytych tagów.
   Brakujące pola są raportowane; eksport wymaga wtedy potwierdzenia.
-- Montserrat i Advercase, Regular/Bold, ułamkowy rozmiar względem krótszego boku,
-  kolor, opacity, interlinia, wyrównanie, dziewięć anchorów i dwa marginesy względne.
+- Montserrat i Advercase, Regular/Bold, kolor, opacity (slider i pole liczbowe),
+  interlinia jako mnożnik fontu oraz wyrównanie tekstu.
+- Globalna jednostka wymiarowania: px, % krótszego lub % dłuższego boku zdjęcia.
+  Dotyczy rozmiaru fontu i czterech marginesów; zmiana jednostki przelicza wartości
+  bez zmiany wyglądu na bieżącym zdjęciu. Domyślnie % krótszego boku.
+- Wizualny edytor marginesów z trybami niezależnym, parami i wszystkimi krawędziami i dziewięć anchorów względem
+  obszaru wewnątrz marginesów. Limity zostawiają co najmniej 1 px tego obszaru;
+  nie zapewniają dopasowania zbyt dużego bloku tekstu.
 - Wspólna geometria podglądu i eksportu. Font jest ładowany przed renderowaniem.
 - Jakość JPG 1–100%, domyślnie Best 95%; presety Small 60 i Balanced 75.
 - Dokładny rozmiar wyniku po kodowaniu w tle, rozmiar wejścia i ostrzeżenie,
@@ -112,14 +118,17 @@ Dokumentacja komponentów i rozbudowy: [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTE
 
 HEX-y są zdefiniowane tylko w `@theme` w `src/index.css`.
 
-| Paleta        | HEX     | Główne zastosowanie       |
-| ------------- | ------- | ------------------------- |
-| charcoal      | #383F51 | tło i ciemny tekst        |
-| slate         | #9CAFB7 | navbar, secondary, border |
-| porcelain     | #FDFFFC | tekst                     |
-| tropical-mint | #50FFB1 | primary                   |
+| Paleta         | HEX     | Główne zastosowanie  |
+| -------------- | ------- | -------------------- |
+| charcoal       | #383F51 | tło i ciemny tekst   |
+| slate          | #9CAFB7 | primary, secondary   |
+| porcelain      | #FDFFFC | tekst                |
+| charcoal-dark  | #292E3B | obszar wokół zdjęcia |
+| charcoal-light | #454E64 | accordiony           |
 
-Komponenty używają tokenów semantycznych, np. `bg-primary` i `text-foreground`.
+Komponenty używają tokenów zastosowań, np. `bg-input-base`, `bg-accordion-base`
+i `text-content-primary`. `pnpm check:tokens` sprawdza zasady kolorów; jest też
+częścią `pnpm check`. Paleta podpisu na zdjęciu pozostaje oddzielona od tokenów UI.
 Glass korzysta z przezroczystości i blur. Logo SVG i Lucide dziedziczą `currentColor`;
 rozmiar i kolor ustawiamy klasami Tailwind.
 

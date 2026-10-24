@@ -27,7 +27,7 @@ export function PickerList({
           key={item.id}
           aria-pressed={!!item.selected}
           onClick={() => onChoose(item.id)}
-          className="control-option control-button block w-full rounded-lg p-3 text-left aria-pressed:bg-secondary/15 aria-pressed:text-primary"
+          className="control-option control-button block w-full rounded-lg p-3 text-left aria-pressed:bg-menu-item-selected aria-pressed:text-accent-color"
         >
           <span className="flex items-start justify-between gap-2">
             <span className="min-w-0 break-all text-xs">{item.label}</span>
@@ -39,7 +39,7 @@ export function PickerList({
             )}
           </span>
           {item.description && (
-            <span className="mt-1 block break-all text-xs leading-5 text-foreground/70">
+            <span className="mt-1 block break-all text-xs leading-5 text-content-secondary">
               {item.description}
             </span>
           )}
@@ -47,7 +47,7 @@ export function PickerList({
         </button>
       ))}
       {items.length === 0 && (
-        <p className="p-3 text-xs text-foreground/70">{emptyText}</p>
+        <p className="p-3 text-xs text-content-secondary">{emptyText}</p>
       )}
     </div>
   );

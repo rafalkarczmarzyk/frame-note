@@ -1,14 +1,31 @@
 import { SidebarSection } from '@/components/layout/sidebar-section';
-import { AlignLeft, AlignCenter, AlignRight, ChevronRight } from 'lucide-react';
+import {
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  ChevronRight,
+  Ruler,
+  Type,
+  Move,
+} from 'lucide-react';
 import { Field } from '@/components/ui/field';
 import { NumberField } from '@/components/ui/number-field';
 import { Select } from '@/components/ui/select';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { AnchorPicker } from '@/components/ui/anchor-picker';
-import type { Caption } from '../../domain/document';
+import { MarginEditor } from '@/components/ui/margin-editor';
+import { Slider } from '@/components/ui/slider';
+import {
+  convertSizing,
+  pixelsPerUnit,
+  sizingLabels,
+  type SizingUnit,
+} from '@/domain/sizing';
+import type { Caption, ImageDimensions } from '../../domain/document';
 
 export function CaptionControls({
   caption,
+  dimensions,
   onChange,
   disabled,
   onBrowseFonts,
@@ -16,6 +33,7 @@ export function CaptionControls({
   persistSections = true,
 }: {
   caption: Caption;
+  dimensions: ImageDimensions;
   onChange: (caption: Caption) => void;
   disabled: boolean;
   onBrowseFonts: () => void;
@@ -26,13 +44,48 @@ export function CaptionControls({
     onChange({ ...caption, style: { ...caption.style, ...patch } });
   const position = (patch: Partial<Caption['position']>) =>
     onChange({ ...caption, position: { ...caption.position, ...patch } });
+  const unit = sizingLabels[caption.sizingUnit];
+  const factor = pixelsPerUnit(caption.sizingUnit, dimensions);
+  const opacity = Math.round(caption.style.opacity * 100);
   return (
     <>
+      <SidebarSection
+        id={`${preferenceScope}sizing`}
+        persist={persistSections}
+        title="Sizing"
+        icon={<Ruler />}
+        summary={unit}
+      >
+        <Field
+          label="Sizing unit"
+          hint={`1 unit = ${Number(factor.toFixed(4))} px on this photo. Changing units preserves the current appearance.`}
+        >
+          {(id, descriptionId) => (
+            <Select
+              id={id}
+              aria-describedby={descriptionId}
+              value={caption.sizingUnit}
+              disabled={disabled}
+              onValueChange={(value) =>
+                onChange(
+                  convertSizing(caption, value as SizingUnit, dimensions),
+                )
+              }
+              options={[
+                { value: 'px', label: 'Pixels (px)' },
+                { value: 'short-edge', label: '% of short edge' },
+                { value: 'long-edge', label: '% of long edge' },
+              ]}
+            />
+          )}
+        </Field>
+      </SidebarSection>
       <SidebarSection
         id={`${preferenceScope}typography`}
         persist={persistSections}
         title="Typography"
-        summary={`${caption.style.fontFamily.replace(' Variable', '')}, ${caption.style.fontSizePercent}%`}
+        icon={<Type />}
+        summary={`${caption.style.fontFamily.replace(' Variable', '')}, ${Number(caption.style.fontSize.toFixed(3))} ${unit}`}
       >
         <fieldset disabled={disabled} className="space-y-4 disabled:opacity-70">
           <Field label="Font">
@@ -53,8 +106,8 @@ export function CaptionControls({
             <Field label="Weight">
               {(id) => (
                 <Select
-                  disabled={disabled}
                   id={id}
+                  disabled={disabled}
                   value={String(caption.style.fontWeight)}
                   onValueChange={(value) =>
                     style({ fontWeight: Number(value) as 400 | 700 })
@@ -67,69 +120,90 @@ export function CaptionControls({
               )}
             </Field>
             <NumberField
-              label="Size (% short edge)"
-              value={caption.style.fontSizePercent}
-              min={0.01}
-              max={20}
-              onValueChange={(fontSizePercent) => style({ fontSizePercent })}
+              key={caption.sizingUnit}
+              label="Font size"
+              unit={unit}
+              value={caption.style.fontSize}
+              min={0.01 / factor}
+              max={Math.max(dimensions.width, dimensions.height) / factor}
+              step="any"
+              disabled={disabled}
+              onValueChange={(fontSize) => style({ fontSize })}
             />
-            <Field label="Color">
-              {(id) => (
-                <Select
-                  disabled={disabled}
-                  id={id}
-                  value={caption.style.color}
-                  onValueChange={(color) => style({ color })}
-                  options={[
-                    { value: 'porcelain', label: 'Porcelain' },
-                    { value: 'charcoal', label: 'Charcoal' },
-                    { value: 'slate', label: 'Slate' },
-                    { value: 'tropical-mint', label: 'Tropical mint' },
-                  ]}
-                />
-              )}
-            </Field>
+          </div>
+          <Field label="Color">
+            {(id) => (
+              <Select
+                disabled={disabled}
+                id={id}
+                value={caption.style.color}
+                onValueChange={(color) => style({ color })}
+                options={[
+                  { value: 'porcelain', label: 'Porcelain' },
+                  { value: 'charcoal', label: 'Charcoal' },
+                  { value: 'slate', label: 'Slate' },
+                ]}
+              />
+            )}
+          </Field>
+          <div className="grid grid-cols-[minmax(0,1fr)_5rem] items-end gap-3">
+            <div className="space-y-2">
+              <p className="text-xs text-label">Opacity</p>
+              <Slider
+                label="Opacity"
+                value={opacity}
+                min={0}
+                max={100}
+                disabled={disabled}
+                onValueChange={(value) => style({ opacity: value / 100 })}
+              />
+            </div>
             <NumberField
-              label="Opacity (%)"
-              value={Math.round(caption.style.opacity * 100)}
+              label="Opacity value"
+              hideLabel
+              unit="%"
+              value={opacity}
               min={0}
               max={100}
               step={1}
+              disabled={disabled}
               onValueChange={(value) => style({ opacity: value / 100 })}
             />
-            <NumberField
-              label="Line height"
-              value={caption.style.lineHeight}
-              min={0.5}
-              max={3}
-              onValueChange={(lineHeight) => style({ lineHeight })}
+          </div>
+          <NumberField
+            label="Line height"
+            unit="×"
+            value={caption.style.lineHeight}
+            min={0.5}
+            max={3}
+            disabled={disabled}
+            onValueChange={(lineHeight) => style({ lineHeight })}
+          />
+          <div className="space-y-2">
+            <p className="text-xs text-label">Text align</p>
+            <SegmentedControl
+              disabled={disabled}
+              label="Text align"
+              value={caption.style.textAlign}
+              onValueChange={(textAlign) => style({ textAlign })}
+              options={[
+                {
+                  value: 'left',
+                  label: 'Align left',
+                  content: <AlignLeft aria-hidden="true" />,
+                },
+                {
+                  value: 'center',
+                  label: 'Align center',
+                  content: <AlignCenter aria-hidden="true" />,
+                },
+                {
+                  value: 'right',
+                  label: 'Align right',
+                  content: <AlignRight aria-hidden="true" />,
+                },
+              ]}
             />
-            <div className="space-y-2">
-              <p className="text-xs text-foreground/75">Text align</p>
-              <SegmentedControl
-                disabled={disabled}
-                label="Text align"
-                value={caption.style.textAlign}
-                onValueChange={(textAlign) => style({ textAlign })}
-                options={[
-                  {
-                    value: 'left',
-                    label: 'Align left',
-                    content: <AlignLeft aria-hidden="true" />,
-                  },
-                  {
-                    value: 'center',
-                    label: 'Align center',
-                    content: <AlignCenter aria-hidden="true" />,
-                  },
-                  {
-                    value: 'right',
-                    label: 'Align right',
-                    content: <AlignRight aria-hidden="true" />,
-                  },
-                ]}
-              />
-            </div>
           </div>
         </fieldset>
       </SidebarSection>
@@ -137,36 +211,46 @@ export function CaptionControls({
         id={`${preferenceScope}position`}
         persist={persistSections}
         title="Position"
+        icon={<Move />}
         summary={caption.position.anchor.replaceAll('-', ' ')}
       >
-        <fieldset disabled={disabled} className="space-y-4 disabled:opacity-70">
+        <fieldset disabled={disabled} className="space-y-5 disabled:opacity-70">
           <div className="space-y-2">
-            <p className="text-xs text-foreground/75">Anchor</p>
-            <AnchorPicker
-              value={caption.position.anchor}
-              onValueChange={(anchor) => position({ anchor })}
-              disabled={disabled}
-            />
+            <p className="text-xs text-label">Anchor</p>
+            <div className="flex justify-center">
+              <AnchorPicker
+                value={caption.position.anchor}
+                onValueChange={(anchor) => position({ anchor })}
+                disabled={disabled}
+              />
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <NumberField
-              label="Margin X (%)"
-              value={caption.position.marginXPercent}
-              min={0}
-              max={50}
-              onValueChange={(marginXPercent) => position({ marginXPercent })}
-            />
-            <NumberField
-              label="Margin Y (%)"
-              value={caption.position.marginYPercent}
-              min={0}
-              max={50}
-              onValueChange={(marginYPercent) => position({ marginYPercent })}
-            />
-          </div>
-          <p className="text-xs leading-5 text-foreground/70">
-            Size and margins use the photo’s shorter edge. Anchors move the
-            block; text alignment controls lines inside it.
+        </fieldset>
+      </SidebarSection>
+      <SidebarSection
+        id={`${preferenceScope}margins`}
+        persist={persistSections}
+        title="Margins"
+        icon={<Ruler />}
+        summary={`${caption.position.marginLinkMode} · ${unit}`}
+      >
+        <fieldset disabled={disabled} className="space-y-4 disabled:opacity-70">
+          <MarginEditor
+            hideLabel
+            key={caption.sizingUnit}
+            value={caption.position.margins}
+            linkMode={caption.position.marginLinkMode}
+            unit={caption.sizingUnit}
+            unitLabel={unit}
+            dimensions={dimensions}
+            disabled={disabled}
+            onChange={(margins, marginLinkMode) =>
+              position({ margins, marginLinkMode })
+            }
+          />
+          <p className="text-xs leading-5 text-content-secondary">
+            Margins define the inner photo area. The anchor positions the
+            caption within it.
           </p>
         </fieldset>
       </SidebarSection>

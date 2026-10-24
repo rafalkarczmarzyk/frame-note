@@ -1,3 +1,5 @@
+import { Type, Move, TextQuote } from 'lucide-react';
+import { PhotoIcon } from '../icons/photo-icon';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Textarea } from '../ui/textarea';
@@ -38,10 +40,11 @@ function AccordionGroup() {
   const [size, setSize] = useState(1.35);
   const [anchor, setAnchor] = useState<AnchorValue>('bottom-left');
   return (
-    <div className="w-full max-w-xs overflow-hidden rounded-xl border bg-background">
+    <div className="w-full max-w-xs bg-app-base">
       <SidebarSection
         id="story-group-photo"
         title="Photo"
+        icon={<PhotoIcon />}
         summary="5964 × 3976 px"
         defaultOpen={false}
         persist={false}
@@ -52,7 +55,12 @@ function AccordionGroup() {
           5964 × 3976 px
         </p>
       </SidebarSection>
-      <SidebarSection id="story-group-caption" title="Caption" persist={false}>
+      <SidebarSection
+        id="story-group-caption"
+        title="Caption"
+        icon={<TextQuote />}
+        persist={false}
+      >
         <Textarea
           aria-label="Caption template"
           rows={3}
@@ -63,6 +71,7 @@ function AccordionGroup() {
       <SidebarSection
         id="story-group-typography"
         title="Typography"
+        icon={<Type />}
         summary={`Montserrat, ${size}%`}
         persist={false}
       >
@@ -77,6 +86,7 @@ function AccordionGroup() {
       <SidebarSection
         id="story-group-position"
         title="Position"
+        icon={<Move />}
         summary={anchor.replaceAll('-', ' ')}
         defaultOpen={false}
         persist={false}
@@ -102,3 +112,5 @@ export const Open: Story = {};
 export const Collapsed: Story = {
   args: { defaultOpen: false, id: 'storybook-collapsed' },
 };
+
+export const WithIcon: Story = { args: { icon: <Type /> } };

@@ -10,17 +10,44 @@ not a separately published npm package.
 
 ## Design tokens
 
-Palette HEX values are declared only in `@theme`: charcoal, slate, porcelain,
-tropical-mint. Components use semantic roles such as primary, secondary,
-foreground and background. Glass uses opacity and blur derived from these roles,
-not new colors. Fonts are local: Montserrat for controls, Advercase for display.
-SVG logos and Lucide icons inherit currentColor.
+The five base colors live in `@theme` in `src/index.css`. They are also used by
+photo captions; do not rename their `--color-*` variables as part of UI changes.
+All 13 shared color recipes live in `:root` as private `--tone-*` values and the
+panel glass material. Components consume usage roles exposed by `@theme inline`.
+
+| Area                                | Tailwind examples                                                                    |
+| ----------------------------------- | ------------------------------------------------------------------------------------ |
+| App, header, sidebar, workspace     | `bg-app-base`, `bg-header-base`, `bg-sidebar-base`, `bg-workspace-base`              |
+| Accordion                           | `bg-accordion-base`, `text-accordion-label`, `text-accordion-icon`                   |
+| Input, textarea, select, dimensions | `bg-input-base`, `text-input-text`, `text-input-unit`, `outline-input-focus-ring`    |
+| Buttons                             | `bg-button-primary-base`, `text-button-primary-text`, `bg-button-secondary-base`     |
+| Segments and anchors                | `bg-segment-base`, `bg-segment-selected`                                             |
+| Slider                              | `bg-slider-track`, `bg-slider-fill`, `bg-slider-thumb`, `bg-slider-thumb-drag`       |
+| Panel and menu                      | `bg-panel-base`, `bg-panel-header-base`, `bg-menu-base`, `shadow-panel`              |
+| Text                                | `text-content-primary`, `text-content-secondary`, `text-content-muted`, `text-label` |
+
+Role aliases may currently share a value but remain independently adjustable.
+Input and button backgrounds must not reference each other's role. To change an
+input background, edit `--input-base`, not the private shared recipe unless a
+palette-wide change is intended. Primary/secondary background roles retain their
+current colors; the consolidation mainly affects near-identical text, edges,
+reflections and shadows. Shared text levels are 100%, 70% and 50%.
+
+No local `color-mix()` or color opacity utilities (`text-…/70`, `bg-…/15`) in
+components. Define a named role instead. Disabled element opacity, photo-caption
+opacity, transforms and forced-colors system values remain legitimate exceptions.
+Shadows, focus washes and reflections are effect tokens; they must also use the
+shared recipes. See Design/Tokens → UsageTokens and ControlSurfaces in Storybook.
+
+`pnpm check:tokens` checks these boundaries, missing CSS variables and accidental
+literal/Tailwind palette colors. It runs inside `pnpm check`. It is an architecture
+guard, not a contrast audit. See [COLOR_AUDIT.md](COLOR_AUDIT.md) for before/after counts.
 
 ## Control surfaces
 
 Controls use macOS-inspired surface hierarchy with the existing FrameNote palette.
-`src/index.css` owns shared `control-*` styles and surface, edge, highlight,
-selection, focus and shadow tokens. Fields use a gently recessed surface; neutral
+`src/index.css` owns shared `control-*` styles, which consume the usage-specific
+color and effect tokens described above. Fields use a gently recessed surface; neutral
 buttons and selected segments use raised surfaces. Accent color is reserved for
 primary actions, slider progress and focus. Segments and anchors share a neutral
 selected state. Controls use 8 px radii; groups and menus use 12 px.
@@ -38,7 +65,12 @@ interpretation of Apple surface principles, not native Liquid Glass rendering.
 - Button, IconButton: primary/outline actions, explicit icon labels, focus states.
 - Input, Textarea: shared styling with native props, refs, disabled states.
 - Field: generates a label target and optional description/error relationship.
-- NumberField: controlled numeric values with a local draft for fractional edits.
+- NumberInput: shared numeric editing with draft values, validation and disabled states.
+- DimensionInput: a numeric input with a required, always-visible unit in its own
+  reserved space; used for dimensions, percentages and multipliers.
+- NumberField: a labeled wrapper that uses DimensionInput when `unit` is supplied,
+  otherwise NumberInput. Supports a visually hidden label. Display rounds to six decimal
+  places; this does not round domain values during unit conversion.
 - Select: custom Radix popper with keyboard navigation and disabled options.
 - Slider: Radix single-value slider, pointer and keyboard support. Optional `marks`
   accept `{ value, label? }` at arbitrary thresholds; out-of-range marks are omitted.
@@ -46,6 +78,10 @@ interpretation of Apple surface principles, not native Liquid Glass rendering.
   Keep labels short and spaced apart to avoid overlap.
 - SegmentedControl: single selection, optional icons, keyboard navigation.
 - AnchorPicker: reusable 3 × 3 grid, independent of the positioning calculation.
+- MarginEditor: four independently editable edges around a diagram, with linked
+  editing and edge highlighting. Link modes: None, Pairs (top/bottom and
+  left/right) and All. Pairs copies top to bottom and left to right; All copies
+  top to every edge, limited to preserve a one-pixel inner area. None keeps values.
 - PickerList: selectable rows, descriptions, preview content and selected labels.
 - InlineNotice: informative, warning and error messages, using existing palette.
 
@@ -53,11 +89,37 @@ All controls accept a disabled state directly or through native field semantics.
 Prefer explicit disabled props for Radix controls. Fields must have an associated
 label or aria-label. Do not replace controls with feature-specific HTML copies.
 
+## Document sizing and caption controls
+
+CaptionControls appears after Caption and contains Sizing, Typography, Position and Margins,
+followed by the workspace Export section. Sizing owns a document-wide `sizingUnit`:
+`px`, `short-edge` or `long-edge`. Font size and all four margins use it. Values
+refer to source-image dimensions, not the preview viewport. `domain/sizing.ts`
+converts all lengths together when the unit changes, preserving pixel geometry
+without rounding the stored values. The default remains percent of the short edge.
+
+Four margins define an inner image rectangle; all nine anchors place the measured
+text block within that rectangle. Margin limits preserve at least one source pixel
+of width/height. They do not guarantee that a very large text block fits; automatic
+text wrapping/resizing is still outside the current scope.
+
+Opacity uses a 0–100 slider and exact numeric field. Line height remains a font-size
+multiplier (`×`), independent of document units. Export quality also remains a
+percentage. The shared caption renderer applies the same sizing and inset geometry
+in preview and export. Captions are not persisted; replacing a photo still resets
+settings, including the sizing unit.
+
+Stories: Components/UI/MarginEditor covers independent, paired, fully linked, asymmetric, pixel
+and disabled variants. Components/UI/CaptionControls covers all units and both
+photo orientations; Screens/EditorWorkspace uses these same controls.
+
 ## Main sidebar and auxiliary panel
 
 EditorWorkspace owns layout and the shared sidebar-width variable. ToolSidebar
 participates in layout and is the permanent home of editing controls.
-SidebarSection provides independent native details/summary sections; persistence
+SidebarSection presents separated, rounded setting groups with a quiet header and
+right-hand disclosure chevron. Titles use Advercase; the optional `icon` prop
+adds a decorative leading icon. Summaries and content retain Montserrat. It uses native details/summary; persistence
 can be scoped or disabled (e.g. Storybook does not write application preferences).
 
 FloatingPanel is non-modal and absolutely positioned by its parent. Opening it

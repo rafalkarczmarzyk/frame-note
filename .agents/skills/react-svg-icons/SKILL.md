@@ -17,7 +17,7 @@ description: Add or update SVG icons and brand assets as React components in Fra
 - Preserve path geometry, transparency and intentional multicolor artwork. Convert SVG attributes to React syntax.
 - Preserve a meaningful `viewBox`. If an icon retains the wide artboard of a full logotype, inspect the geometry and trim empty space without clipping strokes or changing the drawing. Use a square artboard only when it fits the mark.
 - Set sensible default SVG `width` and `height` attributes so the asset stays bounded before utility CSS loads. Preserve proportions and allow caller overrides through SVG props or Tailwind classes. Avoid inline styles that prevent overrides.
-- Use `currentColor` for monochrome fills and strokes. Preserve `fill="none"` and intentional multicolor fills. Call sites use semantic colors such as `text-foreground` and `text-primary`.
+- Use `currentColor` for monochrome fills and strokes. Preserve `fill="none"` and intentional multicolor fills. Call sites use semantic colors such as `text-content-primary` and `text-accent-color`.
 - Forward SVG props to the root. If default classes are needed, destructure `className` and merge it with `cn()` from `@/lib/utils`; accept arbitrary caller classes.
 - Hide decorative SVGs with `aria-hidden="true"` and `focusable="false"`. Informative assets need an accessible name and `role="img"`. Label icon-only buttons and links on the control and hide their nested decorative SVG.
 

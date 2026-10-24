@@ -108,6 +108,16 @@ Bloba. Wynik większy od wejścia jest oznaczony ostrzeżeniem.
 WebKit nie jest równoznaczny z ręcznym testem aplikacji Safari. Wzorce Chromium
 nie stanowią wzorców dla innych silników lub systemów.
 
+### Aktualizacja interfejsu po pre-MVP
+
+Wdrożono globalną jednostkę wymiarowania dokumentu: px, % krótszego boku lub
+% dłuższego boku. Jednostka obejmuje font i cztery marginesy; jej zmiana przelicza
+wartości z zachowaniem wyglądu na bieżącym zdjęciu. Marginesy mają wizualny edytor,
+niezależne wartości i opcję łączenia. Anchory działają względem obszaru wewnątrz
+czterech marginesów. Opacity ma slider i pole liczbowe; interlinia pozostaje
+mnożnikiem fontu. Są to uzgodnione zmiany interfejsu i modelu, nie realizacja
+proponowanych etapów MVP poniżej. Ustawienia nadal resetują się przy zmianie zdjęcia.
+
 ## 4. MVP — oczekiwania i proponowany zakres
 
 Użytkownik określił minimalny cel jako odtworzenie potrzebnych możliwości pluginu
@@ -169,7 +179,7 @@ batch i desktop powinny dostać osobne uzgodnienie zakresu.
   scroll. Otwarcie panelu nie może zmieniać wymiarów zdjęcia.
 - Wspólne prymitywy zamiast osobnych kopii kontrolek. Atomy i kompozycje w Storybooku.
 - Montserrat dla interfejsu, Advercase dla ozdobnych nagłówków.
-- Paleta: charcoal, slate, porcelain, tropical-mint. HEX tylko w definicjach
+- Paleta: charcoal (wariant bazowy, ciemny i jasny), slate, porcelain. Primary używa slate; header i sidebar mają tło charcoal. HEX tylko w definicjach
   `src/index.css`; komponenty korzystają z tokenów semantycznych.
 - Logo i ikony SVG dziedziczą `currentColor`; wymiary i kolor przez Tailwind.
   Ikony: Lucide.

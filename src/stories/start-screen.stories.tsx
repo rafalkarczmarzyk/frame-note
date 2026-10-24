@@ -5,7 +5,7 @@ import { PhotoDropOverlay } from '../features/photo/photo-drop-overlay';
 
 function StartScreenComposition({ isDragging = false }) {
   return (
-    <div className="relative isolate flex h-full flex-col overflow-hidden bg-background text-foreground">
+    <div className="relative isolate flex h-full flex-col overflow-hidden bg-app-base text-content-primary">
       <AppHeader />
       <StartScreen onChoosePhoto={() => {}} />
       {isDragging && <PhotoDropOverlay />}

@@ -31,7 +31,7 @@ export function StartScreen({
         >
           Choose a photo
         </Button>
-        <p className="mt-4 text-sm text-foreground/70">
+        <p className="mt-4 text-sm text-content-secondary">
           or drag and drop it anywhere
         </p>
       </section>

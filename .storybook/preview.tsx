@@ -19,8 +19,8 @@ const preview: Preview = {
       <div
         className={
           context.parameters.layout === 'fullscreen'
-            ? 'relative isolate h-dvh min-h-0 overflow-hidden bg-background font-sans text-foreground'
-            : 'min-h-24 bg-background p-4 font-sans text-foreground'
+            ? 'relative isolate h-dvh min-h-0 overflow-hidden bg-app-base font-sans text-content-primary'
+            : 'min-h-24 bg-app-base p-4 font-sans text-content-primary'
         }
       >
         <Story />
