@@ -27,7 +27,7 @@ export function PickerList({
           key={item.id}
           aria-pressed={!!item.selected}
           onClick={() => onChoose(item.id)}
-          className="block w-full rounded-sm p-3 text-left outline-none hover:bg-secondary/15 focus-visible:ring-1 focus-visible:ring-ring aria-pressed:text-primary"
+          className="control-option control-button block w-full rounded-lg p-3 text-left aria-pressed:bg-secondary/15 aria-pressed:text-primary"
         >
           <span className="flex items-start justify-between gap-2">
             <span className="min-w-0 break-all text-xs">{item.label}</span>

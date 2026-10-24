@@ -116,7 +116,6 @@ export default function App() {
           <div className="flex items-center gap-3">
             <Button
               variant="outline"
-              className="border-secondary-foreground bg-secondary text-secondary-foreground hover:bg-secondary"
               onClick={() => input.current?.click()}
               disabled={loading}
             >

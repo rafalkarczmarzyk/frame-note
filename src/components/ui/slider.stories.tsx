@@ -33,3 +33,32 @@ export const Default: Story = {
   },
 };
 export const Disabled: Story = { args: { disabled: true } };
+
+export const WithScale: Story = {
+  args: {
+    min: 0,
+    marks: [
+      { value: 0, label: '0%' },
+      { value: 25, label: '25%' },
+      { value: 50, label: '50%' },
+      { value: 75, label: '75%' },
+      { value: 100, label: '100%' },
+    ],
+  },
+};
+export const CustomThresholds: Story = {
+  args: {
+    marks: [
+      { value: 1, label: '1%' },
+      { value: 20 },
+      { value: 40 },
+      { value: 60, label: 'Small' },
+      { value: 75, label: 'Balanced' },
+      { value: 95, label: 'Best' },
+      { value: 100 },
+    ],
+  },
+};
+export const DisabledWithScale: Story = {
+  args: { ...WithScale.args, disabled: true },
+};

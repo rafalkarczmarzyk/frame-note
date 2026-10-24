@@ -42,7 +42,7 @@ export function FloatingPanel({
         }
       }}
       className={cn(
-        'flex min-h-0 flex-col overflow-hidden rounded-lg border border-foreground/20 text-foreground shadow-xl shadow-background/40',
+        'flex min-h-0 flex-col overflow-hidden rounded-xl border border-border text-foreground shadow-xl shadow-background/40',
         surface === 'glass' ? 'glass-panel' : 'bg-background',
         className,
       )}
