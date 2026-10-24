@@ -2,7 +2,7 @@
 
 Lokalny edytor podpisów fotograficznych. React + TypeScript + Vite + Tailwind CSS.
 
-## Status: etap 4 — podpis i podstawowy eksport (do akceptacji)
+## Status: etap 5 — stylowanie i pozycja (do akceptacji)
 
 Gotowe: import jednego JPG, podgląd canvas, odczyt i wyszukiwanie metadanych, szablon podpisu z tokenami i podstawowy eksport. Każdy etap czeka na ocenę użytkownika przed przejściem dalej.
 
@@ -86,3 +86,13 @@ Jeden wieloliniowy szablon z tokenami `{group:name}`. Kliknięcie pola wstawia t
 Podgląd i eksport używają wspólnej geometrii Konva: Montserrat, 1,35% krótszego boku, lewy dolny róg i marginesy 3%. Kontrolki stylu i anchorów pozostają na etap 5. Eksport JPG ma oryginalne wymiary i jakość 0,95, nazwę `*-framenote.jpg`. Font jest ładowany przed renderowaniem. Na tym etapie metadane nie są kopiowane, a zachowanie źródłowego profilu kolorów nie jest zapewnione; eksport przeglądarkowy ponownie koduje zdjęcie.
 
 Testy: unity tokenów, brakujących pól, składni i geometrii; jeden funkcjonalny E2E od importu do pobranego JPG, z kontrolą wymiarów i obecności tekstu w pikselach. To nie jest jeszcze regresja wizualna z zaakceptowanym wzorcem (etap 6). Wcześniejsze testy zależne od szczegółów UI zostały zastąpione tym przepływem.
+
+## Etap 5
+
+Kontrolki: Montserrat/Advercase Regular/Bold, rozmiar jako ułamkowy procent krótszego boku, cztery kolory palety, przezroczystość, interlinia, wyrównanie, dziewięć anchorów i dwa marginesy względne. Anchor pozycjonuje rzeczywiście zmierzony blok; wyrównanie dotyczy linii wewnątrz bloku. Zmiana anchora przenosi blok do wskazanego punktu. Dla środkowej osi margines na tej osi jest pomijany.
+
+Wspólne pomiary tekstu i geometria są używane w podglądzie i eksporcie. Font jest ładowany przy zmianie rodziny lub grubości. Ustawienia są na razie przypisane do bieżącego zdjęcia; wymiana zdjęcia przywraca domyślne. Bardzo długi podpis może wyjść poza kadr i zostać przycięty; nie wprowadzamy automatycznego zmniejszania ani zawijania tekstu. Zoom i pan pozostają poza tym etapem.
+
+### Iteracja paneli
+
+Eksport jest w navbarze. Przycisk na stałym dole panelu ustawień otwiera osobny panel tagów po jego lewej stronie. Lista tagów ma własny scroll, niezależny od ustawień. Edytor zapamiętuje kursor i zaznaczenie przy opuszczeniu pola, także na czas wyszukiwania; wstawienie zastępuje zaznaczenie i aktualizuje pozycję następnego wstawienia. Obecność dokładnego tokenu w szablonie oznacza tag jako Used i nadaje mu kolor primary.
