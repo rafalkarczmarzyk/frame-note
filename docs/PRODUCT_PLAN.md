@@ -163,33 +163,42 @@ jeszcze zatwierdzona; poniżej rozdzielamy potrzeby od propozycji implementacji.
   stylowaniem oraz wyrównaniem w osiach.
 - Możliwość dodawania kilku zdjęć w przyszłości.
 
-### Propozycja MVP do zatwierdzenia
+### Uzgodniony podział MVP — 24 października 2026
 
-Najbliższy użyteczny przyrost to powtarzalna praca na jednym zdjęciu przy użyciu
-własnych presetów. Nie trzeba od razu budować edytora wielu kontenerów.
+MVP: jedno zdjęcie, wiele kontenerów tekstowych i SVG, wizualny edytor treści
+oraz presety całego układu. Każdy etap wymaga oceny użytkownika, poprawek
+oraz jego potwierdzenia przed przejściem dalej. Zlecono wyłącznie etap 1.
 
-| Proponowana kolejność                | Efekt                                                                     | Decyzje przed implementacją                              |
-| ------------------------------------ | ------------------------------------------------------------------------- | -------------------------------------------------------- |
-| 1. Presety użytkownika               | Zapis, nazwa, wybór, aktualizacja i usuwanie szablonu ze stylem i pozycją | Trwałość, format danych, zachowanie przy zmianie zdjęcia |
-| 2. Przenoszenie presetów             | Import/eksport wersjonowanego pliku z walidacją                           | Czy wymagane do pierwszego MVP                           |
-| 3. Formatowanie metadanych           | Przydatne formatowanie wartości, w tym rozpoznawanie Helicon              | Dalsze formatowanie i zakres parsera Helicon             |
-| 4. Weryfikacja codziennego przepływu | Preset działa na różnych cropach i obu orientacjach; stabilny eksport     | Reprezentatywne zdjęcia i kryteria akceptacji            |
+| Etap                       | Zakres                                                                                                         | Stan                                    |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| 1. Próba Tiptap            | Tekst, badge’e, ikony SVG, zaznaczanie, przeciąganie, undo/redo i schowek `{klucz}`                            | Zaimplementowana w Storybooku; do oceny |
+| 2. Wiele kontenerów        | Dodawanie, duplikowanie, usuwanie; wybór z listy i canvasu; osobny styl, anchor i marginesy                    | Oczekuje                                |
+| 3. Custom position         | Przeciąganie na zdjęciu, X/Y względne do zdjęcia, przełączanie Anchor/Custom                                   | Oczekuje                                |
+| 4. Docelowy edytor i ikony | Tiptap w sidebarze, picker metadanych, własne SVG z nazwami `{icon:aperture}`, układ tekstu i ikon w eksporcie | Oczekuje                                |
+| 5. Logo SVG                | Osobny kontener, proporcjonalne wymiary, opacity, oryginalne kolory lub jeden kolor, pozycjonowanie            | Oczekuje                                |
+| 6. Presety                 | Zapis, wybór, aktualizacja, Save as, usuwanie, trwałość lokalna, import/eksport wraz z SVG                     | Oczekuje                                |
+| 7. Weryfikacja             | Różne zdjęcia/orientacje, brakujące dane, presety, zgodność podglądu i JPG, Chromium/WebKit                    | Oczekuje                                |
 
-To propozycja kolejności, nie zlecenie realizacji. Wielokontenerowy edytor,
-batch i desktop powinny dostać osobne uzgodnienie zakresu.
+Nazwy kontenerów nie są wymagane: lista pokazuje fragment treści lub miniaturę SVG.
+Sidebar edytuje aktywny kontener; na canvasie wybiera się i przesuwa cały blok.
+Jednostka wymiarowania jest wspólna, styl jednolity wewnątrz kontenera, ale osobny
+dla każdego bloku. Ikony inline domyślnie dziedziczą rozmiar i kolor tekstu.
+Preset zapisuje odwołania do metadanych, wszystkie kontenery i użyte zasoby SVG.
+Jakość JPG proponowana jako osobna preferencja eksportu.
 
-### Proponowane kryteria ukończenia MVP
+Do oceny przy etapie 3 pozostaje punkt odniesienia pozycji Custom: proponowany
+ostatni wybrany anchor. Poza MVP: batch, desktop, formatowanie pojedynczych
+fragmentów tekstu, dziedziczenie stylów i parser Helicon.
 
-- Można stworzyć preset dla konkretnego zastosowania, wrócić do niego po restarcie
-  aplikacji i zastosować do kolejnego zdjęcia.
-- Podpis zachowuje względny rozmiar i pozycję na zdjęciach po różnych cropach.
-- Wybór pola nie jest ograniczony do ręcznie przygotowanej listy popularnych tagów;
-  dostępne są pola odczytane z danego pliku.
-- Brakujące metadane oraz nierozpoznane komentarze mają przewidywalne zachowanie,
-  bez cichej utraty treści.
-- Podgląd i eksport pozostają zgodne; regresja eksportu nadal przechodzi.
-- Zakres formatowania Helicon i ewentualny import/eksport presetów jest jawnie
-  zatwierdzony albo odłożony przed zamknięciem MVP.
+### Etap 1 — próba edytora
+
+Dostęp: Storybook → Screens/CaptionEditorPrototype → Playground.
+Odizolowany od edytora zdjęć i eksportu, używa przykładowych metadanych oraz
+ikon SVG aperture i camera z Lucide. Brakujące tokeny/ikony zachowują nazwę.
+Pisanie pełnego tokenu oraz wklejanie zamienia je na elementy atomowe.
+Kopiowanie i wycinanie używa tekstu `{klucz}`; pole Clipboard playground
+pozwala sprawdzić zawartość schowka. Enter zachowuje nowe wiersze.
+Upload własnych SVG i renderowanie podpisów należą do późniejszych etapów.
 
 ## 5. UX i design system — zachować przy rozwoju
 
