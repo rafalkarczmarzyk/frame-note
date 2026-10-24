@@ -262,3 +262,8 @@ Logo można duplikować i usuwać w swoim wierszu. Zmiana jednostki zachowuje wy
 a wymiana zdjęcia zachowuje cały układ. Zasób SVG jest częścią modelu kontenera;
 trwały zapis dojdzie w etapie presetów. Obowiązują te same limity i wymagania SVG
 co dla ikon inline. Storybook: **Screens/TestPhotos/StandaloneLogo**.
+
+Ustawienia wybranego kontenera są zgrupowane jako **Content**, **Appearance**
+i **Layout**. Wygląd obejmuje rozmiar/font, kolor i opacity, a Layout wyrównanie,
+Line spacing i pozycję. Kolor ma szybkie próbki oraz tęczowy picker inline;
+More colors otwiera pełną paletę i graficzny picker z HEX w panelu.

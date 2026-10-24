@@ -1,7 +1,7 @@
+import { HexColorPicker } from 'react-colorful';
 import { useEffect, useRef, useState } from 'react';
 import { FloatingPanel } from '@/components/layout/floating-panel';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Field } from '@/components/ui/field';
 import { PickerList } from '@/components/ui/picker-list';
 import { ColorSwatch } from '@/components/ui/color-swatch';
@@ -24,14 +24,18 @@ export function ColorPickerPanel({
   className?: string;
   surface?: 'glass' | 'solid';
 }) {
-  const [query, setQuery] = useState('');
-  const [draft, setDraft] = useState(() =>
-    resolveCaptionColor(value, (name) =>
+  const resolve = (color: string) =>
+    resolveCaptionColor(color, (name) =>
       getComputedStyle(document.documentElement).getPropertyValue(
         `--color-${name}`,
       ),
-    ),
-  );
+    );
+  const [draftState, setDraftState] = useState(() => ({
+    value,
+    text: resolve(value),
+  }));
+  const draft = draftState.value === value ? draftState.text : resolve(value);
+  const setDraft = (text: string) => setDraftState({ value, text });
   const [error, setError] = useState('');
   const opener = useRef(document.activeElement);
   useEffect(
@@ -52,11 +56,6 @@ export function ColorPickerPanel({
     );
     setError('');
   };
-  const filtered = captionColors.filter((color) =>
-    `${color.label} ${color.group}`
-      .toLowerCase()
-      .includes(query.toLowerCase().trim()),
-  );
   return (
     <FloatingPanel
       title="Choose a color"
@@ -64,26 +63,21 @@ export function ColorPickerPanel({
       onClose={onClose}
       className={className}
       surface={surface}
-      toolbar={
-        <Input
-          autoFocus
-          aria-label="Search colors"
-          placeholder="Search colors…"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
+    >
+      <section aria-label="Visual color picker" className="mb-4">
+        <HexColorPicker
+          color={
+            normalizeHex(draft) ??
+            resolveCaptionColor(value, (token) =>
+              getComputedStyle(document.documentElement).getPropertyValue(
+                `--color-${token}`,
+              ),
+            )
+          }
+          onChange={(hex) => choose(normalizeHex(hex)!)}
+          style={{ width: '100%', height: 160 }}
         />
-      }
-      footer={
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            const hex = normalizeHex(draft);
-            if (hex) choose(hex);
-            else setError('Enter a valid HEX color using 3 or 6 digits.');
-          }}
-          className="space-y-3"
-          aria-label="Custom caption color"
-        >
+        <div className="mt-4">
           <Field
             label="Custom color (HEX)"
             hint="Use 3 or 6 digits, with or without #."
@@ -98,8 +92,17 @@ export function ColorPickerPanel({
                   aria-invalid={!!error}
                   value={draft}
                   onChange={(event) => {
-                    setDraft(event.target.value);
+                    const text = event.target.value;
+                    const hex = normalizeHex(text);
+                    setDraftState({ value: hex ?? value, text });
+                    if (hex) onChange(hex);
                     setError('');
+                  }}
+                  onBlur={() => {
+                    const hex = normalizeHex(draft);
+                    if (hex) choose(hex);
+                    else
+                      setError('Enter a valid HEX color using 3 or 6 digits.');
                   }}
                   spellCheck={false}
                   autoComplete="off"
@@ -107,19 +110,10 @@ export function ColorPickerPanel({
               </div>
             )}
           </Field>
-          <Button type="submit" size="sm" className="w-full">
-            Apply color
-          </Button>
-        </form>
-      }
-    >
-      {filtered.length === 0 && (
-        <p className="p-3 text-xs text-content-secondary">
-          No matching colors. You can still enter a custom HEX below.
-        </p>
-      )}
+        </div>
+      </section>
       {(['Neutrals', 'Soft colors'] as const).map((group) => {
-        const items = filtered.filter((color) => color.group === group);
+        const items = captionColors.filter((color) => color.group === group);
         return (
           items.length > 0 && (
             <section key={group} className="mb-4">

@@ -868,8 +868,8 @@ export function PhotoWorkspace({
               ) : (
                 <>
                   <SidebarSection
-                    id="caption"
-                    title="Caption"
+                    id="content"
+                    title="Content"
                     iconTone="caption"
                     icon={<TextQuote />}
                   >
