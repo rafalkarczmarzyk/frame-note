@@ -18,7 +18,7 @@
     "test:e2e:ui": "playwright test --ui",
     "check": "pnpm format:check && pnpm check:tokens && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "test:e2e:update": "playwright test --update-snapshots",
-    "storybook": "storybook dev -p 6006 --no-open --disable-telemetry",
+    "storybook": "storybook dev --host 0.0.0.0 -p 6006 --no-open --disable-telemetry",
     "build-storybook": "storybook build --disable-telemetry",
     "check:tokens": "node scripts/check-color-tokens.mjs"
   },

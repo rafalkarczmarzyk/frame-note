@@ -106,6 +106,12 @@
   --section-export: var(--accent-color);
   --section-icon: var(--color-porcelain);
   --section-icon-dark: var(--color-charcoal-dark);
+  --container-settings-base: color-mix(
+    in srgb,
+    var(--color-charcoal-light) 90%,
+    var(--color-porcelain)
+  );
+  --container-settings-border: var(--tone-edge);
   --accordion-base: var(--color-charcoal-light);
   --accordion-header-hover: var(--tone-overlay);
   --accordion-label: var(--content-primary);
@@ -232,6 +238,8 @@
   --color-header-base: var(--header-base);
   --color-sidebar-base: var(--sidebar-base);
   --color-workspace-base: var(--workspace-base);
+  --color-container-settings-base: var(--container-settings-base);
+  --color-container-settings-border: var(--container-settings-border);
   --color-accordion-base: var(--accordion-base);
   --color-accordion-header-hover: var(--accordion-header-hover);
   --color-accordion-label: var(--accordion-label);

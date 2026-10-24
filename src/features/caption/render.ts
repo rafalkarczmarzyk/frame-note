@@ -74,9 +74,33 @@ export async function exportPhoto(
   color: string,
   qualityPercent = 95,
 ): Promise<Blob> {
+  return exportPhotoCaptions(
+    image,
+    dimensions,
+    [{ caption, text, color }],
+    qualityPercent,
+  );
+}
+
+export interface RenderedCaption {
+  caption: Caption;
+  text: string;
+  color: string;
+}
+
+export async function exportPhotoCaptions(
+  image: HTMLImageElement,
+  dimensions: ImageDimensions,
+  captions: readonly RenderedCaption[],
+  qualityPercent = 95,
+): Promise<Blob> {
   const quality = jpegQuality(qualityPercent);
-  await document.fonts.load(
-    `${caption.style.fontWeight} 16px "${caption.style.fontFamily}"`,
+  await Promise.all(
+    captions.map(({ caption }) =>
+      document.fonts.load(
+        `${caption.style.fontWeight} 16px "${caption.style.fontFamily}"`,
+      ),
+    ),
   );
   const container = document.createElement('div');
   const stage = new Konva.Stage({
@@ -94,7 +118,10 @@ export async function exportPhoto(
         height: dimensions.height,
       }),
     );
-    layer.add(new Konva.Text(captionConfig(dimensions, caption, text, color)));
+    for (const { caption, text, color } of captions)
+      layer.add(
+        new Konva.Text(captionConfig(dimensions, caption, text, color)),
+      );
     layer.draw();
     const blob = await stage.toBlob({
       mimeType: 'image/jpeg',

@@ -1,6 +1,14 @@
+import wildlifeUrl from '../../tests/fixtures/20260520-IMG_3843.jpg';
+import portraitUrl from '../../tests/fixtures/20261021-IMG_0469.jpg';
+import { createCaption } from '@/domain/document';
+import {
+  createCaptionLayout,
+  addCaption,
+  type CaptionLayout,
+} from '@/domain/caption-layout';
 import xmpPortraitUrl from '../../tests/fixtures/Agata-104.jpg';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { AppHeader } from '@/components/layout/app-header';
 import { PhotoWorkspace } from '@/features/photo/photo-workspace';
 import { loadPhoto, type LoadedPhoto } from '@/features/photo/load-photo';
@@ -9,7 +17,17 @@ import macroUrl from '../../tests/fixtures/20261021-IMG_9959.jpg';
 import heliconUrl from '../../tests/fixtures/20261020-2026-10-20 14-06-39 (A,R8,S4).jpg';
 import nightUrl from '../../tests/fixtures/20210228-IMG_3200.jpg';
 
-function TestPhotoEditor({ src, name }: { src: string; name: string }) {
+function TestPhotoEditor({
+  src,
+  name,
+  initialLayout,
+  toolbar,
+}: {
+  src: string;
+  name: string;
+  initialLayout?: CaptionLayout;
+  toolbar?: ReactNode;
+}) {
   const [photo, setPhoto] = useState<LoadedPhoto | null>(null);
   const [error, setError] = useState('');
   useEffect(() => {
@@ -45,12 +63,13 @@ function TestPhotoEditor({ src, name }: { src: string; name: string }) {
       <AppHeader>
         <div id="export-actions" />
       </AppHeader>
+      {toolbar}
       {error ? (
         <p role="alert" className="p-6">
           {error}
         </p>
       ) : photo ? (
-        <PhotoWorkspace photo={photo} />
+        <PhotoWorkspace photo={photo} initialLayout={initialLayout} />
       ) : (
         <p role="status" className="p-6">
           Opening test photo…
@@ -90,4 +109,90 @@ export const NightPortrait: Story = {
 
 export const XmpPortrait: Story = {
   args: { src: xmpPortraitUrl, name: 'Agata-104.jpg' },
+};
+
+const multipleLayout = addCaption(
+  addCaption(
+    createCaptionLayout({ ...createCaption(), template: '{author}' }),
+    'technical',
+  ),
+  'title',
+);
+multipleLayout.containers[1]!.template = '{exposure}';
+multipleLayout.containers[1]!.position.anchor = 'bottom-right';
+multipleLayout.containers[2]!.template = 'A closer look';
+multipleLayout.containers[2]!.position.anchor = 'top-center';
+multipleLayout.containers[2]!.style.fontFamily = 'Advercase';
+multipleLayout.containers[2]!.style.fontSize = 4;
+
+export const MultipleCaptions: Story = {
+  args: {
+    src: macroUrl,
+    name: '20261021-IMG_9959.jpg',
+    initialLayout: multipleLayout,
+  },
+};
+
+const testPhotos = [
+  { src: wildlifeUrl, name: '20260520-IMG_3843.jpg', label: 'Wildlife' },
+  {
+    src: portraitUrl,
+    name: '20261021-IMG_0469.jpg',
+    label: 'Wildlife portrait',
+  },
+  { src: brightUrl, name: '20260405-K89A0565.jpg', label: 'Bright background' },
+  { src: macroUrl, name: '20261021-IMG_9959.jpg', label: 'Macro' },
+  {
+    src: heliconUrl,
+    name: '20261020-2026-10-20 14-06-39 (A,R8,S4).jpg',
+    label: 'Helicon stack',
+  },
+  { src: nightUrl, name: '20210228-IMG_3200.jpg', label: 'Night portrait' },
+  { src: xmpPortraitUrl, name: 'Agata-104.jpg', label: 'XMP portrait' },
+];
+
+function AllTestPhotos() {
+  const [selected, setSelected] = useState(testPhotos[0]!);
+  return (
+    <TestPhotoEditor
+      key={selected.src}
+      {...selected}
+      toolbar={
+        <nav
+          aria-label="Test photos"
+          className="flex shrink-0 gap-2 overflow-x-auto bg-sidebar-base p-3"
+        >
+          {testPhotos.map((photo) => (
+            <button
+              key={photo.src}
+              type="button"
+              aria-pressed={selected.src === photo.src}
+              onClick={() => setSelected(photo)}
+              title={photo.name}
+              className="control-button control-neutral flex w-28 shrink-0 flex-col gap-1 p-2 text-xs aria-pressed:outline-2 aria-pressed:outline-input-focus-ring"
+            >
+              <img
+                src={photo.src}
+                alt=""
+                className="h-16 w-full rounded object-contain"
+              />
+              <span>{photo.label}</span>
+            </button>
+          ))}
+        </nav>
+      }
+    />
+  );
+}
+
+export const AllPhotos: Story = {
+  render: () => <AllTestPhotos />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'All seven original test photos. Select a thumbnail to open it in the real editor. Switching photos starts a fresh editor session.',
+      },
+    },
+  },
 };

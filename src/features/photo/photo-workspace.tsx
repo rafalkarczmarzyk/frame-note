@@ -1,8 +1,19 @@
+import { AnchorIcon } from '@/components/ui/anchor-picker';
+import {
+  addCaption,
+  containerCaption,
+  createCaptionLayout,
+  removeCaption,
+  updateCaption,
+  type CaptionLayout,
+} from '@/domain/caption-layout';
+import { createCaption, type Caption } from '@/domain/document';
+import { IconButton } from '@/components/ui/icon-button';
 import { MetadataPicker } from '../caption/metadata-picker';
 import { metadataGroups } from '@/domain/caption-tags';
 import { ColorPickerPanel } from '../caption/color-picker-panel';
 import { resolveCaptionColor } from '@/domain/caption-colors';
-import { Download, TextQuote } from 'lucide-react';
+import { Download, TextQuote, Layers, Plus, Copy, Trash2 } from 'lucide-react';
 import { PhotoIcon } from '@/components/icons/photo-icon';
 import {
   EditorWorkspace,
@@ -29,10 +40,25 @@ import { Button } from '@/components/ui/button';
 import { resolveTemplate } from '../caption/template';
 import { captionConfig, exportName } from '../caption/render';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Stage, Layer, Group, Text, Image as CanvasImage } from 'react-konva';
+import {
+  Stage,
+  Layer,
+  Group,
+  Text,
+  Rect,
+  Image as CanvasImage,
+} from 'react-konva';
 import type { LoadedPhoto } from './load-photo';
 
-export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
+export function PhotoWorkspace({
+  photo,
+  initialLayout,
+}: {
+  photo: LoadedPhoto;
+  initialLayout?: CaptionLayout;
+}) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const host = useRef<HTMLDivElement>(null);
   const templateInput = useRef<HTMLTextAreaElement>(null);
   const selection = useRef<TextSelection>({ start: 0, end: 0 });
@@ -43,18 +69,75 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
   const [fontQuery, setFontQuery] = useState('');
   const [size, setSize] = useState({ width: 1, height: 1 });
   const [query, setQuery] = useState('');
-  const [template, setTemplate] = useState('{author}\n{lens}\n{exposure}');
+  const [layout, setLayout] = useState(
+    () =>
+      initialLayout ??
+      createCaptionLayout({
+        ...photo.document.caption,
+        template: '{author}\n{lens}\n{exposure}',
+      }),
+  );
+  const activeContainer = layout.containers.find(
+    (container) => container.id === layout.activeId,
+  );
+  const settings = activeContainer
+    ? containerCaption(layout, activeContainer)
+    : {
+        ...createCaption(),
+        sizingUnit: layout.sizingUnit,
+        position: {
+          ...createCaption().position,
+          margins: layout.margins,
+          marginLinkMode: layout.marginLinkMode,
+        },
+      };
+  const template = settings.template;
+  const setSettings = (next: Caption | ((value: Caption) => Caption)) => {
+    if (!layout.activeId) return;
+    setLayout((value) =>
+      updateCaption(
+        value,
+        layout.activeId!,
+        typeof next === 'function' ? next(settings) : next,
+        photo.document.photo.dimensions,
+      ),
+    );
+  };
+  const setTemplate = (template: string) =>
+    setSettings({ ...settings, template });
+  const selectContainer = (id: string) => {
+    setEditingId(null);
+    selection.current = { start: 0, end: 0 };
+    setLayout((value) => ({ ...value, activeId: id }));
+  };
+  const addContainer = (duplicate = false) => {
+    selection.current = { start: 0, end: 0 };
+    setLayout((value) =>
+      addCaption(
+        value,
+        Array.from(crypto.getRandomValues(new Uint32Array(4)), (part) =>
+          part.toString(16).padStart(8, '0'),
+        ).join(''),
+        duplicate,
+        photo.document.photo.dimensions,
+      ),
+    );
+  };
   const [exporting, setExporting] = useState(false);
   const [quality, setQuality] = useState(95);
   const [error, setError] = useState('');
-  const [settings, setSettings] = useState(photo.document.caption);
   const [loadedFont, setLoadedFont] = useState('');
-  const fontKey = `${settings.style.fontWeight} 16px "${settings.style.fontFamily}"`;
+  const fontKey = [
+    ...new Set(
+      layout.containers.map(
+        (container) =>
+          `${container.style.fontWeight} 16px "${container.style.fontFamily}"`,
+      ),
+    ),
+  ]
+    .sort()
+    .join('|');
   const fontReady = loadedFont === fontKey;
-  const caption = useMemo(
-    () => ({ ...settings, template }),
-    [settings, template],
-  );
   const used = usedTokens(template);
   const exportTarget = document.getElementById('export-actions');
   const rememberSelection = () => {
@@ -75,27 +158,49 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
     });
   };
   const resolved = resolveTemplate(template, photo.document.photo.metadata);
-  const color = resolveCaptionColor(caption.style.color, (name) =>
-    getComputedStyle(document.documentElement).getPropertyValue(
-      `--color-${name}`,
-    ),
+  const renderedCaptions = useMemo(
+    () =>
+      layout.containers.map((container) => {
+        const caption = containerCaption(layout, container);
+        const resolved = resolveTemplate(
+          caption.template,
+          photo.document.photo.metadata,
+        );
+        const color = resolveCaptionColor(caption.style.color, (name) =>
+          getComputedStyle(document.documentElement).getPropertyValue(
+            `--color-${name}`,
+          ),
+        );
+        return { id: container.id, caption, ...resolved, color };
+      }),
+    [layout, photo],
+  );
+  const exportCaptions = useMemo(
+    () =>
+      renderedCaptions.map(({ caption, text, color }) => ({
+        caption,
+        text,
+        color,
+      })),
+    [renderedCaptions],
   );
   const exportRequest = useMemo(
     () => ({
       image: photo.image,
       dimensions: photo.document.photo.dimensions,
-      caption,
-      text: resolved.text,
-      color,
+      captions: exportCaptions,
       quality,
     }),
-    [photo, caption, resolved.text, color, quality],
+    [photo, exportCaptions, quality],
   );
   const prepared = usePreparedExport(exportRequest, fontReady);
   useEffect(() => {
     let active = true;
-    void document.fonts
-      .load(fontKey)
+    void Promise.all(
+      fontKey
+        ? fontKey.split('|').map((font) => document.fonts.load(font))
+        : [],
+    )
       .then(() => {
         if (active) setLoadedFont(fontKey);
       })
@@ -109,7 +214,9 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
   const download = () => {
     if (!prepared.blob) return;
     if (
-      (resolved.invalidSyntax || resolved.missing.length) &&
+      renderedCaptions.some(
+        (item) => item.invalidSyntax || item.missing.length,
+      ) &&
       !window.confirm(
         'Some tokens could not be resolved. Export the current caption anyway?',
       )
@@ -174,16 +281,49 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
               clipHeight={height}
             >
               <CanvasImage image={photo.image} width={width} height={height} />
-              {fontReady && (
-                <Text
-                  {...captionConfig(
+              {fontReady &&
+                renderedCaptions.map(({ id, caption, text, color }) => {
+                  const config = captionConfig(
                     { width, height },
                     caption,
-                    resolved.text,
+                    text,
                     color,
-                  )}
-                />
-              )}
+                  );
+                  return (
+                    <Group key={id}>
+                      <Text
+                        {...config}
+                        listening
+                        onMouseEnter={() => setHoveredId(id)}
+                        onMouseLeave={() => setHoveredId(null)}
+                        onClick={() => selectContainer(id)}
+                        onTap={() => selectContainer(id)}
+                      />
+                      {(hoveredId === id || editingId === id) && text && (
+                        <Rect
+                          x={config.x - 4 / scale}
+                          y={config.y - 4 / scale}
+                          width={config.width + 8 / scale}
+                          height={
+                            Math.max(
+                              config.fontSize,
+                              text.split('\n').length *
+                                config.fontSize *
+                                config.lineHeight,
+                            ) +
+                            8 / scale
+                          }
+                          stroke={getComputedStyle(document.documentElement)
+                            .getPropertyValue('--color-porcelain')
+                            .trim()}
+                          strokeWidth={1 / scale}
+                          dash={[4 / scale, 3 / scale]}
+                          listening={false}
+                        />
+                      )}
+                    </Group>
+                  );
+                })}
             </Group>
           </Layer>
         </Stage>
@@ -291,90 +431,219 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
       )}
       <ToolSidebar aria-label="Photo tools">
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <SidebarSection
-            id="photo"
-            title="Photo"
-            iconTone="photo"
-            icon={<PhotoIcon />}
-            defaultOpen={false}
-          >
-            <h1 className="break-all text-sm font-medium">
-              {photo.document.photo.name}
-            </h1>
-            <p className="mt-2 text-xs text-content-secondary">
-              {width} × {height} px
-            </p>
-            <p
-              className="mt-1 text-xs text-content-secondary"
-              title={`${photo.document.photo.byteLength.toLocaleString('en-US')} bytes`}
+          <section aria-label="Document settings">
+            <SidebarSection
+              id="photo"
+              title="Photo"
+              iconTone="photo"
+              icon={<PhotoIcon />}
+              defaultOpen={false}
             >
-              Input: {formatBytes(photo.document.photo.byteLength)}
-            </p>
-          </SidebarSection>
-          <SidebarSection
-            id="caption"
-            title="Caption"
-            iconTone="caption"
-            icon={<TextQuote />}
-          >
-            <label className="sr-only" htmlFor="caption-template">
-              Caption
-            </label>
-            <Textarea
-              ref={templateInput}
-              id="caption-template"
-              value={template}
-              onSelect={rememberSelection}
-              onBlur={rememberSelection}
-              onChange={(event) => {
-                setTemplate(event.target.value);
-                rememberSelection();
-              }}
-              rows={6}
-              spellCheck={false}
-              className="mt-2"
-            />
-            {(resolved.missing.length > 0 || resolved.invalidSyntax) && (
-              <p className="mt-2 text-xs" role="status">
-                {resolved.invalidSyntax ? 'Check token syntax. ' : ''}
-                {resolved.missing.length
-                  ? `Missing fields: ${resolved.missing.join(', ')}`
-                  : ''}
+              <h1 className="break-all text-sm font-medium">
+                {photo.document.photo.name}
+              </h1>
+              <p className="mt-2 text-xs text-content-secondary">
+                {width} × {height} px
               </p>
-            )}
-            <div className="mt-4">
+              <p
+                className="mt-1 text-xs text-content-secondary"
+                title={`${photo.document.photo.byteLength.toLocaleString('en-US')} bytes`}
+              >
+                Input: {formatBytes(photo.document.photo.byteLength)}
+              </p>
+            </SidebarSection>
+            <div className="px-7 pt-3">
+              <h2 className="text-sm font-semibold">Document</h2>
+              <p className="mt-1 text-xs text-content-secondary">
+                Applies to all containers
+              </p>
+            </div>
+            <CaptionControls
+              scope="global"
+              dimensions={photo.document.photo.dimensions}
+              caption={settings}
+              onChange={(caption) =>
+                setLayout((value) =>
+                  updateCaption(
+                    value,
+                    '',
+                    caption,
+                    photo.document.photo.dimensions,
+                  ),
+                )
+              }
+              disabled={exporting}
+              onBrowseColors={() => {}}
+              onBrowseFonts={() => {}}
+            />
+          </section>
+          <SidebarSection
+            id="containers"
+            title="Containers"
+            iconTone="caption"
+            icon={<Layers />}
+          >
+            <div className="mb-3 flex gap-2">
               <Button
                 variant="outline"
-                className="w-full"
-                aria-expanded={tagsOpen}
-                aria-controls="auxiliary-panel"
-                onClick={() =>
-                  setActivePanel((value) => (value === 'tags' ? null : 'tags'))
-                }
+                size="sm"
+                onClick={() => addContainer()}
               >
-                {tagsOpen ? 'Hide available tags' : 'Browse available tags'}
+                <Plus aria-hidden="true" />
+                Add container
               </Button>
+              <IconButton
+                label="Duplicate container"
+                disabled={!activeContainer}
+                onClick={() => addContainer(true)}
+              >
+                <Copy />
+              </IconButton>
+              <IconButton
+                label="Delete container"
+                disabled={!activeContainer}
+                onClick={() => {
+                  selection.current = { start: 0, end: 0 };
+                  setLayout((value) => removeCaption(value, value.activeId!));
+                }}
+              >
+                <Trash2 />
+              </IconButton>
             </div>
+            <PickerList
+              items={layout.containers.map((container, index) => ({
+                id: container.id,
+                label:
+                  container.template
+                    .trim()
+                    .replace(/\s+/gu, ' ')
+                    .slice(0, 70) || 'Empty caption',
+                description: (
+                  <span className="flex items-center gap-1.5">
+                    <span>{index + 1} ·</span>
+                    <AnchorIcon
+                      value={container.position.anchor}
+                      className="size-3.5 shrink-0"
+                    />
+                    <span>
+                      {container.position.anchor.replaceAll('-', ' ')}
+                    </span>
+                  </span>
+                ),
+                selected: layout.activeId === container.id,
+              }))}
+              onChoose={selectContainer}
+              onHover={setHoveredId}
+              emptyText="Add a text container to begin."
+            />
+            {activeContainer &&
+              layout.containers.some(
+                (container) =>
+                  container.id !== activeContainer.id &&
+                  container.position.anchor === activeContainer.position.anchor,
+              ) && (
+                <InlineNotice tone="warning" className="mt-3">
+                  Multiple containers use this anchor and may overlap. Select
+                  each from the list to change its anchor or margins.
+                </InlineNotice>
+              )}
           </SidebarSection>
-          <CaptionControls
-            dimensions={photo.document.photo.dimensions}
-            caption={settings}
-            onChange={setSettings}
-            disabled={exporting}
-            onBrowseColors={() =>
-              setActivePanel((value) => (value === 'colors' ? null : 'colors'))
-            }
-            onBrowseFonts={() =>
-              setActivePanel((value) => (value === 'fonts' ? null : 'fonts'))
-            }
-          />
-
+          {activeContainer && (
+            <section
+              key={activeContainer.id}
+              aria-label="Selected container"
+              className="mx-3 my-3 rounded-xl border border-container-settings-border bg-container-settings-base py-1 [&>details]:mx-2 [&>details]:my-2"
+            >
+              <div className="px-4 pt-3 pb-1">
+                <h2 className="text-sm font-semibold">Selected container</h2>
+                <p className="mt-1 truncate text-xs text-content-secondary">
+                  {template.trim() || 'Empty caption'}
+                </p>
+              </div>
+              <SidebarSection
+                id="caption"
+                title="Caption"
+                iconTone="caption"
+                icon={<TextQuote />}
+              >
+                <label className="sr-only" htmlFor="caption-template">
+                  Caption
+                </label>
+                <Textarea
+                  ref={templateInput}
+                  id="caption-template"
+                  value={template}
+                  onSelect={rememberSelection}
+                  onFocus={() => setEditingId(activeContainer.id)}
+                  onBlur={() => {
+                    rememberSelection();
+                    setEditingId(null);
+                  }}
+                  onChange={(event) => {
+                    setTemplate(event.target.value);
+                    rememberSelection();
+                  }}
+                  rows={6}
+                  spellCheck={false}
+                  className="mt-2"
+                />
+                {(resolved.missing.length > 0 || resolved.invalidSyntax) && (
+                  <p className="mt-2 text-xs" role="status">
+                    {resolved.invalidSyntax ? 'Check token syntax. ' : ''}
+                    {resolved.missing.length
+                      ? `Missing fields: ${resolved.missing.join(', ')}`
+                      : ''}
+                  </p>
+                )}
+                <div className="mt-4">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    aria-expanded={tagsOpen}
+                    aria-controls="auxiliary-panel"
+                    onClick={() =>
+                      setActivePanel((value) =>
+                        value === 'tags' ? null : 'tags',
+                      )
+                    }
+                  >
+                    {tagsOpen ? 'Hide available tags' : 'Browse available tags'}
+                  </Button>
+                </div>
+              </SidebarSection>
+              <CaptionControls
+                scope="local"
+                dimensions={photo.document.photo.dimensions}
+                caption={settings}
+                onChange={setSettings}
+                disabled={exporting}
+                onBrowseColors={() =>
+                  setActivePanel((value) =>
+                    value === 'colors' ? null : 'colors',
+                  )
+                }
+                onBrowseFonts={() =>
+                  setActivePanel((value) =>
+                    value === 'fonts' ? null : 'fonts',
+                  )
+                }
+              />
+            </section>
+          )}
           <SidebarSection
             id="export"
             title="Export"
             iconTone="export"
             icon={<Download />}
           >
+            {renderedCaptions.some(
+              (item) => item.invalidSyntax || item.missing.length,
+            ) && (
+              <InlineNotice tone="warning" className="mb-3">
+                Some containers have missing fields or invalid tokens. Select
+                them to review their captions.
+              </InlineNotice>
+            )}
             <fieldset disabled={exporting}>
               <label
                 className="mt-2 flex items-center justify-between text-xs"
