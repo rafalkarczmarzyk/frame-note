@@ -105,7 +105,7 @@ test('keeps caption settings when replacing landscape and portrait photos', asyn
     .getByRole('spinbutton', { name: 'Font size', exact: true })
     .fill('4.5');
   await page
-    .getByRole('spinbutton', { name: 'Line height', exact: true })
+    .getByRole('spinbutton', { name: 'Line spacing', exact: true })
     .fill('1.8');
   await page
     .getByRole('spinbutton', { name: 'Opacity value', exact: true })
@@ -152,7 +152,7 @@ test('keeps caption settings when replacing landscape and portrait photos', asyn
     ).toContainText('% of short edge');
     for (const [name, value] of [
       ['Font size', '4.5'],
-      ['Line height', '1.8'],
+      ['Line spacing', '1.8'],
       ['Opacity value', '65'],
       ['Top', '5'],
       ['Bottom', '5'],

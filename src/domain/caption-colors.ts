@@ -1,5 +1,7 @@
 /** Caption colors are independent of interface accents. Existing token names stay valid. */
 export const captionColors = [
+  { value: 'caption-white', label: 'White', group: 'Neutrals' },
+  { value: 'caption-dark-gray', label: 'Dark gray', group: 'Neutrals' },
   { value: 'porcelain', label: 'Porcelain', group: 'Neutrals' },
   { value: 'caption-silver', label: 'Silver', group: 'Neutrals' },
   { value: 'caption-gray', label: 'Gray', group: 'Neutrals' },

@@ -31,21 +31,29 @@ test('chooses presets, validates custom HEX and exports the chosen color', async
   ).toContainText('Sage');
   const custom = panel.getByRole('textbox', { name: 'Custom color (HEX)' });
   await custom.fill('invalid');
-  await panel.getByRole('button', { name: 'Apply color' }).click();
+  await custom.blur();
   await expect(panel.getByRole('alert')).toContainText('valid HEX');
   await expect(
     page.getByRole('button', { name: 'Color', exact: true }),
   ).toContainText('Sage');
   await custom.fill('abc');
-  await custom.press('Enter');
-  await expect(custom).toHaveValue('#AABBCC');
-  await panel
-    .getByRole('textbox', { name: 'Search colors' })
-    .fill('not a preset');
   await expect(
-    panel.getByText('No matching colors.', { exact: false }),
-  ).toBeVisible();
-  await expect(custom).toBeVisible();
+    page.getByRole('button', { name: 'Color', exact: true }),
+  ).toContainText('#AABBCC');
+  await custom.fill('abcd');
+  await expect(custom).toHaveValue('abcd');
+  await expect(
+    page.getByRole('button', { name: 'Color', exact: true }),
+  ).toContainText('#AABBCC');
+  await custom.fill('aabbcc');
+  await custom.blur();
+  await expect(custom).toHaveValue('#AABBCC');
+  await expect(
+    panel.getByRole('textbox', { name: 'Search colors' }),
+  ).toHaveCount(0);
+  await expect(panel.getByRole('button', { name: 'Apply color' })).toHaveCount(
+    0,
+  );
   await custom.press('Escape');
   await expect(panel).not.toBeVisible();
   await expect(

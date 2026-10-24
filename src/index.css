@@ -26,9 +26,11 @@
   --color-porcelain: #fdfffc;
   --color-slate: #9cafb7;
   /* Caption presets, independent of UI roles. */
+  --color-caption-white: #ffffff;
+  --color-caption-dark-gray: #555555;
   --color-caption-silver: #dedede;
   --color-caption-gray: #a3a3a3;
-  --color-caption-black: #181818;
+  --color-caption-black: #000000;
   --color-caption-ivory: #f3ecdf;
   --color-caption-sand: #d9c9b2;
   --color-caption-blush: #e4c6c3;
@@ -700,4 +702,17 @@
   .numeric-input[data-disabled]:hover {
     background: var(--input-base);
   }
+}
+
+/* Decorative full-spectrum thumbnail for custom caption colors. */
+.color-spectrum {
+  mask-image: radial-gradient(circle closest-side, black 94%, transparent 100%);
+  background: conic-gradient(
+    var(--color-crimson),
+    var(--color-yellow),
+    var(--color-emerald),
+    var(--color-turquoise),
+    var(--color-violet),
+    var(--color-crimson)
+  );
 }

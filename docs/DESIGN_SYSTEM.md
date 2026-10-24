@@ -318,3 +318,23 @@ color picker; CaptionControls hides Typography and provides the shared Position 
 The list shows a thumbnail and filename with the same per-row actions and hover.
 logoLayout computes the same geometry for canvas and JPG, including Custom.
 Screens/TestPhotos/StandaloneLogo demonstrates a logo alongside a text caption.
+
+## Quick and graphical caption colors
+
+Typography offers QuickColors below the full color trigger: white, silver, gray,
+dark gray and black, with selection rings and accessible button labels. Full
+presets and custom HEX remain in the docked panel. A react-colorful HexColorPicker
+adds saturation/brightness and hue controls with live caption updates; opacity
+remains separate. GUI and HEX share the existing normalized RGB value model.
+
+## Local settings organization
+
+Selected container uses three accordions for both text and logos: Content,
+Appearance and Layout. Text Content owns the editor and Tags/Icons actions;
+logo Content owns the file and Replace SVG. Text Appearance orders Font,
+Size/Weight, Color and Opacity; logo Appearance orders dimensions, color mode,
+Color and Opacity. ColorControls shares quick swatches and the inline rainbow
+picker, followed by a compact More colors trigger (palette and HEX stay docked).
+Text Layout groups alignment and Line spacing before a subtle separator, then
+Anchor/Custom positioning. Logo Layout contains positioning only. Global Photo,
+Sizing, Margins, Containers and Export retain their current workspace order.

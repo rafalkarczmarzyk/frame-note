@@ -1,7 +1,6 @@
+import { ColorControls } from './color-controls';
 import { toPixels } from '@/domain/sizing';
 import { anchoredPosition, customPoint } from './layout';
-import { ColorSwatch } from '@/components/ui/color-swatch';
-import { captionColorLabel } from '@/domain/caption-colors';
 import { HelperText } from '@/components/ui/helper-text';
 import { SidebarSection } from '@/components/layout/sidebar-section';
 import {
@@ -95,12 +94,11 @@ export function CaptionControls({
       )}
       {scope !== 'global' && (
         <>
-          {' '}
           {!hideTypography && (
             <SidebarSection
-              id={`${preferenceScope}typography`}
+              id={`${preferenceScope}appearance`}
               persist={persistSections}
-              title="Typography"
+              title="Appearance"
               iconTone="typography"
               icon={<Type />}
             >
@@ -125,6 +123,17 @@ export function CaptionControls({
                   )}
                 </Field>
                 <div className="grid grid-cols-2 gap-3">
+                  <NumberField
+                    key={caption.sizingUnit}
+                    label="Font size"
+                    unit={unit}
+                    value={caption.style.fontSize}
+                    min={0.01 / factor}
+                    max={Math.max(dimensions.width, dimensions.height) / factor}
+                    step="any"
+                    disabled={disabled}
+                    onValueChange={(fontSize) => style({ fontSize })}
+                  />
                   <Field label="Weight">
                     {(id) => (
                       <Select
@@ -141,39 +150,13 @@ export function CaptionControls({
                       />
                     )}
                   </Field>
-                  <NumberField
-                    key={caption.sizingUnit}
-                    label="Font size"
-                    unit={unit}
-                    value={caption.style.fontSize}
-                    min={0.01 / factor}
-                    max={Math.max(dimensions.width, dimensions.height) / factor}
-                    step="any"
-                    disabled={disabled}
-                    onValueChange={(fontSize) => style({ fontSize })}
-                  />
                 </div>
-                <Field label="Color">
-                  {(id) => (
-                    <button
-                      type="button"
-                      id={id}
-                      aria-haspopup="dialog"
-                      onClick={(event) => {
-                        // Safari does not focus buttons on pointer clicks.
-                        event.currentTarget.focus({ preventScroll: true });
-                        onBrowseColors();
-                      }}
-                      className="control-field flex h-9 w-full items-center gap-2 px-3 text-xs"
-                    >
-                      <ColorSwatch value={caption.style.color} />
-                      <span className="min-w-0 flex-1 truncate text-left">
-                        {captionColorLabel(caption.style.color)}
-                      </span>
-                      <ChevronRight className="size-3.5" aria-hidden="true" />
-                    </button>
-                  )}
-                </Field>
+                <ColorControls
+                  value={caption.style.color}
+                  onChange={(color) => style({ color })}
+                  onBrowse={onBrowseColors}
+                  disabled={disabled}
+                />
                 <div className="grid grid-cols-[minmax(0,1fr)_5rem] items-end gap-3">
                   <div className="space-y-2">
                     <p className="text-xs text-label">Opacity</p>
@@ -198,49 +181,13 @@ export function CaptionControls({
                     onValueChange={(value) => style({ opacity: value / 100 })}
                   />
                 </div>
-                <NumberField
-                  label="Line height"
-                  hint="Multiplies the font size. For example, 1.4× with a 20 px font gives a 28 px line height."
-                  unit="×"
-                  value={caption.style.lineHeight}
-                  min={0.5}
-                  max={3}
-                  disabled={disabled}
-                  onValueChange={(lineHeight) => style({ lineHeight })}
-                />
-                <div className="space-y-2">
-                  <p className="text-xs text-label">Text align</p>
-                  <SegmentedControl
-                    disabled={disabled}
-                    label="Text align"
-                    value={caption.style.textAlign}
-                    onValueChange={(textAlign) => style({ textAlign })}
-                    options={[
-                      {
-                        value: 'left',
-                        label: 'Align left',
-                        content: <AlignLeft aria-hidden="true" />,
-                      },
-                      {
-                        value: 'center',
-                        label: 'Align center',
-                        content: <AlignCenter aria-hidden="true" />,
-                      },
-                      {
-                        value: 'right',
-                        label: 'Align right',
-                        content: <AlignRight aria-hidden="true" />,
-                      },
-                    ]}
-                  />
-                </div>
               </fieldset>
             </SidebarSection>
           )}
           <SidebarSection
-            id={`${preferenceScope}position`}
+            id={`${preferenceScope}layout`}
             persist={persistSections}
-            title="Position"
+            title="Layout"
             iconTone="position"
             icon={<Move />}
           >
@@ -248,6 +195,46 @@ export function CaptionControls({
               disabled={disabled}
               className="space-y-5 disabled:opacity-70"
             >
+              {!hideTypography && (
+                <div className="space-y-4 border-b border-border-subtle pb-5">
+                  <div className="space-y-2">
+                    <p className="text-xs text-label">Text align</p>
+                    <SegmentedControl
+                      disabled={disabled}
+                      label="Text align"
+                      value={caption.style.textAlign}
+                      onValueChange={(textAlign) => style({ textAlign })}
+                      options={[
+                        {
+                          value: 'left',
+                          label: 'Align left',
+                          content: <AlignLeft aria-hidden="true" />,
+                        },
+                        {
+                          value: 'center',
+                          label: 'Align center',
+                          content: <AlignCenter aria-hidden="true" />,
+                        },
+                        {
+                          value: 'right',
+                          label: 'Align right',
+                          content: <AlignRight aria-hidden="true" />,
+                        },
+                      ]}
+                    />
+                  </div>
+                  <NumberField
+                    label="Line spacing"
+                    hint="Multiplies the font size. For example, 1.4× with a 20 px font gives a 28 px line height."
+                    unit="×"
+                    value={caption.style.lineHeight}
+                    min={0.5}
+                    max={3}
+                    disabled={disabled}
+                    onValueChange={(lineHeight) => style({ lineHeight })}
+                  />
+                </div>
+              )}
               <SegmentedControl
                 label="Position mode"
                 value={caption.position.custom ? 'custom' : 'anchor'}
