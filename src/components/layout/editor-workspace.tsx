@@ -26,7 +26,7 @@ export function ToolSidebar({
     <aside
       aria-label="Tools"
       className={cn(
-        'flex min-h-0 max-h-[50vh] w-full shrink-0 flex-col border-t bg-background md:max-h-none md:w-[var(--tools-sidebar-width)] md:border-t-0 md:border-l',
+        'flex min-h-0 max-h-[50vh] w-full shrink-0 flex-col border-t bg-sidebar-base md:max-h-none md:w-[var(--tools-sidebar-width)] md:border-t-0 md:border-l',
         className,
       )}
       {...props}

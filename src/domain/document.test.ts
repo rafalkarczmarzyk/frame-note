@@ -18,14 +18,14 @@ describe('photo document', () => {
       ...photo(),
       dimensions: { width: 3000, height: 2000 },
     });
-    expect(original.caption.style.fontSizePercent).toBe(1.35);
+    expect(original.caption.style.fontSize).toBe(1.35);
     expect(cropped.caption).toEqual(original.caption);
   });
   it('does not share mutable caption settings between documents', () => {
     const first = createPhotoDocument(photo());
     const second = createPhotoDocument(photo());
-    first.caption.position.marginXPercent = 8;
-    expect(second.caption.position.marginXPercent).toBe(3);
+    first.caption.position.margins.left = 8;
+    expect(second.caption.position.margins.left).toBe(3);
   });
   it('does not mutate the input photo dimensions', () => {
     const input = photo();

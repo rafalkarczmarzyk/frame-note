@@ -1,6 +1,6 @@
-import { useState } from 'react';
 import { Field } from './field';
-import { Input } from './input';
+import { NumberInput } from './number-input';
+import { DimensionInput } from './dimension-input';
 
 export function NumberField({
   label,
@@ -11,44 +11,39 @@ export function NumberField({
   step = 0.01,
   disabled = false,
   hint,
+  unit,
+  hideLabel = false,
 }: {
   label: string;
   value: number;
   onValueChange: (value: number) => void;
   min: number;
   max: number;
-  step?: number;
+  step?: number | 'any';
   disabled?: boolean;
   hint?: string;
+  unit?: string;
+  hideLabel?: boolean;
 }) {
-  const [draft, setDraft] = useState(String(value));
-  const [focused, setFocused] = useState(false);
   return (
-    <Field label={label} hint={hint}>
-      {(id, descriptionId) => (
-        <Input
-          id={id}
-          aria-describedby={descriptionId}
-          type="number"
-          min={min}
-          max={max}
-          step={step}
-          disabled={disabled}
-          value={focused ? draft : String(value)}
-          onFocus={() => {
-            setDraft(String(value));
-            setFocused(true);
-          }}
-          onBlur={() => setFocused(false)}
-          onChange={(event) => {
-            setDraft(event.target.value);
-            if (event.target.value === '') return;
-            const next = event.target.valueAsNumber;
-            if (Number.isFinite(next) && next >= min && next <= max)
-              onValueChange(next);
-          }}
-        />
-      )}
+    <Field label={label} hint={hint} hideLabel={hideLabel}>
+      {(id, descriptionId) => {
+        const props = {
+          id,
+          'aria-describedby': descriptionId,
+          value,
+          onValueChange,
+          min,
+          max,
+          step,
+          disabled,
+        };
+        return unit ? (
+          <DimensionInput {...props} unit={unit} />
+        ) : (
+          <NumberInput {...props} />
+        );
+      }}
     </Field>
   );
 }

@@ -22,6 +22,45 @@ test('exports landscape and portrait JPGs with stable caption pixels and colors'
       await expect(
         page.getByRole('button', { name: 'Export JPG', exact: true }),
       ).toBeEnabled();
+      // Changing the shared unit must preserve the exported geometry.
+      for (const unit of ['% of long edge', 'Pixels (px)', '% of short edge']) {
+        await page
+          .getByRole('combobox', { name: 'Sizing unit', exact: true })
+          .click();
+        await page.getByRole('option', { name: unit, exact: true }).click();
+      }
+      await expect(
+        page.getByRole('spinbutton', { name: 'Font size', exact: true }),
+      ).toHaveValue('1.35');
+      await page
+        .getByRole('slider', { name: 'Opacity', exact: true })
+        .press('Home');
+      await expect(
+        page.getByRole('spinbutton', { name: 'Opacity value', exact: true }),
+      ).toHaveValue('0');
+      await page
+        .getByRole('spinbutton', { name: 'Opacity value', exact: true })
+        .fill('100');
+      await page
+        .getByRole('spinbutton', { name: 'Right', exact: true })
+        .fill('4');
+      await expect(
+        page.getByRole('spinbutton', { name: 'Top', exact: true }),
+      ).toHaveValue('3');
+      await page
+        .getByRole('radiogroup', { name: 'Margin linking' })
+        .getByRole('radio', { name: 'All', exact: true })
+        .click();
+      await expect(
+        page.getByRole('spinbutton', { name: 'Right', exact: true }),
+      ).toHaveValue('3');
+      await page
+        .getByRole('radiogroup', { name: 'Margin linking' })
+        .getByRole('radio', { name: 'None', exact: true })
+        .click();
+      await expect(
+        page.getByRole('button', { name: 'Export JPG', exact: true }),
+      ).toBeEnabled();
       const preparedBytes = Number(
         await page.getByTestId('output-size').getAttribute('data-bytes'),
       );
@@ -136,7 +175,9 @@ test('exports landscape and portrait JPGs with stable caption pixels and colors'
         );
       }
       if (name === 'landscape') {
-        await page.getByRole('slider').press('Home');
+        await page
+          .getByRole('slider', { name: 'JPEG quality', exact: true })
+          .press('Home');
         const smallerDownload = page.waitForEvent('download');
         await page
           .getByRole('button', { name: 'Export JPG', exact: true })

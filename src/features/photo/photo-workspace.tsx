@@ -1,3 +1,5 @@
+import { Download, TextQuote } from 'lucide-react';
+import { PhotoIcon } from '@/components/icons/photo-icon';
 import {
   EditorWorkspace,
   ToolSidebar,
@@ -151,7 +153,7 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
         )}
       <div
         ref={host}
-        className="min-h-[40vh] min-w-0 flex-1 md:min-h-0"
+        className="min-h-[40vh] min-w-0 flex-1 bg-workspace-base md:min-h-0"
         role="img"
         aria-label={`Photo preview: ${photo.document.photo.name}`}
       >
@@ -199,9 +201,9 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="Search fields or values…"
-                  className="bg-background/30"
+                  className="bg-preview-placeholder"
                 />
-                <p className="mt-2 text-xs text-foreground/70">
+                <p className="mt-2 text-xs text-content-secondary">
                   {fields.length} fields
                 </p>
               </>
@@ -211,7 +213,7 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
                 value={fontQuery}
                 onChange={(event) => setFontQuery(event.target.value)}
                 placeholder="Search fonts…"
-                className="bg-background/30"
+                className="bg-preview-placeholder"
               />
             )
           }
@@ -278,17 +280,18 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
           <SidebarSection
             id="photo"
             title="Photo"
+            icon={<PhotoIcon />}
             defaultOpen={false}
             summary={formatBytes(photo.document.photo.byteLength)}
           >
             <h1 className="break-all text-sm font-medium">
               {photo.document.photo.name}
             </h1>
-            <p className="mt-2 text-xs text-foreground/70">
+            <p className="mt-2 text-xs text-content-secondary">
               {width} × {height} px
             </p>
             <p
-              className="mt-1 text-xs text-foreground/70"
+              className="mt-1 text-xs text-content-secondary"
               title={`${photo.document.photo.byteLength.toLocaleString('en-US')} bytes`}
             >
               Input: {formatBytes(photo.document.photo.byteLength)}
@@ -297,6 +300,7 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
           <SidebarSection
             id="caption"
             title="Caption"
+            icon={<TextQuote />}
             summary={
               resolved.missing.length || resolved.invalidSyntax
                 ? 'Check tokens'
@@ -318,7 +322,7 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
               }}
               rows={6}
               spellCheck={false}
-              className="mt-2 w-full resize-y rounded-sm border bg-background p-3 text-xs leading-5 focus-visible:outline-primary"
+              className="mt-2"
             />
             {(resolved.missing.length > 0 || resolved.invalidSyntax) && (
               <p className="mt-2 text-xs" role="status">
@@ -343,6 +347,7 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
             </div>
           </SidebarSection>
           <CaptionControls
+            dimensions={photo.document.photo.dimensions}
             caption={settings}
             onChange={setSettings}
             disabled={exporting}
@@ -354,6 +359,7 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
           <SidebarSection
             id="export"
             title="Export"
+            icon={<Download />}
             summary={`${quality === 95 ? 'Best' : quality === 75 ? 'Balanced' : quality === 60 ? 'Small' : `${quality}%`} · ${prepared.blob ? formatBytes(prepared.blob.size) : prepared.error ? 'Unavailable' : 'Calculating…'}`}
           >
             <fieldset disabled={exporting}>
@@ -419,7 +425,7 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
                   {prepared.error}
                 </p>
               )}
-              <p className="mt-3 text-xs leading-5 text-foreground/70">
+              <p className="mt-3 text-xs leading-5 text-content-secondary">
                 Original dimensions · sRGB rendering. EXIF, GPS and other source
                 metadata are removed. The original ICC profile is not copied.
               </p>

@@ -1,3 +1,4 @@
+import { toPixels } from '../../domain/sizing';
 import { jpegQuality } from './export-settings';
 import { anchoredPosition } from './layout';
 import Konva from 'konva';
@@ -10,10 +11,29 @@ export function captionConfig(
   text: string,
   color: string,
 ) {
-  const edge = Math.min(dimensions.width, dimensions.height);
-  const fontSize = (edge * caption.style.fontSizePercent) / 100;
-  const marginX = (edge * caption.position.marginXPercent) / 100;
-  const marginY = (edge * caption.position.marginYPercent) / 100;
+  const fontSize = toPixels(
+    caption.style.fontSize,
+    caption.sizingUnit,
+    dimensions,
+  );
+  const margins = {
+    top: toPixels(caption.position.margins.top, caption.sizingUnit, dimensions),
+    right: toPixels(
+      caption.position.margins.right,
+      caption.sizingUnit,
+      dimensions,
+    ),
+    bottom: toPixels(
+      caption.position.margins.bottom,
+      caption.sizingUnit,
+      dimensions,
+    ),
+    left: toPixels(
+      caption.position.margins.left,
+      caption.sizingUnit,
+      dimensions,
+    ),
+  };
   const metrics = new Konva.Text({
     text,
     fontSize,
@@ -28,8 +48,7 @@ export function captionConfig(
     dimensions,
     block,
     caption.position.anchor,
-    marginX,
-    marginY,
+    margins,
   );
   return {
     text,

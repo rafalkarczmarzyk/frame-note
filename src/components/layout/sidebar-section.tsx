@@ -5,6 +5,7 @@ import { readSectionOpen, saveSectionOpen } from '@/lib/section-preferences';
 interface SidebarSectionProps {
   id: string;
   title: string;
+  icon?: ReactNode;
   summary?: string;
   defaultOpen?: boolean;
   persist?: boolean;
@@ -15,6 +16,7 @@ interface SidebarSectionProps {
 export function SidebarSection({
   id,
   title,
+  icon,
   summary,
   defaultOpen = true,
   persist = true,
@@ -40,24 +42,33 @@ export function SidebarSection({
           /* Private browsing can block localStorage. */
         }
       }}
-      className="group/section border-b border-border/60"
+      className="group/section mx-3 my-3 overflow-hidden rounded-xl bg-accordion-base"
     >
-      <summary className="control-disclosure flex cursor-pointer list-none items-center gap-2 px-5 py-4 text-xs font-semibold [&::-webkit-details-marker]:hidden">
-        <ChevronDown
-          aria-hidden="true"
-          className="size-3.5 shrink-0 -rotate-90 transition-transform group-open/section:rotate-0 motion-reduce:transition-none"
-        />
-        <span>{title}</span>
-        {!open && summary && (
+      <summary className="control-disclosure flex cursor-pointer list-none items-center gap-3 px-4 py-3.5 text-xs font-semibold [&::-webkit-details-marker]:hidden">
+        {icon && (
           <span
-            className="ml-auto min-w-0 truncate text-right text-[10px] font-normal text-foreground/70"
-            title={summary}
+            aria-hidden="true"
+            className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-accordion-icon-base text-accordion-icon [&_svg]:size-4"
           >
-            {summary}
+            {icon}
           </span>
         )}
+        <span className="min-w-0 flex-1">
+          <span className="block font-display text-xl leading-6 font-normal text-accordion-label">
+            {title}
+          </span>
+          {!open && summary && (
+            <span className="mt-1 block break-words text-[10px] leading-4 font-normal text-content-secondary">
+              {summary}
+            </span>
+          )}
+        </span>
+        <ChevronDown
+          aria-hidden="true"
+          className="size-3.5 shrink-0 text-content-muted -rotate-90 transition-transform group-open/section:rotate-0 motion-reduce:transition-none"
+        />
       </summary>
-      <div className="p-5">{children}</div>
+      <div className="px-4 pt-2 pb-4">{children}</div>
     </details>
   );
 }

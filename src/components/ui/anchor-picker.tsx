@@ -48,7 +48,7 @@ export function AnchorPicker({
     <div
       role="group"
       aria-label="Caption anchor"
-      className="control-segments grid w-28 grid-cols-3 gap-1 p-1"
+      className="control-segments grid w-32 grid-cols-3 gap-1 p-1"
     >
       {anchorOptions.map((anchor) => {
         const Icon = anchorIcons[anchor];
@@ -61,7 +61,7 @@ export function AnchorPicker({
             aria-pressed={anchor === value}
             onClick={() => onValueChange(anchor)}
             className={cn(
-              'control-segment flex h-8 items-center justify-center text-lg',
+              'control-segment flex h-9 items-center justify-center text-lg',
               anchor === value && 'control-selected',
             )}
           >

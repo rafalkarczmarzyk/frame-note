@@ -42,14 +42,17 @@ export function FloatingPanel({
         }
       }}
       className={cn(
-        'flex min-h-0 flex-col overflow-hidden rounded-xl border border-border text-foreground shadow-xl shadow-background/40',
-        surface === 'glass' ? 'glass-panel' : 'bg-background',
+        'flex min-h-0 flex-col overflow-hidden rounded-xl border border-panel-border text-panel-text shadow-panel',
+        surface === 'glass' ? 'glass-panel' : 'bg-panel-base',
         className,
       )}
     >
-      <header className="shrink-0 border-b border-foreground/15 p-4">
+      <header className="shrink-0 border-b border-panel-border bg-panel-header-base p-4">
         <div className="flex items-center justify-between gap-3">
-          <h2 id={titleId} className="text-sm font-medium">
+          <h2
+            id={titleId}
+            className="font-display text-xl leading-6 font-normal"
+          >
             {title}
           </h2>
           <IconButton label={`Close ${title.toLowerCase()}`} onClick={onClose}>
@@ -59,7 +62,7 @@ export function FloatingPanel({
         {description && (
           <p
             id={descriptionId}
-            className="mt-1 text-xs leading-5 text-foreground/70"
+            className="mt-1 text-xs leading-5 text-content-secondary"
           >
             {description}
           </p>
@@ -70,7 +73,7 @@ export function FloatingPanel({
         {children}
       </div>
       {footer && (
-        <footer className="shrink-0 border-t border-foreground/15 p-4">
+        <footer className="shrink-0 border-t border-panel-border p-4">
           {footer}
         </footer>
       )}

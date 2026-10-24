@@ -17,7 +17,7 @@ export function InlineNotice({
       role={tone === 'error' ? 'alert' : 'status'}
       className={cn(
         'flex items-start gap-2 text-xs leading-5',
-        tone === 'warning' ? 'text-warning' : 'text-foreground/80',
+        tone === 'warning' ? 'text-notice-warning' : 'text-content-secondary',
         className,
       )}
     >
