@@ -200,3 +200,26 @@ Apply color (or Enter) commits a normalized HEX value. Invalid drafts do not cha
 the caption. `resolveCaptionColor` resolves both legacy palette names and custom
 HEX for the shared canvas preview/export path. The custom field stays outside the
 scrollable list. Escape closes the panel and restores focus to the trigger.
+
+## FrameNote metadata helpers
+
+Helpers use unqualified tokens: `{author}`, `{camera}`, `{lens}`, `{shutter}`,
+`{aperture}`, `{iso}`, `{focalLength}`, `{date}`, `{copyright}`, `{exposure}`.
+The `caption-tags` domain module declares ordered source candidates and formats
+values. Author prefers XMP creator, then EXIF Artist and IPTC By-line. Technical
+fields prefer their EXIF equivalents, then XMP. Lens also falls back to XMP Lens.
+Capture date falls back to IPTC DateCreated and XMP CreateDate, without time zone
+conversion. Empty or unusable candidates are skipped. Exposure combines available
+shutter, aperture and ISO values, with units and no empty separators. No stacking
+comment detection is performed.
+
+Helpers are derived without modifying source metadata. The resolver accepts both
+helper names and existing qualified tokens. Known helpers with no value use the
+existing missing-token warning, not a syntax error. New editor sessions start with
+`{author}\n{lens}\n{exposure}`.
+
+The picker groups helpers under **FrameNote**, always first; source groups follow
+as **EXIF**, **XMP**, **IPTC**, then other namespaces. All original keys remain
+insertable. Helper rows show the chosen source(s), or no-data text. Missing helpers
+remain insertable for portable templates. Search covers keys, values, namespaces
+and helper sources, retaining headings only for matching groups.

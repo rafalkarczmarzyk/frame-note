@@ -1,3 +1,4 @@
+import { captionTags, captionTagNames } from '../../domain/caption-tags';
 import type { MetadataField } from '../../domain/metadata';
 
 export interface ResolvedTemplate {
@@ -11,12 +12,16 @@ export function resolveTemplate(
   fields: readonly MetadataField[],
 ): ResolvedTemplate {
   const values = new Map(
-    fields.map((field) => [field.key, field.displayValue]),
+    [
+      ...captionTags(fields).filter((field) => field.displayValue),
+      ...fields,
+    ].map((field) => [field.key, field.displayValue]),
   );
   const missing = new Set<string>();
   let invalidSyntax = false;
   const text = template.replace(/\{([^{}]*)\}/gu, (_, key: string) => {
-    if (!key || !key.includes(':')) invalidSyntax = true;
+    if (!key || (!key.includes(':') && !captionTagNames.includes(key)))
+      invalidSyntax = true;
     if (!values.has(key)) {
       missing.add(key);
       return '';
