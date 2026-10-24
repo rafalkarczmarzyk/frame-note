@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { X } from 'lucide-react';
 import { IconButton } from './icon-button';
 const meta = {
-  title: 'Atoms/IconButton',
+  title: 'Components/UI/IconButton',
   component: IconButton,
   args: { label: 'Close panel', children: <X aria-hidden="true" /> },
 } satisfies Meta<typeof IconButton>;

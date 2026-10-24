@@ -14,7 +14,7 @@ function StartScreenComposition({ isDragging = false }) {
 }
 
 const meta = {
-  title: 'Compositions/StartScreen',
+  title: 'Screens/StartScreen',
   component: StartScreenComposition,
   args: { isDragging: false },
   parameters: {

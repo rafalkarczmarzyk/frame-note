@@ -101,8 +101,8 @@ pnpm storybook
 pnpm build-storybook
 ```
 
-Storybook: http://localhost:6006. 40 przykładów: Foundations, Atoms, Molecules,
-Layout i Compositions. Aplikacja oraz stories importują te same komponenty i CSS.
+Storybook: http://localhost:6006. Podział: Design (tokeny), Components (UI, Layout,
+Brand) i Screens (ekran startowy oraz edytor ze zdjęciem poziomym i pionowym). Aplikacja oraz stories importują te same komponenty i CSS.
 Sprawdzono renderowanie wszystkich przykładów oraz interakcje Select i Slider.
 Addon dostępności pomaga w przeglądzie; nie stanowi pełnego audytu dostępności.
 

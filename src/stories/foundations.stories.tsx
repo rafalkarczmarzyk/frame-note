@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 const meta = {
-  title: 'Foundations/Tokens',
+  title: 'Design/Tokens',
   parameters: {
     docs: {
       description: {

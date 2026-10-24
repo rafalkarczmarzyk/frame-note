@@ -8,7 +8,7 @@ const preview: Preview = {
     docs: { theme: themes.dark },
     options: {
       storySort: {
-        order: ['Foundations', 'Atoms', 'Molecules', 'Layout', 'Compositions'],
+        order: ['Design', 'Components', ['UI', 'Layout', 'Brand'], 'Screens'],
       },
     },
     controls: { expanded: true },

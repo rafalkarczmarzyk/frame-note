@@ -42,7 +42,7 @@ export function SidebarSection({
       }}
       className="group/section border-b"
     >
-      <summary className="flex cursor-pointer list-none items-center gap-2 px-5 py-4 text-sm font-medium hover:bg-secondary/10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary [&::-webkit-details-marker]:hidden">
+      <summary className="flex cursor-pointer list-none items-center gap-2 bg-secondary/15 px-5 py-4 text-sm font-medium hover:bg-secondary/25 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary [&::-webkit-details-marker]:hidden">
         <ChevronDown
           aria-hidden="true"
           className="size-3.5 shrink-0 -rotate-90 transition-transform group-open/section:rotate-0 motion-reduce:transition-none"
@@ -57,7 +57,7 @@ export function SidebarSection({
           </span>
         )}
       </summary>
-      <div className="px-5 pb-5">{children}</div>
+      <div className="p-5">{children}</div>
     </details>
   );
 }

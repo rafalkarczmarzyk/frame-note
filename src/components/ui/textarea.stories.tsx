@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Textarea } from './textarea';
 const meta = {
-  title: 'Atoms/Textarea',
+  title: 'Components/UI/Textarea',
   component: Textarea,
   args: {
     'aria-label': 'Caption',
