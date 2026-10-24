@@ -1,3 +1,5 @@
+import { inlineLayout, tintedIcon } from './inline-layout';
+import { loadIcon, type SvgIcon } from './svg-icons';
 import { toPixels } from '../../domain/sizing';
 import { jpegQuality } from './export-settings';
 import { anchoredPosition, customPosition } from './layout';
@@ -88,6 +90,7 @@ export interface RenderedCaption {
   caption: Caption;
   text: string;
   color: string;
+  icons?: readonly SvgIcon[];
 }
 
 export async function exportPhotoCaptions(
@@ -120,10 +123,48 @@ export async function exportPhotoCaptions(
         height: dimensions.height,
       }),
     );
-    for (const { caption, text, color } of captions)
-      layer.add(
-        new Konva.Text(captionConfig(dimensions, caption, text, color)),
-      );
+    for (const { caption, text, color, icons = [] } of captions) {
+      if (!icons.length) {
+        layer.add(
+          new Konva.Text(captionConfig(dimensions, caption, text, color)),
+        );
+        continue;
+      }
+      const scene = inlineLayout(dimensions, caption, text, icons);
+      const group = new Konva.Group({
+        x: scene.x,
+        y: scene.y,
+        opacity: caption.style.opacity,
+      });
+      layer.add(group);
+      for (const run of scene.runs) {
+        if (run.icon) {
+          const image = await loadIcon(run.icon);
+          group.add(
+            new Konva.Image({
+              x: run.x,
+              y: run.y + (scene.lineHeight - scene.fontSize) / 2,
+              width: run.width,
+              height: scene.fontSize,
+              image: tintedIcon(run.icon, image, scene.fontSize, color),
+            }),
+          );
+        } else
+          group.add(
+            new Konva.Text({
+              x: run.x,
+              y: run.y,
+              text: run.text,
+              fontSize: scene.fontSize,
+              fontFamily: caption.style.fontFamily,
+              fontStyle: caption.style.fontWeight === 700 ? 'bold' : 'normal',
+              lineHeight: caption.style.lineHeight,
+              fill: color,
+              wrap: 'none',
+            }),
+          );
+      }
+    }
     layer.draw();
     const blob = await stage.toBlob({
       mimeType: 'image/jpeg',

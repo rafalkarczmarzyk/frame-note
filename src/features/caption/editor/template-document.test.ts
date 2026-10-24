@@ -9,6 +9,7 @@ describe('editor template interchange', () => {
   it.each([
     '',
     '© {author} — {exif:Artist}',
+    '{file:Image Width} {iptc:By-line}',
     '{icon:aperture} {aperture}\n\n{missing}\n',
     '  spaces  {author}{camera} end ',
     'Unfinished {author and {} remain literal',

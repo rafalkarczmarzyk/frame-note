@@ -4,7 +4,7 @@ import type { JSONContent } from '@tiptap/core';
 export function templateInline(text: string): JSONContent[] {
   const content: JSONContent[] = [];
   let offset = 0;
-  for (const match of text.matchAll(/\{([^{}\s]+)\}/gu)) {
+  for (const match of text.matchAll(/\{([^{}\r\n]+)\}/gu)) {
     if (match.index > offset)
       content.push({ type: 'text', text: text.slice(offset, match.index) });
     content.push({ type: 'captionToken', attrs: { token: match[1] } });

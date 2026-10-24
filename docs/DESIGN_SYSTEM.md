@@ -294,3 +294,16 @@ captions. Canvas dragging updates coordinates in source-image space, independent
 of preview scale. A dashed outline remains visible during dragging. Duplicate
 preserves Custom; adding a fresh container uses the next available anchor.
 Screens/TestPhotos/CustomPosition demonstrates this mode.
+
+## Production caption editor — MVP stage 4
+
+CaptionEditor in features/caption/editor shares token extension, token view and
+plain-text interchange with the isolated prototype. TokenContext supplies real
+metadata and SVG assets; missing tokens show a warning without losing the key.
+Inline SVG uses a monochrome CSS mask in the editor (no badge surface or visible
+label), with the same accessible name and tooltip as the serialized token.
+Browse icons opens the docked IconPickerPanel, built with existing controls.
+Preview/export share inlineLayout, text measurements and tinted SVG rasterization.
+Plain-text captions retain their original export rendering path. Caption selection
+and dragging use the whole measured block, including inline icons. Examples:
+Screens/TestPhotos/InlineIcons and the original CaptionEditorPrototype.

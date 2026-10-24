@@ -1,6 +1,37 @@
+import {
+  Camera,
+  Aperture,
+  Timer,
+  Focus,
+  Ruler,
+  Sun,
+  UserRound,
+  Copyright,
+  CalendarDays,
+  SlidersHorizontal,
+} from 'lucide-react';
 import { PickerList } from '@/components/ui/picker-list';
 import { metadataGroups } from '@/domain/caption-tags';
 import type { MetadataField } from '@/domain/metadata';
+
+const helperIcons = {
+  author: UserRound,
+  camera: Camera,
+  lens: Focus,
+  shutter: Timer,
+  aperture: Aperture,
+  iso: Sun,
+  focalLength: Ruler,
+  date: CalendarDays,
+  copyright: Copyright,
+  exposure: SlidersHorizontal,
+};
+function helperIcon(key: string) {
+  const Icon = helperIcons[key as keyof typeof helperIcons];
+  return Icon ? (
+    <Icon aria-hidden="true" className="size-4 shrink-0" />
+  ) : undefined;
+}
 
 export function MetadataPicker({
   fields,
@@ -35,6 +66,8 @@ export function MetadataPicker({
             items={group.fields.map((field) => ({
               id: field.key,
               label: field.key,
+              leading:
+                group.name === 'FrameNote' ? helperIcon(field.key) : undefined,
               selected: used.has(field.key),
               description: field.displayValue || 'No data in this photo.',
               preview:

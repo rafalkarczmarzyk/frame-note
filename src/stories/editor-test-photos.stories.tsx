@@ -1,3 +1,6 @@
+import { Aperture, Camera } from 'lucide-react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import type { SvgIcon } from '@/features/caption/svg-icons';
 import wildlifeUrl from '../../tests/fixtures/20260520-IMG_3843.jpg';
 import portraitUrl from '../../tests/fixtures/20261021-IMG_0469.jpg';
 import { createCaption } from '@/domain/document';
@@ -21,11 +24,13 @@ function TestPhotoEditor({
   src,
   name,
   initialLayout,
+  initialIcons,
   toolbar,
 }: {
   src: string;
   name: string;
   initialLayout?: CaptionLayout;
+  initialIcons?: SvgIcon[];
   toolbar?: ReactNode;
 }) {
   const [photo, setPhoto] = useState<LoadedPhoto | null>(null);
@@ -69,7 +74,11 @@ function TestPhotoEditor({
           {error}
         </p>
       ) : photo ? (
-        <PhotoWorkspace photo={photo} initialLayout={initialLayout} />
+        <PhotoWorkspace
+          photo={photo}
+          initialLayout={initialLayout}
+          initialIcons={initialIcons}
+        />
       ) : (
         <p role="status" className="p-6">
           Opening test photo…
@@ -204,5 +213,22 @@ export const CustomPosition: Story = {
     src: macroUrl,
     name: '20261021-IMG_9959.jpg',
     initialLayout: customLayout,
+  },
+};
+
+const inlineIcons: SvgIcon[] = [
+  { name: 'aperture', svg: renderToStaticMarkup(<Aperture />), aspect: 1 },
+  { name: 'camera', svg: renderToStaticMarkup(<Camera />), aspect: 1 },
+];
+const inlineLayoutExample = createCaptionLayout({
+  ...createCaption(),
+  template: '{icon:aperture} {aperture}   {icon:camera} {camera}\n{author}',
+});
+export const InlineIcons: Story = {
+  args: {
+    src: macroUrl,
+    name: '20261021-IMG_9959.jpg',
+    initialLayout: inlineLayoutExample,
+    initialIcons: inlineIcons,
   },
 };

@@ -75,7 +75,7 @@ function format(name: string, field: MetadataField): string {
     }
     case 'iso': {
       const value = number ?? Number(text.replace(/^ISO\s*/i, ''));
-      return Number.isFinite(value) && value > 0 ? String(value) : '';
+      return Number.isFinite(value) && value > 0 ? `ISO ${value}` : '';
     }
     case 'focalLength': {
       const value = number ?? Number(text.replace(/\s*mm$/i, ''));
@@ -130,11 +130,7 @@ export function captionTags(fields: readonly MetadataField[]): CaptionTag[] {
       key: 'exposure',
       name: 'exposure',
       group: 'FrameNote',
-      displayValue: exposure
-        .map((tag) =>
-          tag.key === 'iso' ? `ISO ${tag.displayValue}` : tag.displayValue,
-        )
-        .join(' · '),
+      displayValue: exposure.map((tag) => tag.displayValue).join(' · '),
       rawValue: null,
       sources: exposure.flatMap((tag) => tag.sources),
     },

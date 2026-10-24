@@ -5,8 +5,11 @@ import { Fragment, Slice } from '@tiptap/pm/model';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { HelperText } from '@/components/ui/helper-text';
-import { CaptionToken } from './token-extension';
-import { documentTemplate, templateDocument } from './template-document';
+import { CaptionToken } from '../editor/token-extension';
+import {
+  documentTemplate,
+  templateDocument,
+} from '../editor/template-document';
 
 const initial =
   '© {author}\n{icon:aperture} {aperture} · {camera}\n{missing} {icon:missing}';

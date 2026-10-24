@@ -1,3 +1,13 @@
+import { brandIcons } from '../caption/brand-icons';
+import { iconMarker } from '../caption/inline-content';
+import { builtinIcons } from '../caption/builtin-icons';
+import type { Editor } from '@tiptap/react';
+import { CaptionEditor } from '../caption/editor/caption-editor';
+import { IconPickerPanel } from '../caption/icon-picker-panel';
+import { loadIcon, type SvgIcon } from '../caption/svg-icons';
+import { resolveCaptionContent } from '../caption/inline-content';
+import { inlineLayout } from '../caption/inline-layout';
+import { InlinePreview } from '../caption/inline-preview';
 import { customPoint, customPosition } from '../caption/layout';
 import { AnchorIcon } from '@/components/ui/anchor-picker';
 import {
@@ -14,7 +24,16 @@ import { MetadataPicker } from '../caption/metadata-picker';
 import { metadataGroups } from '@/domain/caption-tags';
 import { ColorPickerPanel } from '../caption/color-picker-panel';
 import { resolveCaptionColor } from '@/domain/caption-colors';
-import { Download, TextQuote, Layers, Plus, Copy, Trash2 } from 'lucide-react';
+import {
+  Download,
+  TextQuote,
+  Layers,
+  Plus,
+  Copy,
+  Trash2,
+  Tags,
+  Shapes,
+} from 'lucide-react';
 import { PhotoIcon } from '@/components/icons/photo-icon';
 import {
   EditorWorkspace,
@@ -22,7 +41,6 @@ import {
 } from '@/components/layout/editor-workspace';
 import { FloatingPanel } from '@/components/layout/floating-panel';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { PickerList } from '@/components/ui/picker-list';
@@ -31,16 +49,11 @@ import { InlineNotice } from '@/components/ui/inline-notice';
 import { formatBytes } from '@/lib/format-bytes';
 import { usePreparedExport } from '../caption/use-prepared-export';
 import { createPortal } from 'react-dom';
-import {
-  insertToken,
-  usedTokens,
-  type TextSelection,
-} from '../caption/insert-token';
+import { usedTokens } from '../caption/insert-token';
 import { CaptionControls } from '../caption/caption-controls';
 import { Button } from '@/components/ui/button';
-import { resolveTemplate } from '../caption/template';
 import { captionConfig, exportName } from '../caption/render';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import {
   Stage,
   Layer,
@@ -54,18 +67,43 @@ import type { LoadedPhoto } from './load-photo';
 export function PhotoWorkspace({
   photo,
   initialLayout,
+  initialIcons = [],
 }: {
   photo: LoadedPhoto;
   initialLayout?: CaptionLayout;
+  initialIcons?: SvgIcon[];
 }) {
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const host = useRef<HTMLDivElement>(null);
-  const templateInput = useRef<HTMLTextAreaElement>(null);
-  const selection = useRef<TextSelection>({ start: 0, end: 0 });
+  const editorRef = useRef<Editor | null>(null);
+  const editorReady = useCallback((editor: Editor | null) => {
+    editorRef.current = editor;
+  }, []);
+  const [icons, setIcons] = useState<SvgIcon[]>(() => [
+    ...builtinIcons,
+    ...initialIcons.filter(
+      (icon) => !builtinIcons.some((builtin) => builtin.name === icon.name),
+    ),
+  ]);
+  const [iconImages, setIconImages] = useState<
+    ReadonlyMap<string, HTMLImageElement>
+  >(new Map());
+  useEffect(() => {
+    let active = true;
+    void Promise.all(
+      icons.map(async (icon) => [icon.svg, await loadIcon(icon)] as const),
+    ).then((entries) => {
+      if (active) setIconImages(new Map(entries));
+    });
+    return () => {
+      active = false;
+    };
+  }, [icons]);
+  const iconsReady = icons.every((icon) => iconImages.has(icon.svg));
   const [activePanel, setActivePanel] = useState<
-    'tags' | 'fonts' | 'colors' | null
+    'tags' | 'fonts' | 'colors' | 'icons' | null
   >(null);
   const tagsOpen = activePanel === 'tags';
   const [fontQuery, setFontQuery] = useState('');
@@ -109,11 +147,9 @@ export function PhotoWorkspace({
     setSettings({ ...settings, template });
   const selectContainer = (id: string) => {
     setEditingId(null);
-    selection.current = { start: 0, end: 0 };
     setLayout((value) => ({ ...value, activeId: id }));
   };
   const addContainer = (duplicate = false) => {
-    selection.current = { start: 0, end: 0 };
     setLayout((value) =>
       addCaption(
         value,
@@ -142,31 +178,26 @@ export function PhotoWorkspace({
   const fontReady = loadedFont === fontKey;
   const used = usedTokens(template);
   const exportTarget = document.getElementById('export-actions');
-  const rememberSelection = () => {
-    const element = templateInput.current;
-    if (element)
-      selection.current = {
-        start: element.selectionStart,
-        end: element.selectionEnd,
-      };
-  };
   const addToken = (key: string) => {
-    const result = insertToken(template, key, selection.current);
-    selection.current = { start: result.cursor, end: result.cursor };
-    setTemplate(result.template);
-    requestAnimationFrame(() => {
-      templateInput.current?.focus({ preventScroll: true });
-      templateInput.current?.setSelectionRange(result.cursor, result.cursor);
-    });
+    editorRef.current
+      ?.chain()
+      .focus()
+      .insertContent({ type: 'captionToken', attrs: { token: key } })
+      .run();
   };
-  const resolved = resolveTemplate(template, photo.document.photo.metadata);
+  const resolved = resolveCaptionContent(
+    template,
+    photo.document.photo.metadata,
+    icons,
+  );
   const renderedCaptions = useMemo(
     () =>
       layout.containers.map((container) => {
         const caption = containerCaption(layout, container);
-        const resolved = resolveTemplate(
+        const resolved = resolveCaptionContent(
           caption.template,
           photo.document.photo.metadata,
+          icons,
         );
         const color = resolveCaptionColor(caption.style.color, (name) =>
           getComputedStyle(document.documentElement).getPropertyValue(
@@ -175,14 +206,15 @@ export function PhotoWorkspace({
         );
         return { id: container.id, caption, ...resolved, color };
       }),
-    [layout, photo],
+    [layout, photo, icons],
   );
   const exportCaptions = useMemo(
     () =>
-      renderedCaptions.map(({ caption, text, color }) => ({
+      renderedCaptions.map(({ caption, text, color, icons }) => ({
         caption,
         text,
         color,
+        icons,
       })),
     [renderedCaptions],
   );
@@ -195,7 +227,7 @@ export function PhotoWorkspace({
     }),
     [photo, exportCaptions, quality],
   );
-  const prepared = usePreparedExport(exportRequest, fontReady);
+  const prepared = usePreparedExport(exportRequest, fontReady && iconsReady);
   useEffect(() => {
     let active = true;
     void Promise.all(
@@ -284,97 +316,159 @@ export function PhotoWorkspace({
             >
               <CanvasImage image={photo.image} width={width} height={height} />
               {fontReady &&
-                renderedCaptions.map(({ id, caption, text, color }) => {
-                  const config = captionConfig(
-                    { width, height },
-                    caption,
-                    text,
-                    color,
-                  );
-                  return (
-                    <Group key={id}>
-                      <Text
-                        {...config}
-                        listening
-                        draggable={!exporting}
-                        onDragStart={() => {
-                          selectContainer(id);
-                          setDraggingId(id);
-                        }}
-                        onDragMove={(event) => {
-                          const node = event.target;
-                          const block = {
-                            width: node.width(),
-                            height: node.height(),
-                          };
-                          const point = customPoint(
+                iconsReady &&
+                renderedCaptions.map(
+                  ({ id, caption, text, color, icons: inlineIcons }) => {
+                    const config = captionConfig(
+                      { width, height },
+                      caption,
+                      text,
+                      color,
+                    );
+                    const placeholder = !caption.template.trim();
+                    const visualColor = placeholder
+                      ? getComputedStyle(document.documentElement)
+                          .getPropertyValue('--color-porcelain')
+                          .trim()
+                      : color;
+                    const scene = placeholder
+                      ? inlineLayout(
+                          { width, height },
+                          caption,
+                          iconMarker(0),
+                          [brandIcons[0]!],
+                        )
+                      : inlineIcons.length
+                        ? inlineLayout(
                             { width, height },
-                            block,
-                            caption.position.anchor,
-                            node.position(),
-                          );
-                          const custom = {
-                            x: Math.min(100, Math.max(0, point.x)),
-                            y: Math.min(100, Math.max(0, point.y)),
-                          };
-                          node.position(
-                            customPosition(
+                            caption,
+                            text,
+                            inlineIcons,
+                          )
+                        : null;
+                    const geometry = scene ?? {
+                      ...config,
+                      height:
+                        text.split('\n').length *
+                        config.fontSize *
+                        config.lineHeight,
+                    };
+                    return (
+                      <Group key={id}>
+                        <Group
+                          x={geometry.x}
+                          y={geometry.y}
+                          width={geometry.width}
+                          height={geometry.height}
+                          opacity={placeholder ? 0.4 : caption.style.opacity}
+                          listening
+                          draggable={!exporting}
+                          onDragStart={() => {
+                            selectContainer(id);
+                            setDraggingId(id);
+                          }}
+                          onDragMove={(event) => {
+                            const node = event.currentTarget;
+                            const block = {
+                              width: node.width(),
+                              height: node.height(),
+                            };
+                            const point = customPoint(
                               { width, height },
                               block,
                               caption.position.anchor,
-                              custom,
-                            ),
-                          );
-                          setLayout((value) => ({
-                            ...value,
-                            containers: value.containers.map((container) =>
-                              container.id === id
-                                ? {
-                                    ...container,
-                                    position: { ...container.position, custom },
-                                  }
-                                : container,
-                            ),
-                          }));
-                        }}
-                        onDragEnd={() => setDraggingId(null)}
-                        onMouseEnter={() => setHoveredId(id)}
-                        onMouseLeave={() => setHoveredId(null)}
-                        onClick={() => selectContainer(id)}
-                        onTap={() => selectContainer(id)}
-                      />
-                      {(hoveredId === id ||
-                        editingId === id ||
-                        draggingId === id) &&
-                        text && (
+                              node.position(),
+                            );
+                            const custom = {
+                              x: Math.min(100, Math.max(0, point.x)),
+                              y: Math.min(100, Math.max(0, point.y)),
+                            };
+                            node.position(
+                              customPosition(
+                                { width, height },
+                                block,
+                                caption.position.anchor,
+                                custom,
+                              ),
+                            );
+                            setLayout((value) => ({
+                              ...value,
+                              containers: value.containers.map((container) =>
+                                container.id === id
+                                  ? {
+                                      ...container,
+                                      position: {
+                                        ...container.position,
+                                        custom,
+                                      },
+                                    }
+                                  : container,
+                              ),
+                            }));
+                          }}
+                          onDragEnd={() => setDraggingId(null)}
+                          onMouseEnter={() => setHoveredId(id)}
+                          onMouseLeave={() => setHoveredId(null)}
+                          onClick={() => selectContainer(id)}
+                          onTap={() => selectContainer(id)}
+                        >
                           <Rect
-                            x={config.x - 4 / scale}
-                            y={config.y - 4 / scale}
-                            width={config.width + 8 / scale}
-                            height={
-                              Math.max(
-                                config.fontSize,
-                                text.split('\n').length *
-                                  config.fontSize *
-                                  config.lineHeight,
-                              ) +
-                              8 / scale
-                            }
-                            stroke={getComputedStyle(document.documentElement)
-                              .getPropertyValue('--color-porcelain')
-                              .trim()}
-                            strokeWidth={1 / scale}
-                            dash={[4 / scale, 3 / scale]}
-                            listening={false}
+                            width={geometry.width}
+                            height={geometry.height}
+                            fill={color}
+                            opacity={0}
                           />
-                        )}
-                    </Group>
-                  );
-                })}
+                          {scene ? (
+                            <InlinePreview
+                              scene={scene}
+                              caption={caption}
+                              color={visualColor}
+                              images={iconImages}
+                            />
+                          ) : (
+                            <Text
+                              {...config}
+                              x={0}
+                              y={0}
+                              opacity={1}
+                              listening={false}
+                            />
+                          )}
+                        </Group>
+                        {(hoveredId === id ||
+                          editingId === id ||
+                          draggingId === id) &&
+                          (text || placeholder) && (
+                            <Rect
+                              x={geometry.x - 4 / scale}
+                              y={geometry.y - 4 / scale}
+                              width={geometry.width + 8 / scale}
+                              height={geometry.height + 8 / scale}
+                              stroke={getComputedStyle(document.documentElement)
+                                .getPropertyValue('--color-porcelain')
+                                .trim()}
+                              strokeWidth={1 / scale}
+                              dash={[4 / scale, 3 / scale]}
+                              listening={false}
+                            />
+                          )}
+                      </Group>
+                    );
+                  },
+                )}
             </Group>
           </Layer>
         </Stage>
       </div>
+      {activePanel === 'icons' && (
+        <IconPickerPanel
+          icons={icons}
+          onUpload={(icon) => setIcons((value) => [...value, icon])}
+          onChoose={(name) => addToken(`icon:${name}`)}
+          onClose={() => setActivePanel(null)}
+          className="max-h-[40vh] w-full shrink-0 rounded-none shadow-none md:max-h-none md:w-80"
+        />
+      )}
       {activePanel === 'colors' && (
         <ColorPickerPanel
           value={settings.style.color}
@@ -389,7 +483,7 @@ export function PhotoWorkspace({
           className="max-h-[40vh] w-full shrink-0 rounded-none shadow-none md:max-h-none md:w-80"
         />
       )}
-      {activePanel && activePanel !== 'colors' && (
+      {activePanel && activePanel !== 'colors' && activePanel !== 'icons' && (
         <FloatingPanel
           id="auxiliary-panel"
           title={tagsOpen ? 'Available tags' : 'Choose a font'}
@@ -569,7 +663,6 @@ export function PhotoWorkspace({
                     <IconButton
                       label={`Duplicate container ${index + 1}`}
                       onClick={() => {
-                        selection.current = { start: 0, end: 0 };
                         setEditingId(null);
                         setLayout((value) =>
                           addCaption(
@@ -590,7 +683,6 @@ export function PhotoWorkspace({
                       label={`Delete container ${index + 1}`}
                       onClick={() => {
                         if (layout.activeId === container.id) {
-                          selection.current = { start: 0, end: 0 };
                           setEditingId(null);
                         }
                         setHoveredId(null);
@@ -641,26 +733,14 @@ export function PhotoWorkspace({
                 iconTone="caption"
                 icon={<TextQuote />}
               >
-                <label className="sr-only" htmlFor="caption-template">
-                  Caption
-                </label>
-                <Textarea
-                  ref={templateInput}
-                  id="caption-template"
+                <CaptionEditor
                   value={template}
-                  onSelect={rememberSelection}
+                  fields={photo.document.photo.metadata}
+                  icons={icons}
+                  onChange={setTemplate}
                   onFocus={() => setEditingId(activeContainer.id)}
-                  onBlur={() => {
-                    rememberSelection();
-                    setEditingId(null);
-                  }}
-                  onChange={(event) => {
-                    setTemplate(event.target.value);
-                    rememberSelection();
-                  }}
-                  rows={6}
-                  spellCheck={false}
-                  className="mt-2"
+                  onBlur={() => setEditingId(null)}
+                  onReady={editorReady}
                 />
                 {(resolved.missing.length > 0 || resolved.invalidSyntax) && (
                   <p className="mt-2 text-xs" role="status">
@@ -670,10 +750,13 @@ export function PhotoWorkspace({
                       : ''}
                   </p>
                 )}
-                <div className="mt-4">
+                <div className="mt-4 flex flex-wrap gap-2">
                   <Button
                     variant="outline"
-                    className="w-full"
+                    className="min-w-0 flex-1 basis-28 whitespace-nowrap"
+                    aria-label={
+                      tagsOpen ? 'Hide available tags' : 'Browse available tags'
+                    }
                     aria-expanded={tagsOpen}
                     aria-controls="auxiliary-panel"
                     onClick={() =>
@@ -682,7 +765,22 @@ export function PhotoWorkspace({
                       )
                     }
                   >
-                    {tagsOpen ? 'Hide available tags' : 'Browse available tags'}
+                    <Tags aria-hidden="true" />
+                    Tags
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="min-w-0 flex-1 basis-28 whitespace-nowrap"
+                    aria-label="Browse icons"
+                    aria-expanded={activePanel === 'icons'}
+                    onClick={() =>
+                      setActivePanel((value) =>
+                        value === 'icons' ? null : 'icons',
+                      )
+                    }
+                  >
+                    <Shapes aria-hidden="true" />
+                    Icons
                   </Button>
                 </div>
               </SidebarSection>

@@ -37,8 +37,8 @@ pnpm test:e2e
 pnpm build-storybook
 ```
 
-- `check`: Prettier, kontrola tokenów kolorów, ESLint, TypeScript, 173 testów jednostkowych i build aplikacji.
-- E2E na produkcyjnym buildzie, port 4173: siedem scenariuszy w Chromium i WebKit (14 testów).
+- `check`: Prettier, kontrola tokenów kolorów, ESLint, TypeScript, 177 testów jednostkowych i build aplikacji.
+- E2E na produkcyjnym buildzie, port 4173: osiem scenariuszy w Chromium i WebKit (16 testów).
 - Przepływ eksportu sprawdza oba oryginalne JPG, wymiary, jakość, rozmiar w bajtach,
   brak źródłowych metadanych, różnice kolorów sRGB i obrót EXIF 6.
 - Regresja wizualna porównuje piksele eksportu w Chromium, bez zależności od UI.
@@ -201,11 +201,11 @@ Sekcja **Containers** pozwala dodawać, duplikować i usuwać kontenery tekstowe
 Wybór z listy lub kliknięciem podpisu na zdjęciu zmienia aktywny kontener;
 sidebar edytuje wyłącznie jego treść, styl i anchor. Jednostka wymiarowania
 pozostaje wspólna: zmiana przelicza wszystkie kontenery, zachowując ich wygląd.
-Nowy kontener ma treść „Sample text” i kopiuje ustawienia aktywnego. Można usunąć wszystkie
+Nowy kontener ma pustą treść i zaślepkę tylko w podglądzie i kopiuje ustawienia aktywnego. Można usunąć wszystkie
 kontenery i wyeksportować samo zdjęcie. Ramka zaznaczenia nie trafia do JPG.
 
 Przykład: Storybook → **Screens/TestPhotos → MultipleCaptions**.
-Przeciąganie i pozycja Custom są dostępne; integracja Tiptap pozostaje na etap 4.
+Przeciąganie i pozycja Custom są dostępne; integracja Tiptap jest dostępna w etapie 4.
 
 Sidebar rozdziela **Selected container** (treść, typografia, pozycja) oraz
 **Document** (wspólna jednostka i marginesy, informacje o zdjęciu).
@@ -221,3 +221,29 @@ Punkt odniesienia można ustawić w zakresie 0–100%; duży blok może wychodzi
 zdjęcie. Wybór anchora przywraca pozycjonowanie względem wspólnych marginesów.
 Duplikat zachowuje Custom, nowy kontener dostaje wolny anchor.
 Storybook: Screens/TestPhotos/CustomPosition.
+
+## Wizualny edytor i SVG inline — MVP etap 4
+
+Caption używa Tiptap: tekst i nowe wiersze, atomowe badge’e metadanych oraz ikony
+SVG bez ramki i widocznej nazwy (token w tooltipie). Tagi korzystają z rzeczywistych
+metadanych zdjęcia; brakujące elementy są oznaczone, bez usuwania zapisu z szablonu.
+Browse available tags wstawia element w miejscu kursora lub zamiast zaznaczenia.
+Zaznaczanie, usuwanie, przeciąganie i undo/redo działają wewnątrz edytora.
+Kopiowanie/wycinanie daje `{klucz}`, a wklejenie odtwarza elementy wizualne.
+
+Browse icons pozwala nadać nazwę i wgrać SVG (do 256 KB, 2000 elementów). Następnie
+wybierz ikonę, aby wstawić `{icon:nazwa}`. SVG musi być samodzielną grafiką wektorową,
+bez skryptów, osadzonych obrazów, zewnętrznych zasobów i arkuszy stylów; tekst należy
+zamienić na krzywe. Ikony zachowują proporcje i dziedziczą kolor, rozmiar i opacity
+kontenera. Podgląd i eksport korzystają z tych samych pomiarów i układu tekstu/SVG.
+Wgrane ikony pozostają przy wymianie zdjęcia w sesji; trwały zapis zasobów dojdzie
+w etapie presetów. Samodzielny blok logo SVG pozostaje na etap 5.
+
+Storybook: **Screens/TestPhotos/InlineIcons** pokazuje edytor i eksport z ikonami
+aperture i camera. Test E2E sprawdza upload, odrzucenie skryptu, schowek, brakującą
+ikonę i piksel koloru SVG w JPG. Obecny eksport tekstowy zachowuje wcześniejsze wzorce.
+
+Puste kontenery pokazują przyciemnione logo FrameNote i ramkę wyłącznie na canvasie.
+Zaślepka nie trafia do schowka ani JPG i znika przy pierwszej treści. W edytorze
+widoczna jest podpowiedź. Built-in zawiera też `{icon:framenote-logo}` (pełne logo)
+i `{icon:framenote-icon}` (znak marki); ich świadome wstawienie trafia do eksportu.

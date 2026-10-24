@@ -167,7 +167,7 @@ export function addCaption(
               ? content.position.anchor
               : nextFreeAnchor(layout, content.position.anchor),
         },
-        template: duplicate ? content.template : 'Sample text',
+        template: duplicate ? content.template : '',
         id,
       },
     ],

@@ -12,14 +12,14 @@ test('edits independent containers, selects on canvas and exports the whole layo
   await page
     .getByRole('button', { name: 'Add container', exact: true })
     .click();
-  await expect(caption).toHaveValue('Sample text');
+  await expect(caption).toHaveAttribute('data-template', '');
   await caption.fill('Second caption');
   await page.getByRole('button', { name: 'top-right', exact: true }).click();
   await page
     .getByRole('spinbutton', { name: 'Font size', exact: true })
     .fill('3');
   await page.getByRole('button', { name: /First caption/ }).click();
-  await expect(caption).toHaveValue('First caption');
+  await expect(caption).toHaveAttribute('data-template', 'First caption');
   await expect(
     page.getByRole('spinbutton', { name: 'Font size', exact: true }),
   ).toHaveValue('2');
@@ -55,7 +55,7 @@ test('edits independent containers, selects on canvas and exports the whole layo
     shortEdge * 0.03 * scale -
     shortEdge * 0.02 * scale;
   await canvas.click({ position: { x, y } });
-  await expect(caption).toHaveValue('First caption');
+  await expect(caption).toHaveAttribute('data-template', 'First caption');
 
   async function downloadImage() {
     const button = page.getByRole('button', {
@@ -80,7 +80,7 @@ test('edits independent containers, selects on canvas and exports the whole layo
   await page
     .getByRole('button', { name: 'Delete container 1', exact: true })
     .click();
-  await expect(caption).toHaveValue('Second caption');
+  await expect(caption).toHaveAttribute('data-template', 'Second caption');
   const secondOnly = await downloadImage();
   const changes = await page.evaluate(
     async ({ both, secondOnly }) => {
@@ -140,5 +140,5 @@ test('edits independent containers, selects on canvas and exports the whole layo
   await page
     .getByRole('button', { name: 'Add container', exact: true })
     .click();
-  await expect(caption).toHaveValue('Sample text');
+  await expect(caption).toHaveAttribute('data-template', '');
 });

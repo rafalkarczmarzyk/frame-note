@@ -11,14 +11,14 @@ import { toPixels } from './sizing';
 
 const dimensions = { width: 2000, height: 1000 };
 describe('multiple caption containers', () => {
-  it('adds a visible sample container with an independent copy of the selected style and position', () => {
+  it('adds an empty container with an independent copy of the selected style and position', () => {
     const first = createCaptionLayout({
       ...createCaption(),
       template: '{author}',
     });
     const next = addCaption(first, 'second');
     expect(next.activeId).toBe('second');
-    expect(next.containers[1]!.template).toBe('Sample text');
+    expect(next.containers[1]!.template).toBe('');
     next.containers[1]!.style.fontSize = 5;
     next.containers[1]!.position.anchor = 'top-right';
     expect(first.containers[0]!.style.fontSize).toBe(2);

@@ -8,7 +8,10 @@ test('shows helpers first, keeps original namespaces and resolves a portable tem
   const input = page.getByLabel('Choose JPG photo');
   await input.setInputFiles(xmpPortraitFixture.path);
   const caption = page.getByLabel('Caption', { exact: true });
-  await expect(caption).toHaveValue('{author}\n{lens}\n{exposure}');
+  await expect(caption).toHaveAttribute(
+    'data-template',
+    '{author}\n{lens}\n{exposure}',
+  );
   await page.getByRole('button', { name: 'Browse available tags' }).click();
   const panel = page.getByRole('dialog', { name: 'Available tags' });
   await expect(panel.locator('h3').first()).toHaveText('FrameNote');
@@ -36,7 +39,10 @@ test('shows helpers first, keeps original namespaces and resolves a portable tem
     page.getByRole('button', { name: 'Export JPG', exact: true }),
   ).toBeEnabled();
   await input.setInputFiles(wildlifeFixture.path);
-  await expect(caption).toHaveValue('{author}\n{lens}\n{date}');
+  await expect(caption).toHaveAttribute(
+    'data-template',
+    '{author}\n{lens}\n{date}',
+  );
   await page.getByRole('button', { name: 'Browse available tags' }).click();
   await search.fill('author');
   await expect(panel.locator('h3')).toHaveText(['FrameNote']);
