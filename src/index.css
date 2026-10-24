@@ -600,23 +600,53 @@
 
 @layer components {
   .margin-editor-grid {
+    position: relative;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: 36px 72px 36px;
     grid-template-areas: '. top .' 'left center right' '. bottom .';
-    align-items: end;
-    gap: 18px 8px;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    border: 1px dashed var(--border-subtle);
+    border-radius: 8px;
+    background: var(--tone-surface);
+  }
+  .margin-model-value .numeric-input {
+    height: 30px;
+    padding-inline: 3px;
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
+  .margin-model-value .numeric-input:not(:focus-within) .numeric-unit,
+  .margin-model-value .numeric-input:not(:focus-within) .numeric-steppers {
+    display: none;
+  }
+  .margin-model-value .numeric-input:focus-within {
+    background: var(--input-base);
+    border-color: var(--input-focus-ring);
+    box-shadow: var(--input-focus-shadow);
+  }
+  .margin-model-value .numeric-input input {
+    text-align: center;
   }
   .margin-diagram {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 36px;
+    height: 100%;
+    border: 1px solid var(--border-subtle);
+    border-radius: 4px;
+    background: var(--workspace-base);
   }
   .margin-photo {
-    position: absolute;
-    width: 60px;
-    height: 59px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
     pointer-events: none;
   }
   .margin-edge {
@@ -638,16 +668,16 @@
     width: 2px;
   }
   .margin-edge-top {
-    top: 0;
+    top: -1px;
   }
   .margin-edge-bottom {
-    bottom: 0;
+    bottom: -1px;
   }
   .margin-edge-left {
-    left: 0;
+    left: -1px;
   }
   .margin-edge-right {
-    right: 0;
+    right: -1px;
   }
   .margin-edge-active {
     background: var(--accent-color);
@@ -662,6 +692,36 @@
     align-items: center;
     gap: 4px;
     padding-inline: 8px;
+  }
+  .numeric-steppers {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    width: 14px;
+    height: 100%;
+    order: 2;
+  }
+  .numeric-steppers button {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    cursor: pointer;
+  }
+  .numeric-steppers button:hover {
+    background: var(--tone-hover);
+  }
+  .numeric-steppers button:focus-visible {
+    outline: 1px solid var(--input-focus-ring);
+  }
+  .numeric-steppers button:disabled {
+    opacity: var(--control-disabled-opacity);
+    cursor: default;
+  }
+  .numeric-steppers svg {
+    width: 12px;
+    height: 12px;
   }
   .numeric-input input {
     width: 100%;

@@ -1,3 +1,4 @@
+import { ChevronUp, ChevronDown } from 'lucide-react';
 import { useId, useState, type ComponentProps } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -18,6 +19,7 @@ export interface NumberInputProps extends Omit<
   max: number;
   step?: number | 'any';
   suffix?: string;
+  stepperLabel?: string;
 }
 
 /** Numeric editing shared by plain numbers and values with a fixed unit. */
@@ -28,6 +30,7 @@ export function NumberInput({
   max,
   step = 0.01,
   suffix,
+  stepperLabel,
   disabled,
   className,
   onFocus,
@@ -38,6 +41,17 @@ export function NumberInput({
   const format = (number: number) => String(Number(number.toFixed(6)));
   const [draft, setDraft] = useState(format(value));
   const [focused, setFocused] = useState(false);
+  const nudge = (direction: number) => {
+    const next = Math.min(
+      max,
+      Math.max(
+        min,
+        Number((value + direction * (step === 'any' ? 1 : step)).toFixed(6)),
+      ),
+    );
+    setDraft(format(next));
+    onValueChange(next);
+  };
   return (
     <div
       className={cn('control-field numeric-input', className)}
@@ -79,6 +93,28 @@ export function NumberInput({
             onValueChange(next);
         }}
       />
+      {stepperLabel && (
+        <span className="numeric-steppers">
+          <button
+            type="button"
+            aria-label={`Increase ${stepperLabel}`}
+            disabled={disabled || value >= max}
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={() => nudge(1)}
+          >
+            <ChevronUp aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            aria-label={`Decrease ${stepperLabel}`}
+            disabled={disabled || value <= min}
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={() => nudge(-1)}
+          >
+            <ChevronDown aria-hidden="true" />
+          </button>
+        </span>
+      )}
       {suffix && (
         <span className="numeric-unit" id={unitId}>
           {suffix}
