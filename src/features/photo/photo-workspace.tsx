@@ -1,3 +1,6 @@
+import { TriangleAlert } from 'lucide-react';
+import { formatBytes } from '@/lib/format-bytes';
+import { usePreparedExport } from '../caption/use-prepared-export';
 import { createPortal } from 'react-dom';
 import {
   insertToken,
@@ -7,8 +10,8 @@ import {
 import { CaptionControls } from '../caption/caption-controls';
 import { Button } from '@/components/ui/button';
 import { resolveTemplate } from '../caption/template';
-import { captionConfig, exportPhoto, exportName } from '../caption/render';
-import { useEffect, useRef, useState } from 'react';
+import { captionConfig, exportName } from '../caption/render';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Stage, Layer, Group, Text, Image as CanvasImage } from 'react-konva';
 import type { LoadedPhoto } from './load-photo';
 
@@ -23,12 +26,16 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
     '{exif:Artist}\n{exif:LensModel}\n{exif:ExposureTime} s · {exif:FNumber} · ISO {exif:ISOSpeedRatings}',
   );
   const [exporting, setExporting] = useState(false);
+  const [quality, setQuality] = useState(95);
   const [error, setError] = useState('');
   const [settings, setSettings] = useState(photo.document.caption);
   const [loadedFont, setLoadedFont] = useState('');
   const fontKey = `${settings.style.fontWeight} 16px "${settings.style.fontFamily}"`;
   const fontReady = loadedFont === fontKey;
-  const caption = { ...settings, template };
+  const caption = useMemo(
+    () => ({ ...settings, template }),
+    [settings, template],
+  );
   const used = usedTokens(template);
   const exportTarget = document.getElementById('export-actions');
   const rememberSelection = () => {
@@ -52,6 +59,18 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
   const color = getComputedStyle(document.documentElement)
     .getPropertyValue(`--color-${caption.style.color}`)
     .trim();
+  const exportRequest = useMemo(
+    () => ({
+      image: photo.image,
+      dimensions: photo.document.photo.dimensions,
+      caption,
+      text: resolved.text,
+      color,
+      quality,
+    }),
+    [photo, caption, resolved.text, color, quality],
+  );
+  const prepared = usePreparedExport(exportRequest, fontReady);
   useEffect(() => {
     let active = true;
     void document.fonts
@@ -66,7 +85,8 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
       active = false;
     };
   }, [fontKey]);
-  const download = async () => {
+  const download = () => {
+    if (!prepared.blob) return;
     if (
       (resolved.invalidSyntax || resolved.missing.length) &&
       !window.confirm(
@@ -75,26 +95,13 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
     )
       return;
     setExporting(true);
-    setError('');
-    try {
-      const blob = await exportPhoto(
-        photo.image,
-        photo.document.photo.dimensions,
-        caption,
-        resolved.text,
-        color,
-      );
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = exportName(photo.document.photo.name);
-      link.click();
-      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Export failed.');
-    } finally {
-      setExporting(false);
-    }
+    const url = URL.createObjectURL(prepared.blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = exportName(photo.document.photo.name);
+    link.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    window.setTimeout(() => setExporting(false), 0);
   };
   useEffect(() => {
     const element = host.current;
@@ -124,10 +131,7 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
     <main className="flex min-h-0 flex-1 flex-col md:flex-row">
       {exportTarget &&
         createPortal(
-          <Button
-            disabled={!fontReady || exporting}
-            onClick={() => void download()}
-          >
+          <Button disabled={!prepared.blob || exporting} onClick={download}>
             {exporting ? 'Exporting…' : 'Export JPG'}
           </Button>,
           exportTarget,
@@ -232,6 +236,12 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
           <p className="mt-2 text-xs text-foreground/70">
             {width} × {height} px
           </p>
+          <p
+            className="mt-1 text-xs text-foreground/70"
+            title={`${photo.document.photo.byteLength.toLocaleString('en-US')} bytes`}
+          >
+            Input: {formatBytes(photo.document.photo.byteLength)}
+          </p>
           <label className="mt-6 block text-xs" htmlFor="caption-template">
             Caption
           </label>
@@ -263,10 +273,92 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
             disabled={exporting}
           />
 
-          <p className="mt-3 text-xs text-foreground/70">
-            Basic export: JPEG 95%, original dimensions. Source metadata is not
-            copied; original color profile preservation is not yet supported.
-          </p>
+          <fieldset disabled={exporting} className="mt-5 border-t pt-4">
+            <legend className="text-xs font-medium">Export</legend>
+            <label
+              className="mt-2 flex items-center justify-between text-xs"
+              htmlFor="jpeg-quality"
+            >
+              JPEG quality <span>{quality}%</span>
+            </label>
+            <div
+              role="group"
+              aria-label="JPEG quality presets"
+              className="mt-3 flex overflow-hidden rounded-sm border"
+            >
+              {[
+                { value: 60, label: 'Small' },
+                { value: 75, label: 'Balanced' },
+                { value: 95, label: 'Best' },
+              ].map((preset) => (
+                <button
+                  key={preset.value}
+                  type="button"
+                  aria-label={`${preset.label} JPEG quality`}
+                  title={`${preset.value}%`}
+                  aria-pressed={quality === preset.value}
+                  onClick={() => setQuality(preset.value)}
+                  className="flex-1 border-r py-2 text-xs last:border-r-0 hover:bg-secondary hover:text-secondary-foreground focus-visible:z-10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary aria-pressed:bg-primary aria-pressed:text-primary-foreground"
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+            <input
+              id="jpeg-quality"
+              type="range"
+              min={1}
+              max={100}
+              step={1}
+              value={quality}
+              onChange={(event) => setQuality(event.target.valueAsNumber)}
+              className="mt-3 w-full accent-primary"
+            />
+            <p
+              className="mt-3 text-xs"
+              role="status"
+              aria-live="polite"
+              data-testid="output-size"
+              data-bytes={prepared.blob?.size}
+              title={
+                prepared.blob
+                  ? `${prepared.blob.size.toLocaleString('en-US')} bytes`
+                  : undefined
+              }
+            >
+              Output:{' '}
+              {prepared.blob
+                ? formatBytes(prepared.blob.size)
+                : prepared.error
+                  ? 'Unavailable'
+                  : 'Calculating…'}
+            </p>
+            {prepared.blob &&
+              prepared.blob.size > photo.document.photo.byteLength && (
+                <p
+                  className="mt-2 flex items-start gap-2 text-xs text-warning"
+                  role="status"
+                >
+                  <TriangleAlert
+                    className="size-4 shrink-0"
+                    aria-hidden="true"
+                  />
+                  <span>
+                    Output is larger than the original. Try a lower JPEG
+                    quality.
+                  </span>
+                </p>
+              )}
+            {prepared.error && (
+              <p role="alert" className="mt-2 text-xs">
+                {prepared.error}
+              </p>
+            )}
+            <p className="mt-3 text-xs leading-5 text-foreground/70">
+              Original dimensions · sRGB rendering. EXIF, GPS and other source
+              metadata are removed. The original ICC profile is not copied.
+            </p>
+          </fieldset>
           {error && (
             <p role="alert" className="mt-3 text-xs">
               {error}

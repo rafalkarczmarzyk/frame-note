@@ -2,7 +2,7 @@
 
 Lokalny edytor podpisów fotograficznych. React + TypeScript + Vite + Tailwind CSS.
 
-## Status: etap 5 — stylowanie i pozycja (do akceptacji)
+## Status: etap 6 — zapisany; kolejny etap nie jest rozpoczęty
 
 Gotowe: import jednego JPG, podgląd canvas, odczyt i wyszukiwanie metadanych, szablon podpisu z tokenami i podstawowy eksport. Każdy etap czeka na ocenę użytkownika przed przejściem dalej.
 
@@ -96,3 +96,26 @@ Wspólne pomiary tekstu i geometria są używane w podglądzie i eksporcie. Font
 ### Iteracja paneli
 
 Eksport jest w navbarze. Przycisk na stałym dole panelu ustawień otwiera osobny panel tagów po jego lewej stronie. Lista tagów ma własny scroll, niezależny od ustawień. Edytor zapamiętuje kursor i zaznaczenie przy opuszczeniu pola, także na czas wyszukiwania; wstawienie zastępuje zaznaczenie i aktualizuje pozycję następnego wstawienia. Obecność dokładnego tokenu w szablonie oznacza tag jako Used i nadaje mu kolor primary.
+
+## Etap 6
+
+Jakość JPG jest regulowana od 1 do 100% (domyślnie 95%). Eksport zachowuje wymiary zdekodowanego, poprawnie zorientowanego zdjęcia i utrwala obrót w pikselach. Profil renderowania Canvas to domyślne sRGB. Kopia nie zawiera źródłowych EXIF/IPTC/XMP/GPS ani źródłowego ICC. To świadome ograniczenie pre-MVP: nie kopiujemy potencjalnie niezgodnego profilu ani starego tagu Orientation. JPG jest ponownie kodowany; nie jest bezstratną kopią. Sprawdzona ścieżka kolorystyczna dotyczy dostarczonych zdjęć sRGB; Adobe RGB, Display P3 i nietypowe profile wymagają osobnej weryfikacji.
+
+E2E działa na produkcyjnym buildzie. Jeden scenariusz obejmuje dwa oryginalne JPG, kontrolę wymiarów, brak metadanych, zmianę jakości oraz syntetyczny obrót EXIF 6. Dla sRGB mierzymy różnicę kolorów w obszarze bez tekstu (średni błąd poniżej 3/255 na kanał). Nie jest to pomiar kolorymetryczny ani gwarancja identycznych bajtów.
+
+### Wzorce wizualne
+
+`e2e/photo-flow.spec.ts-snapshots` zawiera kandydatów do akceptacji: miniaturę całego eksportu i fragment podpisu w oryginalnej rozdzielczości dla obu zdjęć. To obrazy zdekodowanego wyniku JPG, a nie screenshoty interfejsu. Wzorce zostały obejrzane podczas implementacji; zamknięcie etapu zatwierdza je jako punkt odniesienia.
+
+- Sprawdzanie: `pnpm test:e2e` (bez aktualizacji wzorców).
+- Świadoma aktualizacja: `pnpm test:e2e:update`, następnie obejrzenie obrazów i diffu.
+- Wzorce są osobne dla platformy i przeglądarki; obecne: macOS/Chromium z lockfile projektu. Linux i WebKit potrzebują własnych, przejrzanych wzorców.
+- Porównanie dopuszcza próg różnicy koloru 0,1 i maksymalnie 0,1% różniących się pikseli. Błąd zapisuje obrazy actual/expected/diff w `test-results`.
+
+### Dokładny rozmiar przed pobraniem
+
+Panel pokazuje Input i Output w jednostkach dziesiętnych (kB/MB jak Finder); tooltip zawiera dokładną liczbę bajtów. Output powstaje po rzeczywistym kodowaniu JPG w tle, po 450 ms bez zmiany ustawień. Podczas zmian poprzedni rozmiar jest ukrywany, a pobieranie wyłączone do przygotowania aktualnego pliku. Przycisk pobiera dokładnie przechowywany Blob, bez ponownego kodowania.
+
+Kolejka nie uruchamia dwóch kodowań naraz, pomija nieaktualne żądania i ignoruje spóźnione wyniki. Zmiana wyszukiwarki tagów lub rozmiaru okna nie koduje zdjęcia ponownie. Unity sprawdzają debounce, kolejność, anulowanie i format rozmiaru; E2E porównuje deklarowaną liczbę bajtów z pobranym plikiem. Duże obrazy nadal mogą chwilowo obciążać główny wątek podczas rysowania — debounce nie oznacza Web Workera.
+
+Presety jakości nad suwakiem: Small (60%), Balanced (75%), Best (95%, domyślny). Gdy przygotowany wynik jest większy od pliku wejściowego, panel pokazuje ikonę TriangleAlert i sugestię obniżenia jakości.
