@@ -95,7 +95,7 @@ Wspólne pomiary tekstu i geometria są używane w podglądzie i eksporcie. Font
 
 ### Iteracja paneli
 
-Eksport jest w navbarze. Przycisk na stałym dole panelu ustawień otwiera osobny panel tagów po jego lewej stronie. Lista tagów ma własny scroll, niezależny od ustawień. Edytor zapamiętuje kursor i zaznaczenie przy opuszczeniu pola, także na czas wyszukiwania; wstawienie zastępuje zaznaczenie i aktualizuje pozycję następnego wstawienia. Obecność dokładnego tokenu w szablonie oznacza tag jako Used i nadaje mu kolor primary.
+Eksport jest w navbarze. Przycisk w sekcji Caption, pod edytorem szablonu, otwiera osobny panel tagów po lewej stronie ustawień. Lista tagów ma własny scroll, niezależny od ustawień. Edytor zapamiętuje kursor i zaznaczenie przy opuszczeniu pola, także na czas wyszukiwania; wstawienie zastępuje zaznaczenie i aktualizuje pozycję następnego wstawienia. Obecność dokładnego tokenu w szablonie oznacza tag jako Used i nadaje mu kolor primary.
 
 ## Etap 6
 
@@ -119,3 +119,9 @@ Panel pokazuje Input i Output w jednostkach dziesiętnych (kB/MB jak Finder); to
 Kolejka nie uruchamia dwóch kodowań naraz, pomija nieaktualne żądania i ignoruje spóźnione wyniki. Zmiana wyszukiwarki tagów lub rozmiaru okna nie koduje zdjęcia ponownie. Unity sprawdzają debounce, kolejność, anulowanie i format rozmiaru; E2E porównuje deklarowaną liczbę bajtów z pobranym plikiem. Duże obrazy nadal mogą chwilowo obciążać główny wątek podczas rysowania — debounce nie oznacza Web Workera.
 
 Presety jakości nad suwakiem: Small (60%), Balanced (75%), Best (95%, domyślny). Gdy przygotowany wynik jest większy od pliku wejściowego, panel pokazuje ikonę TriangleAlert i sugestię obniżenia jakości.
+
+## Zwijane sekcje sidebara
+
+Wspólny `SidebarSection` w `src/components/layout` odpowiada za nagłówek, chevron, odstępy i podsumowanie po zwinięciu. Korzysta z natywnego `details/summary`, dostępnego z klawiatury, i pozostawia kontrolki zamontowane po zwinięciu. Sekcje: Photo (domyślnie zwinięta), Caption, Typography, Position i Export (domyślnie otwarte). Każdą można zwijać niezależnie.
+
+Stan otwarcia zapisujemy pod kluczami `framenote.sidebar.v1.*` w localStorage; nie jest częścią ustawień zdjęcia. Pozostaje po wymianie pliku i odświeżeniu. Przy niedostępnym localStorage interfejs nadal działa. Zwijanie nie zmienia podpisu, nie przerywa przygotowania eksportu i nie zamyka osobnego panelu tagów.

@@ -1,3 +1,4 @@
+import { SidebarSection } from '@/components/layout/sidebar-section';
 import { TriangleAlert } from 'lucide-react';
 import { formatBytes } from '@/lib/format-bytes';
 import { usePreparedExport } from '../caption/use-prepared-export';
@@ -229,152 +230,174 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
         className="flex min-h-0 max-h-[50vh] w-full shrink-0 flex-col border-t bg-background md:max-h-none md:w-80 md:border-t-0 md:border-l"
         aria-label="Photo tools"
       >
-        <div className="min-h-0 flex-1 overflow-y-auto p-5">
-          <h1 className="break-all text-sm font-medium">
-            {photo.document.photo.name}
-          </h1>
-          <p className="mt-2 text-xs text-foreground/70">
-            {width} × {height} px
-          </p>
-          <p
-            className="mt-1 text-xs text-foreground/70"
-            title={`${photo.document.photo.byteLength.toLocaleString('en-US')} bytes`}
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <SidebarSection
+            id="photo"
+            title="Photo"
+            defaultOpen={false}
+            summary={formatBytes(photo.document.photo.byteLength)}
           >
-            Input: {formatBytes(photo.document.photo.byteLength)}
-          </p>
-          <label className="mt-6 block text-xs" htmlFor="caption-template">
-            Caption
-          </label>
-          <textarea
-            ref={templateInput}
-            id="caption-template"
-            value={template}
-            onSelect={rememberSelection}
-            onBlur={rememberSelection}
-            onChange={(event) => {
-              setTemplate(event.target.value);
-              rememberSelection();
-            }}
-            rows={6}
-            spellCheck={false}
-            className="mt-2 w-full resize-y rounded-sm border bg-background p-3 text-xs leading-5 focus-visible:outline-primary"
-          />
-          {(resolved.missing.length > 0 || resolved.invalidSyntax) && (
-            <p className="mt-2 text-xs" role="status">
-              {resolved.invalidSyntax ? 'Check token syntax. ' : ''}
-              {resolved.missing.length
-                ? `Missing fields: ${resolved.missing.join(', ')}`
-                : ''}
+            <h1 className="break-all text-sm font-medium">
+              {photo.document.photo.name}
+            </h1>
+            <p className="mt-2 text-xs text-foreground/70">
+              {width} × {height} px
             </p>
-          )}
+            <p
+              className="mt-1 text-xs text-foreground/70"
+              title={`${photo.document.photo.byteLength.toLocaleString('en-US')} bytes`}
+            >
+              Input: {formatBytes(photo.document.photo.byteLength)}
+            </p>
+          </SidebarSection>
+          <SidebarSection
+            id="caption"
+            title="Caption"
+            summary={
+              resolved.missing.length || resolved.invalidSyntax
+                ? 'Check tokens'
+                : `${resolved.text ? resolved.text.split('\n').length : 0} lines`
+            }
+          >
+            <label className="sr-only" htmlFor="caption-template">
+              Caption
+            </label>
+            <textarea
+              ref={templateInput}
+              id="caption-template"
+              value={template}
+              onSelect={rememberSelection}
+              onBlur={rememberSelection}
+              onChange={(event) => {
+                setTemplate(event.target.value);
+                rememberSelection();
+              }}
+              rows={6}
+              spellCheck={false}
+              className="mt-2 w-full resize-y rounded-sm border bg-background p-3 text-xs leading-5 focus-visible:outline-primary"
+            />
+            {(resolved.missing.length > 0 || resolved.invalidSyntax) && (
+              <p className="mt-2 text-xs" role="status">
+                {resolved.invalidSyntax ? 'Check token syntax. ' : ''}
+                {resolved.missing.length
+                  ? `Missing fields: ${resolved.missing.join(', ')}`
+                  : ''}
+              </p>
+            )}
+            <div className="mt-4">
+              <Button
+                variant="outline"
+                className="w-full"
+                aria-expanded={tagsOpen}
+                aria-controls="metadata-panel"
+                onClick={() => setTagsOpen((value) => !value)}
+              >
+                {tagsOpen ? 'Hide available tags' : 'Browse available tags'}
+              </Button>
+            </div>
+          </SidebarSection>
           <CaptionControls
             caption={settings}
             onChange={setSettings}
             disabled={exporting}
           />
 
-          <fieldset disabled={exporting} className="mt-5 border-t pt-4">
-            <legend className="text-xs font-medium">Export</legend>
-            <label
-              className="mt-2 flex items-center justify-between text-xs"
-              htmlFor="jpeg-quality"
-            >
-              JPEG quality <span>{quality}%</span>
-            </label>
-            <div
-              role="group"
-              aria-label="JPEG quality presets"
-              className="mt-3 flex overflow-hidden rounded-sm border"
-            >
-              {[
-                { value: 60, label: 'Small' },
-                { value: 75, label: 'Balanced' },
-                { value: 95, label: 'Best' },
-              ].map((preset) => (
-                <button
-                  key={preset.value}
-                  type="button"
-                  aria-label={`${preset.label} JPEG quality`}
-                  title={`${preset.value}%`}
-                  aria-pressed={quality === preset.value}
-                  onClick={() => setQuality(preset.value)}
-                  className="flex-1 border-r py-2 text-xs last:border-r-0 hover:bg-secondary hover:text-secondary-foreground focus-visible:z-10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary aria-pressed:bg-primary aria-pressed:text-primary-foreground"
-                >
-                  {preset.label}
-                </button>
-              ))}
-            </div>
-            <input
-              id="jpeg-quality"
-              type="range"
-              min={1}
-              max={100}
-              step={1}
-              value={quality}
-              onChange={(event) => setQuality(event.target.valueAsNumber)}
-              className="mt-3 w-full accent-primary"
-            />
-            <p
-              className="mt-3 text-xs"
-              role="status"
-              aria-live="polite"
-              data-testid="output-size"
-              data-bytes={prepared.blob?.size}
-              title={
-                prepared.blob
-                  ? `${prepared.blob.size.toLocaleString('en-US')} bytes`
-                  : undefined
-              }
-            >
-              Output:{' '}
-              {prepared.blob
-                ? formatBytes(prepared.blob.size)
-                : prepared.error
-                  ? 'Unavailable'
-                  : 'Calculating…'}
-            </p>
-            {prepared.blob &&
-              prepared.blob.size > photo.document.photo.byteLength && (
-                <p
-                  className="mt-2 flex items-start gap-2 text-xs text-warning"
-                  role="status"
-                >
-                  <TriangleAlert
-                    className="size-4 shrink-0"
-                    aria-hidden="true"
-                  />
-                  <span>
-                    Output is larger than the original. Try a lower JPEG
-                    quality.
-                  </span>
+          <SidebarSection
+            id="export"
+            title="Export"
+            summary={`${quality === 95 ? 'Best' : quality === 75 ? 'Balanced' : quality === 60 ? 'Small' : `${quality}%`} · ${prepared.blob ? formatBytes(prepared.blob.size) : prepared.error ? 'Unavailable' : 'Calculating…'}`}
+          >
+            <fieldset disabled={exporting}>
+              <label
+                className="mt-2 flex items-center justify-between text-xs"
+                htmlFor="jpeg-quality"
+              >
+                JPEG quality <span>{quality}%</span>
+              </label>
+              <div
+                role="group"
+                aria-label="JPEG quality presets"
+                className="mt-3 flex overflow-hidden rounded-sm border"
+              >
+                {[
+                  { value: 60, label: 'Small' },
+                  { value: 75, label: 'Balanced' },
+                  { value: 95, label: 'Best' },
+                ].map((preset) => (
+                  <button
+                    key={preset.value}
+                    type="button"
+                    aria-label={`${preset.label} JPEG quality`}
+                    title={`${preset.value}%`}
+                    aria-pressed={quality === preset.value}
+                    onClick={() => setQuality(preset.value)}
+                    className="flex-1 border-r py-2 text-xs last:border-r-0 hover:bg-secondary hover:text-secondary-foreground focus-visible:z-10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary aria-pressed:bg-primary aria-pressed:text-primary-foreground"
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+              <input
+                id="jpeg-quality"
+                type="range"
+                min={1}
+                max={100}
+                step={1}
+                value={quality}
+                onChange={(event) => setQuality(event.target.valueAsNumber)}
+                className="mt-3 w-full accent-primary"
+              />
+              <p
+                className="mt-3 text-xs"
+                role="status"
+                aria-live="polite"
+                data-testid="output-size"
+                data-bytes={prepared.blob?.size}
+                title={
+                  prepared.blob
+                    ? `${prepared.blob.size.toLocaleString('en-US')} bytes`
+                    : undefined
+                }
+              >
+                Output:{' '}
+                {prepared.blob
+                  ? formatBytes(prepared.blob.size)
+                  : prepared.error
+                    ? 'Unavailable'
+                    : 'Calculating…'}
+              </p>
+              {prepared.blob &&
+                prepared.blob.size > photo.document.photo.byteLength && (
+                  <p
+                    className="mt-2 flex items-start gap-2 text-xs text-warning"
+                    role="status"
+                  >
+                    <TriangleAlert
+                      className="size-4 shrink-0"
+                      aria-hidden="true"
+                    />
+                    <span>
+                      Output is larger than the original. Try a lower JPEG
+                      quality.
+                    </span>
+                  </p>
+                )}
+              {prepared.error && (
+                <p role="alert" className="mt-2 text-xs">
+                  {prepared.error}
                 </p>
               )}
-            {prepared.error && (
-              <p role="alert" className="mt-2 text-xs">
-                {prepared.error}
+              <p className="mt-3 text-xs leading-5 text-foreground/70">
+                Original dimensions · sRGB rendering. EXIF, GPS and other source
+                metadata are removed. The original ICC profile is not copied.
               </p>
-            )}
-            <p className="mt-3 text-xs leading-5 text-foreground/70">
-              Original dimensions · sRGB rendering. EXIF, GPS and other source
-              metadata are removed. The original ICC profile is not copied.
-            </p>
-          </fieldset>
+            </fieldset>
+          </SidebarSection>
           {error && (
-            <p role="alert" className="mt-3 text-xs">
+            <p role="alert" className="p-5 text-xs">
               {error}
             </p>
           )}
-        </div>
-        <div className="shrink-0 border-t p-4">
-          <Button
-            variant="outline"
-            className="w-full"
-            aria-expanded={tagsOpen}
-            aria-controls="metadata-panel"
-            onClick={() => setTagsOpen((value) => !value)}
-          >
-            {tagsOpen ? 'Hide available tags' : 'Browse available tags'}
-          </Button>
         </div>
       </aside>
     </main>
