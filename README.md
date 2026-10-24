@@ -63,8 +63,11 @@ funkcjonalne i pomiar kolorów bez porównywania do wzorców Chromium.
 - Odczyt metadanych rozpoznawanych przez ExifReader: EXIF, IPTC, XMP i ICC.
   Dostępne pola można przeszukiwać i wstawiać z listy. Nie gwarantujemy obsługi
   każdego niestandardowego pola lub MakerNote.
-- Jeden wieloliniowy szablon `{group:name}`, np. `{exif:Artist}`.
+- Jeden wieloliniowy szablon z helperami FrameNote (`{author}`, `{lens}`, `{exposure}`)
+  i oryginalnymi tagami `{group:name}`, np. `{exif:Artist}`.
   Wstawianie w pozycji kursora, zastępowanie zaznaczenia, oznaczenie użytych tagów.
+  Helpery są na górze w grupie FrameNote, a oryginały w grupach namespace.
+  Domyślny podpis: `{author}`, `{lens}`, `{exposure}` w osobnych wierszach.
   Brakujące pola są raportowane; eksport wymaga wtedy potwierdzenia.
 - Zmiana zdjęcia zachowuje ustawienia podpisu i jakość eksportu w bieżącej sesji.
 - Montserrat i Advercase, Regular/Bold, kolor (lista neutralnych i pastelowych odcieni oraz własny HEX), opacity (slider i pole liczbowe),

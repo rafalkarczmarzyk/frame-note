@@ -1,3 +1,5 @@
+import { MetadataPicker } from '../features/caption/metadata-picker';
+import { usedTokens } from '../features/caption/insert-token';
 import { ColorPickerPanel } from '../features/caption/color-picker-panel';
 import { Download, TextQuote } from 'lucide-react';
 import { PhotoIcon } from '../components/icons/photo-icon';
@@ -84,58 +86,66 @@ function EditorDemo({
             className="absolute inset-y-4 right-[calc(var(--tools-sidebar-width)+1rem)] z-20 w-72"
             toolbar={<Input aria-label="Search panel" placeholder="Search…" />}
           >
-            <PickerList
-              items={
-                panel === 'tags'
-                  ? [
-                      {
-                        id: 'exif:Artist',
-                        label: 'exif:Artist',
-                        description: 'Rafal Karczmarzyk',
-                        selected: caption.template.includes('{exif:Artist}'),
-                      },
-                      {
-                        id: 'exif:LensModel',
-                        label: 'exif:LensModel',
-                        description: photo.lens,
-                      },
-                    ]
-                  : [
-                      {
-                        id: 'Montserrat Variable',
-                        label: 'Montserrat',
-                        preview: (
-                          <span className="font-sans text-xl">
-                            Every frame has a story.
-                          </span>
-                        ),
-                      },
-                      {
-                        id: 'Advercase',
-                        label: 'Advercase',
-                        preview: (
-                          <span className="font-display text-2xl">
-                            Every frame has a story.
-                          </span>
-                        ),
-                      },
-                    ]
-              }
-              onChoose={(id) =>
-                panel === 'tags'
-                  ? setCaption((value) => ({
-                      ...value,
-                      template: value.template + `{${id}}`,
-                    }))
-                  : setCaption((value) => ({
-                      ...value,
-                      style: {
-                        ...value.style,
-                        fontFamily: id as typeof value.style.fontFamily,
-                      },
-                    }))
-              }
-            />
+            {panel === 'tags' ? (
+              <MetadataPicker
+                fields={[
+                  {
+                    key: 'exif:Artist',
+                    group: 'exif',
+                    name: 'Artist',
+                    displayValue: 'Rafal Karczmarzyk',
+                    rawValue: 'Rafal Karczmarzyk',
+                  },
+                  {
+                    key: 'exif:LensModel',
+                    group: 'exif',
+                    name: 'LensModel',
+                    displayValue: photo.lens,
+                    rawValue: photo.lens,
+                  },
+                ]}
+                query=""
+                used={usedTokens(caption.template)}
+                onChoose={(id) =>
+                  setCaption((value) => ({
+                    ...value,
+                    template: value.template + `{${id}}`,
+                  }))
+                }
+              />
+            ) : (
+              <PickerList
+                items={[
+                  {
+                    id: 'Montserrat Variable',
+                    label: 'Montserrat',
+                    preview: (
+                      <span className="font-sans text-xl">
+                        Every frame has a story.
+                      </span>
+                    ),
+                  },
+                  {
+                    id: 'Advercase',
+                    label: 'Advercase',
+                    preview: (
+                      <span className="font-display text-2xl">
+                        Every frame has a story.
+                      </span>
+                    ),
+                  },
+                ]}
+                onChoose={(id) =>
+                  setCaption((value) => ({
+                    ...value,
+                    style: {
+                      ...value.style,
+                      fontFamily: id as typeof value.style.fontFamily,
+                    },
+                  }))
+                }
+              />
+            )}
           </FloatingPanel>
         )}
         <ToolSidebar>

@@ -1,3 +1,5 @@
+import { MetadataPicker } from '../caption/metadata-picker';
+import { metadataGroups } from '@/domain/caption-tags';
 import { ColorPickerPanel } from '../caption/color-picker-panel';
 import { resolveCaptionColor } from '@/domain/caption-colors';
 import { Download, TextQuote } from 'lucide-react';
@@ -41,9 +43,7 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
   const [fontQuery, setFontQuery] = useState('');
   const [size, setSize] = useState({ width: 1, height: 1 });
   const [query, setQuery] = useState('');
-  const [template, setTemplate] = useState(
-    '{exif:Artist}\n{exif:LensModel}\n{exif:ExposureTime} s · {exif:FNumber} · ISO {exif:ISOSpeedRatings}',
-  );
+  const [template, setTemplate] = useState('{author}\n{lens}\n{exposure}');
   const [exporting, setExporting] = useState(false);
   const [quality, setQuality] = useState(95);
   const [error, setError] = useState('');
@@ -143,10 +143,10 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
     Math.max(1, size.height - 48) / height,
     1,
   );
-  const fields = photo.document.photo.metadata.filter((field) =>
-    `${field.key} ${field.displayValue}`
-      .toLowerCase()
-      .includes(query.toLowerCase()),
+  const fields = photo.document.photo.metadata;
+  const matchingFieldCount = metadataGroups(fields, query).reduce(
+    (count, group) => count + group.fields.length,
+    0,
   );
   return (
     <EditorWorkspace>
@@ -223,7 +223,7 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
                   className="bg-preview-placeholder"
                 />
                 <p className="mt-2 text-xs text-content-secondary">
-                  {fields.length} fields
+                  {matchingFieldCount} tags
                 </p>
               </>
             ) : (
@@ -238,16 +238,11 @@ export function PhotoWorkspace({ photo }: { photo: LoadedPhoto }) {
           }
         >
           {tagsOpen ? (
-            <PickerList
-              items={fields.map((field) => ({
-                id: field.key,
-                label: field.key,
-                description: field.displayValue,
-                selected: used.has(field.key),
-              }))}
-              selectedLabel="Used"
+            <MetadataPicker
+              fields={fields}
+              query={query}
+              used={used}
               onChoose={addToken}
-              emptyText="No matching metadata."
             />
           ) : (
             <PickerList
