@@ -13,6 +13,7 @@ export default defineConfig([
     'playwright-report',
     'test-results',
     'coverage',
+    'storybook-static',
   ]),
   js.configs.recommended,
   tseslint.configs.recommended,
@@ -23,6 +24,10 @@ export default defineConfig([
   {
     files: ['src/**/*.{ts,tsx}'],
     extends: [reactHooks.configs.flat.recommended, reactRefresh.configs.vite],
+  },
+  {
+    files: ['src/**/*.stories.tsx'],
+    rules: { 'react-refresh/only-export-components': 'off' },
   },
   prettier,
 ]);

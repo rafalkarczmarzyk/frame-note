@@ -1,0 +1,54 @@
+import type { ReactNode } from 'react';
+import { Check } from 'lucide-react';
+
+export interface PickerItem {
+  id: string;
+  label: string;
+  description?: string;
+  selected?: boolean;
+  preview?: ReactNode;
+}
+export function PickerList({
+  items,
+  onChoose,
+  emptyText = 'No matches.',
+  selectedLabel = 'Selected',
+}: {
+  items: readonly PickerItem[];
+  onChoose: (id: string) => void;
+  emptyText?: string;
+  selectedLabel?: string;
+}) {
+  return (
+    <div className="space-y-1">
+      {items.map((item) => (
+        <button
+          type="button"
+          key={item.id}
+          aria-pressed={!!item.selected}
+          onClick={() => onChoose(item.id)}
+          className="block w-full rounded-sm p-3 text-left outline-none hover:bg-secondary/15 focus-visible:ring-1 focus-visible:ring-ring aria-pressed:text-primary"
+        >
+          <span className="flex items-start justify-between gap-2">
+            <span className="min-w-0 break-all text-xs">{item.label}</span>
+            {item.selected && (
+              <span className="flex shrink-0 items-center gap-1 text-[10px]">
+                <Check aria-hidden="true" className="size-3.5" />
+                {selectedLabel}
+              </span>
+            )}
+          </span>
+          {item.description && (
+            <span className="mt-1 block break-all text-xs leading-5 text-foreground/70">
+              {item.description}
+            </span>
+          )}
+          {item.preview && <span className="mt-3 block">{item.preview}</span>}
+        </button>
+      ))}
+      {items.length === 0 && (
+        <p className="p-3 text-xs text-foreground/70">{emptyText}</p>
+      )}
+    </div>
+  );
+}

@@ -9,4 +9,5 @@ minimumReleaseAgeExclude:
   - 'ignore@7.0.14'
 # The published browser bundle is used; no dependency build is required.
 allowBuilds:
+  esbuild: true
   exifreader: false
