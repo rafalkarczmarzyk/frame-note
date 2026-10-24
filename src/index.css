@@ -37,12 +37,28 @@
   --secondary-foreground: var(--color-charcoal);
   --muted: var(--color-charcoal);
   --muted-foreground: var(--color-porcelain);
-  --border: var(--color-slate);
+  --border: color-mix(in srgb, var(--color-slate) 24%, transparent);
   --ring: var(--color-porcelain);
   --accent: var(--color-slate);
   --warning: var(--color-slate);
   --destructive: var(--color-porcelain);
-  --radius: 0.25rem;
+  --radius: 0.5rem;
+  --control-surface: color-mix(
+    in srgb,
+    var(--foreground) 6%,
+    var(--background)
+  );
+  --control-hover: color-mix(in srgb, var(--foreground) 10%, var(--background));
+  --control-edge: color-mix(in srgb, var(--foreground) 12%, transparent);
+  --control-highlight: color-mix(in srgb, var(--foreground) 16%, transparent);
+  --control-selected: color-mix(
+    in srgb,
+    var(--foreground) 18%,
+    var(--background)
+  );
+  --control-shadow: 0 2px 5px
+    color-mix(in srgb, var(--color-charcoal) 45%, transparent);
+  --control-focus: color-mix(in srgb, var(--primary) 65%, var(--foreground));
 }
 
 @theme inline {
@@ -76,11 +92,267 @@
 }
 
 @layer components {
+  .control-field,
+  .control-button,
+  .control-segment,
+  .control-disclosure,
+  .control-slider-thumb {
+    outline: none;
+    transition:
+      background-color 140ms ease,
+      box-shadow 140ms ease,
+      border-color 140ms ease;
+  }
+  .control-field {
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    background: var(--control-surface);
+    color: var(--foreground);
+    box-shadow:
+      inset 0 1px 2px color-mix(in srgb, var(--color-charcoal) 35%, transparent),
+      inset 0 -1px 0 var(--control-edge);
+  }
+  .control-field::placeholder {
+    color: color-mix(in srgb, var(--foreground) 48%, transparent);
+  }
+  .control-field:hover:not(:disabled) {
+    background: var(--control-hover);
+  }
+  .control-field:focus-visible {
+    border-color: var(--control-focus);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 16%, transparent);
+  }
+  .control-field[aria-invalid='true'] {
+    border-color: var(--foreground);
+    border-style: dashed;
+  }
+  .control-button {
+    border-radius: var(--radius);
+  }
+  .button-primary,
+  .control-neutral {
+    border: 1px solid var(--control-edge);
+    box-shadow:
+      inset 0 1px 0 var(--control-highlight),
+      var(--control-shadow);
+  }
   .button-primary {
-    @apply border border-primary bg-primary text-primary-foreground;
+    background-color: var(--primary);
+    background-image: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--foreground) 15%, transparent),
+      transparent
+    );
+    color: var(--primary-foreground);
   }
   .button-primary:hover:not(:disabled) {
-    @apply border-warning bg-warning;
+    background-color: color-mix(in srgb, var(--primary) 75%, var(--foreground));
+  }
+  .control-neutral {
+    color: var(--foreground);
+    background: var(--control-surface);
+  }
+  .control-neutral:hover:not(:disabled),
+  .control-quiet:hover:not(:disabled) {
+    background: var(--control-hover);
+  }
+  .control-button:active:not(:disabled) {
+    box-shadow: inset 0 1px 3px
+      color-mix(in srgb, var(--color-charcoal) 30%, transparent);
+  }
+  .control-button:focus-visible,
+  .control-segment:focus-visible,
+  .control-disclosure:focus-visible,
+  .control-slider-thumb:focus-visible {
+    outline: 2px solid var(--control-focus);
+    outline-offset: 2px;
+  }
+
+  .control-segments {
+    border-radius: calc(var(--radius) + 4px);
+    background: color-mix(
+      in srgb,
+      var(--color-charcoal) 90%,
+      var(--color-slate)
+    );
+    box-shadow: inset 0 1px 2px
+      color-mix(in srgb, var(--color-charcoal) 45%, transparent);
+  }
+  .control-segment {
+    border-radius: var(--radius);
+    color: color-mix(in srgb, var(--foreground) 75%, transparent);
+  }
+  .control-segment:hover:not(:disabled) {
+    background-color: var(--control-hover);
+    color: var(--foreground);
+  }
+  .control-segment[data-state='on'],
+  .control-segment.control-selected {
+    background-color: var(--control-hover);
+    background-image: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--foreground) 8%, transparent),
+      transparent
+    );
+    color: var(--foreground);
+    box-shadow:
+      inset 0 1px 0 var(--control-highlight),
+      var(--control-shadow);
+  }
+
+  .control-segment[data-state='on']:hover:not(:disabled),
+  .control-segment.control-selected:hover:not(:disabled) {
+    background-color: var(--control-selected);
+  }
+
+  .control-menu {
+    border: 1px solid var(--control-edge);
+    border-radius: 12px;
+    background: var(--background);
+    box-shadow:
+      inset 0 1px 0 var(--control-highlight),
+      0 12px 32px color-mix(in srgb, var(--color-charcoal) 65%, transparent);
+  }
+  .control-option:not([data-disabled]):hover,
+  .control-option[data-highlighted]:not([data-disabled]) {
+    background: var(--control-hover);
+  }
+
+  .slider-field {
+    --slider-thumb-width: 1.75rem;
+  }
+  .slider-scale {
+    position: relative;
+    height: 1.75rem;
+    margin-inline: calc(var(--slider-thumb-width) / 2);
+    color: color-mix(in srgb, var(--foreground) 65%, transparent);
+  }
+  .slider-mark {
+    position: absolute;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translateX(-50%);
+  }
+  .slider-tick {
+    width: 1px;
+    height: 5px;
+    background: currentColor;
+    opacity: 0.5;
+  }
+  .slider-mark-label {
+    margin-top: 5px;
+    font-size: 10px;
+    line-height: 1rem;
+    white-space: nowrap;
+  }
+  .slider-field:has(.control-slider[data-disabled]) .slider-scale {
+    opacity: 0.4;
+  }
+  .control-slider-track {
+    background: color-mix(in srgb, var(--foreground) 15%, transparent);
+    box-shadow: inset 0 1px 2px
+      color-mix(in srgb, var(--color-charcoal) 40%, transparent);
+  }
+  .control-slider-range {
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--primary) 70%, var(--foreground)),
+      var(--primary)
+    );
+    box-shadow: inset 0 1px 0 var(--control-highlight);
+  }
+  .control-slider-thumb {
+    width: var(--slider-thumb-width);
+    background-color: var(--foreground);
+    border: 1px solid color-mix(in srgb, var(--foreground) 30%, transparent);
+    backdrop-filter: blur(4px);
+    box-shadow:
+      inset 0 1px 0 var(--control-highlight),
+      0 2px 4px color-mix(in srgb, var(--color-charcoal) 40%, transparent);
+    cursor: grab;
+    transition:
+      background-color 140ms ease,
+      transform 140ms ease;
+  }
+  .control-slider[data-dragging] .control-slider-thumb {
+    transform: scale(1.1);
+    background-color: color-mix(in srgb, var(--foreground) 35%, transparent);
+    cursor: grabbing;
+  }
+  .control-slider[data-disabled] .control-slider-thumb {
+    cursor: not-allowed;
+  }
+  @supports not (backdrop-filter: blur(1px)) {
+    .control-slider[data-dragging] .control-slider-thumb {
+      background-color: color-mix(
+        in srgb,
+        var(--foreground) 75%,
+        var(--background)
+      );
+    }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .control-slider .control-slider-thumb {
+      background: var(--foreground);
+      backdrop-filter: none;
+    }
+  }
+
+  .control-disclosure {
+    background: color-mix(in srgb, var(--foreground) 4%, transparent);
+  }
+  .control-disclosure:hover {
+    background: color-mix(in srgb, var(--foreground) 8%, transparent);
+  }
+  .control-disclosure:focus-visible {
+    outline-offset: -4px;
+  }
+
+  .control-field:disabled,
+  .control-button:disabled,
+  .control-segment:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  @supports (backdrop-filter: blur(1px)) {
+    .control-menu {
+      background: color-mix(in srgb, var(--background) 88%, transparent);
+      backdrop-filter: blur(24px) saturate(120%);
+    }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .control-menu {
+      background: var(--background);
+      backdrop-filter: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .control-field,
+    .control-button,
+    .control-segment,
+    .control-disclosure,
+    .control-slider-thumb {
+      transition: none;
+    }
+  }
+  @media (forced-colors: active) {
+    .control-field,
+    .control-button,
+    .control-segments,
+    .control-segment,
+    .control-menu,
+    .control-slider-track,
+    .control-slider-thumb {
+      border: 1px solid ButtonText;
+    }
+    .control-segment[data-state='on'],
+    .control-segment.control-selected {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
   }
 }
 
@@ -95,6 +367,15 @@
       box-shadow:
         inset 0 1px 0 color-mix(in srgb, var(--foreground) 12%, transparent),
         0 12px 40px color-mix(in srgb, var(--background) 35%, transparent);
+    }
+  }
+}
+
+@layer components {
+  @media (prefers-reduced-transparency: reduce) {
+    .glass-panel {
+      background: var(--background);
+      backdrop-filter: none;
     }
   }
 }

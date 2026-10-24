@@ -19,7 +19,7 @@ export function Field({
   const descriptionId = hint || error ? `${id}-description` : undefined;
   return (
     <div className={cn('space-y-2', className)}>
-      <label htmlFor={id} className="block text-xs">
+      <label htmlFor={id} className="block text-xs text-foreground/75">
         {label}
       </label>
       {children(id, descriptionId)}

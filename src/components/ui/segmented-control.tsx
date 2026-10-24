@@ -32,7 +32,7 @@ export function SegmentedControl<T extends string>({
         if (next) onValueChange(next as T);
       }}
       disabled={disabled}
-      className={cn('grid overflow-hidden rounded-sm border', className)}
+      className={cn('control-segments grid gap-1 p-1', className)}
       style={{
         gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))`,
       }}
@@ -43,7 +43,7 @@ export function SegmentedControl<T extends string>({
           value={option.value}
           aria-label={option.label}
           title={option.title ?? option.label}
-          className="flex h-9 min-w-0 items-center justify-center gap-1 border-r px-2 text-xs outline-none last:border-r-0 hover:bg-secondary hover:text-secondary-foreground focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset data-[state=on]:bg-primary data-[state=on]:text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-4"
+          className="control-segment flex h-7 min-w-0 items-center justify-center gap-1 px-2 text-xs [&_svg]:size-4"
         >
           {option.content ?? option.label}
         </ToggleGroup.Item>

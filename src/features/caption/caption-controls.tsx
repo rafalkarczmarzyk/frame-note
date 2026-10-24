@@ -42,7 +42,7 @@ export function CaptionControls({
                 id={id}
                 aria-haspopup="dialog"
                 onClick={onBrowseFonts}
-                className="flex h-9 w-full items-center justify-between rounded-sm border px-3 text-xs outline-none hover:bg-secondary/10 focus-visible:ring-1 focus-visible:ring-primary"
+                className="control-field flex h-9 w-full items-center justify-between px-3 text-xs"
               >
                 <span>{caption.style.fontFamily.replace(' Variable', '')}</span>
                 <ChevronRight className="size-3.5" aria-hidden="true" />
@@ -105,7 +105,7 @@ export function CaptionControls({
               onValueChange={(lineHeight) => style({ lineHeight })}
             />
             <div className="space-y-2">
-              <p className="text-xs">Text align</p>
+              <p className="text-xs text-foreground/75">Text align</p>
               <SegmentedControl
                 disabled={disabled}
                 label="Text align"
@@ -141,7 +141,7 @@ export function CaptionControls({
       >
         <fieldset disabled={disabled} className="space-y-4 disabled:opacity-70">
           <div className="space-y-2">
-            <p className="text-xs">Anchor</p>
+            <p className="text-xs text-foreground/75">Anchor</p>
             <AnchorPicker
               value={caption.position.anchor}
               onValueChange={(anchor) => position({ anchor })}

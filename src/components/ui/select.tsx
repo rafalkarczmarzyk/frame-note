@@ -33,7 +33,7 @@ export function Select({
     >
       <SelectPrimitive.Trigger
         {...props}
-        className="flex h-9 w-full min-w-0 items-center justify-between gap-2 rounded-sm border bg-background px-3 text-left text-xs outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+        className="control-field flex h-9 w-full min-w-0 items-center justify-between gap-2 px-3 text-left text-xs"
       >
         <SelectPrimitive.Value placeholder={placeholder} />
         <SelectPrimitive.Icon>
@@ -44,7 +44,7 @@ export function Select({
         <SelectPrimitive.Content
           position="popper"
           sideOffset={5}
-          className="z-[100] max-h-[var(--radix-select-content-available-height)] min-w-[var(--radix-select-trigger-width)] overflow-y-auto rounded-sm border bg-background p-1 text-foreground shadow-lg shadow-background/30"
+          className="z-[100] max-h-[var(--radix-select-content-available-height)] min-w-[var(--radix-select-trigger-width)] control-menu overflow-y-auto p-1.5 text-foreground"
         >
           <SelectPrimitive.Viewport>
             {options.map((option) => (
@@ -52,7 +52,7 @@ export function Select({
                 key={option.value}
                 value={option.value}
                 disabled={option.disabled}
-                className="relative flex cursor-default select-none items-center rounded-sm py-2 pr-8 pl-3 text-xs outline-none data-[highlighted]:bg-secondary data-[highlighted]:text-secondary-foreground data-[disabled]:opacity-40"
+                className="control-option relative flex cursor-pointer select-none items-center rounded-md py-2 pr-8 pl-3 text-xs outline-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
               >
                 <SelectPrimitive.ItemText>
                   {option.label}

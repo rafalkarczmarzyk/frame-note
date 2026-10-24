@@ -16,6 +16,23 @@ foreground and background. Glass uses opacity and blur derived from these roles,
 not new colors. Fonts are local: Montserrat for controls, Advercase for display.
 SVG logos and Lucide icons inherit currentColor.
 
+## Control surfaces
+
+Controls use macOS-inspired surface hierarchy with the existing FrameNote palette.
+`src/index.css` owns shared `control-*` styles and surface, edge, highlight,
+selection, focus and shadow tokens. Fields use a gently recessed surface; neutral
+buttons and selected segments use raised surfaces. Accent color is reserved for
+primary actions, slider progress and focus. Segments and anchors share a neutral
+selected state. Controls use 8 px radii; groups and menus use 12 px.
+
+Use `control-field` for field-like triggers such as the font picker so they match
+Input and Select. Button outline is a neutral raised surface; IconButton is quiet.
+All controls retain visible keyboard focus and disabled states. Invalid fields
+use a dashed contrasting edge with an associated error message when applicable.
+Blur is limited to floating menus and panels, with opaque fallbacks and reduced
+transparency support. Motion respects reduced-motion preferences. This is a web
+interpretation of Apple surface principles, not native Liquid Glass rendering.
+
 ## UI components
 
 - Button, IconButton: primary/outline actions, explicit icon labels, focus states.
@@ -23,7 +40,10 @@ SVG logos and Lucide icons inherit currentColor.
 - Field: generates a label target and optional description/error relationship.
 - NumberField: controlled numeric values with a local draft for fractional edits.
 - Select: custom Radix popper with keyboard navigation and disabled options.
-- Slider: Radix single-value slider, pointer and keyboard support.
+- Slider: Radix single-value slider, pointer and keyboard support. Optional `marks`
+  accept `{ value, label? }` at arbitrary thresholds; out-of-range marks are omitted.
+  Scale ticks align with the thumb center, do not snap values and do not change `step`.
+  Keep labels short and spaced apart to avoid overlap.
 - SegmentedControl: single selection, optional icons, keyboard navigation.
 - AnchorPicker: reusable 3 × 3 grid, independent of the positioning calculation.
 - PickerList: selectable rows, descriptions, preview content and selected labels.
@@ -61,7 +81,8 @@ Development: http://localhost:6006. Production application remains on port 3000.
 Stories are organized by purpose, without Atomic Design categories:
 
 - Design/Tokens: palette, typography and shared visual tokens.
-- Components/UI: reusable controls from `components/ui`.
+- Components/UI: reusable controls from `components/ui`, plus Accordion (the
+  sidebar section component).
 - Components/Layout: workspace and panel components from `components/layout`.
 - Components/Brand: the logo from `components/brand`.
 - Screens: start screen states and editor previews with landscape/portrait photos.
