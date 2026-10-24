@@ -1,3 +1,4 @@
+import type { LogoContent } from './svg-asset';
 import type { Margins, SizingUnit, MarginLinkMode } from './sizing';
 import type { MetadataField } from './metadata';
 
@@ -27,6 +28,7 @@ export type Anchor =
   | 'bottom-right';
 
 export interface Caption {
+  logo?: LogoContent;
   template: string;
   sizingUnit: SizingUnit;
   style: {

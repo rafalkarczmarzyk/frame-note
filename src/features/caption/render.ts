@@ -1,3 +1,4 @@
+import { logoLayout } from './logo-layout';
 import { inlineLayout, tintedIcon } from './inline-layout';
 import { loadIcon, type SvgIcon } from './svg-icons';
 import { toPixels } from '../../domain/sizing';
@@ -124,6 +125,18 @@ export async function exportPhotoCaptions(
       }),
     );
     for (const { caption, text, color, icons = [] } of captions) {
+      if (caption.logo) {
+        const scene = logoLayout(dimensions, caption);
+        const raw = await loadIcon(caption.logo.asset);
+        const image =
+          caption.logo.colorMode === 'single'
+            ? tintedIcon(caption.logo.asset, raw, scene.height, color)
+            : raw;
+        layer.add(
+          new Konva.Image({ ...scene, image, opacity: caption.style.opacity }),
+        );
+        continue;
+      }
       if (!icons.length) {
         layer.add(
           new Konva.Text(captionConfig(dimensions, caption, text, color)),

@@ -174,8 +174,8 @@ oraz jego potwierdzenia przed przejściem dalej. Etap 1 zaakceptowano i zapisano
 | 1. Próba Tiptap            | Tekst, badge’e, ikony SVG, zaznaczanie, przeciąganie, undo/redo i schowek `{klucz}`                            | Zaakceptowana; commit `bacbda4` |
 | 2. Wiele kontenerów        | Dodawanie, duplikowanie, usuwanie; wybór z listy i canvasu; osobny styl i anchor; globalne marginesy           | Zaimplementowany; do oceny      |
 | 3. Custom position         | Przeciąganie na zdjęciu, X/Y względne do zdjęcia, przełączanie Anchor/Custom                                   | Zaakceptowany; commit `addfa4f` |
-| 4. Docelowy edytor i ikony | Tiptap w sidebarze, picker metadanych, własne SVG z nazwami `{icon:aperture}`, układ tekstu i ikon w eksporcie | Zaimplementowany; do oceny      |
-| 5. Logo SVG                | Osobny kontener, proporcjonalne wymiary, opacity, oryginalne kolory lub jeden kolor, pozycjonowanie            | Oczekuje                        |
+| 4. Docelowy edytor i ikony | Tiptap w sidebarze, picker metadanych, własne SVG z nazwami `{icon:aperture}`, układ tekstu i ikon w eksporcie | Zaakceptowany; commit `a4afee3` |
+| 5. Logo SVG                | Osobny kontener, proporcjonalne wymiary, opacity, oryginalne kolory lub jeden kolor, pozycjonowanie            | Zaimplementowany; do oceny      |
 | 6. Presety                 | Zapis, wybór, aktualizacja, Save as, usuwanie, trwałość lokalna, import/eksport wraz z SVG                     | Oczekuje                        |
 | 7. Weryfikacja             | Różne zdjęcia/orientacje, brakujące dane, presety, zgodność podglądu i JPG, Chromium/WebKit                    | Oczekuje                        |
 
@@ -313,3 +313,16 @@ Zasoby pozostają w sesji przy wymianie zdjęcia; trwałość należy do etapu 6
 Limit SVG: 256 KB i 2000 elementów; brak skryptów, zasobów zewnętrznych, obrazów,
 tekstu i arkuszy stylów (tekst zamienić na krzywe). Samodzielne logo to etap 5.
 Storybook: Screens/TestPhotos/InlineIcons. Etap 4 do oceny, bez commita.
+
+### Etap 5 — samodzielne logo SVG
+
+Etap 4 zaakceptowano i zapisano w commicie `a4afee3`. Użytkownik zlecił etap 5.
+Add logo dodaje SVG do modelu kontenera (asset, szerokość i tryb kolorów).
+Rozmiary zachowują proporcje i wspólną jednostkę dokumentu. Original colors lub
+Single color, opacity, wymiana pliku z zachowaniem szerokości/stylu/pozycji.
+Kontener logo ma wspólny z tekstem mechanizm wyboru, duplikowania, usuwania,
+anchorów, globalnych marginesów i Custom z przeciąganiem. Nowy kontener tekstowy
+nie dziedziczy grafiki z aktywnego logo. Miniatura i nazwa pliku identyfikują logo
+na liście. Podgląd i eksport korzystają z logoLayout; nieudany upload nie niszczy
+poprzedniego pliku. Zasoby pozostają w sesji; presety to etap 6.
+Przykład: Screens/TestPhotos/StandaloneLogo. Etap 5 pozostaje do oceny, bez commita.

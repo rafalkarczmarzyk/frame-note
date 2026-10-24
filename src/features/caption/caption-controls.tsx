@@ -38,8 +38,10 @@ export function CaptionControls({
   preferenceScope = '',
   persistSections = true,
   scope = 'all',
+  hideTypography = false,
 }: {
   scope?: 'all' | 'local' | 'global';
+  hideTypography?: boolean;
   caption: Caption;
   dimensions: ImageDimensions;
   onChange: (caption: Caption) => void;
@@ -94,145 +96,147 @@ export function CaptionControls({
       {scope !== 'global' && (
         <>
           {' '}
-          <SidebarSection
-            id={`${preferenceScope}typography`}
-            persist={persistSections}
-            title="Typography"
-            iconTone="typography"
-            icon={<Type />}
-          >
-            <fieldset
-              disabled={disabled}
-              className="space-y-4 disabled:opacity-70"
+          {!hideTypography && (
+            <SidebarSection
+              id={`${preferenceScope}typography`}
+              persist={persistSections}
+              title="Typography"
+              iconTone="typography"
+              icon={<Type />}
             >
-              <Field label="Font">
-                {(id) => (
-                  <button
-                    type="button"
-                    id={id}
-                    aria-haspopup="dialog"
-                    onClick={onBrowseFonts}
-                    className="control-field flex h-9 w-full items-center justify-between px-3 text-xs"
-                  >
-                    <span>
-                      {caption.style.fontFamily.replace(' Variable', '')}
-                    </span>
-                    <ChevronRight className="size-3.5" aria-hidden="true" />
-                  </button>
-                )}
-              </Field>
-              <div className="grid grid-cols-2 gap-3">
-                <Field label="Weight">
+              <fieldset
+                disabled={disabled}
+                className="space-y-4 disabled:opacity-70"
+              >
+                <Field label="Font">
                   {(id) => (
-                    <Select
+                    <button
+                      type="button"
                       id={id}
-                      disabled={disabled}
-                      value={String(caption.style.fontWeight)}
-                      onValueChange={(value) =>
-                        style({ fontWeight: Number(value) as 400 | 700 })
-                      }
-                      options={[
-                        { value: '400', label: 'Regular' },
-                        { value: '700', label: 'Bold' },
-                      ]}
-                    />
+                      aria-haspopup="dialog"
+                      onClick={onBrowseFonts}
+                      className="control-field flex h-9 w-full items-center justify-between px-3 text-xs"
+                    >
+                      <span>
+                        {caption.style.fontFamily.replace(' Variable', '')}
+                      </span>
+                      <ChevronRight className="size-3.5" aria-hidden="true" />
+                    </button>
                   )}
                 </Field>
-                <NumberField
-                  key={caption.sizingUnit}
-                  label="Font size"
-                  unit={unit}
-                  value={caption.style.fontSize}
-                  min={0.01 / factor}
-                  max={Math.max(dimensions.width, dimensions.height) / factor}
-                  step="any"
-                  disabled={disabled}
-                  onValueChange={(fontSize) => style({ fontSize })}
-                />
-              </div>
-              <Field label="Color">
-                {(id) => (
-                  <button
-                    type="button"
-                    id={id}
-                    aria-haspopup="dialog"
-                    onClick={(event) => {
-                      // Safari does not focus buttons on pointer clicks.
-                      event.currentTarget.focus({ preventScroll: true });
-                      onBrowseColors();
-                    }}
-                    className="control-field flex h-9 w-full items-center gap-2 px-3 text-xs"
-                  >
-                    <ColorSwatch value={caption.style.color} />
-                    <span className="min-w-0 flex-1 truncate text-left">
-                      {captionColorLabel(caption.style.color)}
-                    </span>
-                    <ChevronRight className="size-3.5" aria-hidden="true" />
-                  </button>
-                )}
-              </Field>
-              <div className="grid grid-cols-[minmax(0,1fr)_5rem] items-end gap-3">
-                <div className="space-y-2">
-                  <p className="text-xs text-label">Opacity</p>
-                  <Slider
-                    label="Opacity"
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="Weight">
+                    {(id) => (
+                      <Select
+                        id={id}
+                        disabled={disabled}
+                        value={String(caption.style.fontWeight)}
+                        onValueChange={(value) =>
+                          style({ fontWeight: Number(value) as 400 | 700 })
+                        }
+                        options={[
+                          { value: '400', label: 'Regular' },
+                          { value: '700', label: 'Bold' },
+                        ]}
+                      />
+                    )}
+                  </Field>
+                  <NumberField
+                    key={caption.sizingUnit}
+                    label="Font size"
+                    unit={unit}
+                    value={caption.style.fontSize}
+                    min={0.01 / factor}
+                    max={Math.max(dimensions.width, dimensions.height) / factor}
+                    step="any"
+                    disabled={disabled}
+                    onValueChange={(fontSize) => style({ fontSize })}
+                  />
+                </div>
+                <Field label="Color">
+                  {(id) => (
+                    <button
+                      type="button"
+                      id={id}
+                      aria-haspopup="dialog"
+                      onClick={(event) => {
+                        // Safari does not focus buttons on pointer clicks.
+                        event.currentTarget.focus({ preventScroll: true });
+                        onBrowseColors();
+                      }}
+                      className="control-field flex h-9 w-full items-center gap-2 px-3 text-xs"
+                    >
+                      <ColorSwatch value={caption.style.color} />
+                      <span className="min-w-0 flex-1 truncate text-left">
+                        {captionColorLabel(caption.style.color)}
+                      </span>
+                      <ChevronRight className="size-3.5" aria-hidden="true" />
+                    </button>
+                  )}
+                </Field>
+                <div className="grid grid-cols-[minmax(0,1fr)_5rem] items-end gap-3">
+                  <div className="space-y-2">
+                    <p className="text-xs text-label">Opacity</p>
+                    <Slider
+                      label="Opacity"
+                      value={opacity}
+                      min={0}
+                      max={100}
+                      disabled={disabled}
+                      onValueChange={(value) => style({ opacity: value / 100 })}
+                    />
+                  </div>
+                  <NumberField
+                    label="Opacity value"
+                    hideLabel
+                    unit="%"
                     value={opacity}
                     min={0}
                     max={100}
+                    step={1}
                     disabled={disabled}
                     onValueChange={(value) => style({ opacity: value / 100 })}
                   />
                 </div>
                 <NumberField
-                  label="Opacity value"
-                  hideLabel
-                  unit="%"
-                  value={opacity}
-                  min={0}
-                  max={100}
-                  step={1}
+                  label="Line height"
+                  hint="Multiplies the font size. For example, 1.4× with a 20 px font gives a 28 px line height."
+                  unit="×"
+                  value={caption.style.lineHeight}
+                  min={0.5}
+                  max={3}
                   disabled={disabled}
-                  onValueChange={(value) => style({ opacity: value / 100 })}
+                  onValueChange={(lineHeight) => style({ lineHeight })}
                 />
-              </div>
-              <NumberField
-                label="Line height"
-                hint="Multiplies the font size. For example, 1.4× with a 20 px font gives a 28 px line height."
-                unit="×"
-                value={caption.style.lineHeight}
-                min={0.5}
-                max={3}
-                disabled={disabled}
-                onValueChange={(lineHeight) => style({ lineHeight })}
-              />
-              <div className="space-y-2">
-                <p className="text-xs text-label">Text align</p>
-                <SegmentedControl
-                  disabled={disabled}
-                  label="Text align"
-                  value={caption.style.textAlign}
-                  onValueChange={(textAlign) => style({ textAlign })}
-                  options={[
-                    {
-                      value: 'left',
-                      label: 'Align left',
-                      content: <AlignLeft aria-hidden="true" />,
-                    },
-                    {
-                      value: 'center',
-                      label: 'Align center',
-                      content: <AlignCenter aria-hidden="true" />,
-                    },
-                    {
-                      value: 'right',
-                      label: 'Align right',
-                      content: <AlignRight aria-hidden="true" />,
-                    },
-                  ]}
-                />
-              </div>
-            </fieldset>
-          </SidebarSection>
+                <div className="space-y-2">
+                  <p className="text-xs text-label">Text align</p>
+                  <SegmentedControl
+                    disabled={disabled}
+                    label="Text align"
+                    value={caption.style.textAlign}
+                    onValueChange={(textAlign) => style({ textAlign })}
+                    options={[
+                      {
+                        value: 'left',
+                        label: 'Align left',
+                        content: <AlignLeft aria-hidden="true" />,
+                      },
+                      {
+                        value: 'center',
+                        label: 'Align center',
+                        content: <AlignCenter aria-hidden="true" />,
+                      },
+                      {
+                        value: 'right',
+                        label: 'Align right',
+                        content: <AlignRight aria-hidden="true" />,
+                      },
+                    ]}
+                  />
+                </div>
+              </fieldset>
+            </SidebarSection>
+          )}
           <SidebarSection
             id={`${preferenceScope}position`}
             persist={persistSections}

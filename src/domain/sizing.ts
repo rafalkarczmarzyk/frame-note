@@ -56,6 +56,9 @@ export function convertSizing(
   return {
     ...caption,
     sizingUnit: unit,
+    ...(caption.logo
+      ? { logo: { ...caption.logo, width: convert(caption.logo.width) } }
+      : {}),
     style: { ...caption.style, fontSize: convert(caption.style.fontSize) },
     position: {
       ...caption.position,
