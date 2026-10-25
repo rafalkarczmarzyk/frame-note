@@ -28,6 +28,7 @@ export interface MarginEditorProps {
   dimensions: ImageDimensions;
   disabled?: boolean;
   hideLabel?: boolean;
+  hideUnitLabel?: boolean;
   appearance?: 'default' | 'compact';
   onChange: (value: Margins, linkMode: MarginLinkMode) => void;
 }
@@ -40,6 +41,7 @@ export function MarginEditor({
   dimensions,
   disabled = false,
   hideLabel = false,
+  hideUnitLabel = false,
   appearance = 'default',
   onChange,
 }: MarginEditorProps) {
@@ -135,12 +137,14 @@ export function MarginEditor({
       >
         {compact && (
           <>
-            <span
-              className="absolute top-2 left-2 text-[10px] text-content-muted"
-              aria-label={`Margin unit: ${unitLabel}`}
-            >
-              {unitLabel}
-            </span>
+            {!hideUnitLabel && (
+              <span
+                className="absolute top-2 left-2 text-[10px] text-content-muted"
+                aria-label={`Margin unit: ${unitLabel}`}
+              >
+                {unitLabel}
+              </span>
+            )}
             {resetButton}
           </>
         )}
