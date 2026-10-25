@@ -21,15 +21,22 @@ export function InlinePreview({
               key={index}
               listening={false}
               x={run.x}
-              y={run.y + (scene.lineHeight - scene.fontSize) / 2}
+              y={
+                run.y +
+                (run.icon.image ? 0 : (scene.lineHeight - scene.fontSize) / 2)
+              }
               width={run.width}
-              height={scene.fontSize}
-              image={tintedIcon(
-                run.icon,
-                images.get(run.icon.svg)!,
-                scene.fontSize,
-                color,
-              )}
+              height={run.height}
+              image={
+                run.original
+                  ? images.get(run.icon.svg)!
+                  : tintedIcon(
+                      run.icon,
+                      images.get(run.icon.svg)!,
+                      run.height,
+                      color,
+                    )
+              }
             />
           )
         ) : (

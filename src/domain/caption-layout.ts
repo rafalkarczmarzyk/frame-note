@@ -173,6 +173,7 @@ export function addCaption(
               ? content.position.anchor
               : nextFreeAnchor(layout, content.position.anchor),
         },
+        visible: duplicate ? content.visible : true,
         logo: duplicate ? content.logo : undefined,
         template: duplicate ? content.template : '',
         id,
@@ -221,6 +222,38 @@ export function addLogo(
             },
           }
         : container,
+    ),
+  };
+}
+
+/** Storage is back-to-front; the UI presents the frontmost layer first. */
+export function moveLayer(
+  layout: CaptionLayout,
+  id: string,
+  visualIndex: number,
+): CaptionLayout {
+  const visual = [...layout.containers].reverse();
+  const index = visual.findIndex((layer) => layer.id === id);
+  if (
+    index < 0 ||
+    !Number.isInteger(visualIndex) ||
+    visualIndex < 0 ||
+    visualIndex >= visual.length ||
+    index === visualIndex
+  )
+    return layout;
+  const [layer] = visual.splice(index, 1);
+  visual.splice(visualIndex, 0, layer!);
+  return { ...layout, containers: visual.reverse() };
+}
+export function toggleLayerVisibility(
+  layout: CaptionLayout,
+  id: string,
+): CaptionLayout {
+  return {
+    ...layout,
+    containers: layout.containers.map((layer) =>
+      layer.id === id ? { ...layer, visible: layer.visible === false } : layer,
     ),
   };
 }

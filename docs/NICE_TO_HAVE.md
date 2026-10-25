@@ -21,3 +21,31 @@ polecenia. Nowe decyzje dopisujemy lub aktualizujemy w istniejącym wpisie.
   etykiet uchwytów. Tooltipy nie blokują osobno planowanego kompaktowania
   Margins; w tym planie użytkownik odrzucił również samą ikonę zdjęcia
   w środku diagramu jako mylącą.
+
+## NTH-002 — Wersjonowane schematy presetów i migracje
+
+- **Status:** odłożone.
+- **Data decyzji:** 2026-10-25.
+- **Źródło:** rozmowa o zgodności presetów podczas refaktoru logo i dodawania PNG.
+- **Pomysł:** osobne schematy Zod dla kolejnych wersji formatu, jawne migracje
+  starszych presetów do aktualnej wersji oraz komunikaty dla nieobsługiwanych
+  wersji. Walidacja zawartości SVG i PNG pozostaje dodatkowym krokiem.
+- **Decyzja na teraz:** projekt jest w developmencie; format presetów można
+  zmieniać bez gwarancji zgodności i migracji istniejących zapisów. Użytkownik
+  dopuszcza utratę kompatybilności starszych presetów. Nie wdrażać teraz Zod
+  ani nie rozbudowywać mechanizmu migracji.
+- **Stan kodu przy odłożeniu:** parser ma już pole `version` i ręczną obsługę
+  wersji 1/2; nie traktujemy tego jako stabilnego kontraktu formatu. Ta decyzja
+  nie wymaga usuwania istniejącego pola ani kasowania zapisanych presetów.
+- **Przy powrocie do tematu:** ustalić pierwszą stabilną wersję formatu i zakres
+  wspieranych starszych zapisów; dodać schematy, migracje i testy na zachowanych
+  przykładach plików. Importować starsze presety, gdy możliwa jest migracja.
+
+## NTH-003 — Przyciski zmiany kolejności warstw
+
+- **Status:** odłożone.
+- **Data decyzji:** 2026-10-25.
+- **Źródło:** użytkownik wybrał przeciąganie listy od początku, a przyciski na później.
+- **Pomysł:** akcje przenieś wyżej, niżej, na sam spód oraz na sam wierzch.
+- **Granica zakresu:** obecnie wdrażamy przeciąganie, jego obsługę klawiaturą
+  oraz widoczność przez oko po lewej. Osobnych przycisków przenoszenia nie dodawać.

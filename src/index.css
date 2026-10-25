@@ -114,6 +114,11 @@
     var(--color-porcelain)
   );
   --container-settings-border: var(--tone-edge);
+  --selected-element-base: color-mix(
+    in srgb,
+    var(--container-settings-base) 88%,
+    var(--color-porcelain)
+  );
   --accordion-base: var(--color-charcoal-light);
   --accordion-header-hover: var(--tone-overlay);
   --accordion-label: var(--content-primary);
@@ -242,6 +247,7 @@
   --color-workspace-base: var(--workspace-base);
   --color-container-settings-base: var(--container-settings-base);
   --color-container-settings-border: var(--container-settings-border);
+  --color-selected-element-base: var(--selected-element-base);
   --color-accordion-base: var(--accordion-base);
   --color-accordion-header-hover: var(--accordion-header-hover);
   --color-accordion-label: var(--accordion-label);

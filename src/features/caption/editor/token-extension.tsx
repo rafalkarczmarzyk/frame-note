@@ -1,4 +1,4 @@
-import { Plugin } from '@tiptap/pm/state';
+import { NodeSelection, Plugin } from '@tiptap/pm/state';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import { Node, mergeAttributes, InputRule } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
@@ -55,7 +55,8 @@ export const CaptionToken = Node.create({
         props: {
           decorations: (state) => {
             const { from, to, empty } = state.selection;
-            if (empty) return null;
+            // Individual node views draw their own selection outline.
+            if (empty || state.selection instanceof NodeSelection) return null;
             const decorations: Decoration[] = [];
             state.doc.nodesBetween(from, to, (node, position) => {
               if (

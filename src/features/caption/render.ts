@@ -1,6 +1,7 @@
+import type { InlineAsset } from '@/domain/inline-image';
 import { logoLayout } from './logo-layout';
 import { inlineLayout, tintedIcon } from './inline-layout';
-import { loadIcon, type SvgIcon } from './svg-icons';
+import { loadIcon } from './svg-icons';
 import { toPixels } from '../../domain/sizing';
 import { jpegQuality } from './export-settings';
 import { anchoredPosition, customPosition } from './layout';
@@ -91,7 +92,7 @@ export interface RenderedCaption {
   caption: Caption;
   text: string;
   color: string;
-  icons?: readonly SvgIcon[];
+  icons?: readonly InlineAsset[];
 }
 
 export async function exportPhotoCaptions(
@@ -125,6 +126,7 @@ export async function exportPhotoCaptions(
       }),
     );
     for (const { caption, text, color, icons = [] } of captions) {
+      if (caption.visible === false) continue;
       if (caption.logo) {
         const scene = logoLayout(dimensions, caption);
         const raw = await loadIcon(caption.logo.asset);
@@ -156,10 +158,14 @@ export async function exportPhotoCaptions(
           group.add(
             new Konva.Image({
               x: run.x,
-              y: run.y + (scene.lineHeight - scene.fontSize) / 2,
+              y:
+                run.y +
+                (run.icon.image ? 0 : (scene.lineHeight - scene.fontSize) / 2),
               width: run.width,
-              height: scene.fontSize,
-              image: tintedIcon(run.icon, image, scene.fontSize, color),
+              height: run.height,
+              image: run.original
+                ? image
+                : tintedIcon(run.icon, image, run.height, color),
             }),
           );
         } else

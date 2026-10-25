@@ -308,3 +308,25 @@ Identyfikatory presetów nie wymagają API dostępnego wyłącznie przez HTTPS,
 więc zapis może działać również przy otwarciu aplikacji przez HTTP w LAN.
 
 Zakres, dowody i ograniczenia: [raport weryfikacji](docs/MVP_VERIFICATION.md).
+
+## Grafiki w treści — refaktor, etap 2 do oceny
+
+Content → Add image pozwala mieszać SVG i PNG z tekstem, tagami i ikonami.
+Każde wystąpienie ma własną wysokość względem fontu lub w jednostce dokumentu.
+Zaznaczona grafika ma kontrolki wymiany, usuwania i rozmiaru. SVG zachowuje
+oryginalne kolory albo używa koloru kontenera; PNG zachowuje kolory i alfa.
+PNG: do 2 MB, 32 MP i 16384 px na bok; SVG: dotychczasowe limity 256 KB
+i walidacja. Preset pozostaje ograniczony do 5 MB; zapis wersji 2 dołącza grafiki,
+a import starszej wersji migruje osobne logo. Grafiki dodaje się wyłącznie przez Content → Add image; Containers zawiera
+tylko Add container. Przykład: Screens/TestPhotos/MixedImages.
+
+Plan i aktualny stan: [refaktor logo](docs/INLINE_LOGO_PLAN.md).
+
+## Kolejność i widoczność warstw
+
+Lista Layers pokazuje warstwy od przodu do tyłu. Przeciągnij uchwyt obok oka,
+aby zmienić kolejność; na uchwycie działają też strzałki góra/dół, Home i End.
+Escape anuluje przeciąganie. Oko po lewej ukrywa warstwę w podglądzie i JPG;
+pozostaje ona edytowalna i nie blokuje eksportu brakującymi danymi. Add layer
+pozostaje pod listą i dodaje widoczną warstwę na wierzchu. Preset zachowuje
+kolejność i widoczność.

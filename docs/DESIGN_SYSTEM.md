@@ -528,3 +528,35 @@ heading or “Applies to all containers” description.
 Sizing & Margins shares one sidebar disclosure. The sizing unit selector precedes
 the compact margin editor, without a pixel conversion hint or repeated unit label
 in the diagram. Reset and individual input units remain available.
+
+### Inline images — refactor stage 2
+
+Production CaptionEditor now accepts SVG and PNG through Add image. Selecting
+an image shows a lighter selected-element surface containing Relative to font /
+Fixed height, Image height with unit and steppers, SVG color mode, Replace image
+and Remove image. The green outline and remove action remain available while
+editing the settings. Relative height steps by 0.25×; document dimensions step by
+1 px or 0.1 in relative units. Existing Typography and Position controls remain
+the production controls. PNG keeps original colors and alpha; SVG can use the
+container color. The shared inline geometry expands rows for taller images.
+Screens/TestPhotos/MixedImages uses the real FrameNote SVG and user PNG on a
+photo. Containers offers only Add container. Every container uses the Container
+inspector; images are added exclusively through Content → Add image.
+
+### Layer terminology
+
+The interface calls composition blocks Layers: Layers, Add layer, Layer,
+Duplicate layer, Delete layer and Layer color. The Add layer action follows
+the list. Internal container identifiers and preset field names remain unchanged.
+
+### Layer stacking and visibility
+
+Layers are listed front-to-back; the top row covers rows below it. Add layer
+remains below the list and inserts a visible layer at the front. Storage retains
+back-to-front order for the renderer. An eye control on the left of each row
+shows/hides the layer; a separate grip supports pointer dragging with an insertion
+line, cancellation and keyboard Arrow Up/Down, Home and End. Moving preserves
+selection and geometry. Hidden layers remain selectable and editable, use muted
+row text, and are excluded from preview, JPG and missing-data export warnings.
+Presets preserve ordering and visibility; absent visibility means visible.
+Story: Components/UI/PickerList/ReorderLayers.

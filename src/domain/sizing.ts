@@ -1,3 +1,4 @@
+import { imageToken, parseImageToken } from './inline-image';
 import type { Caption, ImageDimensions } from './document';
 
 export type MarginLinkMode = 'none' | 'pairs' | 'all';
@@ -56,6 +57,15 @@ export function convertSizing(
   return {
     ...caption,
     sizingUnit: unit,
+    template: caption.template.replace(
+      /\{(image:[^{}]*)\}/gu,
+      (original, token: string) => {
+        const image = parseImageToken(token);
+        return image?.unit === 'document'
+          ? `{${imageToken({ ...image, height: convert(image.height) })}}`
+          : original;
+      },
+    ),
     ...(caption.logo
       ? { logo: { ...caption.logo, width: convert(caption.logo.width) } }
       : {}),

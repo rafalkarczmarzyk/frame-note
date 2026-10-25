@@ -1,6 +1,11 @@
+import type { ImageAsset } from '@/domain/inline-image';
 import { createContext } from 'react';
 import type { SvgIcon } from '../svg-icons';
 export const TokenContext = createContext<{
+  images?: readonly ImageAsset[];
+  selectedImagePosition?: number | null;
+  imageFontPixels?: number;
+  imageUnitPixels?: number;
   values: Record<string, string>;
   icons?: readonly SvgIcon[];
 }>({

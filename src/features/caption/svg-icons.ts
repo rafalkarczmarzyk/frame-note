@@ -79,7 +79,7 @@ export function svgIcon(name: string, source: string): SvgIcon {
   const ratio = width! / height!;
   root.setAttribute('width', String(ratio >= 1 ? 512 : 512 * ratio));
   root.setAttribute('height', String(ratio >= 1 ? 512 / ratio : 512));
-  root.setAttribute('color', 'black');
+  if (!root.hasAttribute('color')) root.setAttribute('color', 'black');
   return {
     name,
     svg: new XMLSerializer().serializeToString(root),
@@ -101,7 +101,9 @@ export function loadIcon(icon: SvgIcon) {
         images.delete(icon.svg);
         reject(Error(`Could not render icon: ${icon.name}`));
       };
-      image.src = svgUrl(icon.svg);
+      image.src = icon.svg.startsWith('data:image/png;base64,')
+        ? icon.svg
+        : svgUrl(icon.svg);
     });
     images.set(icon.svg, pending);
     if (images.size > 64) images.delete(images.keys().next().value!);
