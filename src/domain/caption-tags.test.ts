@@ -233,7 +233,59 @@ describe('FrameNote caption helpers', () => {
     expect(
       get([field('xmp:CreateDate', '2020-07-22T17:06:17.79')], 'date')
         .displayValue,
-    ).toBe('2020-07-22');
+    ).toBe('');
+    expect(
+      get([field('iptc:DateCreated', '20240229')], 'date').displayValue,
+    ).toBe('2024-02-29');
+    expect(
+      get([field('exif:DateTimeOriginal', '2023:02:29 12:00:00')], 'date')
+        .displayValue,
+    ).toBe('');
+    expect(
+      get([field('exif:DateTimeOriginal', '2024:04:31 12:00:00')], 'date')
+        .displayValue,
+    ).toBe('');
+    expect(
+      get([field('xmp:CreateDate', '2024-02-29T12:00:00Z')], 'date')
+        .displayValue,
+    ).toBe('');
+  });
+  it('selects an XMP language alternative predictably and preserves equipment text', () => {
+    const authorCandidates: MetadataCandidate[] = [
+      {
+        group: 'xmp',
+        name: 'creator',
+        source: 'xmp:dc:creator',
+        rawValue: 'Auteur',
+        displayValue: 'Auteur',
+        namespaceUri: 'http://purl.org/dc/elements/1.1/',
+        language: 'fr',
+      },
+      {
+        group: 'xmp',
+        name: 'creator',
+        source: 'xmp:dc:creator',
+        rawValue: 'Photographer',
+        displayValue: 'Photographer',
+        namespaceUri: 'http://purl.org/dc/elements/1.1/',
+        language: 'x-default',
+      },
+    ];
+    expect(
+      get([xmpField('creator', authorCandidates)], 'author'),
+    ).toMatchObject({
+      displayValue: 'Photographer',
+      sources: ['xmp:dc:creator'],
+    });
+    expect(
+      get([field('exif:Model', ' EOS R6m2 ')], 'camera').displayValue,
+    ).toBe('EOS R6m2');
+    expect(
+      get([field('exif:LensModel', 'EF-S24mm f/2.8 STM')], 'lens').displayValue,
+    ).toBe('EF-S24mm f/2.8 STM');
+    expect(
+      get([field('exif:LensID', 'Canon RF100-500mm')], 'lens').displayValue,
+    ).toBe('');
   });
   it('keeps originals unchanged and resolves both helper and source tokens', () => {
     const fields = [
