@@ -132,9 +132,6 @@ function resolveSourceGroup(
 
   const type = sensitivityType.value;
   if (!Number.isInteger(type) || type < 1 || type > 7) return null;
-  const includesIsoSpeed = [3, 5, 6, 7].includes(type);
-  if (!includesIsoSpeed) return null;
-
   const designated = [
     ...(type === 1 || type === 4 || type === 5 || type === 7
       ? [readTag(fields, group, 'StandardOutputSensitivity')]
@@ -158,13 +155,7 @@ function resolveSourceGroup(
     };
   }
 
-  if (
-    !primaryReads.some((read) => read.found) ||
-    primaryReads.every((read) => !read.found) ||
-    !parameter ||
-    parameter.value <= 0
-  )
-    return null;
+  if (!parameter || parameter.value <= 0) return null;
 
   return {
     value: parameter.value,

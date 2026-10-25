@@ -517,9 +517,13 @@ i fallback do XMP po niepoprawnym EXIF.
 Etap 4 dodaje resolver ISO uwzględniający SensitivityType, oddziela EXIF od XMP,
 odrzuca wartości niejednoznaczne i używa ISOSpeed dopiero do uzupełnienia
 sentinela 65535 przy zgodnym typie. W testowanych fotografiach Canon
-SensitivityType=2 oznacza Recommended Exposure Index, więc dotychczasowe
-ISOSpeedRatings nie jest prezentowane jako ISO. Testy fixture zostały
-zaktualizowane zgodnie z tą semantyką.
+SensitivityType=2 oznacza Recommended Exposure Index. EXIF 0x8827 jest
+PhotographicSensitivity i zwraca wybrany parametr czułości (SOS, REI lub ISO
+Speed); helper `{iso}` zachowuje zgodną z istniejącym UI prezentację `ISO N`.
+Zrzut panelu użytkownika pokazał rzeczywiste `ISOSpeedRatings=800`, którego
+wcześniejszy resolver błędnie ukrywał. Wartości sensytywności Canonów znów są
+widoczne, a osobne tagi SOS/REI/ISOSpeed nadal są rozróżniane przy walidacji
+zestawów i sentinela 65535.
 
 Etap 5 waliduje dzień kalendarzowy, zachowując dzień zapisany w wartości nawet
 przy offsetcie; obsługuje daty IPTC `YYYYMMDD` i pomija XMP CreateDate jako

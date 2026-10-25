@@ -42,6 +42,13 @@ Czas, przysłona, ISO i ogniskowa mają już jednostki/oznaczenia. Nie dopisuj p
 dodaje ten prefiks samodzielnie, pomija brakujące części i nie pozostawia pustych
 separatorów. Bez żadnych parametrów ekspozycji jest traktowany jako brak danych.
 
+`{iso}` rozwiązuje EXIF PhotographicSensitivity (dawniej ISOSpeedRatings)
+razem z SensitivityType. Tag ten opisuje czułość używaną przy wykonaniu zdjęcia;
+typ może wskazywać SOS, REI, ISO Speed albo ich zgodne kombinacje. Dla zgodnego
+zestawu helper zachowuje format `ISO N`, również przy SensitivityType=2 (REI).
+Przy wartości granicznej 65535 korzysta z pełnego pola wskazanego przez typ.
+Samotne Auto ISO, Base ISO, ISOSpeed lub latitude nie zastępują czułości zdjęcia.
+
 Import obsługuje JPG i PNG. Eksport nadal zapisuje JPG; przezroczyste piksele PNG
 mają białe tło zarówno w podglądzie, jak i eksporcie.
 

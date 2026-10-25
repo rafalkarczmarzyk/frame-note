@@ -145,8 +145,8 @@ describe('FrameNote caption helpers', () => {
       ).displayValue,
     ).toBe('');
   });
-  it('follows SensitivityType and rejects SOS-only, REI-only, contradictions, and list values', () => {
-    for (const type of [1, 2, 4]) {
+  it('uses PhotographicSensitivity for each declared sensitivity type', () => {
+    for (const type of [1, 2, 3, 4, 5, 6, 7]) {
       expect(
         get(
           [
@@ -154,15 +154,29 @@ describe('FrameNote caption helpers', () => {
             field('exif:SensitivityType', String(type), type),
           ],
           'iso',
-        ).displayValue,
-      ).toBe('');
+        ),
+      ).toMatchObject({
+        displayValue: 'ISO 800',
+        sources: ['exif:PhotographicSensitivity'],
+      });
     }
+  });
+  it('rejects contradictions, reserved types, and list values', () => {
     expect(
       get(
         [
           field('exif:PhotographicSensitivity', '800', 800),
           field('exif:SensitivityType', '3', 3),
           field('exif:ISOSpeed', '1600', 1600),
+        ],
+        'iso',
+      ).displayValue,
+    ).toBe('');
+    expect(
+      get(
+        [
+          field('exif:PhotographicSensitivity', '800', 800),
+          field('exif:SensitivityType', '8', 8),
         ],
         'iso',
       ).displayValue,
