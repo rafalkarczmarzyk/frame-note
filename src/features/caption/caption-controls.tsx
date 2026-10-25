@@ -1,3 +1,5 @@
+import { InspectorSection } from '@/components/layout/inspector-section';
+import { IconButton } from '@/components/ui/icon-button';
 import { ColorControls } from './color-controls';
 import { toPixels } from '@/domain/sizing';
 import { anchoredPosition, customPoint } from './layout';
@@ -9,12 +11,12 @@ import {
   AlignRight,
   ChevronRight,
   Ruler,
-  Type,
-  Move,
+  Bold,
+  ArrowDownUp,
 } from 'lucide-react';
+import { Select } from '@/components/ui/select';
 import { Field } from '@/components/ui/field';
 import { NumberField } from '@/components/ui/number-field';
-import { Select } from '@/components/ui/select';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { AnchorPicker } from '@/components/ui/anchor-picker';
 import { MarginEditor } from '@/components/ui/margin-editor';
@@ -57,6 +59,40 @@ export function CaptionControls({
   const unit = sizingLabels[caption.sizingUnit];
   const factor = pixelsPerUnit(caption.sizingUnit, dimensions);
   const opacity = Math.round(caption.style.opacity * 100);
+  const anchorCoordinates = customPoint(
+    dimensions,
+    { width: 0, height: 0 },
+    caption.position.anchor,
+    anchoredPosition(
+      dimensions,
+      { width: 0, height: 0 },
+      caption.position.anchor,
+      {
+        top: toPixels(
+          caption.position.margins.top,
+          caption.sizingUnit,
+          dimensions,
+        ),
+        right: toPixels(
+          caption.position.margins.right,
+          caption.sizingUnit,
+          dimensions,
+        ),
+        bottom: toPixels(
+          caption.position.margins.bottom,
+          caption.sizingUnit,
+          dimensions,
+        ),
+        left: toPixels(
+          caption.position.margins.left,
+          caption.sizingUnit,
+          dimensions,
+        ),
+      },
+    ),
+  );
+  const coordinates = caption.position.custom ?? anchorCoordinates;
+
   return (
     <>
       {scope !== 'local' && (
@@ -95,18 +131,12 @@ export function CaptionControls({
       {scope !== 'global' && (
         <>
           {!hideTypography && (
-            <SidebarSection
-              id={`${preferenceScope}appearance`}
-              persist={persistSections}
-              title="Appearance"
-              iconTone="typography"
-              icon={<Type />}
-            >
+            <InspectorSection title="Typography">
               <fieldset
                 disabled={disabled}
-                className="space-y-4 disabled:opacity-70"
+                className="space-y-2 disabled:opacity-70"
               >
-                <Field label="Font">
+                <Field label="Font" hideLabel>
                   {(id) => (
                     <button
                       type="button"
@@ -122,10 +152,11 @@ export function CaptionControls({
                     </button>
                   )}
                 </Field>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)] items-center gap-2">
                   <NumberField
                     key={caption.sizingUnit}
                     label="Font size"
+                    hideLabel
                     unit={unit}
                     value={caption.style.fontSize}
                     min={0.01 / factor}
@@ -134,32 +165,77 @@ export function CaptionControls({
                     disabled={disabled}
                     onValueChange={(fontSize) => style({ fontSize })}
                   />
-                  <Field label="Weight">
-                    {(id) => (
-                      <Select
-                        id={id}
-                        disabled={disabled}
-                        value={String(caption.style.fontWeight)}
-                        onValueChange={(value) =>
-                          style({ fontWeight: Number(value) as 400 | 700 })
-                        }
-                        options={[
-                          { value: '400', label: 'Regular' },
-                          { value: '700', label: 'Bold' },
-                        ]}
-                      />
-                    )}
-                  </Field>
+                  <IconButton
+                    label="Bold"
+                    aria-pressed={caption.style.fontWeight === 700}
+                    disabled={disabled}
+                    className={
+                      caption.style.fontWeight === 700 ? 'control-selected' : ''
+                    }
+                    onClick={() =>
+                      style({
+                        fontWeight:
+                          caption.style.fontWeight === 700 ? 400 : 700,
+                      })
+                    }
+                  >
+                    <Bold aria-hidden="true" />
+                  </IconButton>
+                  <div
+                    className="grid min-w-0 grid-cols-[1rem_minmax(0,1fr)] items-center gap-1"
+                    title="Line spacing: multiplier of font size"
+                  >
+                    <ArrowDownUp
+                      className="size-4 shrink-0 text-content-secondary"
+                      aria-hidden="true"
+                    />
+                    <NumberField
+                      label="Line spacing"
+                      hideLabel
+                      unit="×"
+                      value={caption.style.lineHeight}
+                      min={0.5}
+                      max={3}
+                      disabled={disabled}
+                      onValueChange={(lineHeight) => style({ lineHeight })}
+                    />
+                  </div>
                 </div>
-                <ColorControls
-                  value={caption.style.color}
-                  onChange={(color) => style({ color })}
-                  onBrowse={onBrowseColors}
-                  disabled={disabled}
-                />
-                <div className="grid grid-cols-[minmax(0,1fr)_5rem] items-end gap-3">
+                <div className="grid grid-cols-2 items-start gap-2">
+                  <SegmentedControl
+                    disabled={disabled}
+                    label="Text align"
+                    value={caption.style.textAlign}
+                    onValueChange={(textAlign) => style({ textAlign })}
+                    options={[
+                      {
+                        value: 'left',
+                        label: 'Align left',
+                        content: <AlignLeft aria-hidden="true" />,
+                      },
+                      {
+                        value: 'center',
+                        label: 'Align center',
+                        content: <AlignCenter aria-hidden="true" />,
+                      },
+                      {
+                        value: 'right',
+                        label: 'Align right',
+                        content: <AlignRight aria-hidden="true" />,
+                      },
+                    ]}
+                  />
+                  <ColorControls
+                    value={caption.style.color}
+                    onChange={(color) => style({ color })}
+                    onBrowse={onBrowseColors}
+                    disabled={disabled}
+                    compact
+                  />
+                </div>
+                <div className="grid grid-cols-[auto_minmax(0,1fr)_5rem] items-center gap-2">
+                  <span className="text-xs text-label">Opacity</span>
                   <div className="space-y-2">
-                    <p className="text-xs text-label">Opacity</p>
                     <Slider
                       label="Opacity"
                       value={opacity}
@@ -182,157 +258,73 @@ export function CaptionControls({
                   />
                 </div>
               </fieldset>
-            </SidebarSection>
+            </InspectorSection>
           )}
-          <SidebarSection
-            id={`${preferenceScope}layout`}
-            persist={persistSections}
-            title="Layout"
-            iconTone="position"
-            icon={<Move />}
-          >
+          <InspectorSection title="Position">
             <fieldset
               disabled={disabled}
-              className="space-y-5 disabled:opacity-70"
+              className="space-y-2 disabled:opacity-70"
             >
-              {!hideTypography && (
-                <div className="space-y-4 border-b border-border-subtle pb-5">
-                  <div className="space-y-2">
-                    <p className="text-xs text-label">Text align</p>
-                    <SegmentedControl
-                      disabled={disabled}
-                      label="Text align"
-                      value={caption.style.textAlign}
-                      onValueChange={(textAlign) => style({ textAlign })}
-                      options={[
-                        {
-                          value: 'left',
-                          label: 'Align left',
-                          content: <AlignLeft aria-hidden="true" />,
-                        },
-                        {
-                          value: 'center',
-                          label: 'Align center',
-                          content: <AlignCenter aria-hidden="true" />,
-                        },
-                        {
-                          value: 'right',
-                          label: 'Align right',
-                          content: <AlignRight aria-hidden="true" />,
-                        },
-                      ]}
-                    />
-                  </div>
-                  <NumberField
-                    label="Line spacing"
-                    hint="Multiplies the font size. For example, 1.4× with a 20 px font gives a 28 px line height."
-                    unit="×"
-                    value={caption.style.lineHeight}
-                    min={0.5}
-                    max={3}
-                    disabled={disabled}
-                    onValueChange={(lineHeight) => style({ lineHeight })}
-                  />
-                </div>
-              )}
               <SegmentedControl
                 label="Position mode"
                 value={caption.position.custom ? 'custom' : 'anchor'}
                 disabled={disabled}
                 options={[
                   { value: 'anchor', label: 'Anchor' },
-                  { value: 'custom', label: 'Custom' },
+                  { value: 'custom', label: 'Manual' },
                 ]}
                 onValueChange={(mode) => {
                   if (mode === 'anchor') position({ custom: undefined });
-                  else {
-                    const margins = {
-                      top: toPixels(
-                        caption.position.margins.top,
-                        caption.sizingUnit,
-                        dimensions,
-                      ),
-                      right: toPixels(
-                        caption.position.margins.right,
-                        caption.sizingUnit,
-                        dimensions,
-                      ),
-                      bottom: toPixels(
-                        caption.position.margins.bottom,
-                        caption.sizingUnit,
-                        dimensions,
-                      ),
-                      left: toPixels(
-                        caption.position.margins.left,
-                        caption.sizingUnit,
-                        dimensions,
-                      ),
-                    };
-                    position({
-                      custom: customPoint(
-                        dimensions,
-                        { width: 0, height: 0 },
-                        caption.position.anchor,
-                        anchoredPosition(
-                          dimensions,
-                          { width: 0, height: 0 },
-                          caption.position.anchor,
-                          margins,
-                        ),
-                      ),
-                    });
-                  }
+                  else position({ custom: anchorCoordinates });
                 }}
               />
-              {caption.position.custom && (
-                <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 divide-x divide-border-subtle">
+                <fieldset
+                  disabled={disabled || !!caption.position.custom}
+                  aria-label="Anchor position"
+                  className="min-w-0 pr-3 disabled:opacity-50"
+                >
+                  <AnchorPicker
+                    value={caption.position.anchor}
+                    onValueChange={(anchor) =>
+                      position({ anchor, custom: undefined })
+                    }
+                    disabled={disabled || !!caption.position.custom}
+                  />
+                </fieldset>
+                <fieldset
+                  disabled={disabled || !caption.position.custom}
+                  aria-label="Manual position"
+                  className="min-w-0 space-y-2 pl-3 disabled:opacity-50"
+                >
                   <NumberField
                     label="X position"
                     unit="%"
-                    value={caption.position.custom.x}
+                    value={coordinates.x}
                     min={0}
                     max={100}
                     step="any"
-                    disabled={disabled}
+                    disabled={disabled || !caption.position.custom}
                     onValueChange={(x) =>
-                      position({ custom: { ...caption.position.custom!, x } })
+                      position({ custom: { ...coordinates, x } })
                     }
                   />
                   <NumberField
                     label="Y position"
                     unit="%"
-                    value={caption.position.custom.y}
+                    value={coordinates.y}
                     min={0}
                     max={100}
                     step="any"
-                    disabled={disabled}
+                    disabled={disabled || !caption.position.custom}
                     onValueChange={(y) =>
-                      position({ custom: { ...caption.position.custom!, y } })
+                      position({ custom: { ...coordinates, y } })
                     }
                   />
-                </div>
-              )}
-              <HelperText>
-                {caption.position.custom
-                  ? 'X/Y locate the last anchor point within the full photo. Global margins do not affect Custom position. Switch to Anchor mode to use the anchor grid.'
-                  : 'Drag the caption on the photo to set a custom position.'}
-              </HelperText>
-              {!caption.position.custom && (
-                <div className="space-y-2">
-                  <p className="text-xs text-label">Anchor</p>
-                  <div className="flex justify-center">
-                    <AnchorPicker
-                      value={caption.position.anchor}
-                      onValueChange={(anchor) =>
-                        position({ anchor, custom: undefined })
-                      }
-                      disabled={disabled}
-                    />
-                  </div>
-                </div>
-              )}
+                </fieldset>
+              </div>
             </fieldset>
-          </SidebarSection>
+          </InspectorSection>
         </>
       )}
       {scope !== 'local' && (

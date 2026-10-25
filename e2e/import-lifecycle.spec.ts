@@ -111,6 +111,7 @@ test('keeps caption settings when replacing landscape and portrait photos', asyn
     .getByRole('spinbutton', { name: 'Opacity value', exact: true })
     .fill('65');
   await page.getByRole('button', { name: 'Color', exact: true }).click();
+  await page.getByRole('button', { name: 'More colors…', exact: true }).click();
   const colors = page.getByRole('dialog', { name: 'Choose a color' });
   await colors.getByRole('textbox', { name: 'Custom color (HEX)' }).fill('bcd');
   await colors.getByRole('button', { name: 'Close choose a color' }).click();

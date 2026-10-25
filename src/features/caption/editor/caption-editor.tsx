@@ -64,7 +64,7 @@ export function CaptionEditor({
         'aria-placeholder': 'Add text, a tag or an icon…',
         spellcheck: 'false',
         class:
-          'control-field min-h-36 p-3 text-xs leading-7 whitespace-pre-wrap outline-none',
+          'control-field min-h-24 max-h-48 overflow-y-auto p-2 text-xs leading-7 whitespace-pre-wrap outline-none',
       }),
       clipboardTextSerializer: (slice) =>
         documentTemplate({ type: 'doc', content: slice.content.toJSON() }),

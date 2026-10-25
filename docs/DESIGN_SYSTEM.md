@@ -373,3 +373,37 @@ containing only missing values. Empty metadata values count as missing.
 The same resolution feeds canvas and JPG. Preset validation and SVG restoration
 are exercised after browser reload and across landscape/portrait source images.
 Current verification and its limits: [MVP_VERIFICATION.md](MVP_VERIFICATION.md).
+
+## Compact text inspector
+
+Text containers use always-visible InspectorSection groups: Content, Typography,
+and Position. Small Montserrat headings and separators replace nested accordion
+cards. The content editor grows from three lines to a capped scroll area; Tags
+and Icons use small footer actions. Typography puts size, Bold (Regular/Bold),
+and line spacing in one row, followed by alignment and a compact color disclosure.
+The color disclosure contains quick colors and access to the full color panel;
+Escape closes it and restores trigger focus. Opacity retains both slider and
+numeric input in one row. Position retains Anchor/Custom semantics and source
+geometry; anchor controls sit beside a short margins explanation. Logo controls
+retain their existing appearance sections. Stories: CaptionControls /
+CompactInspector and CustomInspector.
+
+Position now keeps Anchor and Custom controls in two equal columns separated by
+a vertical rule. The mode switch enables one column and disables/dims the other.
+Inactive X/Y show the anchor's coordinates in photo percentages; the anchor grid
+retains the last reference point in Custom mode. Mode changes preserve the
+existing geometry rules.
+
+The positioning mode is labeled **Manual** in the interface (Anchor / Manual);
+the stored model continues to use `custom` for compatibility with presets.
+
+The selected container inspector is a single persistent SidebarSection with
+`surface="container"`, the standard display heading, icon and disclosure arrow.
+Its inner Content, Typography and Position groups remain always visible while
+expanded. Container rows use PickerList's `selectionTone="container"` to match
+the inspector background with neutral text. Other pickers retain their selection
+style. Hovering a block on the canvas or its list row shows its positioning mode
+and anchor or X/Y plus “Drag to move” beside the canvas outline. This hint is
+clamped within the photo, ignores pointer events and hides during dragging.
+It belongs to the preview only and never enters the exported image.
+The floating on-photo editing toolbar remains deferred for a separate decision.

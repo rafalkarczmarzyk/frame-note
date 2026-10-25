@@ -39,3 +39,16 @@ export const Portrait: Story = {
   args: { dimensions: { width: 4000, height: 6000 } },
 };
 export const Disabled: Story = { args: { disabled: true } };
+
+export const CompactInspector: Story = {
+  args: { scope: 'local' },
+};
+export const CustomInspector: Story = {
+  args: {
+    scope: 'local',
+    caption: {
+      ...createCaption(),
+      position: { ...createCaption().position, custom: { x: 25, y: 75 } },
+    },
+  },
+};

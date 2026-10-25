@@ -24,6 +24,7 @@ test('chooses presets, validates custom HEX and exports the chosen color', async
     .getByRole('spinbutton', { name: 'Font size', exact: true })
     .fill('8');
   await page.getByRole('button', { name: 'Color', exact: true }).click();
+  await page.getByRole('button', { name: 'More colors…', exact: true }).click();
   const panel = page.getByRole('dialog', { name: 'Choose a color' });
   await panel.getByRole('button', { name: 'Sage', exact: true }).click();
   await expect(

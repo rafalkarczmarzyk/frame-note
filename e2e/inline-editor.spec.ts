@@ -58,6 +58,7 @@ test('uploads SVG, edits atomic tokens, round-trips the clipboard and exports a 
   await expect(editor).toHaveAttribute('data-template', '{icon:square}');
   await expect(editor.locator('[data-token="icon:square"]')).toHaveCount(1);
   await page.getByRole('button', { name: 'Color', exact: true }).click();
+  await page.getByRole('button', { name: 'More colors…', exact: true }).click();
   await page
     .getByRole('textbox', { name: 'Custom color (HEX)', exact: true })
     .fill('12ab34');

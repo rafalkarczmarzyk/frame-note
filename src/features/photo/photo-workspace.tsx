@@ -1,3 +1,4 @@
+import { InspectorSection } from '@/components/layout/inspector-section';
 import { createId } from '@/lib/create-id';
 import { defaultTemplate } from '@/domain/builtin-presets';
 import { PresetControls } from '../presets/preset-controls';
@@ -34,13 +35,13 @@ import { ColorPickerPanel } from '../caption/color-picker-panel';
 import { resolveCaptionColor } from '@/domain/caption-colors';
 import {
   Download,
-  TextQuote,
   Layers,
   Plus,
   Copy,
   Trash2,
   Tags,
   Shapes,
+  Type,
   Image as ImageIcon,
 } from 'lucide-react';
 import { PhotoIcon } from '@/components/icons/photo-icon';
@@ -531,6 +532,54 @@ export function PhotoWorkspace({
                               listening={false}
                             />
                           )}
+                        {hoveredId === id &&
+                          !draggingId &&
+                          (text || placeholder || caption.logo) && (
+                            <Group
+                              listening={false}
+                              x={Math.max(
+                                0,
+                                Math.min(
+                                  geometry.x,
+                                  width - Math.min(280 / scale, width),
+                                ),
+                              )}
+                              y={
+                                geometry.y >= 52 / scale
+                                  ? geometry.y - 52 / scale
+                                  : Math.max(
+                                      0,
+                                      Math.min(
+                                        height - 46 / scale,
+                                        geometry.y +
+                                          geometry.height +
+                                          10 / scale,
+                                      ),
+                                    )
+                              }
+                            >
+                              <Rect
+                                width={Math.min(280 / scale, width)}
+                                height={42 / scale}
+                                cornerRadius={6 / scale}
+                                fill={getComputedStyle(document.documentElement)
+                                  .getPropertyValue('--color-panel-base')
+                                  .trim()}
+                              />
+                              <Text
+                                listening={false}
+                                width={Math.min(280 / scale, width)}
+                                padding={8 / scale}
+                                fontSize={11 / scale}
+                                lineHeight={1.3}
+                                fontFamily="Montserrat Variable"
+                                fill={getComputedStyle(document.documentElement)
+                                  .getPropertyValue('--color-content-primary')
+                                  .trim()}
+                                text={`${caption.position.custom ? `Manual: X ${Number(caption.position.custom.x.toFixed(1))}% · Y ${Number(caption.position.custom.y.toFixed(1))}%` : `Anchor: ${caption.position.anchor.replaceAll('-', ' ')}`}\nDrag to move`}
+                              />
+                            </Group>
+                          )}
                       </Group>
                     );
                   },
@@ -801,7 +850,7 @@ export function PhotoWorkspace({
                       className="size-3.5 shrink-0"
                     />
                     <span>
-                      {container.position.custom ? 'Custom · ' : ''}
+                      {container.position.custom ? 'Manual · ' : ''}
                       {container.position.anchor.replaceAll('-', ' ')}
                     </span>
                   </span>
@@ -845,6 +894,7 @@ export function PhotoWorkspace({
                   </div>
                 ),
               }))}
+              selectionTone="container"
               selectedLabel=""
               onChoose={selectContainer}
               onHover={setHoveredId}
@@ -865,19 +915,14 @@ export function PhotoWorkspace({
               )}
           </SidebarSection>
           {activeContainer && (
-            <section
+            <SidebarSection
               key={activeContainer.id}
-              aria-label="Selected container"
-              className="mx-3 my-3 rounded-xl border border-container-settings-border bg-container-settings-base py-1 [&>details]:mx-2 [&>details]:my-2"
+              id="selected-container"
+              title={settings.logo ? 'Logo container' : 'Text container'}
+              icon={settings.logo ? <ImageIcon /> : <Type />}
+              iconTone="typography"
+              surface="container"
             >
-              <div className="px-4 pt-3 pb-1">
-                <h2 className="text-sm font-semibold">Selected container</h2>
-                <p className="mt-1 truncate text-xs text-content-secondary">
-                  {settings.logo?.asset.name ||
-                    template.trim() ||
-                    'Empty caption'}
-                </p>
-              </div>
               {settings.logo ? (
                 <LogoControls
                   caption={settings}
@@ -894,12 +939,7 @@ export function PhotoWorkspace({
                 />
               ) : (
                 <>
-                  <SidebarSection
-                    id="content"
-                    title="Content"
-                    iconTone="caption"
-                    icon={<TextQuote />}
-                  >
+                  <InspectorSection title="Content">
                     <CaptionEditor
                       value={template}
                       fields={photo.document.photo.metadata}
@@ -918,10 +958,10 @@ export function PhotoWorkspace({
                           : ''}
                       </p>
                     )}
-                    <div className="mt-4 flex flex-wrap gap-2">
+                    <div className="mt-2 flex justify-end gap-2">
                       <Button
                         variant="outline"
-                        className="min-w-0 flex-1 basis-28 whitespace-nowrap"
+                        size="sm"
                         aria-label={
                           tagsOpen
                             ? 'Hide available tags'
@@ -940,7 +980,7 @@ export function PhotoWorkspace({
                       </Button>
                       <Button
                         variant="outline"
-                        className="min-w-0 flex-1 basis-28 whitespace-nowrap"
+                        size="sm"
                         aria-label="Browse icons"
                         aria-expanded={activePanel === 'icons'}
                         onClick={() =>
@@ -953,7 +993,7 @@ export function PhotoWorkspace({
                         Icons
                       </Button>
                     </div>
-                  </SidebarSection>
+                  </InspectorSection>
                 </>
               )}
               <CaptionControls
@@ -974,7 +1014,7 @@ export function PhotoWorkspace({
                   )
                 }
               />
-            </section>
+            </SidebarSection>
           )}
           <SidebarSection
             id="export"

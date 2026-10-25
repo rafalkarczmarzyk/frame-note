@@ -39,3 +39,7 @@ export const Metadata: Story = {};
 export const Empty: Story = {
   args: { items: [], emptyText: 'No matching fields.' },
 };
+
+export const ContainerSelection: Story = {
+  args: { selectionTone: 'container', selectedLabel: '' },
+};
