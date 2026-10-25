@@ -214,6 +214,7 @@ export function CaptionEditor({
           return true;
         };
         void (async () => {
+          let pasteWarning = '';
           if (rich && new Blob([rich]).size <= 5_000_000) {
             try {
               const data = JSON.parse(rich);
@@ -286,9 +287,9 @@ export function CaptionEditor({
               return;
             } catch {
               if (!alive()) return;
-              setError(
-                'Could not paste images. Portable text was used instead.',
-              );
+              pasteWarning =
+                'Could not paste images. Portable text was used instead.';
+              setError(pasteWarning);
             }
           }
           if (!alive() || text === undefined) return;
@@ -303,7 +304,7 @@ export function CaptionEditor({
               imageAssets.current,
             );
             view.dispatch(transaction);
-            setError('');
+            setError(pasteWarning);
           } catch (cause) {
             setError(
               cause instanceof Error
