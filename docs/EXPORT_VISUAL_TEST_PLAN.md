@@ -73,6 +73,25 @@ w pliku wynikowym. Obecny eksport nie kopiuje źródłowych tagów.
   pełny `pnpm test:photo-export --project=chromium` — 40/40. Wszystkie
   zapisane pełne obrazy mają zerową różnicę pikseli.
 
+### Zrealizowano — etap 3
+
+- Dodano oddzielne, pełnoobrazowe wzorce WebKit/macOS dla wszystkich 40
+  przypadków etapu 2 oraz mieszanego SVG + PNG. Wzorce Chromium pozostają
+  niezależne od wzorców WebKit.
+- Eksport Wildlife jest porównywany bajt w bajt po otwarciu w osobnych
+  kontekstach przeglądarki przy viewportach 900 × 700 / DPR 1 oraz
+  1500 × 1000 / DPR 2. Eksport nie zależy od rozmiaru podglądu ani skali ekranu.
+- Test opóźnia żądanie Advercase Bold, sprawdza, że pobieranie pozostaje
+  wyłączone do czasu załadowania fontu, a potem porównuje cały JPG z wzorcem.
+- Test podglądu używa markera SVG w kontrolowanym położeniu Manual. Mierzy
+  jego położenie w canvasie podglądu i w zapisanym JPG; uwzględnia skalę
+  podglądu i tolerancję kompresji JPG.
+- Weryfikacja: `pnpm check` — 237 testów jednostkowych, lint, typy i build;
+  pełne `pnpm test:photo-export --project=chromium` — 43/43 oraz
+  `pnpm test:photo-export --project=webkit` — 43/43. Oba przebiegi korzystały
+  z istniejących wzorców bez ich aktualizacji; wszystkie piksele pełnych JPG
+  zgadzały się dokładnie.
+
 ## Trzy uzupełniające się kontrole
 
 1. **Treść i ustawienia.** Do pary zdjęcie + preset dołączamy ręcznie sprawdzony
