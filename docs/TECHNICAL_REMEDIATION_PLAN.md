@@ -327,3 +327,16 @@ Poniższe obserwacje nie są dodatkowymi zatwierdzonymi etapami:
 - Zakres współbieżności: operacje jednej instancji aplikacji; synchronizacja
   niezależnych kart przeglądarki nie została dodana.
 - Użytkownik zezwolił na commit i automatyczne przejście po pomyślnej weryfikacji.
+
+### Etap 2 — wykonanie 2026-10-25
+
+- Nowa warstwa otrzymuje pustą kolekcję obrazów, duplikat tylko użyte zasoby.
+- Model dokumentu i presety przechowują aktywne zasoby. Zamontowany edytor
+  zachowuje osobną kolekcję dla undo/redo, także po usunięciu ostatniego tokenu.
+- Polityka: do 100 aktywnych obrazów; cache historii do 1000 zasobów i 64 MB
+  zakodowanych źródeł. Przekroczenie daje jawny błąd; zmiana warstwy zwalnia
+  historię tej instancji edytora. Limit nie jest pomiarem pamięci zdekodowanych grafik.
+- Test schowka zaczyna od rzeczywiście pustej warstwy. Test obejmuje również
+  odtworzenie usuniętej grafiki i jej rozmiaru przez undo.
+- Weryfikacja: pnpm check (216 testów), 10/10 E2E obrazów i presetów
+  Chromium/WebKit, build Storybooka. Ręczny przegląd stories niewykonany.
