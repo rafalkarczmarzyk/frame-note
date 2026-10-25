@@ -6,6 +6,7 @@ Przed rozpoczęciem pracy przeczytaj:
 - [Uruchomienie i aktualne możliwości](README.md).
 - [Design system](docs/DESIGN_SYSTEM.md).
 - [Nice to have — pomysły odłożone na później](docs/NICE_TO_HAVE.md).
+- [Audyt techniczny — wymagania i plan etapowych poprawek](docs/TECHNICAL_REMEDIATION_PLAN.md).
 
 Pre-MVP jest ukończone i zaakceptowane. Plan MVP zawiera propozycje, które
 wymagają uzgodnienia zakresu. Pracujemy etapami: implementacja, ocena użytkownika,
