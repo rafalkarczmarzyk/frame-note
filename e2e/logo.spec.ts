@@ -97,7 +97,7 @@ test('adds and replaces a proportional SVG logo, exports original and single col
   await page.getByRole('option', { name: 'Pixels (px)', exact: true }).click();
   await expect(width).toHaveValue('80');
   await expect(height).toHaveValue('40');
-  await page.getByRole('radio', { name: 'Custom', exact: true }).click();
+  await page.getByRole('radio', { name: 'Manual', exact: true }).click();
   await page
     .getByRole('spinbutton', { name: 'X position', exact: true })
     .fill('50');

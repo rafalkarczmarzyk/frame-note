@@ -11,6 +11,7 @@ interface SidebarSectionProps {
   defaultOpen?: boolean;
   persist?: boolean;
   children: ReactNode;
+  surface?: 'default' | 'container';
 }
 
 /** Native details gives keyboard access and keeps editor controls mounted. */
@@ -22,6 +23,7 @@ export function SidebarSection({
   defaultOpen = true,
   persist = true,
   children,
+  surface = 'default',
 }: SidebarSectionProps) {
   const [open, setOpen] = useState(() => {
     if (!persist) return defaultOpen;
@@ -43,7 +45,7 @@ export function SidebarSection({
           /* Private browsing can block localStorage. */
         }
       }}
-      className="group/section mx-3 my-3 overflow-hidden rounded-xl bg-accordion-base"
+      className={`group/section mx-3 my-3 overflow-hidden rounded-xl ${surface === 'container' ? 'border border-container-settings-border bg-container-settings-base' : 'bg-accordion-base'}`}
     >
       <summary className="control-disclosure flex cursor-pointer list-none items-center gap-3 px-4 py-3.5 text-xs font-semibold [&::-webkit-details-marker]:hidden">
         {icon && (
@@ -75,7 +77,15 @@ export function SidebarSection({
           className="size-3.5 shrink-0 text-content-muted -rotate-90 transition-transform group-open/section:rotate-0 motion-reduce:transition-none"
         />
       </summary>
-      <div className="px-4 pt-2 pb-4">{children}</div>
+      <div
+        className={
+          surface === 'container'
+            ? '[&>details]:mx-2 [&>details]:my-2'
+            : 'px-4 pt-2 pb-4'
+        }
+      >
+        {children}
+      </div>
     </details>
   );
 }

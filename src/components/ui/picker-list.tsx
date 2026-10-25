@@ -16,19 +16,21 @@ export function PickerList({
   onHover,
   emptyText = 'No matches.',
   selectedLabel = 'Selected',
+  selectionTone = 'default',
 }: {
   items: readonly PickerItem[];
   onChoose: (id: string) => void;
   onHover?: (id: string | null) => void;
   emptyText?: string;
   selectedLabel?: string;
+  selectionTone?: 'default' | 'container';
 }) {
   return (
     <div className="space-y-1">
       {items.map((item) => (
         <div
           key={item.id}
-          className={`flex items-center gap-1 rounded-lg hover:bg-menu-item-hover ${item.selected ? 'bg-menu-item-selected' : ''}`}
+          className={`flex items-center gap-1 rounded-lg ${item.selected && selectionTone === 'container' ? '' : 'hover:bg-menu-item-hover'} ${item.selected ? (selectionTone === 'container' ? 'bg-container-settings-base' : 'bg-menu-item-selected') : ''}`}
           onMouseEnter={() => onHover?.(item.id)}
           onMouseLeave={() => onHover?.(null)}
         >
@@ -36,7 +38,7 @@ export function PickerList({
             type="button"
             aria-pressed={!!item.selected}
             onClick={() => onChoose(item.id)}
-            className="control-button block min-w-0 flex-1 rounded-lg p-3 text-left aria-pressed:text-accent-color"
+            className={`control-button block min-w-0 flex-1 rounded-lg p-3 text-left ${selectionTone === 'default' ? 'aria-pressed:text-accent-color' : ''}`}
           >
             <span className="flex items-start justify-between gap-2">
               <span className="flex min-w-0 items-center gap-3 text-xs">

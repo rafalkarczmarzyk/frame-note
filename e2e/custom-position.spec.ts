@@ -19,7 +19,16 @@ test('drags a caption without a jump and exports Custom independently of margins
     return readFile((await (await pending).path())!);
   };
   const anchored = await download();
-  await page.getByRole('radio', { name: 'Custom', exact: true }).click();
+  await expect(
+    page.getByRole('spinbutton', { name: 'X position', exact: true }),
+  ).toBeDisabled();
+  await page.getByRole('radio', { name: 'Manual', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: 'bottom-left', exact: true }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole('spinbutton', { name: 'X position', exact: true }),
+  ).toBeEnabled();
   await expect(
     page.getByRole('spinbutton', { name: 'X position', exact: true }),
   ).toHaveValue('2');
@@ -68,6 +77,6 @@ test('drags a caption without a jump and exports Custom independently of margins
   expect(positioned.equals(moved)).toBe(false);
   await page.getByRole('radio', { name: 'Anchor', exact: true }).click();
   await page.getByRole('button', { name: 'bottom-right', exact: true }).click();
-  await expect(inputX).toHaveCount(0);
+  await expect(inputX).toBeDisabled();
   expect((await download()).equals(positioned)).toBe(false);
 });

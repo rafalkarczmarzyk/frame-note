@@ -119,3 +119,7 @@ export const Collapsed: Story = {
 };
 
 export const WithIcon: Story = { args: { icon: <Type /> } };
+
+export const ContainerInspector: Story = {
+  args: { title: 'Text container', surface: 'container' },
+};
