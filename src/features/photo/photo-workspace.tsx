@@ -1,3 +1,4 @@
+import { activeImageAssets } from '@/domain/image-retention';
 import { moveLayer, toggleLayerVisibility } from '@/domain/caption-layout';
 import { Eye, EyeOff } from 'lucide-react';
 import { migrateLogo, parseImageToken } from '@/domain/inline-image';
@@ -132,38 +133,77 @@ function PhotoWorkspaceContent({
           template: defaultTemplate,
         }),
   );
-  const assets = useMemo(
-    () => [
-      ...icons,
-      ...layout.containers.flatMap((container) => [
+  const assets = useMemo(() => {
+    const visible = layout.containers.filter(
+      (container) => container.visible !== false,
+    );
+    const used = new Set(
+      visible.flatMap((container) =>
+        [...container.template.matchAll(/\{icon:([^{}]+)\}/gu)].map(
+          (match) => match[1],
+        ),
+      ),
+    );
+    return [
+      ...icons.filter((icon) => used.has(icon.name)),
+      ...(visible.some(
+        (container) => !container.template.trim() && !container.logo,
+      )
+        ? [brandIcons[0]!]
+        : []),
+      ...visible.flatMap((container) => [
         ...(container.logo ? [container.logo.asset] : []),
-        ...(container.images ?? []).map((image) => ({
-          name: image.name,
-          svg: image.source,
-          aspect: image.width / image.height,
-        })),
+        ...activeImageAssets(container.template, container.images ?? []).map(
+          (image) => ({
+            name: image.name,
+            svg: image.source,
+            aspect: image.width / image.height,
+          }),
+        ),
       ]),
-    ],
-    [icons, layout.containers],
-  );
+    ];
+  }, [icons, layout.containers]);
+  const [assetFailures, setAssetFailures] = useState<
+    ReadonlyMap<string, string>
+  >(new Map());
   useEffect(() => {
     let active = true;
     void Promise.all(
-      assets.map(async (asset) => [asset.svg, await loadIcon(asset)] as const),
-    )
-      .then((entries) => {
-        if (active) setIconImages(new Map(entries));
-      })
-      .catch((cause: unknown) => {
-        if (active)
-          setError(
-            cause instanceof Error ? cause.message : 'Could not render SVG.',
-          );
-      });
+      assets.map(async (asset) => {
+        try {
+          return { source: asset.svg, image: await loadIcon(asset) };
+        } catch {
+          return {
+            source: asset.svg,
+            error: `Could not render image: ${asset.name}. Replace it or hide its layer to export.`,
+          };
+        }
+      }),
+    ).then((results) => {
+      if (!active) return;
+      setIconImages(
+        new Map(
+          results.flatMap((result) =>
+            result.image ? [[result.source, result.image] as const] : [],
+          ),
+        ),
+      );
+      setAssetFailures(
+        new Map(
+          results.flatMap((result) =>
+            result.error ? [[result.source, result.error] as const] : [],
+          ),
+        ),
+      );
+    });
     return () => {
       active = false;
     };
   }, [assets]);
+  const assetError = assets
+    .map((asset) => assetFailures.get(asset.svg))
+    .filter(Boolean)
+    .join(' ');
   const iconsReady = assets.every((asset) => iconImages.has(asset.svg));
   const activeContainer = layout.containers.find(
     (container) => container.id === layout.activeId,
@@ -370,9 +410,14 @@ function PhotoWorkspaceContent({
                   height={height}
                 />
                 {fontReady &&
-                  iconsReady &&
                   renderedCaptions.map(
                     ({ id, caption, text, color, icons: inlineIcons }) => {
+                      if (
+                        (caption.logo &&
+                          !iconImages.has(caption.logo.asset.svg)) ||
+                        inlineIcons.some((icon) => !iconImages.has(icon.svg))
+                      )
+                        return null;
                       const config = captionConfig(
                         { width, height },
                         caption,
@@ -791,9 +836,9 @@ function PhotoWorkspaceContent({
             iconTone="caption"
             icon={<Layers />}
           >
-            {error && (
+            {(error || assetError) && (
               <p role="alert" className="mb-3 text-xs">
-                {error}
+                {error || assetError}
               </p>
             )}
             <PickerList

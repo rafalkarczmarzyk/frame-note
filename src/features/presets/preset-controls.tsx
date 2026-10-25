@@ -31,7 +31,7 @@ import {
   presetNameLimit,
   type LayoutPreset,
 } from '@/domain/presets';
-import { loadIcon } from '../caption/svg-icons';
+import { prepareImageAssets } from '../caption/image-assets';
 import { svgIcon } from '../caption/svg-icons';
 
 export function PresetControls({
@@ -463,14 +463,8 @@ export function PresetControls({
               id: createId(),
             };
             await Promise.all(
-              preset.layout.containers.flatMap((container) =>
-                (container.images ?? []).map((asset) =>
-                  loadIcon({
-                    name: asset.name,
-                    svg: asset.source,
-                    aspect: asset.width / asset.height,
-                  }),
-                ),
+              preset.layout.containers.map((container) =>
+                prepareImageAssets(container.images),
               ),
             );
             if (store((latest) => [...latest, preset])) apply(preset);
