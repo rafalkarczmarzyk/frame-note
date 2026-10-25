@@ -1,3 +1,4 @@
+import { activeImageAssets } from './image-retention';
 import { createCaption, type Caption, type ImageDimensions } from './document';
 import type { SvgAsset } from './svg-asset';
 import {
@@ -175,6 +176,9 @@ export function addCaption(
         },
         visible: duplicate ? content.visible : true,
         logo: duplicate ? content.logo : undefined,
+        images: duplicate
+          ? activeImageAssets(content.template, content.images ?? [])
+          : [],
         template: duplicate ? content.template : '',
         id,
       },

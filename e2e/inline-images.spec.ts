@@ -107,7 +107,18 @@ test('edits mixed SVG and PNG content, preserves image selection and restores po
       rich: data.getData('application/x-framenote-content'),
     };
   });
+  await page.getByRole('button', { name: 'Remove image', exact: true }).click();
+  await expect(raster).toHaveCount(0);
+  await page.getByLabel('Caption', { exact: true }).press('ControlOrMeta+z');
+  await expect(raster).toBeVisible();
+  await raster.click();
+  await expect(height).toHaveValue('100');
   await page.getByRole('button', { name: 'Add layer', exact: true }).click();
+  await expect(raster).toHaveCount(0);
+  await expect(page.getByLabel('Caption', { exact: true })).toHaveAttribute(
+    'data-template',
+    '',
+  );
   await page.evaluate((clipboard) => {
     const data = new DataTransfer();
     data.setData('text/plain', clipboard.text);

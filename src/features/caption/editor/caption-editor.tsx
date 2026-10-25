@@ -1,3 +1,7 @@
+import {
+  activeImageAssets,
+  checkImageRetention,
+} from '@/domain/image-retention';
 import type { ReactNode } from 'react';
 import { ImagePlus } from 'lucide-react';
 import { createId } from '@/lib/create-id';
@@ -65,7 +69,11 @@ export function CaptionEditor({
   });
   const imageAssets = useRef<ImageAsset[]>([...images]);
   useEffect(() => {
-    imageAssets.current = [...images];
+    const retained = new Map(
+      imageAssets.current.map((asset) => [asset.id, asset]),
+    );
+    for (const asset of images) retained.set(asset.id, asset);
+    imageAssets.current = [...retained.values()];
   }, [images]);
   const [selectedPosition, setSelectedPosition] = useState<number | null>(null);
   const selectedRef = useRef<number | null>(null);
@@ -98,7 +106,10 @@ export function CaptionEditor({
     onUpdate: ({ editor }) =>
       callbacks.current.onChange(
         documentTemplate(editor.getJSON()),
-        imageAssets.current,
+        activeImageAssets(
+          documentTemplate(editor.getJSON()),
+          imageAssets.current,
+        ),
       ),
     onTransaction: ({ editor, transaction }) => {
       const selection = editor.state.selection;
@@ -203,8 +214,7 @@ export function CaptionEditor({
               if (!merged.some((item) => item.id === id))
                 merged.push({ ...image, id });
             }
-            if (merged.length > 100)
-              throw Error('A layer supports up to 100 images.');
+
             const rewrite = (node: JSONContent): JSONContent => {
               const ref = parseImageToken(String(node.attrs?.token));
               return {
@@ -227,10 +237,15 @@ export function CaptionEditor({
               ...data.content,
               content: data.content.content.map(rewrite),
             });
-            imageAssets.current = merged;
-            view.dispatch(
-              view.state.tr.replaceSelection(slice).scrollIntoView(),
+            const transaction = view.state.tr
+              .replaceSelection(slice)
+              .scrollIntoView();
+            checkImageRetention(
+              documentTemplate(transaction.doc.toJSON()),
+              merged,
             );
+            imageAssets.current = merged;
+            view.dispatch(transaction);
             event.preventDefault();
             return true;
           } catch {
@@ -367,8 +382,28 @@ export function CaptionEditor({
                 const existing = imageAssets.current.find(
                   (item) => item.source === asset.source,
                 );
-                if (!existing && imageAssets.current.length >= 100)
-                  throw Error('A layer supports up to 100 images.');
+                const added = existing
+                  ? imageAssets.current
+                  : [...imageAssets.current, asset];
+                const tokenValue = imageToken({
+                  height: 2,
+                  unit: 'font',
+                  colorMode: 'original',
+                  ...previous,
+                  assetId: existing?.id ?? asset.id,
+                });
+                const target =
+                  replaceAt === null
+                    ? insertion
+                    : { from: replaceAt, to: replaceAt + 1 };
+                const next = editor.state.tr.replaceWith(
+                  target.from,
+                  target.to,
+                  editor.schema.nodes.captionToken!.create({
+                    token: tokenValue,
+                  }),
+                );
+                checkImageRetention(documentTemplate(next.doc.toJSON()), added);
                 if (!existing)
                   imageAssets.current = [...imageAssets.current, asset];
                 editor
