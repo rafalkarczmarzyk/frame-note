@@ -6,7 +6,9 @@ test('edits independent containers, selects on canvas and exports the whole layo
   page,
 }) => {
   await page.goto('/');
-  await page.getByLabel('Choose JPG photo').setInputFiles(wildlifeFixture.path);
+  await page
+    .getByLabel('Choose JPG or PNG photo')
+    .setInputFiles(wildlifeFixture.path);
   const caption = page.getByLabel('Caption', { exact: true });
   await caption.fill('First caption');
   await page.getByRole('button', { name: 'Add layer', exact: true }).click();

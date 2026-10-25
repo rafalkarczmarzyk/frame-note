@@ -14,7 +14,7 @@ test('chooses presets, validates custom HEX and exports the chosen color', async
     context.fillRect(0, 0, canvas.width, canvas.height);
     return canvas.toDataURL('image/jpeg').split(',')[1]!;
   });
-  await page.getByLabel('Choose JPG photo').setInputFiles({
+  await page.getByLabel('Choose JPG or PNG photo').setInputFiles({
     name: 'color-test.jpg',
     mimeType: 'image/jpeg',
     buffer: Buffer.from(fixture, 'base64'),

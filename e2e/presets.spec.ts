@@ -16,7 +16,7 @@ test('saves and restores a layout after reload and imports an exported preset', 
     mimeType: 'image/jpeg',
     buffer: Buffer.from(data, 'base64'),
   };
-  await page.getByLabel('Choose JPG photo').setInputFiles(photo);
+  await page.getByLabel('Choose JPG or PNG photo').setInputFiles(photo);
   await page.getByLabel('Caption', { exact: true }).fill('Saved {author}');
   await page.getByRole('button', { name: 'Save preset', exact: true }).click();
   await page.getByLabel('Preset name', { exact: true }).fill('Wildlife');
@@ -26,7 +26,7 @@ test('saves and restores a layout after reload and imports an exported preset', 
     page.getByText('Unsaved changes', { exact: true }),
   ).toBeVisible();
   await page.reload();
-  await page.getByLabel('Choose JPG photo').setInputFiles(photo);
+  await page.getByLabel('Choose JPG or PNG photo').setInputFiles(photo);
   await page
     .getByRole('button', { name: 'Manage presets', exact: true })
     .click();
@@ -77,7 +77,7 @@ test('offers built-in Default and Macro and resolves the Helicon fixture', async
 }) => {
   await page.goto('/');
   await page
-    .getByLabel('Choose JPG photo')
+    .getByLabel('Choose JPG or PNG photo')
     .setInputFiles('tests/fixtures/20261020-2026-10-20 14-06-39 (A,R8,S4).jpg');
   await page.getByRole('combobox', { name: 'Saved preset' }).click();
   await page.getByRole('option', { name: 'Default dark', exact: true }).click();
@@ -194,7 +194,7 @@ test('restores SVG assets, blank lines and custom positions across photo orienta
       },
       { width, height },
     );
-    await page.getByLabel('Choose JPG photo').setInputFiles({
+    await page.getByLabel('Choose JPG or PNG photo').setInputFiles({
       name: 'orientation.jpg',
       mimeType: 'image/jpeg',
       buffer: Buffer.from(bytes, 'base64'),
@@ -307,7 +307,7 @@ test('keeps long-name duplicates and valid presets alongside damaged entries', a
     mimeType: 'image/jpeg',
     buffer: Buffer.from(data, 'base64'),
   };
-  await page.getByLabel('Choose JPG photo').setInputFiles(photo);
+  await page.getByLabel('Choose JPG or PNG photo').setInputFiles(photo);
   await page.getByRole('button', { name: 'Save preset', exact: true }).click();
   const name = 'x'.repeat(80);
   await page.getByLabel('Preset name', { exact: true }).fill(name);
@@ -323,7 +323,7 @@ test('keeps long-name duplicates and valid presets alongside damaged entries', a
     localStorage.setItem(key, JSON.stringify(saved));
   });
   await page.reload();
-  await page.getByLabel('Choose JPG photo').setInputFiles(photo);
+  await page.getByLabel('Choose JPG or PNG photo').setInputFiles(photo);
   await expect(page.getByRole('alert')).toContainText(
     'original data is preserved',
   );

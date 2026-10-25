@@ -11,7 +11,7 @@ export interface ImageDimensions {
 /** Dimensions are those of the correctly oriented, decoded image. */
 export interface Photo {
   name: string;
-  mimeType: 'image/jpeg';
+  mimeType: 'image/jpeg' | 'image/png';
   byteLength: number;
   dimensions: ImageDimensions;
   metadata: readonly MetadataField[];

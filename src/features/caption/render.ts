@@ -101,6 +101,9 @@ export async function exportPhotoCaptions(
   captions: readonly RenderedCaption[],
   qualityPercent = 95,
 ): Promise<Blob> {
+  const alphaMatte = getComputedStyle(document.documentElement)
+    .getPropertyValue('--color-caption-white')
+    .trim();
   const quality = jpegQuality(qualityPercent);
   await Promise.all(
     captions.map(({ caption }) =>
@@ -118,6 +121,16 @@ export async function exportPhotoCaptions(
   try {
     const layer = new Konva.Layer();
     stage.add(layer);
+    layer.add(
+      new Konva.Rect({
+        x: 0,
+        y: 0,
+        width: dimensions.width,
+        height: dimensions.height,
+        fill: alphaMatte,
+        listening: false,
+      }),
+    );
     layer.add(
       new Konva.Image({
         image,
@@ -199,5 +212,5 @@ export async function exportPhotoCaptions(
 }
 
 export function exportName(name: string): string {
-  return name.replace(/\.jpe?g$/iu, '') + '-framenote.jpg';
+  return name.replace(/\.(?:jpe?g|png)$/iu, '') + '-framenote.jpg';
 }

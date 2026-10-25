@@ -7,7 +7,7 @@ async function openPhoto(page: Page) {
     canvas.height = 150;
     return canvas.toDataURL('image/jpeg').split(',')[1]!;
   });
-  await page.getByLabel('Choose JPG photo').setInputFiles({
+  await page.getByLabel('Choose JPG or PNG photo').setInputFiles({
     name: 'test.jpg',
     mimeType: 'image/jpeg',
     buffer: Buffer.from(data, 'base64'),

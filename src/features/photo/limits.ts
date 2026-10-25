@@ -6,10 +6,10 @@ export class PhotoLimitError extends Error {}
 
 export function validateFileSize(bytes: number): void {
   if (!Number.isSafeInteger(bytes) || bytes <= 0)
-    throw new Error('This file is empty. Choose a JPG photo.');
+    throw new Error('This file is empty. Choose a JPG or PNG photo.');
   if (bytes > MAX_FILE_BYTES)
     throw new PhotoLimitError(
-      'This photo exceeds the pre-MVP limit of 100 MB. Export a smaller JPG from Lightroom.',
+      'This photo exceeds the pre-MVP limit of 100 MB. Export a smaller JPG or PNG from your photo editor.',
     );
 }
 export function validateImageSize(width: number, height: number): void {
@@ -23,6 +23,6 @@ export function validateImageSize(width: number, height: number): void {
     width * height > MAX_IMAGE_PIXELS
   )
     throw new PhotoLimitError(
-      'This photo exceeds the pre-MVP limit of 50 megapixels or 16384 pixels per edge. Export a smaller JPG.',
+      'This photo exceeds the pre-MVP limit of 50 megapixels or 16384 pixels per edge. Export a smaller JPG or PNG.',
     );
 }
