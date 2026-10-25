@@ -76,3 +76,38 @@ export const ReorderLayers: Story = {
     );
   },
 };
+
+export const LongReorderList: Story = {
+  render: function LongReorderList() {
+    const [items, setItems] = useState(
+      Array.from({ length: 30 }, (_, index) => ({
+        id: String(index),
+        label: `Layer ${index + 1}`,
+        selected: index === 0,
+      })),
+    );
+    return (
+      <div className="h-64 max-w-sm overflow-y-auto">
+        <PickerList
+          items={items}
+          selectedLabel=""
+          selectionTone="container"
+          onChoose={(id) =>
+            setItems((current) =>
+              current.map((item) => ({ ...item, selected: item.id === id })),
+            )
+          }
+          onMove={(id, index) =>
+            setItems((current) => {
+              const next = [...current];
+              const from = next.findIndex((item) => item.id === id);
+              const [item] = next.splice(from, 1);
+              next.splice(index, 0, item!);
+              return next;
+            })
+          }
+        />
+      </div>
+    );
+  },
+};

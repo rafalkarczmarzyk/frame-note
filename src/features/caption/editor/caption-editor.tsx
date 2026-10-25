@@ -414,14 +414,13 @@ export function CaptionEditor({
                 : null;
               try {
                 const asset = await importImage(file, createId());
+                if (editor.isDestroyed) return;
                 if (
-                  editor.isDestroyed ||
+                  revision.current !== startRevision ||
                   (replaceAt !== null &&
                     String(editor.state.doc.nodeAt(replaceAt)?.attrs.token) !==
                       previousToken)
                 )
-                  return;
-                if (revision.current !== startRevision)
                   throw Error(
                     'Content changed while the image was loading. Add the image again at the desired position.',
                   );

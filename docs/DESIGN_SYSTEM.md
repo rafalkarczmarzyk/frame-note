@@ -570,3 +570,12 @@ otherwise the current caption editor or an available workspace button. Switching
 panel content transfers focus without trapping it. ColorPickerPanel uses this
 shared behavior. Components/Layout/FloatingPanel/KeyboardFocus demonstrates
 entry and return. Screen reader behavior has not been manually verified.
+
+### Layer list scrolling — technical remediation
+
+PickerList detects its scrolling ancestor from overflow and dimensions. While
+a grip has pointer capture, approaching the visible top or bottom edge starts
+continuous scrolling even if the pointer stops moving. The insertion gap follows
+the scrolling rows. Escape, pointer cancellation and lost capture cancel the
+move; Arrow Up/Down, Home and End retain their existing behavior.
+Components/UI/PickerList/LongReorderList demonstrates a constrained list.

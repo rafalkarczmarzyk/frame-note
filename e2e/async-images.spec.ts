@@ -181,3 +181,44 @@ test('a broken visible asset blocks export until its layer is hidden', async ({
   await expect(exportButton).toBeEnabled();
   await expect(page.getByRole('alert')).toHaveCount(0);
 });
+
+test('reports cancellation when an image being replaced is removed during decoding', async ({
+  page,
+}) => {
+  await openPhoto(page);
+  const caption = page.getByLabel('Caption', { exact: true });
+  await caption.press('ControlOrMeta+a');
+  await caption.press('Backspace');
+  await expect(caption).toHaveAttribute('data-template', '');
+  await page
+    .getByLabel('Upload image', { exact: true })
+    .setInputFiles('tests/fixtures/logos/rt.png');
+  const image = page.getByRole('img', { name: 'rt.png', exact: true });
+  await image.click();
+  await page.evaluate(() => {
+    const original = File.prototype.arrayBuffer;
+    File.prototype.arrayBuffer = async function () {
+      document.body.dataset.importPending = 'yes';
+      await new Promise<void>((resolve) =>
+        window.addEventListener('release-import', () => resolve(), {
+          once: true,
+        }),
+      );
+      return original.call(this);
+    };
+  });
+  const pending = page.waitForEvent('filechooser');
+  await page
+    .getByRole('button', { name: 'Replace image', exact: true })
+    .click();
+  await (await pending).setFiles('tests/fixtures/logos/rt.png');
+  await expect(page.locator('body')).toHaveAttribute(
+    'data-import-pending',
+    'yes',
+  );
+  await page.getByRole('button', { name: 'Remove image', exact: true }).click();
+  await page.evaluate(() => window.dispatchEvent(new Event('release-import')));
+  await expect(page.getByRole('alert')).toContainText('Content changed');
+  await expect(image).toHaveCount(0);
+  await expect(caption).toHaveAttribute('data-template', '');
+});
