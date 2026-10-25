@@ -8,7 +8,7 @@ async function openEditor(page: import('@playwright/test').Page) {
     canvas.height = 180;
     return canvas.toDataURL('image/jpeg').split(',')[1]!;
   });
-  await page.getByLabel('Choose JPG photo').setInputFiles({
+  await page.getByLabel('Choose JPG or PNG photo').setInputFiles({
     name: 'image-limit.jpg',
     mimeType: 'image/jpeg',
     buffer: Buffer.from(photo, 'base64'),
@@ -92,7 +92,7 @@ test('enforces the 100 image limit for plain paste and preserves the valid prese
     canvas.height = 180;
     return canvas.toDataURL('image/jpeg').split(',')[1]!;
   });
-  await page.getByLabel('Choose JPG photo').setInputFiles({
+  await page.getByLabel('Choose JPG or PNG photo').setInputFiles({
     name: 'image-limit.jpg',
     mimeType: 'image/jpeg',
     buffer: Buffer.from(photo, 'base64'),

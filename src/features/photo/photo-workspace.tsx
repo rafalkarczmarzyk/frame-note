@@ -96,6 +96,13 @@ function PhotoWorkspaceContent({
   initialLayout?: CaptionLayout;
   initialIcons?: SvgIcon[];
 }) {
+  const alphaMatte = useMemo(
+    () =>
+      getComputedStyle(document.documentElement)
+        .getPropertyValue('--color-caption-white')
+        .trim(),
+    [],
+  );
   const [error, setError] = useState('');
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -409,6 +416,14 @@ function PhotoWorkspaceContent({
                 clipWidth={width}
                 clipHeight={height}
               >
+                <Rect
+                  x={0}
+                  y={0}
+                  width={width}
+                  height={height}
+                  fill={alphaMatte}
+                  listening={false}
+                />
                 <CanvasImage
                   image={photo.image}
                   width={width}

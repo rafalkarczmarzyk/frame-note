@@ -6,7 +6,9 @@ test('drags a caption without a jump and exports Custom independently of margins
   page,
 }) => {
   await page.goto('/');
-  await page.getByLabel('Choose JPG photo').setInputFiles(wildlifeFixture.path);
+  await page
+    .getByLabel('Choose JPG or PNG photo')
+    .setInputFiles(wildlifeFixture.path);
   await page.getByLabel('Caption', { exact: true }).fill('Custom position');
   const exportButton = page.getByRole('button', {
     name: 'Export JPG',

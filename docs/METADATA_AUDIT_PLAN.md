@@ -496,8 +496,8 @@ osobnym commitem.
 | 2. Ekstrakcja i pochodzenie XMP                    | Zakończony; commit `adf1bec` | 228 testów, format, lint, TypeScript, build.                                |
 | 3. Czas, przysłona i ogniskowa                     | Zakończony; commit `958c73e` | 230 testów, format, lint, TypeScript, build.                                |
 | 4. ISO                                             | Zakończony; commit `40b2bd3` | 234 testy, format, lint, TypeScript, build.                                 |
-| 5. Tekst, sprzęt i data                            | Zakończony; weryfikacja OK   | Testy domeny i fixture, pełna weryfikacja przed commitem.                   |
-| 6. PNG jako zdjęcie                                | Oczekuje                     | —                                                                           |
+| 5. Tekst, sprzęt i data                            | Zakończony; commit `0ee17c9` | 235 testów, format, lint, TypeScript, build.                                |
+| 6. PNG jako zdjęcie                                | Zakończony; weryfikacja OK   | 236 testów, 6 testów E2E Chromium/WebKit, build.                            |
 | 7. Macierz realnych plików i regresja              | Oczekuje                     | Brak próbek producentów innych niż Canon; żadne zdjęcia nie zostały dodane. |
 
 Etap 2 wydziela `extractMetadata`, zachowuje kandydatów XMP wraz z URI, ścieżką
@@ -526,3 +526,10 @@ przy offsetcie; obsługuje daty IPTC `YYYYMMDD` i pomija XMP CreateDate jako
 potencjalny czas eksportu. Autor obsługuje XMP tiff:Artist, a alternatywy
 językowe wybierają x-default, potem angielski, potem pierwszą wartość. Nazwy
 aparatu i obiektywu pozostają tekstem źródłowym; LensID nie jest fallbackiem.
+
+Etap 6 rozpoznaje JPEG/PNG po sygnaturze, sprawdza zgodność typu i rozszerzenia,
+waliduje wymiary PNG z IHDR przed dekodowaniem i zachowuje wspólne limity.
+Dokument zdjęcia przechowuje wykryty MIME, ale eksport pozostaje JPG. Przezroczyste
+PNG jest matowane białym kolorem systemowym w podglądzie i eksporcie. Obsługiwany
+jest nieskompresowany XMP i eXIf przez istniejący ExifReader; skompresowanego XMP
+nie włączono. Testy importu przebiegły w Chromium i WebKit.

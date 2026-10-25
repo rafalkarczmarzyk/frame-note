@@ -12,7 +12,7 @@ test('reorders overlapping layers by dragging and keyboard and hides them from e
     canvas.height = 600;
     return canvas.toDataURL('image/jpeg').split(',')[1]!;
   });
-  await page.getByLabel('Choose JPG photo').setInputFiles({
+  await page.getByLabel('Choose JPG or PNG photo').setInputFiles({
     name: 'layers.jpg',
     mimeType: 'image/jpeg',
     buffer: Buffer.from(jpeg, 'base64'),

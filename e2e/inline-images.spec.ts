@@ -16,7 +16,7 @@ test('edits mixed SVG and PNG content, preserves image selection and restores po
     mimeType: 'image/jpeg',
     buffer: Buffer.from(jpeg, 'base64'),
   };
-  await page.getByLabel('Choose JPG photo').setInputFiles(photo);
+  await page.getByLabel('Choose JPG or PNG photo').setInputFiles(photo);
   await expect(
     page.getByRole('button', { name: 'Add logo', exact: true }),
   ).toHaveCount(0);
@@ -87,7 +87,7 @@ test('edits mixed SVG and PNG content, preserves image selection and restores po
   await page.getByLabel('Preset name', { exact: true }).fill('Mixed images');
   await page.getByRole('button', { name: 'Save', exact: true }).click();
   await page.reload();
-  await page.getByLabel('Choose JPG photo').setInputFiles(photo);
+  await page.getByLabel('Choose JPG or PNG photo').setInputFiles(photo);
   await page
     .getByRole('combobox', { name: 'Saved preset', exact: true })
     .click();

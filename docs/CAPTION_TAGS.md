@@ -42,6 +42,9 @@ Czas, przysłona, ISO i ogniskowa mają już jednostki/oznaczenia. Nie dopisuj p
 dodaje ten prefiks samodzielnie, pomija brakujące części i nie pozostawia pustych
 separatorów. Bez żadnych parametrów ekspozycji jest traktowany jako brak danych.
 
+Import obsługuje JPG i PNG. Eksport nadal zapisuje JPG; przezroczyste piksele PNG
+mają białe tło zarówno w podglądzie, jak i eksporcie.
+
 Data zachowuje dzień z metadanych; nie przeliczamy jej na strefę czasową urządzenia.
 `xmp:CreateDate` jest pomijane, bo może opisywać eksport lub utworzenie po edycji.
 Daty są sprawdzane kalendarzowo; `20240229` i `2024-02-29` są poprawne, ale

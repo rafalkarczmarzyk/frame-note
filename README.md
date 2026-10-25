@@ -6,7 +6,7 @@ Konva i ExifReader. Zdjęcia są przetwarzane w przeglądarce, bez wysyłania na
 ## Status
 
 Pre-MVP ukończone i zaakceptowane; ostatni etap zapisany w commicie `9a627af`.
-Cały przepływ działa: import JPG → szablon podpisu → stylowanie i podgląd → eksport.
+Cały przepływ działa: import JPG/PNG → szablon podpisu → stylowanie i podgląd → eksport JPG.
 Po zamknięciu pre-MVP dodano uzgodnione usprawnienia UI, helpery metadanych i nowe
 zdjęcia testowe. Nie oznacza to zatwierdzenia całej roadmapy MVP.
 
@@ -65,7 +65,7 @@ funkcjonalne i pomiar kolorów bez porównywania do wzorców Chromium.
 
 ## Aktualne możliwości
 
-- Jeden JPG: wybór pliku lub drag & drop. Błąd wymiany pozostawia poprzednie zdjęcie.
+- Jeden JPG lub PNG: wybór pliku lub drag & drop. Błąd wymiany pozostawia poprzednie zdjęcie.
 - Odczyt metadanych rozpoznawanych przez ExifReader: EXIF, IPTC, XMP i ICC.
   Dostępne pola można przeszukiwać i wstawiać z listy. Nie gwarantujemy obsługi
   każdego niestandardowego pola lub MakerNote.

@@ -14,7 +14,7 @@ test('uploads SVG, edits atomic tokens, round-trips the clipboard and exports a 
     context.fillRect(0, 0, 1200, 800);
     return canvas.toDataURL('image/jpeg').split(',')[1]!;
   });
-  await page.getByLabel('Choose JPG photo').setInputFiles({
+  await page.getByLabel('Choose JPG or PNG photo').setInputFiles({
     name: 'black.jpg',
     mimeType: 'image/jpeg',
     buffer: Buffer.from(black, 'base64'),

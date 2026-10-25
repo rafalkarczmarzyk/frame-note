@@ -128,8 +128,8 @@ export default function App() {
       <input
         ref={input}
         type="file"
-        accept="image/jpeg,.jpg,.jpeg"
-        aria-label="Choose JPG photo"
+        accept="image/jpeg,image/png,.jpg,.jpeg,.png"
+        aria-label="Choose JPG or PNG photo"
         className="hidden"
         onChange={(event) => {
           const file = event.target.files?.[0];

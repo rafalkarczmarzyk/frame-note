@@ -5,7 +5,7 @@ test('shows helpers first, keeps original namespaces and resolves a portable tem
   page,
 }) => {
   await page.goto('/');
-  const input = page.getByLabel('Choose JPG photo');
+  const input = page.getByLabel('Choose JPG or PNG photo');
   await input.setInputFiles(xmpPortraitFixture.path);
   const caption = page.getByLabel('Caption', { exact: true });
   await expect(caption).toHaveAttribute(

@@ -27,7 +27,7 @@ test('recovers from invalid imports and keeps the latest photo during rapid repl
     };
   });
   await page.goto('/');
-  const input = page.getByLabel('Choose JPG photo');
+  const input = page.getByLabel('Choose JPG or PNG photo');
   await input.setInputFiles(wildlifeFixture.path);
   await input.setInputFiles(portraitFixture.path);
   await expect(
@@ -86,11 +86,44 @@ test('recovers from invalid imports and keeps the latest photo during rapid repl
   expect(errors).toEqual([]);
 });
 
+test('imports PNG photos and rejects a mismatched PNG extension', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const input = page.getByLabel('Choose JPG or PNG photo');
+  const png = await page.evaluate(async () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 16;
+    canvas.height = 12;
+    const context = canvas.getContext('2d')!;
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob>((resolve) =>
+      canvas.toBlob((value) => resolve(value!), 'image/png'),
+    );
+    return [...new Uint8Array(await blob.arrayBuffer())];
+  });
+  await input.setInputFiles({
+    name: 'transparent.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(png),
+  });
+  await expect(
+    page.getByRole('img', { name: 'Photo preview: transparent.png' }),
+  ).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Export JPG' })).toBeEnabled();
+  await input.setInputFiles({
+    name: 'wrong.jpg',
+    mimeType: 'image/png',
+    buffer: Buffer.from(png),
+  });
+  await expect(page.getByRole('alert')).toContainText('does not match');
+});
+
 test('keeps caption settings when replacing landscape and portrait photos', async ({
   page,
 }) => {
   await page.goto('/');
-  const input = page.getByLabel('Choose JPG photo');
+  const input = page.getByLabel('Choose JPG or PNG photo');
   await input.setInputFiles(wildlifeFixture.path);
   await page
     .getByLabel('Caption', { exact: true })

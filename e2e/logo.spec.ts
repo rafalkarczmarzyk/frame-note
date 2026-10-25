@@ -19,7 +19,7 @@ test('adds SVG through container content and exports original and single colors'
     mimeType: 'image/jpeg',
     buffer: Buffer.from(black, 'base64'),
   };
-  await page.getByLabel('Choose JPG photo').setInputFiles(photo);
+  await page.getByLabel('Choose JPG or PNG photo').setInputFiles(photo);
   await page.getByLabel('Caption', { exact: true }).press('ControlOrMeta+a');
   await page.getByLabel('Caption', { exact: true }).press('Backspace');
   await expect(page.getByLabel('Caption', { exact: true })).toHaveAttribute(

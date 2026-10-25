@@ -15,7 +15,9 @@ test('exports landscape and portrait JPGs with stable caption pixels and colors'
   ] as const) {
     await test.step(name, async () => {
       await page.goto('/');
-      await page.getByLabel('Choose JPG photo').setInputFiles(fixture.path);
+      await page
+        .getByLabel('Choose JPG or PNG photo')
+        .setInputFiles(fixture.path);
       await page
         .getByLabel('Caption', { exact: true })
         .fill('{exif:Artist}\nFrameNote test');
@@ -226,7 +228,7 @@ test('exports landscape and portrait JPGs with stable caption pixels and colors'
       255, 225, 0, 34, 69, 120, 105, 102, 0, 0, 73, 73, 42, 0, 8, 0, 0, 0, 1, 0,
       18, 1, 3, 0, 1, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0,
     ]);
-    await page.getByLabel('Choose JPG photo').setInputFiles({
+    await page.getByLabel('Choose JPG or PNG photo').setInputFiles({
       name: 'rotated.jpg',
       mimeType: 'image/jpeg',
       buffer: Buffer.concat([
