@@ -747,6 +747,26 @@ function PhotoWorkspaceContent({
         )}
       <ToolSidebar aria-label="Photo tools">
         <div className="min-h-0 flex-1 overflow-y-auto">
+          <SidebarSection
+            id="photo"
+            title="Photo"
+            iconTone="photo"
+            icon={<PhotoIcon />}
+            defaultOpen={false}
+          >
+            <h1 className="break-all text-sm font-medium">
+              {photo.document.photo.name}
+            </h1>
+            <p className="mt-2 text-xs text-content-secondary">
+              {width} × {height} px
+            </p>
+            <p
+              className="mt-1 text-xs text-content-secondary"
+              title={`${photo.document.photo.byteLength.toLocaleString('en-US')} bytes`}
+            >
+              Input: {formatBytes(photo.document.photo.byteLength)}
+            </p>
+          </SidebarSection>
           <PresetControls
             panelHost={presetHost}
             onBrowse={() => setActivePanel('presets')}
@@ -769,32 +789,6 @@ function PhotoWorkspaceContent({
             }}
           />
           <section aria-label="Document settings">
-            <SidebarSection
-              id="photo"
-              title="Photo"
-              iconTone="photo"
-              icon={<PhotoIcon />}
-              defaultOpen={false}
-            >
-              <h1 className="break-all text-sm font-medium">
-                {photo.document.photo.name}
-              </h1>
-              <p className="mt-2 text-xs text-content-secondary">
-                {width} × {height} px
-              </p>
-              <p
-                className="mt-1 text-xs text-content-secondary"
-                title={`${photo.document.photo.byteLength.toLocaleString('en-US')} bytes`}
-              >
-                Input: {formatBytes(photo.document.photo.byteLength)}
-              </p>
-            </SidebarSection>
-            <div className="px-7 pt-3">
-              <h2 className="text-sm font-semibold">Document</h2>
-              <p className="mt-1 text-xs text-content-secondary">
-                Applies to all containers
-              </p>
-            </div>
             <CaptionControls
               scope="global"
               dimensions={photo.document.photo.dimensions}

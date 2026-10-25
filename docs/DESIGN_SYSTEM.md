@@ -341,7 +341,7 @@ Sizing, Margins, Containers and Export retain their current workspace order.
 
 ## Layout presets
 
-Presets precedes Photo in the main sidebar. PresetControls reuses SidebarSection,
+Photo precedes Presets in the main sidebar. PresetControls reuses SidebarSection,
 Field, Input, Select and Button. The saved name, explicit update/save-as actions,
 unsaved indicator and import/export remain separate from photo export.
 Errors are announced through an alert. Saved data is versioned and validated,
@@ -516,3 +516,15 @@ helper paragraph is removed. MarginRulers no longer renders floating name/value
 tooltips; handles retain letters, triangles, accessible values and shared edge
 highlighting. Earlier review-only and tooltip descriptions above are historical.
 The shared Tooltip proposal remains deferred in NICE_TO_HAVE.md.
+
+### Sidebar order
+
+The sidebar orders Photo → Presets → Sizing → Margins → Containers → Selected
+container → Export. Global sizing and margin controls have no visible Document
+heading or “Applies to all containers” description.
+
+### Combined sizing and margins
+
+Sizing & Margins shares one sidebar disclosure. The sizing unit selector precedes
+the compact margin editor, without a pixel conversion hint or repeated unit label
+in the diagram. Reset and individual input units remain available.

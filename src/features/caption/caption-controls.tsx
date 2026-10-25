@@ -98,14 +98,11 @@ export function CaptionControls({
         <SidebarSection
           id={`${preferenceScope}sizing`}
           persist={persistSections}
-          title="Sizing"
+          title="Sizing & Margins"
           iconTone="sizing"
           icon={<Ruler />}
         >
-          <Field
-            label="Sizing unit"
-            hint={`1 unit = ${Number(factor.toFixed(4))} px on this photo. Changing units preserves the current appearance.`}
-          >
+          <Field label="Sizing unit">
             {(id, descriptionId) => (
               <Select
                 id={id}
@@ -125,6 +122,23 @@ export function CaptionControls({
               />
             )}
           </Field>
+          <fieldset disabled={disabled} className="mt-3 disabled:opacity-70">
+            <MarginEditor
+              appearance="compact"
+              hideLabel
+              hideUnitLabel
+              key={caption.sizingUnit}
+              value={caption.position.margins}
+              linkMode={caption.position.marginLinkMode}
+              unit={caption.sizingUnit}
+              unitLabel={unit}
+              dimensions={dimensions}
+              disabled={disabled}
+              onChange={(margins, marginLinkMode) =>
+                position({ margins, marginLinkMode })
+              }
+            />
+          </fieldset>
         </SidebarSection>
       )}
       {scope !== 'global' && (
@@ -325,35 +339,6 @@ export function CaptionControls({
             </fieldset>
           </InspectorSection>
         </>
-      )}
-      {scope !== 'local' && (
-        <SidebarSection
-          id={`${preferenceScope}margins`}
-          persist={persistSections}
-          title="Margins"
-          iconTone="sizing"
-          icon={<Ruler />}
-        >
-          <fieldset
-            disabled={disabled}
-            className="space-y-4 disabled:opacity-70"
-          >
-            <MarginEditor
-              appearance="compact"
-              hideLabel
-              key={caption.sizingUnit}
-              value={caption.position.margins}
-              linkMode={caption.position.marginLinkMode}
-              unit={caption.sizingUnit}
-              unitLabel={unit}
-              dimensions={dimensions}
-              disabled={disabled}
-              onChange={(margins, marginLinkMode) =>
-                position({ margins, marginLinkMode })
-              }
-            />
-          </fieldset>
-        </SidebarSection>
       )}
     </>
   );
