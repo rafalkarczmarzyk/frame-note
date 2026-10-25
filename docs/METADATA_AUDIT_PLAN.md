@@ -494,8 +494,8 @@ osobnym commitem.
 | -------------------------------------------------- | ---------------------------- | --------------------------------------------------------------------------- |
 | 1. Kontrakt i testy charakterystycznych przypadków | Zakończony; commit `1d79474` | 225 testów, format, lint, TypeScript, build.                                |
 | 2. Ekstrakcja i pochodzenie XMP                    | Zakończony; commit `adf1bec` | 228 testów, format, lint, TypeScript, build.                                |
-| 3. Czas, przysłona i ogniskowa                     | Zakończony; czeka na commit  | 230 testów, format, lint, TypeScript, build.                                |
-| 4. ISO                                             | Oczekuje                     | —                                                                           |
+| 3. Czas, przysłona i ogniskowa                     | Zakończony; commit `958c73e` | 230 testów, format, lint, TypeScript, build.                                |
+| 4. ISO                                             | Zakończony; weryfikacja OK   | 234 testy, format, lint, TypeScript, build.                                 |
 | 5. Tekst, sprzęt i data                            | Oczekuje                     | —                                                                           |
 | 6. PNG jako zdjęcie                                | Oczekuje                     | —                                                                           |
 | 7. Macierz realnych plików i regresja              | Oczekuje                     | Brak próbek producentów innych niż Canon; żadne zdjęcia nie zostały dodane. |
@@ -513,3 +513,10 @@ APEX ShutterSpeedValue/ApertureValue dokładnie raz. Bezpośrednie ExposureTime
 i FNumber mają pierwszeństwo; listy ISO nie są dzielone. Testy obejmują
 ułamki, zero w mianowniku, racjonalną ogniskową, listę ISO, konwersje Tv/Av
 i fallback do XMP po niepoprawnym EXIF.
+
+Etap 4 dodaje resolver ISO uwzględniający SensitivityType, oddziela EXIF od XMP,
+odrzuca wartości niejednoznaczne i używa ISOSpeed dopiero do uzupełnienia
+sentinela 65535 przy zgodnym typie. W testowanych fotografiach Canon
+SensitivityType=2 oznacza Recommended Exposure Index, więc dotychczasowe
+ISOSpeedRatings nie jest prezentowane jako ISO. Testy fixture zostały
+zaktualizowane zgodnie z tą semantyką.
