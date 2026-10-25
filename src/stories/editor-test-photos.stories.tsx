@@ -266,3 +266,14 @@ export const Presets: Story = {
     },
   },
 };
+
+/** Hover rulers or focus margin fields to compare the shared guides. */
+export const MarginRulers: Story = {
+  args: {
+    initialLayout: {
+      ...createCaptionLayout(),
+      margins: { top: 4, bottom: 4, left: 8, right: 8 },
+      marginLinkMode: 'pairs',
+    },
+  },
+};

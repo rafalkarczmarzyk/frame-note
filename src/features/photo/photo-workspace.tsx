@@ -1,3 +1,5 @@
+import { MarginRulers } from './margin-rulers';
+import { MarginPreviewProvider } from '@/components/ui/margin-preview-provider';
 import { InspectorSection } from '@/components/layout/inspector-section';
 import { createId } from '@/lib/create-id';
 import { defaultTemplate } from '@/domain/builtin-presets';
@@ -74,7 +76,17 @@ import {
 } from 'react-konva';
 import type { LoadedPhoto } from './load-photo';
 
-export function PhotoWorkspace({
+export function PhotoWorkspace(
+  props: Parameters<typeof PhotoWorkspaceContent>[0],
+) {
+  return (
+    <MarginPreviewProvider>
+      <PhotoWorkspaceContent {...props} />
+    </MarginPreviewProvider>
+  );
+}
+
+function PhotoWorkspaceContent({
   photo,
   initialLayout,
   initialIcons = [],
@@ -339,8 +351,8 @@ export function PhotoWorkspace({
   }, []);
   const { width, height } = photo.document.photo.dimensions;
   const scale = Math.min(
-    Math.max(1, size.width - 48) / width,
-    Math.max(1, size.height - 48) / height,
+    Math.max(1, size.width - 80) / width,
+    Math.max(1, size.height - 80) / height,
     1,
   );
   const fields = photo.document.photo.metadata;
@@ -359,234 +371,258 @@ export function PhotoWorkspace({
         )}
       <div
         ref={host}
-        className="min-h-[40vh] min-w-0 flex-1 bg-workspace-base md:min-h-0"
-        role="img"
-        aria-label={`Photo preview: ${photo.document.photo.name}`}
+        className="relative min-h-[40vh] min-w-0 flex-1 bg-workspace-base md:min-h-0"
       >
-        <Stage width={size.width} height={size.height}>
-          <Layer>
-            <Group
-              x={(size.width - width * scale) / 2}
-              y={(size.height - height * scale) / 2}
-              scaleX={scale}
-              scaleY={scale}
-              clipWidth={width}
-              clipHeight={height}
-            >
-              <CanvasImage image={photo.image} width={width} height={height} />
-              {fontReady &&
-                iconsReady &&
-                renderedCaptions.map(
-                  ({ id, caption, text, color, icons: inlineIcons }) => {
-                    const config = captionConfig(
-                      { width, height },
-                      caption,
-                      text,
-                      color,
-                    );
-                    const placeholder =
-                      !caption.logo && !caption.template.trim();
-                    const visualColor = placeholder
-                      ? getComputedStyle(document.documentElement)
-                          .getPropertyValue('--color-porcelain')
-                          .trim()
-                      : color;
-                    const scene = placeholder
-                      ? inlineLayout(
-                          { width, height },
-                          caption,
-                          iconMarker(0),
-                          [brandIcons[0]!],
-                        )
-                      : inlineIcons.length
+        <div
+          role="img"
+          aria-label={`Photo preview: ${photo.document.photo.name}`}
+        >
+          <Stage width={size.width} height={size.height}>
+            <Layer>
+              <Group
+                x={(size.width - width * scale) / 2}
+                y={(size.height - height * scale) / 2}
+                scaleX={scale}
+                scaleY={scale}
+                clipWidth={width}
+                clipHeight={height}
+              >
+                <CanvasImage
+                  image={photo.image}
+                  width={width}
+                  height={height}
+                />
+                {fontReady &&
+                  iconsReady &&
+                  renderedCaptions.map(
+                    ({ id, caption, text, color, icons: inlineIcons }) => {
+                      const config = captionConfig(
+                        { width, height },
+                        caption,
+                        text,
+                        color,
+                      );
+                      const placeholder =
+                        !caption.logo && !caption.template.trim();
+                      const visualColor = placeholder
+                        ? getComputedStyle(document.documentElement)
+                            .getPropertyValue('--color-porcelain')
+                            .trim()
+                        : color;
+                      const scene = placeholder
                         ? inlineLayout(
                             { width, height },
                             caption,
-                            text,
-                            inlineIcons,
+                            iconMarker(0),
+                            [brandIcons[0]!],
                           )
-                        : null;
-                    const logoGeometry = caption.logo
-                      ? logoLayout({ width, height }, caption)
-                      : null;
-                    const geometry = logoGeometry ??
-                      scene ?? {
-                        ...config,
-                        height:
-                          text.split('\n').length *
-                          config.fontSize *
-                          config.lineHeight,
-                      };
-                    return (
-                      <Group key={id}>
-                        <Group
-                          x={geometry.x}
-                          y={geometry.y}
-                          width={geometry.width}
-                          height={geometry.height}
-                          opacity={placeholder ? 0.4 : caption.style.opacity}
-                          listening
-                          draggable={!exporting}
-                          onDragStart={() => {
-                            selectContainer(id);
-                            setDraggingId(id);
-                          }}
-                          onDragMove={(event) => {
-                            const node = event.currentTarget;
-                            const block = {
-                              width: node.width(),
-                              height: node.height(),
-                            };
-                            const point = customPoint(
+                        : inlineIcons.length
+                          ? inlineLayout(
                               { width, height },
-                              block,
-                              caption.position.anchor,
-                              node.position(),
-                            );
-                            const custom = {
-                              x: Math.min(100, Math.max(0, point.x)),
-                              y: Math.min(100, Math.max(0, point.y)),
-                            };
-                            node.position(
-                              customPosition(
+                              caption,
+                              text,
+                              inlineIcons,
+                            )
+                          : null;
+                      const logoGeometry = caption.logo
+                        ? logoLayout({ width, height }, caption)
+                        : null;
+                      const geometry = logoGeometry ??
+                        scene ?? {
+                          ...config,
+                          height:
+                            text.split('\n').length *
+                            config.fontSize *
+                            config.lineHeight,
+                        };
+                      return (
+                        <Group key={id}>
+                          <Group
+                            x={geometry.x}
+                            y={geometry.y}
+                            width={geometry.width}
+                            height={geometry.height}
+                            opacity={placeholder ? 0.4 : caption.style.opacity}
+                            listening
+                            draggable={!exporting}
+                            onDragStart={() => {
+                              selectContainer(id);
+                              setDraggingId(id);
+                            }}
+                            onDragMove={(event) => {
+                              const node = event.currentTarget;
+                              const block = {
+                                width: node.width(),
+                                height: node.height(),
+                              };
+                              const point = customPoint(
                                 { width, height },
                                 block,
                                 caption.position.anchor,
-                                custom,
-                              ),
-                            );
-                            setLayout((value) => ({
-                              ...value,
-                              containers: value.containers.map((container) =>
-                                container.id === id
-                                  ? {
-                                      ...container,
-                                      position: {
-                                        ...container.position,
-                                        custom,
-                                      },
-                                    }
-                                  : container,
-                              ),
-                            }));
-                          }}
-                          onDragEnd={() => setDraggingId(null)}
-                          onMouseEnter={() => setHoveredId(id)}
-                          onMouseLeave={() => setHoveredId(null)}
-                          onClick={() => selectContainer(id)}
-                          onTap={() => selectContainer(id)}
-                        >
-                          <Rect
-                            width={geometry.width}
-                            height={geometry.height}
-                            fill={color}
-                            opacity={0}
-                          />
-                          {caption.logo && logoGeometry ? (
-                            <CanvasImage
-                              listening={false}
-                              width={logoGeometry.width}
-                              height={logoGeometry.height}
-                              image={
-                                caption.logo.colorMode === 'single'
-                                  ? tintedIcon(
-                                      caption.logo.asset,
-                                      iconImages.get(caption.logo.asset.svg)!,
-                                      logoGeometry.height,
-                                      color,
-                                    )
-                                  : iconImages.get(caption.logo.asset.svg)
-                              }
-                            />
-                          ) : scene ? (
-                            <InlinePreview
-                              scene={scene}
-                              caption={caption}
-                              color={visualColor}
-                              images={iconImages}
-                            />
-                          ) : (
-                            <Text
-                              {...config}
-                              x={0}
-                              y={0}
-                              opacity={1}
-                              listening={false}
-                            />
-                          )}
-                        </Group>
-                        {(hoveredId === id ||
-                          editingId === id ||
-                          draggingId === id) &&
-                          (text || placeholder || caption.logo) && (
-                            <Rect
-                              x={geometry.x - 4 / scale}
-                              y={geometry.y - 4 / scale}
-                              width={geometry.width + 8 / scale}
-                              height={geometry.height + 8 / scale}
-                              stroke={getComputedStyle(document.documentElement)
-                                .getPropertyValue('--color-porcelain')
-                                .trim()}
-                              strokeWidth={1 / scale}
-                              dash={[4 / scale, 3 / scale]}
-                              listening={false}
-                            />
-                          )}
-                        {hoveredId === id &&
-                          !draggingId &&
-                          (text || placeholder || caption.logo) && (
-                            <Group
-                              listening={false}
-                              x={Math.max(
-                                0,
-                                Math.min(
-                                  geometry.x,
-                                  width - Math.min(280 / scale, width),
+                                node.position(),
+                              );
+                              const custom = {
+                                x: Math.min(100, Math.max(0, point.x)),
+                                y: Math.min(100, Math.max(0, point.y)),
+                              };
+                              node.position(
+                                customPosition(
+                                  { width, height },
+                                  block,
+                                  caption.position.anchor,
+                                  custom,
                                 ),
-                              )}
-                              y={
-                                geometry.y >= 52 / scale
-                                  ? geometry.y - 52 / scale
-                                  : Math.max(
-                                      0,
-                                      Math.min(
-                                        height - 46 / scale,
-                                        geometry.y +
-                                          geometry.height +
-                                          10 / scale,
-                                      ),
-                                    )
-                              }
-                            >
-                              <Rect
-                                width={Math.min(280 / scale, width)}
-                                height={42 / scale}
-                                cornerRadius={6 / scale}
-                                fill={getComputedStyle(document.documentElement)
-                                  .getPropertyValue('--color-panel-base')
-                                  .trim()}
-                              />
-                              <Text
+                              );
+                              setLayout((value) => ({
+                                ...value,
+                                containers: value.containers.map((container) =>
+                                  container.id === id
+                                    ? {
+                                        ...container,
+                                        position: {
+                                          ...container.position,
+                                          custom,
+                                        },
+                                      }
+                                    : container,
+                                ),
+                              }));
+                            }}
+                            onDragEnd={() => setDraggingId(null)}
+                            onMouseEnter={() => setHoveredId(id)}
+                            onMouseLeave={() => setHoveredId(null)}
+                            onClick={() => selectContainer(id)}
+                            onTap={() => selectContainer(id)}
+                          >
+                            <Rect
+                              width={geometry.width}
+                              height={geometry.height}
+                              fill={color}
+                              opacity={0}
+                            />
+                            {caption.logo && logoGeometry ? (
+                              <CanvasImage
                                 listening={false}
-                                width={Math.min(280 / scale, width)}
-                                padding={8 / scale}
-                                fontSize={11 / scale}
-                                lineHeight={1.3}
-                                fontFamily="Montserrat Variable"
-                                fill={getComputedStyle(document.documentElement)
-                                  .getPropertyValue('--color-content-primary')
-                                  .trim()}
-                                text={`${caption.position.custom ? `Manual: X ${Number(caption.position.custom.x.toFixed(1))}% · Y ${Number(caption.position.custom.y.toFixed(1))}%` : `Anchor: ${caption.position.anchor.replaceAll('-', ' ')}`}\nDrag to move`}
+                                width={logoGeometry.width}
+                                height={logoGeometry.height}
+                                image={
+                                  caption.logo.colorMode === 'single'
+                                    ? tintedIcon(
+                                        caption.logo.asset,
+                                        iconImages.get(caption.logo.asset.svg)!,
+                                        logoGeometry.height,
+                                        color,
+                                      )
+                                    : iconImages.get(caption.logo.asset.svg)
+                                }
                               />
-                            </Group>
-                          )}
-                      </Group>
-                    );
-                  },
-                )}
-            </Group>
-          </Layer>
-        </Stage>
+                            ) : scene ? (
+                              <InlinePreview
+                                scene={scene}
+                                caption={caption}
+                                color={visualColor}
+                                images={iconImages}
+                              />
+                            ) : (
+                              <Text
+                                {...config}
+                                x={0}
+                                y={0}
+                                opacity={1}
+                                listening={false}
+                              />
+                            )}
+                          </Group>
+                          {(hoveredId === id ||
+                            editingId === id ||
+                            draggingId === id) &&
+                            (text || placeholder || caption.logo) && (
+                              <Rect
+                                x={geometry.x - 4 / scale}
+                                y={geometry.y - 4 / scale}
+                                width={geometry.width + 8 / scale}
+                                height={geometry.height + 8 / scale}
+                                stroke={getComputedStyle(
+                                  document.documentElement,
+                                )
+                                  .getPropertyValue('--color-porcelain')
+                                  .trim()}
+                                strokeWidth={1 / scale}
+                                dash={[4 / scale, 3 / scale]}
+                                listening={false}
+                              />
+                            )}
+                          {hoveredId === id &&
+                            !draggingId &&
+                            (text || placeholder || caption.logo) && (
+                              <Group
+                                listening={false}
+                                x={Math.max(
+                                  0,
+                                  Math.min(
+                                    geometry.x,
+                                    width - Math.min(280 / scale, width),
+                                  ),
+                                )}
+                                y={
+                                  geometry.y >= 52 / scale
+                                    ? geometry.y - 52 / scale
+                                    : Math.max(
+                                        0,
+                                        Math.min(
+                                          height - 46 / scale,
+                                          geometry.y +
+                                            geometry.height +
+                                            10 / scale,
+                                        ),
+                                      )
+                                }
+                              >
+                                <Rect
+                                  width={Math.min(280 / scale, width)}
+                                  height={42 / scale}
+                                  cornerRadius={6 / scale}
+                                  fill={getComputedStyle(
+                                    document.documentElement,
+                                  )
+                                    .getPropertyValue('--color-panel-base')
+                                    .trim()}
+                                />
+                                <Text
+                                  listening={false}
+                                  width={Math.min(280 / scale, width)}
+                                  padding={8 / scale}
+                                  fontSize={11 / scale}
+                                  lineHeight={1.3}
+                                  fontFamily="Montserrat Variable"
+                                  fill={getComputedStyle(
+                                    document.documentElement,
+                                  )
+                                    .getPropertyValue('--color-content-primary')
+                                    .trim()}
+                                  text={`${caption.position.custom ? `Manual: X ${Number(caption.position.custom.x.toFixed(1))}% · Y ${Number(caption.position.custom.y.toFixed(1))}%` : `Anchor: ${caption.position.anchor.replaceAll('-', ' ')}`}\nDrag to move`}
+                                />
+                              </Group>
+                            )}
+                        </Group>
+                      );
+                    },
+                  )}
+              </Group>
+            </Layer>
+          </Stage>
+        </div>
+        <MarginRulers
+          disabled={exporting}
+          onChange={(margins) => setLayout((value) => ({ ...value, margins }))}
+          dimensions={{ width, height }}
+          unit={layout.sizingUnit}
+          margins={layout.margins}
+          linkMode={layout.marginLinkMode}
+          scale={scale}
+          x={(size.width - width * scale) / 2}
+          y={(size.height - height * scale) / 2}
+        />
       </div>
       {activePanel === 'presets' && (
         <div

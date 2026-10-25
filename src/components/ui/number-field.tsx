@@ -4,6 +4,7 @@ import { DimensionInput } from './dimension-input';
 
 export function NumberField({
   label,
+  title,
   value,
   onValueChange,
   min,
@@ -16,6 +17,7 @@ export function NumberField({
   showSteppers = false,
 }: {
   label: string;
+  title?: string;
   value: number;
   onValueChange: (value: number) => void;
   min: number;
@@ -32,6 +34,7 @@ export function NumberField({
       {(id, descriptionId) => {
         const props = {
           id,
+          title,
           'aria-describedby': descriptionId,
           value,
           onValueChange,

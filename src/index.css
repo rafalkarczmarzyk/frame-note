@@ -612,6 +612,28 @@
     border-radius: 8px;
     background: var(--tone-surface);
   }
+  .margin-editor-compact {
+    grid-template-rows: 30px 56px 30px;
+    gap: 0;
+    padding: 8px;
+  }
+  .margin-editor-compact .margin-diagram {
+    justify-self: center;
+    align-self: center;
+    width: 72px;
+    height: auto;
+    aspect-ratio: 3 / 2;
+  }
+  .margin-editor-compact .margin-edge-top,
+  .margin-editor-compact .margin-edge-bottom {
+    left: -1px;
+    right: -1px;
+  }
+  .margin-editor-compact .margin-edge-left,
+  .margin-editor-compact .margin-edge-right {
+    top: -1px;
+    bottom: -1px;
+  }
   .margin-model-value .numeric-input {
     height: 30px;
     padding-inline: 3px;

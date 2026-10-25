@@ -129,3 +129,28 @@ export function setMarginLinkMode(
   const left = Math.min(margins.left, limits.left);
   return { top, bottom: top, left, right: left };
 }
+
+/** Move a ruler handle in screen pixels, preserving the grab offset. */
+export function moveMargin(
+  margins: Margins,
+  side: keyof Margins,
+  delta: number,
+  scale: number,
+  unit: SizingUnit,
+  dimensions: ImageDimensions,
+  mode: MarginLinkMode,
+): Margins {
+  const direction = side === 'right' || side === 'bottom' ? -1 : 1;
+  const step = unit === 'px' ? 1 : 0.1;
+  const next =
+    margins[side] +
+    (direction * delta) / (scale * pixelsPerUnit(unit, dimensions));
+  const rounded = Math.round(next / step) * step;
+  const limit = marginLimits(margins, unit, dimensions, mode)[side];
+  return changeMargin(
+    margins,
+    side,
+    Math.min(limit, Math.max(0, rounded)),
+    mode,
+  );
+}

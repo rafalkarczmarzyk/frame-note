@@ -1,3 +1,6 @@
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { SidebarSection } from '@/components/layout/sidebar-section';
+import { Ruler } from 'lucide-react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { MarginEditor } from './margin-editor';
@@ -56,3 +59,99 @@ export const Pixels: Story = {
   },
 };
 export const Disabled: Story = { args: { disabled: true } };
+
+export const Compact: Story = { args: { appearance: 'compact' } };
+export const CompactPaired: Story = {
+  args: { ...Pairs.args, appearance: 'compact' },
+};
+export const CompactLinked: Story = {
+  args: { linkMode: 'all', appearance: 'compact' },
+};
+export const CompactPixels: Story = {
+  args: { ...Pixels.args, appearance: 'compact' },
+};
+export const CompactLongEdge: Story = {
+  args: {
+    appearance: 'compact',
+    unit: 'long-edge',
+    unitLabel: '% L',
+    value: { top: 2, bottom: 2, left: 2, right: 2 },
+  },
+};
+export const CompactDisabled: Story = {
+  args: { appearance: 'compact', disabled: true },
+};
+export const CompactNarrow: Story = {
+  args: { appearance: 'compact' },
+  decorators: [
+    (Story) => (
+      <div className="w-[220px]">
+        <Story />
+      </div>
+    ),
+  ],
+};
+export const CompactFocused: Story = {
+  args: { ...Pixels.args, appearance: 'compact' },
+  play: async ({ canvasElement }) => {
+    within(canvasElement).getByRole('spinbutton', { name: 'Left' }).focus();
+    await waitFor(() =>
+      expect(
+        within(canvasElement).getByRole('button', { name: 'Increase Left' }),
+      ).toBeVisible(),
+    );
+  },
+};
+export const CompactSidebar: Story = {
+  args: { appearance: 'compact' },
+  decorators: [
+    (Story) => (
+      <div className="w-[320px]">
+        <SidebarSection
+          id="compact-margin-preview"
+          title="Margins"
+          icon={<Ruler />}
+          iconTone="sizing"
+          persist={false}
+        >
+          <Story />
+        </SidebarSection>
+      </div>
+    ),
+  ],
+};
+export const CompactInteraction: Story = {
+  args: { appearance: 'compact' },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const left = canvas.getByRole('spinbutton', { name: 'Left' });
+    const right = canvas.getByRole('spinbutton', { name: 'Right' });
+    await userEvent.click(canvas.getByRole('radio', { name: 'Paired' }));
+    await userEvent.clear(left);
+    await userEvent.type(left, '8');
+    await userEvent.tab();
+    await expect(right).toHaveValue(8);
+    await userEvent.click(canvas.getByRole('radio', { name: 'Linked' }));
+    for (const side of ['Top', 'Right', 'Bottom', 'Left'])
+      await expect(canvas.getByRole('spinbutton', { name: side })).toHaveValue(
+        3,
+      );
+    await userEvent.clear(left);
+    await userEvent.type(left, '7');
+    await userEvent.tab();
+    await expect(canvas.getByRole('spinbutton', { name: 'Top' })).toHaveValue(
+      7,
+    );
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Reset margins' }),
+    );
+    for (const side of ['Top', 'Right', 'Bottom', 'Left'])
+      await expect(canvas.getByRole('spinbutton', { name: side })).toHaveValue(
+        3,
+      );
+    await expect(canvas.getByRole('radio', { name: 'Linked' })).toHaveAttribute(
+      'data-state',
+      'on',
+    );
+  },
+};

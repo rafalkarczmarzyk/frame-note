@@ -407,3 +407,112 @@ and anchor or X/Y plus “Drag to move” beside the canvas outline. This hint i
 clamped within the photo, ignores pointer events and hides during dragging.
 It belongs to the preview only and never enters the exported image.
 The floating on-photo editing toolbar remains deferred for a separate decision.
+
+## Photo margin rulers
+
+The photo preview has horizontal and vertical rulers aligned with the displayed
+image. Adaptive ticks show source-image values in the document unit. Markers
+identify left/right and top/bottom margins. Hovering either ruler shows all four
+full-image guides; hovering a marker or margin field highlights the linked edges
+(None/Pairs/All) in the same accent as MarginEditor. Field focus takes priority
+over hover. Guides update while numeric values change, ignore pointer events,
+and are absent from exported JPGs and presets. Ruler handles use a 32 × 28 px (or transposed) target with L/R/T/B badges
+and a live name/value tooltip on hover, focus and drag. Pointer capture keeps
+movement active outside the ruler. Dragging respects linking, document units
+and one-pixel inner-area limits; Escape or pointer cancellation restores the
+original margins. Arrow keys move the handle by the input step (Shift ×10).
+Active dragging takes precedence over field focus and hover.
+Story: Screens/TestPhotos/MarginRulers.
+
+Rulers rest at 60% opacity with only the triangular margin pointers visible.
+Hovering either ruler or a margin input, focusing an input/handle, or dragging
+restores full ruler opacity and reveals all letter badges. Invisible badges
+retain the same handle hit areas.
+
+MarginEditor places a compact RotateCcw + Reset action beside the unit label.
+It restores all four default margins (3% of the short image edge, converted to
+the current document unit), preserves the link mode and respects image limits.
+
+### Isolated margin ruler stories
+
+`Components/UI/MarginRulers` renders the production component over a neutral
+light/dark surface, without PhotoWorkspace, image loading or export. Each example
+has independent local state. Playground Controls set image width/height, preview
+scale, document unit, initial margins, link mode, disabled state and optional
+MarginEditor. Changing Controls resets that example's local session.
+
+- Playground: adjustable isolated example.
+- InteractionStates: resting, ruler hover, handle hover and keyboard focus next
+  to one another, seeded through the component's real events.
+- LinkModes and Units: side-by-side comparisons with equivalent pixel geometry
+  for px / short-edge / long-edge units.
+- Geometry: landscape, portrait, asymmetric margins and a small preview.
+- Limits: zero margins, one-pixel inner height and nearby handles. These examples
+  deliberately expose overlap and targeting problems for review.
+- WithMarginInput: shared hover/focus, input values and Reset.
+- Disabled: disabled ruler handles and MarginEditor.
+- HoverAndFocus, DragAndCancel and InputAndReset: automated play assertions.
+  The synthetic drag play substitutes pointer capture only; real browser pointer
+  capture remains covered by `e2e/margin-rulers.spec.ts`.
+
+The fixture scrolls when the chosen dimensions exceed the available width; it
+does not silently change the requested scale. Screens/TestPhotos/MarginRulers
+continues to cover integration with the actual editor.
+
+### Individual ruler primitives
+
+The editor composition now imports the same UI primitives documented separately:
+
+- `Components/UI/Ruler`: one horizontal or vertical ruler, active/resting opacity,
+  px scale, compact length, scale density and an interactive hover example.
+  `length` and `pixelsPerUnit` are display-pixel values. This component renders
+  ticks and its children; it owns no margins or document state.
+- `Components/UI/MarginHandle`: one marker on an empty surface, triangle-only,
+  letter, active, each side, hover/tooltip, keyboard focus, draggable, disabled
+  and a long numeric value. `position` is the triangle tip's display coordinate.
+  This is a controlled button/slider primitive forwarding pointer/keyboard props;
+  document linking and geometry remain in MarginRulers. Its small standalone
+  story controller supplies pointer capture and a simple value mapping.
+- `Components/UI/MarginGuides`: overlay alone, neutral, one active edge, each
+  paired axis, all edges, photo boundaries and nearly overlapping positions.
+- `MarginTooltip` shares name/value rendering between the composition and the
+  isolated handle stories.
+
+These stories require no MarginPreviewProvider. The existing MarginRulers suite
+continues to verify composition, real document units, input synchronization and
+shared interaction priority; it is not replaced by the primitive stories.
+
+### Compact margin editor
+
+MarginEditor exposes `appearance="compact"`; the application uses this accepted
+appearance. The previous default remains available in comparison stories. The compact
+variant puts Individual / Paired / Linked above the four always-visible values;
+these labels map to the existing none / pairs / all model without changing
+linking semantics. Custom mode symbols are not supplied yet.
+
+Its diagram grid is 134 px high, with the unit at the top-left and an icon + Reset label
+at the bottom-right. The center retains the same highlighted edges, with no
+photo icon or Caption area text. Header labels, helper paragraphs and native
+title tooltips are omitted in this variant. Ruler name/value tooltips are removed from the application composition; letters,
+triangles, accessible values and edge highlighting remain. NumberField forwards an
+optional title to NumberInput so an empty title can suppress its default hint.
+
+Components/UI/MarginEditor adds Compact, CompactPaired, CompactLinked,
+CompactPixels, CompactLongEdge, CompactDisabled, CompactNarrow (220 px),
+CompactFocused, CompactSidebar and CompactInteraction. The last example checks
+linked edits and reset while retaining the selected link mode. The default
+stories remain available for comparison.
+
+The compact center rectangle has a fixed 3:2 aspect ratio (72 × 48 px), centered
+in a 56 px row to leave space around focused inputs. Highlighted edges run the
+full length of its border without corner gaps.
+
+### Compact margins accepted in the application
+
+CaptionControls now uses the reviewed compact MarginEditor: Individual / Paired /
+Linked above the values, a 72 × 48 px center rectangle, full-length edge highlights,
+unit in the top-left and icon + Reset in the bottom-right. The extra margins
+helper paragraph is removed. MarginRulers no longer renders floating name/value
+tooltips; handles retain letters, triangles, accessible values and shared edge
+highlighting. Earlier review-only and tooltip descriptions above are historical.
+The shared Tooltip proposal remains deferred in NICE_TO_HAVE.md.

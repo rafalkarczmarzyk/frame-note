@@ -75,7 +75,7 @@ export function NumberInput({
         max={max}
         step={step}
         disabled={disabled}
-        title={`${format(value)}${suffix ? ` ${suffix}` : ''}`}
+        title={props.title ?? `${format(value)}${suffix ? ` ${suffix}` : ''}`}
         onFocus={(event) => {
           setDraft(format(value));
           setFocused(true);

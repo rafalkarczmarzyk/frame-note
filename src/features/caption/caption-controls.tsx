@@ -3,7 +3,6 @@ import { IconButton } from '@/components/ui/icon-button';
 import { ColorControls } from './color-controls';
 import { toPixels } from '@/domain/sizing';
 import { anchoredPosition, customPoint } from './layout';
-import { HelperText } from '@/components/ui/helper-text';
 import { SidebarSection } from '@/components/layout/sidebar-section';
 import {
   AlignLeft,
@@ -340,6 +339,7 @@ export function CaptionControls({
             className="space-y-4 disabled:opacity-70"
           >
             <MarginEditor
+              appearance="compact"
               hideLabel
               key={caption.sizingUnit}
               value={caption.position.margins}
@@ -352,10 +352,6 @@ export function CaptionControls({
                 position({ margins, marginLinkMode })
               }
             />
-            <HelperText>
-              Margins define the inner photo area. The anchor positions the
-              caption within it.
-            </HelperText>
           </fieldset>
         </SidebarSection>
       )}

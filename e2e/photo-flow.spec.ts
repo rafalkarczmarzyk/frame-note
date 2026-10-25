@@ -53,14 +53,14 @@ test('exports landscape and portrait JPGs with stable caption pixels and colors'
       ).toHaveValue('3');
       await page
         .getByRole('radiogroup', { name: 'Margin linking' })
-        .getByRole('radio', { name: 'All', exact: true })
+        .getByRole('radio', { name: 'Linked', exact: true })
         .click();
       await expect(
         page.getByRole('spinbutton', { name: 'Right', exact: true }),
       ).toHaveValue('3');
       await page
         .getByRole('radiogroup', { name: 'Margin linking' })
-        .getByRole('radio', { name: 'None', exact: true })
+        .getByRole('radio', { name: 'Individual', exact: true })
         .click();
       await expect(
         page.getByRole('button', { name: 'Export JPG', exact: true }),
@@ -235,7 +235,11 @@ test('exports landscape and portrait JPGs with stable caption pixels and colors'
         jpeg.subarray(2),
       ]),
     });
-    await page.getByLabel('Caption', { exact: true }).fill('');
+    const captionEditor = page.getByLabel('Caption', { exact: true });
+    await captionEditor.click();
+    await captionEditor.press('ControlOrMeta+A');
+    await captionEditor.press('Backspace');
+    await expect(captionEditor).toHaveAttribute('data-template', '');
     const pending = page.waitForEvent('download');
     await page.getByRole('button', { name: 'Export JPG', exact: true }).click();
     const path = await (await pending).path();

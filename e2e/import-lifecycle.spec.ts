@@ -122,7 +122,7 @@ test('keeps caption settings when replacing landscape and portrait photos', asyn
     .click();
   await page
     .getByRole('radiogroup', { name: 'Margin linking' })
-    .getByRole('radio', { name: 'Pairs', exact: true })
+    .getByRole('radio', { name: 'Paired', exact: true })
     .click();
   await page.getByRole('spinbutton', { name: 'Top', exact: true }).fill('5');
   await page.getByRole('spinbutton', { name: 'Left', exact: true }).fill('7');
@@ -170,7 +170,7 @@ test('keeps caption settings when replacing landscape and portrait photos', asyn
       page.getByRole('radio', { name: 'Align right', exact: true }),
     ).toBeChecked();
     await expect(
-      page.getByRole('radio', { name: 'Pairs', exact: true }),
+      page.getByRole('radio', { name: 'Paired', exact: true }),
     ).toBeChecked();
     await expect(
       page.getByRole('radio', { name: 'Balanced', exact: true }),
