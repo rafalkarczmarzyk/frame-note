@@ -1,6 +1,13 @@
-import { createMetadataField, type MetadataField } from '../../domain/metadata';
+import {
+  createMetadataField,
+  type MetadataCandidate,
+  type MetadataField,
+} from '../../domain/metadata';
 
-export function normalizeMetadata(groups: unknown): MetadataField[] {
+export function normalizeMetadata(
+  groups: unknown,
+  candidates: readonly MetadataCandidate[] = [],
+): MetadataField[] {
   if (!groups || typeof groups !== 'object') return [];
   const fields: MetadataField[] = [];
   for (const [group, tags] of Object.entries(groups)) {
@@ -15,7 +22,20 @@ export function normalizeMetadata(groups: unknown): MetadataField[] {
           ? description
           : (JSON.stringify(description ?? value) ?? '');
       fields.push(
-        createMetadataField({ group, name, rawValue: value, displayValue }),
+        createMetadataField({
+          group,
+          name,
+          rawValue: value,
+          displayValue,
+          ...(group === 'xmp' &&
+          candidates.some((candidate) => candidate.name === name)
+            ? {
+                candidates: candidates.filter(
+                  (candidate) => candidate.name === name,
+                ),
+              }
+            : {}),
+        }),
       );
     }
   }

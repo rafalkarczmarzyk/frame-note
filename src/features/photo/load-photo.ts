@@ -1,6 +1,7 @@
 import { PhotoLimitError, validateFileSize, validateImageSize } from './limits';
 import { createPhotoDocument, type PhotoDocument } from '../../domain/document';
-import { isJpeg, normalizeMetadata } from './metadata';
+import { extractMetadata } from './extract-metadata';
+import { isJpeg } from './metadata';
 
 export interface LoadedPhoto {
   document: PhotoDocument;
@@ -15,9 +16,7 @@ export async function loadPhoto(file: File): Promise<LoadedPhoto> {
     throw new Error('Please choose a valid JPG photo.');
   const url = URL.createObjectURL(file);
   try {
-    const { default: ExifReader } = await import('exifreader');
-    const tags = await ExifReader.load(bytes, { expanded: true, async: true });
-    const metadata = normalizeMetadata(tags);
+    const metadata = await extractMetadata(bytes);
     const sourceWidth = metadata.find(
       (field) => field.key === 'file:Image Width',
     )?.rawValue;

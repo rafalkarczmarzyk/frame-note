@@ -8,6 +8,19 @@ export interface MetadataField {
   displayValue: string;
   /** Original reader value retained for future formatting. */
   rawValue: unknown;
+  /** Fully qualified alternatives retained when XMP properties share a local name. */
+  candidates?: readonly MetadataCandidate[];
+}
+
+export interface MetadataCandidate {
+  group: string;
+  name: string;
+  source: string;
+  rawValue: unknown;
+  displayValue: string;
+  namespaceUri?: string;
+  propertyPath?: string;
+  language?: string;
 }
 
 export function metadataKey(group: string, name: string): string {
