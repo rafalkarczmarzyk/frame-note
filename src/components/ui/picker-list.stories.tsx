@@ -43,3 +43,36 @@ export const Empty: Story = {
 export const ContainerSelection: Story = {
   args: { selectionTone: 'container', selectedLabel: '' },
 };
+
+export const ReorderLayers: Story = {
+  render: function ReorderLayers() {
+    const [items, setItems] = useState([
+      { id: 'signature', label: 'Signature', selected: true },
+      { id: 'camera', label: 'Camera details' },
+      { id: 'author', label: 'Author' },
+    ]);
+    return (
+      <div className="max-w-sm">
+        <PickerList
+          items={items}
+          selectionTone="container"
+          selectedLabel=""
+          onChoose={(id) =>
+            setItems((items) =>
+              items.map((item) => ({ ...item, selected: item.id === id })),
+            )
+          }
+          onMove={(id, index) =>
+            setItems((items) => {
+              const result = [...items];
+              const current = result.findIndex((item) => item.id === id);
+              const [item] = result.splice(current, 1);
+              result.splice(index, 0, item!);
+              return result;
+            })
+          }
+        />
+      </div>
+    );
+  },
+};

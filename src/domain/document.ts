@@ -1,3 +1,4 @@
+import type { ImageAsset } from './inline-image';
 import type { LogoContent } from './svg-asset';
 import type { Margins, SizingUnit, MarginLinkMode } from './sizing';
 import type { MetadataField } from './metadata';
@@ -28,7 +29,9 @@ export type Anchor =
   | 'bottom-right';
 
 export interface Caption {
+  visible?: boolean;
   logo?: LogoContent;
+  images?: ImageAsset[];
   template: string;
   sizingUnit: SizingUnit;
   style: {

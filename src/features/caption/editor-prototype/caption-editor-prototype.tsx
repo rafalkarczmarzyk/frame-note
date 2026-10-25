@@ -51,7 +51,7 @@ export function CaptionEditorPrototype() {
         'aria-label': 'Visual caption editor',
         'aria-multiline': 'true',
         class:
-          'control-field min-h-44 p-3 text-sm leading-8 whitespace-pre-wrap outline-none',
+          'control-field min-h-44 p-3 text-sm leading-8 whitespace-pre-wrap outline-none [&_.ProseMirror-selectednode]:outline-none',
       },
       clipboardTextSerializer: (slice) =>
         documentTemplate({ type: 'doc', content: slice.content.toJSON() }),

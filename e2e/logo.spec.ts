@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
 
-test('adds and replaces a proportional SVG logo, exports original and single colors, and shares positioning', async ({
+test('adds SVG through container content and exports original and single colors', async ({
   page,
 }) => {
   await page.goto('/');
@@ -20,30 +20,30 @@ test('adds and replaces a proportional SVG logo, exports original and single col
     buffer: Buffer.from(black, 'base64'),
   };
   await page.getByLabel('Choose JPG photo').setInputFiles(photo);
-  await page.getByLabel('Caption', { exact: true }).fill('Author');
-  await page.getByLabel('Upload SVG logo').setInputFiles({
+  await page.getByLabel('Caption', { exact: true }).press('ControlOrMeta+a');
+  await page.getByLabel('Caption', { exact: true }).press('Backspace');
+  await expect(page.getByLabel('Caption', { exact: true })).toHaveAttribute(
+    'data-template',
+    '',
+  );
+  await expect(
+    page.getByRole('button', { name: 'Add logo', exact: true }),
+  ).toHaveCount(0);
+  await page.getByLabel('Upload image', { exact: true }).setInputFiles({
     name: 'two-colors.svg',
     mimeType: 'image/svg+xml',
     buffer: Buffer.from(
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50"><rect width="50" height="50" fill="red"/><rect x="50" width="50" height="50" fill="blue"/></svg>',
     ),
   });
-  const width = page.getByRole('spinbutton', {
-    name: 'Logo width',
-    exact: true,
-  });
+  await page.getByRole('img', { name: 'two-colors.svg', exact: true }).click();
+  await page.getByRole('radio', { name: 'Fixed height', exact: true }).click();
   const height = page.getByRole('spinbutton', {
-    name: 'Logo height',
+    name: 'Image height',
     exact: true,
   });
-  await expect(width).toHaveValue('15');
-  await expect(height).toHaveValue('7.5');
-  await expect(
-    page.getByRole('button', { name: 'bottom-right', exact: true }),
-  ).toHaveAttribute('aria-pressed', 'true');
-  await expect(
-    page.getByRole('spinbutton', { name: 'Font size', exact: true }),
-  ).toHaveCount(0);
+  await height.fill('7.5');
+  await page.getByRole('button', { name: 'bottom-right', exact: true }).click();
   async function pixels() {
     const button = page.getByRole('button', {
       name: 'Export JPG',
@@ -74,8 +74,10 @@ test('adds and replaces a proportional SVG logo, exports original and single col
   expect(original[0]![0]).toBeGreaterThan(240);
   expect(original[0]![2]).toBeLessThan(15);
   expect(original[1]![2]).toBeGreaterThan(240);
-  await page.getByRole('radio', { name: 'Single color', exact: true }).click();
+  await page.getByRole('img', { name: 'two-colors.svg', exact: true }).click();
+  await page.getByRole('radio', { name: 'Layer color', exact: true }).click();
   await page.getByRole('button', { name: 'Color', exact: true }).click();
+  await page.getByRole('button', { name: 'More colors…', exact: true }).click();
   const hex = page.getByRole('textbox', {
     name: 'Custom color (HEX)',
     exact: true,
@@ -87,57 +89,11 @@ test('adds and replaces a proportional SVG logo, exports original and single col
     expect(Math.abs(pixel[1]! - 171)).toBeLessThan(8);
     expect(Math.abs(pixel[2]! - 52)).toBeLessThan(8);
   }
-  await width.fill('20');
-  await expect(height).toHaveValue('10');
-  await height.fill('5');
-  await expect(width).toHaveValue('10');
-  await page
-    .getByRole('combobox', { name: 'Sizing unit', exact: true })
-    .click();
-  await page.getByRole('option', { name: 'Pixels (px)', exact: true }).click();
-  await expect(width).toHaveValue('80');
-  await expect(height).toHaveValue('40');
-  await page.getByRole('radio', { name: 'Manual', exact: true }).click();
-  await page
-    .getByRole('spinbutton', { name: 'X position', exact: true })
-    .fill('50');
-  await page
-    .getByRole('spinbutton', { name: 'Y position', exact: true })
-    .fill('50');
-  await page.getByLabel('Replace SVG logo').setInputFiles({
-    name: 'replacement.svg',
-    mimeType: 'image/svg+xml',
-    buffer: Buffer.from(
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="orange"/></svg>',
-    ),
-  });
-  await expect(height).toHaveValue('80');
-  await expect(width).toHaveValue('80');
+  await page.getByRole('img', { name: 'two-colors.svg', exact: true }).click();
+  await expect(height).toHaveValue('7.5');
+  await page.getByRole('img', { name: 'two-colors.svg', exact: true }).click();
+  await page.getByRole('button', { name: 'Remove image', exact: true }).click();
   await expect(
-    page.getByRole('spinbutton', { name: 'X position', exact: true }),
-  ).toHaveValue('50');
-  await page
-    .getByLabel('Choose JPG photo')
-    .setInputFiles({ ...photo, name: 'replacement-photo.jpg' });
-  await expect(width).toHaveValue('80');
-  await expect(
-    page.getByRole('spinbutton', { name: 'X position', exact: true }),
-  ).toHaveValue('50');
-  await page
-    .getByRole('button', { name: 'Duplicate container 2', exact: true })
-    .click();
-  await expect(
-    page.getByRole('button', { name: /^replacement.svg/ }),
-  ).toHaveCount(2);
-  await page
-    .getByRole('button', { name: 'Delete container 2', exact: true })
-    .click();
-  await expect(width).toHaveValue('80');
-  await page
-    .getByRole('button', { name: 'Add container', exact: true })
-    .click();
-  await expect(
-    page.getByRole('textbox', { name: 'Caption', exact: true }),
-  ).toHaveAttribute('data-template', '');
-  await expect(width).toHaveCount(0);
+    page.getByRole('img', { name: 'two-colors.svg', exact: true }),
+  ).toHaveCount(0);
 });

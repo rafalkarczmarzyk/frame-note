@@ -1,9 +1,11 @@
+import { migrateLogo, parseImageToken } from './inline-image';
+import { validateImageAssets } from './image-validation';
 import type { CaptionLayout } from './caption-layout';
 import type { SvgAsset } from './svg-asset';
 import { captionColors, normalizeHex } from './caption-colors';
 
 export interface LayoutPreset {
-  version: 1;
+  version: 1 | 2;
   id: string;
   name: string;
   layout: CaptionLayout;
@@ -48,7 +50,8 @@ export function parsePreset(
   if (source.length > 5_000_000)
     throw Error('Preset must be smaller than 5 MB.');
   const data = record(JSON.parse(source));
-  if (data.version !== 1) throw Error('Unsupported preset version.');
+  if (data.version !== 1 && data.version !== 2)
+    throw Error('Unsupported preset version.');
   const name = text(data.name, 80).trim();
   if (!name) return invalid();
   const asset = (value: unknown, logo = false) => {
@@ -86,6 +89,12 @@ export function parsePreset(
     const logo = c.logo === undefined ? undefined : record(c.logo);
     return {
       id,
+      ...(c.visible === undefined
+        ? {}
+        : { visible: typeof c.visible === 'boolean' ? c.visible : invalid() }),
+      ...(c.images !== undefined
+        ? { images: validateImageAssets(c.images, validateSvg) }
+        : {}),
       template: text(c.template, 100_000),
       style: {
         fontFamily: oneOf(s.fontFamily, ['Montserrat Variable', 'Advercase']),
@@ -132,7 +141,7 @@ export function parsePreset(
   if (new Set(icons.map((icon) => icon.name)).size !== icons.length)
     return invalid();
   return {
-    version: 1,
+    version: 2,
     id: text(data.id, 100),
     name,
     layout: {
@@ -144,7 +153,7 @@ export function parsePreset(
         left: number(margins.left, 0),
       },
       marginLinkMode: oneOf(raw.marginLinkMode, ['none', 'pairs', 'all']),
-      containers,
+      containers: containers.map(migrateLogo),
       activeId:
         typeof raw.activeId === 'string' && ids.has(raw.activeId)
           ? raw.activeId
@@ -166,10 +175,26 @@ export function createPreset(
     ),
   ]);
   return structuredClone({
-    version: 1,
+    version: 2,
     id,
     name: name.trim(),
-    layout,
+    layout: {
+      ...layout,
+      containers: layout.containers.map((container) => {
+        const migrated = migrateLogo(container);
+        const ids = new Set(
+          [...migrated.template.matchAll(/\{(image:[^{}]*)\}/gu)].map(
+            (match) => parseImageToken(match[1]!)?.assetId,
+          ),
+        );
+        return {
+          ...migrated,
+          ...(migrated.images
+            ? { images: migrated.images.filter((image) => ids.has(image.id)) }
+            : {}),
+        };
+      }),
+    },
     icons: icons.filter((icon) => used.has(icon.name)),
   });
 }

@@ -1,13 +1,15 @@
+import { moveLayer, toggleLayerVisibility } from '@/domain/caption-layout';
+import { Eye, EyeOff } from 'lucide-react';
+import { migrateLogo, parseImageToken } from '@/domain/inline-image';
 import { MarginRulers } from './margin-rulers';
 import { MarginPreviewProvider } from '@/components/ui/margin-preview-provider';
 import { InspectorSection } from '@/components/layout/inspector-section';
 import { createId } from '@/lib/create-id';
 import { defaultTemplate } from '@/domain/builtin-presets';
 import { PresetControls } from '../presets/preset-controls';
-import { LogoControls } from '../caption/logo-controls';
 import { logoLayout } from '../caption/logo-layout';
 import { tintedIcon } from '../caption/inline-layout';
-import { svgIcon, svgUrl } from '../caption/svg-icons';
+import { svgUrl } from '../caption/svg-icons';
 import { brandIcons } from '../caption/brand-icons';
 import { iconMarker } from '../caption/inline-content';
 import { builtinIcons } from '../caption/builtin-icons';
@@ -22,7 +24,6 @@ import { customPoint, customPosition } from '../caption/layout';
 import { AnchorIcon } from '@/components/ui/anchor-picker';
 import {
   addCaption,
-  addLogo,
   containerCaption,
   createCaptionLayout,
   removeCaption,
@@ -44,7 +45,6 @@ import {
   Tags,
   Shapes,
   Type,
-  Image as ImageIcon,
 } from 'lucide-react';
 import { PhotoIcon } from '@/components/icons/photo-icon';
 import {
@@ -121,20 +121,28 @@ function PhotoWorkspaceContent({
   const [fontQuery, setFontQuery] = useState('');
   const [size, setSize] = useState({ width: 1, height: 1 });
   const [query, setQuery] = useState('');
-  const [layout, setLayout] = useState(
-    () =>
-      initialLayout ??
-      createCaptionLayout({
-        ...photo.document.caption,
-        template: defaultTemplate,
-      }),
+  const [layout, setLayout] = useState(() =>
+    initialLayout
+      ? {
+          ...initialLayout,
+          containers: initialLayout.containers.map(migrateLogo),
+        }
+      : createCaptionLayout({
+          ...photo.document.caption,
+          template: defaultTemplate,
+        }),
   );
   const assets = useMemo(
     () => [
       ...icons,
-      ...layout.containers.flatMap((container) =>
-        container.logo ? [container.logo.asset] : [],
-      ),
+      ...layout.containers.flatMap((container) => [
+        ...(container.logo ? [container.logo.asset] : []),
+        ...(container.images ?? []).map((image) => ({
+          name: image.name,
+          svg: image.source,
+          aspect: image.width / image.height,
+        })),
+      ]),
     ],
     [icons, layout.containers],
   );
@@ -157,43 +165,6 @@ function PhotoWorkspaceContent({
     };
   }, [assets]);
   const iconsReady = assets.every((asset) => iconImages.has(asset.svg));
-  const logoUpload = useRef<HTMLInputElement>(null);
-  const [logoLoading, setLogoLoading] = useState(false);
-  const uploadLogo = async (file: File, replaceId?: string) => {
-    setError('');
-    setLogoLoading(true);
-    try {
-      if (file.size > 256_000) throw Error('SVG must be smaller than 256 KB.');
-      const asset = { ...svgIcon('logo', await file.text()), name: file.name };
-      await loadIcon(asset);
-      setLayout((value) =>
-        replaceId
-          ? {
-              ...value,
-              containers: value.containers.map((container) =>
-                container.id === replaceId && container.logo
-                  ? { ...container, logo: { ...container.logo, asset } }
-                  : container,
-              ),
-            }
-          : addLogo(
-              value,
-              Array.from(crypto.getRandomValues(new Uint32Array(4)), (part) =>
-                part.toString(16).padStart(8, '0'),
-              ).join(''),
-              asset,
-              photo.document.photo.dimensions,
-            ),
-      );
-      setActivePanel(null);
-    } catch (cause) {
-      setError(
-        cause instanceof Error ? cause.message : 'Could not load SVG logo.',
-      );
-    } finally {
-      setLogoLoading(false);
-    }
-  };
   const activeContainer = layout.containers.find(
     (container) => container.id === layout.activeId,
   );
@@ -220,8 +191,10 @@ function PhotoWorkspaceContent({
       ),
     );
   };
-  const setTemplate = (template: string) =>
-    setSettings({ ...settings, template });
+  const setTemplate = (
+    template: string,
+    images?: import('@/domain/inline-image').ImageAsset[],
+  ) => setSettings({ ...settings, template, ...(images ? { images } : {}) });
   const selectContainer = (id: string) => {
     setEditingId(null);
     if (layout.containers.find((container) => container.id === id)?.logo)
@@ -260,23 +233,27 @@ function PhotoWorkspaceContent({
     template,
     photo.document.photo.metadata,
     icons,
+    settings.images,
   );
   const renderedCaptions = useMemo(
     () =>
-      layout.containers.map((container) => {
-        const caption = containerCaption(layout, container);
-        const resolved = resolveCaptionContent(
-          caption.template,
-          photo.document.photo.metadata,
-          icons,
-        );
-        const color = resolveCaptionColor(caption.style.color, (name) =>
-          getComputedStyle(document.documentElement).getPropertyValue(
-            `--color-${name}`,
-          ),
-        );
-        return { id: container.id, caption, ...resolved, color };
-      }),
+      layout.containers
+        .filter((container) => container.visible !== false)
+        .map((container) => {
+          const caption = containerCaption(layout, container);
+          const resolved = resolveCaptionContent(
+            caption.template,
+            photo.document.photo.metadata,
+            icons,
+            caption.images,
+          );
+          const color = resolveCaptionColor(caption.style.color, (name) =>
+            getComputedStyle(document.documentElement).getPropertyValue(
+              `--color-${name}`,
+            ),
+          );
+          return { id: container.id, caption, ...resolved, color };
+        }),
     [layout, photo, icons],
   );
   const exportCaptions = useMemo(
@@ -810,177 +787,206 @@ function PhotoWorkspaceContent({
           </section>
           <SidebarSection
             id="containers"
-            title="Containers"
+            title="Layers"
             iconTone="caption"
             icon={<Layers />}
           >
-            <div className="mb-3 flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => addContainer()}
-              >
-                <Plus aria-hidden="true" />
-                Add container
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={logoLoading}
-                onClick={() => logoUpload.current?.click()}
-              >
-                <ImageIcon aria-hidden="true" />
-                Add logo
-              </Button>
-              <input
-                ref={logoUpload}
-                type="file"
-                accept=".svg,image/svg+xml"
-                className="hidden"
-                aria-label="Upload SVG logo"
-                onChange={(event) => {
-                  const file = event.currentTarget.files?.[0];
-                  event.currentTarget.value = '';
-                  if (file) void uploadLogo(file);
-                }}
-              />
-            </div>
-            {logoLoading && (
-              <p role="status" className="mb-3 text-xs">
-                Loading SVG…
-              </p>
-            )}
             {error && (
               <p role="alert" className="mb-3 text-xs">
                 {error}
               </p>
             )}
             <PickerList
-              items={layout.containers.map((container, index) => ({
-                id: container.id,
-                leading: container.logo ? (
-                  <img
-                    src={svgUrl(container.logo.asset.svg)}
-                    alt=""
-                    className="size-6 shrink-0 rounded bg-content-primary p-0.5"
-                  />
-                ) : undefined,
-                label:
-                  container.logo?.asset.name ||
-                  container.template
-                    .trim()
-                    .replace(/\s+/gu, ' ')
-                    .slice(0, 70) ||
-                  'Empty caption',
-                description: (
-                  <span className="flex items-center gap-1.5">
-                    <span>{index + 1} ·</span>
-                    <AnchorIcon
-                      value={container.position.anchor}
-                      className="size-3.5 shrink-0"
+              onMove={(id, index) =>
+                setLayout((value) => moveLayer(value, id, index))
+              }
+              items={[...layout.containers]
+                .reverse()
+                .map((container, index) => ({
+                  muted: container.visible === false,
+                  controlsLeft: (
+                    <IconButton
+                      aria-pressed={container.visible !== false}
+                      label={`${container.visible === false ? 'Show' : 'Hide'} layer ${index + 1}`}
+                      onClick={() =>
+                        setLayout((value) =>
+                          toggleLayerVisibility(value, container.id),
+                        )
+                      }
+                    >
+                      {container.visible === false ? <EyeOff /> : <Eye />}
+                    </IconButton>
+                  ),
+                  id: container.id,
+                  leading: container.logo ? (
+                    <img
+                      src={svgUrl(container.logo.asset.svg)}
+                      alt=""
+                      className="size-6 shrink-0 rounded bg-content-primary p-0.5"
                     />
-                    <span>
-                      {container.position.custom ? 'Manual · ' : ''}
-                      {container.position.anchor.replaceAll('-', ' ')}
+                  ) : undefined,
+                  label:
+                    container.logo?.asset.name ||
+                    container.template
+                      .replace(/\{(image:[^{}]*)\}/gu, (_, token: string) => {
+                        const reference = parseImageToken(token);
+                        return (
+                          container.images?.find(
+                            (image) => image.id === reference?.assetId,
+                          )?.name ?? 'Missing image'
+                        );
+                      })
+                      .trim()
+                      .replace(/\s+/gu, ' ')
+                      .slice(0, 70) ||
+                    'Empty caption',
+                  description: (
+                    <span className="flex items-center gap-1.5">
+                      <span>{index + 1} ·</span>
+                      <AnchorIcon
+                        value={container.position.anchor}
+                        className="size-3.5 shrink-0"
+                      />
+                      <span>
+                        {container.position.custom ? 'Manual · ' : ''}
+                        {container.position.anchor.replaceAll('-', ' ')}
+                      </span>
                     </span>
-                  </span>
-                ),
-                selected: layout.activeId === container.id,
-                actions: (
-                  <div className="flex items-center">
-                    <IconButton
-                      label={`Duplicate container ${index + 1}`}
-                      onClick={() => {
-                        setEditingId(null);
-                        setLayout((value) =>
-                          addCaption(
-                            { ...value, activeId: container.id },
-                            Array.from(
-                              crypto.getRandomValues(new Uint32Array(4)),
-                              (part) => part.toString(16).padStart(8, '0'),
-                            ).join(''),
-                            true,
-                            photo.document.photo.dimensions,
-                          ),
-                        );
-                      }}
-                    >
-                      <Copy />
-                    </IconButton>
-                    <IconButton
-                      label={`Delete container ${index + 1}`}
-                      onClick={() => {
-                        if (layout.activeId === container.id) {
+                  ),
+                  selected: layout.activeId === container.id,
+                  actions: (
+                    <div className="flex items-center">
+                      <IconButton
+                        label={`Duplicate layer ${index + 1}`}
+                        onClick={() => {
                           setEditingId(null);
-                        }
-                        setHoveredId(null);
-                        setLayout((value) =>
-                          removeCaption(value, container.id),
-                        );
-                      }}
-                    >
-                      <Trash2 />
-                    </IconButton>
-                  </div>
-                ),
-              }))}
+                          setLayout((value) =>
+                            addCaption(
+                              { ...value, activeId: container.id },
+                              Array.from(
+                                crypto.getRandomValues(new Uint32Array(4)),
+                                (part) => part.toString(16).padStart(8, '0'),
+                              ).join(''),
+                              true,
+                              photo.document.photo.dimensions,
+                            ),
+                          );
+                        }}
+                      >
+                        <Copy />
+                      </IconButton>
+                      <IconButton
+                        label={`Delete layer ${index + 1}`}
+                        onClick={() => {
+                          if (layout.activeId === container.id) {
+                            setEditingId(null);
+                          }
+                          setHoveredId(null);
+                          setLayout((value) =>
+                            removeCaption(value, container.id),
+                          );
+                        }}
+                      >
+                        <Trash2 />
+                      </IconButton>
+                    </div>
+                  ),
+                }))}
               selectionTone="container"
               selectedLabel=""
               onChoose={selectContainer}
               onHover={setHoveredId}
-              emptyText="Add a text container to begin."
+              emptyText="Add a layer to begin."
             />
             {activeContainer &&
+              activeContainer.visible !== false &&
               layout.containers.some(
                 (container) =>
                   container.id !== activeContainer.id &&
+                  container.visible !== false &&
                   !container.position.custom &&
                   !activeContainer.position.custom &&
                   container.position.anchor === activeContainer.position.anchor,
               ) && (
                 <InlineNotice tone="warning" className="mt-3">
-                  Multiple containers use this anchor and may overlap. Select
-                  each from the list to change its anchor.
+                  Multiple layers use this anchor and may overlap. Select each
+                  from the list to change its anchor.
                 </InlineNotice>
               )}
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => addContainer()}
+              >
+                <Plus aria-hidden="true" />
+                Add layer
+              </Button>
+            </div>
           </SidebarSection>
           {activeContainer && (
             <SidebarSection
               key={activeContainer.id}
               id="selected-container"
-              title={settings.logo ? 'Logo container' : 'Text container'}
-              icon={settings.logo ? <ImageIcon /> : <Type />}
+              title="Layer"
+              icon={<Type />}
               iconTone="typography"
               surface="container"
             >
-              {settings.logo ? (
-                <LogoControls
-                  caption={settings}
-                  dimensions={photo.document.photo.dimensions}
-                  onChange={setSettings}
-                  onReplace={(file) => {
-                    void uploadLogo(file, activeContainer.id);
-                  }}
-                  onBrowseColors={() =>
-                    setActivePanel((value) =>
-                      value === 'colors' ? null : 'colors',
-                    )
-                  }
-                />
-              ) : (
-                <>
-                  <InspectorSection title="Content">
-                    <CaptionEditor
-                      value={template}
-                      fields={photo.document.photo.metadata}
-                      icons={icons}
-                      onChange={setTemplate}
-                      onFocus={() => setEditingId(activeContainer.id)}
-                      onBlur={() => setEditingId(null)}
-                      onReady={editorReady}
-                    />
-                    {(resolved.missing.length > 0 ||
-                      resolved.invalidSyntax) && (
+              <>
+                <InspectorSection title="Content">
+                  <CaptionEditor
+                    value={template}
+                    images={settings.images}
+                    sizingUnit={settings.sizingUnit}
+                    fontSize={settings.style.fontSize}
+                    dimensions={photo.document.photo.dimensions}
+                    fields={photo.document.photo.metadata}
+                    icons={icons}
+                    onChange={setTemplate}
+                    onFocus={() => setEditingId(activeContainer.id)}
+                    onBlur={() => setEditingId(null)}
+                    onReady={editorReady}
+                    actions={
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          aria-label={
+                            tagsOpen
+                              ? 'Hide available tags'
+                              : 'Browse available tags'
+                          }
+                          aria-expanded={tagsOpen}
+                          aria-controls="auxiliary-panel"
+                          onClick={() =>
+                            setActivePanel((value) =>
+                              value === 'tags' ? null : 'tags',
+                            )
+                          }
+                        >
+                          <Tags aria-hidden="true" />
+                          Tags
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          aria-label="Browse icons"
+                          aria-expanded={activePanel === 'icons'}
+                          onClick={() =>
+                            setActivePanel((value) =>
+                              value === 'icons' ? null : 'icons',
+                            )
+                          }
+                        >
+                          <Shapes aria-hidden="true" />
+                          Icons
+                        </Button>
+                      </>
+                    }
+                  />
+                  {settings.visible !== false &&
+                    (resolved.missing.length > 0 || resolved.invalidSyntax) && (
                       <p className="mt-2 text-xs" role="status">
                         {resolved.invalidSyntax ? 'Check token syntax. ' : ''}
                         {resolved.missing.length
@@ -988,46 +994,9 @@ function PhotoWorkspaceContent({
                           : ''}
                       </p>
                     )}
-                    <div className="mt-2 flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        aria-label={
-                          tagsOpen
-                            ? 'Hide available tags'
-                            : 'Browse available tags'
-                        }
-                        aria-expanded={tagsOpen}
-                        aria-controls="auxiliary-panel"
-                        onClick={() =>
-                          setActivePanel((value) =>
-                            value === 'tags' ? null : 'tags',
-                          )
-                        }
-                      >
-                        <Tags aria-hidden="true" />
-                        Tags
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        aria-label="Browse icons"
-                        aria-expanded={activePanel === 'icons'}
-                        onClick={() =>
-                          setActivePanel((value) =>
-                            value === 'icons' ? null : 'icons',
-                          )
-                        }
-                      >
-                        <Shapes aria-hidden="true" />
-                        Icons
-                      </Button>
-                    </div>
-                  </InspectorSection>
-                </>
-              )}
+                </InspectorSection>
+              </>
               <CaptionControls
-                hideTypography={!!settings.logo}
                 scope="local"
                 dimensions={photo.document.photo.dimensions}
                 caption={settings}
@@ -1056,8 +1025,8 @@ function PhotoWorkspaceContent({
               (item) => item.invalidSyntax || item.missing.length,
             ) && (
               <InlineNotice tone="warning" className="mb-3">
-                Some containers have missing fields or invalid tokens. Select
-                them to review their captions.
+                Some layers have missing fields or invalid tokens. Select them
+                to review their captions.
               </InlineNotice>
             )}
             <fieldset disabled={exporting}>

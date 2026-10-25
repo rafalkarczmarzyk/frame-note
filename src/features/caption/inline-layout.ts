@@ -3,6 +3,7 @@ import type { Caption, ImageDimensions } from '@/domain/document';
 import { toPixels } from '../../domain/sizing';
 import { anchoredPosition, customPosition } from './layout';
 import { inlineRuns } from './inline-content';
+import type { InlineAsset } from '@/domain/inline-image';
 import type { SvgIcon } from './svg-icons';
 
 export interface InlineRun {
@@ -10,13 +11,15 @@ export interface InlineRun {
   y: number;
   width: number;
   text?: string;
-  icon?: SvgIcon;
+  icon?: InlineAsset;
+  height: number;
+  original?: boolean;
 }
 export function inlineLayout(
   dimensions: ImageDimensions,
   caption: Caption,
   text: string,
-  icons: readonly SvgIcon[],
+  icons: readonly InlineAsset[],
 ) {
   const fontSize = toPixels(
     caption.style.fontSize,
@@ -38,10 +41,19 @@ export function inlineLayout(
               wrap: 'none',
             })
           : null;
-      const size = icon ? fontSize * icon.aspect : (metrics?.width() ?? 0);
+      const height = icon?.image
+        ? icon.image.unit === 'font'
+          ? fontSize * icon.image.height
+          : toPixels(icon.image.height, caption.sizingUnit, dimensions)
+        : fontSize;
+      const size = icon ? height * icon.aspect : (metrics?.width() ?? 0);
       metrics?.destroy();
       const result = {
         x: width,
+        height,
+        original:
+          icon?.image?.colorMode === 'original' ||
+          icon?.image?.asset.format === 'png',
         width: size,
         text: 'text' in run ? run.text : undefined,
         icon,
@@ -49,11 +61,16 @@ export function inlineLayout(
       width += size;
       return result;
     });
-    return { width, runs };
+    const hasImage = runs.some((run) => run.icon?.image);
+    const imageOnly = runs.length > 0 && runs.every((run) => run.icon?.image);
+    const height = hasImage
+      ? Math.max(imageOnly ? 0 : lineHeight, ...runs.map((run) => run.height))
+      : lineHeight;
+    return { width, runs, height, hasImage };
   });
   const block = {
     width: Math.max(0, ...lines.map((line) => line.width)),
-    height: lines.length * lineHeight,
+    height: lines.reduce((sum, line) => sum + line.height, 0),
   };
   const margins = {
     top: toPixels(caption.position.margins.top, caption.sizingUnit, dimensions),
@@ -81,7 +98,10 @@ export function inlineLayout(
         caption.position.custom,
       )
     : anchoredPosition(dimensions, block, caption.position.anchor, margins);
-  const runs: InlineRun[] = lines.flatMap((line, row) => {
+  let rowY = 0;
+  const runs: InlineRun[] = lines.flatMap((line) => {
+    const y = rowY;
+    rowY += line.height;
     const offset =
       caption.style.textAlign === 'right'
         ? block.width - line.width
@@ -91,7 +111,11 @@ export function inlineLayout(
     return line.runs.map((run) => ({
       ...run,
       x: run.x + offset,
-      y: row * lineHeight,
+      y:
+        y +
+        (line.hasImage
+          ? (line.height - (run.icon ? run.height : lineHeight)) / 2
+          : 0),
     }));
   });
   return { ...block, ...position, fontSize, lineHeight, runs };

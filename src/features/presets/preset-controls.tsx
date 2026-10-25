@@ -29,6 +29,7 @@ import {
   presetStorageKey,
   type LayoutPreset,
 } from '@/domain/presets';
+import { loadIcon } from '../caption/svg-icons';
 import { svgIcon } from '../caption/svg-icons';
 
 export function PresetControls({
@@ -89,6 +90,15 @@ export function PresetControls({
     onBrowse();
   };
   const store = (next: LayoutPreset[]) => {
+    if (
+      next.some(
+        (preset) =>
+          new Blob([JSON.stringify(preset, null, 2)]).size > 5_000_000,
+      )
+    ) {
+      setError('Preset exceeds 5 MB. Use smaller image files or fewer images.');
+      return false;
+    }
     try {
       if (persist) localStorage.setItem(presetStorageKey, JSON.stringify(next));
       setPresets(next);
@@ -285,11 +295,16 @@ export function PresetControls({
                         layout,
                         icons,
                       );
-                      const url = URL.createObjectURL(
-                        new Blob([JSON.stringify(preset, null, 2)], {
-                          type: 'application/json',
-                        }),
-                      );
+                      const blob = new Blob([JSON.stringify(preset, null, 2)], {
+                        type: 'application/json',
+                      });
+                      if (blob.size > 5_000_000) {
+                        setError(
+                          'Preset exceeds 5 MB. Use smaller image files or fewer images.',
+                        );
+                        return;
+                      }
+                      const url = URL.createObjectURL(blob);
                       const link = document.createElement('a');
                       link.href = url;
                       link.download = `${preset.name.replace(/[^a-z0-9_-]/gi, '-')}.framenote.json`;
@@ -418,6 +433,17 @@ export function PresetControls({
               ...parsePreset(await file.text(), svgIcon),
               id: createId(),
             };
+            await Promise.all(
+              preset.layout.containers.flatMap((container) =>
+                (container.images ?? []).map((asset) =>
+                  loadIcon({
+                    name: asset.name,
+                    svg: asset.source,
+                    aspect: asset.width / asset.height,
+                  }),
+                ),
+              ),
+            );
             if (store([...presets, preset])) apply(preset);
           } catch (cause) {
             setError(

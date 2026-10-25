@@ -9,9 +9,7 @@ test('edits independent containers, selects on canvas and exports the whole layo
   await page.getByLabel('Choose JPG photo').setInputFiles(wildlifeFixture.path);
   const caption = page.getByLabel('Caption', { exact: true });
   await caption.fill('First caption');
-  await page
-    .getByRole('button', { name: 'Add container', exact: true })
-    .click();
+  await page.getByRole('button', { name: 'Add layer', exact: true }).click();
   await expect(caption).toHaveAttribute('data-template', '');
   await caption.fill('Second caption');
   await page.getByRole('button', { name: 'top-right', exact: true }).click();
@@ -77,7 +75,7 @@ test('edits independent containers, selects on canvas and exports the whole layo
   await page.getByRole('button', { name: /First caption/ }).click();
   const both = await downloadImage();
   await page
-    .getByRole('button', { name: 'Delete container 1', exact: true })
+    .getByRole('button', { name: 'Delete layer 2', exact: true })
     .click();
   await expect(caption).toHaveAttribute('data-template', 'Second caption');
   const secondOnly = await downloadImage();
@@ -123,21 +121,19 @@ test('edits independent containers, selects on canvas and exports the whole layo
   expect(changes.bottomLeft).toBeGreaterThan(100);
   expect(changes.topRight).toBe(0);
   await page
-    .getByRole('button', { name: 'Duplicate container 1', exact: true })
+    .getByRole('button', { name: 'Duplicate layer 1', exact: true })
     .click();
   await expect(
     page.getByRole('button', { name: /Second caption/ }),
   ).toHaveCount(2);
   await page
-    .getByRole('button', { name: 'Delete container 1', exact: true })
+    .getByRole('button', { name: 'Delete layer 1', exact: true })
     .click();
   await page
-    .getByRole('button', { name: 'Delete container 1', exact: true })
+    .getByRole('button', { name: 'Delete layer 1', exact: true })
     .click();
-  await expect(page.getByText('Add a text container to begin.')).toBeVisible();
+  await expect(page.getByText('Add a layer to begin.')).toBeVisible();
   await expect(globalLeft).toHaveValue('100');
-  await page
-    .getByRole('button', { name: 'Add container', exact: true })
-    .click();
+  await page.getByRole('button', { name: 'Add layer', exact: true }).click();
   await expect(caption).toHaveAttribute('data-template', '');
 });

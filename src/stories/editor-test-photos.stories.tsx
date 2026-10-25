@@ -277,3 +277,52 @@ export const MarginRulers: Story = {
     },
   },
 };
+
+function MixedImageExample() {
+  const [layout, setLayout] = useState<CaptionLayout | null>(null);
+  const [error, setError] = useState('');
+  useEffect(() => {
+    let active = true;
+    void (async () => {
+      const [{ importImage }, { imageToken }, svgUrl, pngUrl] =
+        await Promise.all([
+          import('@/features/caption/image-assets'),
+          import('@/domain/inline-image'),
+          import('../../tests/fixtures/logos/frame-note-logo.svg'),
+          import('../../tests/fixtures/logos/rt.png'),
+        ]);
+      const images = await Promise.all(
+        [
+          [svgUrl.default, 'FrameNote.svg'],
+          [pngUrl.default, 'rt.png'],
+        ].map(async ([url, name], index) => {
+          const response = await fetch(url!);
+          return importImage(
+            new File([await response.blob()], name!),
+            `demo-${index}`,
+          );
+        }),
+      );
+      const template = `{${imageToken({ assetId: 'demo-0', height: 2, unit: 'font', colorMode: 'original' })}} {author}\n{camera}\n{${imageToken({ assetId: 'demo-1', height: 3, unit: 'font', colorMode: 'original' })}}`;
+      if (active)
+        setLayout(
+          createCaptionLayout({ ...createCaption(), template, images }),
+        );
+    })().catch((cause: unknown) => {
+      if (active) setError(String(cause));
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+  return layout ? (
+    <TestPhotoEditor
+      src={macroUrl}
+      name="20261021-IMG_9959.jpg"
+      initialLayout={layout}
+    />
+  ) : (
+    <p role="status">{error || 'Opening images…'}</p>
+  );
+}
+export const MixedImages: Story = { render: () => <MixedImageExample /> };
