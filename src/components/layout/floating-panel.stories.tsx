@@ -1,3 +1,6 @@
+import { useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { Button } from '../ui/button';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { FloatingPanel } from './floating-panel';
 import { Input } from '../ui/input';
@@ -72,5 +75,35 @@ export const FontContent: Story = {
         onChoose={() => {}}
       />
     ),
+  },
+};
+
+export const KeyboardFocus: Story = {
+  render: function KeyboardFocus(args) {
+    const [open, setOpen] = useState(false);
+    return (
+      <div className="space-y-2">
+        <Button onClick={() => setOpen(true)}>Open panel</Button>
+        {open && (
+          <FloatingPanel
+            {...args}
+            className="max-h-[440px]"
+            onClose={() => setOpen(false)}
+          />
+        )}
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: 'Open panel' });
+    await userEvent.click(trigger);
+    await waitFor(() =>
+      expect(
+        canvas.getByRole('textbox', { name: 'Search tags' }),
+      ).toHaveFocus(),
+    );
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(trigger).toHaveFocus());
   },
 };

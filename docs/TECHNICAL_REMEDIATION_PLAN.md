@@ -35,7 +35,7 @@ wszystkich stories ani rzeczywistego hostingu. Nie potwierdza zgodności WCAG.
 | 2    | Własność i retencja zasobów warstwy          | FN-03        | P2        | Medium | brak       | zweryfikowany |
 | 3    | Bezpieczne operacje asynchroniczne i schowek | FN-04, FN-05 | P2        | Medium | etap 2     | zweryfikowany |
 | 4    | Stabilność przygotowanego eksportu           | FN-06        | P2        | Small  | brak       | zweryfikowany |
-| 5    | Nawigacja klawiaturą w panelach              | FN-07        | P2        | Medium | brak       | nierozpoczęty |
+| 5    | Nawigacja klawiaturą w panelach              | FN-07        | P2        | Medium | brak       | zweryfikowany |
 | 6    | Przewijanie podczas przeciągania warstw      | FN-08        | P3        | Small  | brak       | nierozpoczęty |
 
 Kolejność minimalizuje powtórną pracę. Medium/Small to względny nakład, nie estymacja czasu.
@@ -368,3 +368,17 @@ Poniższe obserwacje nie są dodatkowymi zatwierdzonymi etapami:
   przy wyborze/hoverze i ponowne kodowanie po zmianie treści.
 - Weryfikacja: pnpm check (216 testów), 2/2 E2E stabilności eksportu,
   4/4 E2E kolejności warstw i pikseli JPG w Chromium/WebKit. Bez aktualizacji wzorców.
+
+### Etap 5 — wykonanie 2026-10-25
+
+- FloatingPanel ma wspólny kontrakt: początkowy fokus na polu/listach lub
+  samym panelu, Escape i zamknięcie przywracają kontrolkę otwarcia.
+- Przełączanie paneli zachowuje nowy cel powrotu również przy kliknięciach
+  w WebKit; brak kontrolki ma fallback do aktualnego edytora.
+- Usunięto osobny mechanizm powrotu z panelu kolorów. Nie ma pułapki fokusu.
+- Story KeyboardFocus dokumentuje otwarcie i powrót; interakcję uruchomiono
+  w Chromium i obejrzano zrzut. Test E2E obejmuje wszystkie pięć paneli,
+  przełączenie zawartości i usunięcie warstwy z kontrolką otwarcia.
+- Luka: nie wykonano ręcznego testu z czytnikiem ekranu.
+- Weryfikacja: pnpm check (216 testów), 2/2 E2E fokusu oraz 10/10
+  E2E edytora i presetów w Chromium/WebKit. Build Storybooka zaliczony.
