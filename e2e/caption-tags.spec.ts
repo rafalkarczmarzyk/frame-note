@@ -21,14 +21,14 @@ test('shows helpers first, keeps original namespaces and resolves a portable tem
       .getByRole('button', { name: /^author\b/ }),
   ).toContainText('PAULINA PECZEK');
   await expect(panel.getByRole('button', { name: /^author\b/ })).toContainText(
-    'Source: xmp:creator',
+    'Source: xmp:dc:creator',
   );
   await expect(panel.getByRole('button', { name: /^iso\b/ })).toContainText(
     'No data in this photo.',
   );
   const search = panel.getByRole('textbox', { name: 'Search metadata' });
   await search.fill('xmp:creator');
-  await expect(panel.locator('h3')).toHaveText(['FrameNote', 'XMP']);
+  await expect(panel.locator('h3')).toHaveText(['XMP']);
   await expect(
     panel.getByRole('button', { name: /^xmp:creator\b/ }),
   ).toBeVisible();

@@ -490,15 +490,15 @@ składni zapisanych szablonów — te ograniczenia wynikają już ze zlecenia.
 Plan jest realizowany etapami. Każdy etap przechodzi pełne `pnpm check` przed
 osobnym commitem.
 
-| Etap                                               | Stan                         | Weryfikacja                                                                 |
-| -------------------------------------------------- | ---------------------------- | --------------------------------------------------------------------------- |
-| 1. Kontrakt i testy charakterystycznych przypadków | Zakończony; commit `1d79474` | 225 testów, format, lint, TypeScript, build.                                |
-| 2. Ekstrakcja i pochodzenie XMP                    | Zakończony; commit `adf1bec` | 228 testów, format, lint, TypeScript, build.                                |
-| 3. Czas, przysłona i ogniskowa                     | Zakończony; commit `958c73e` | 230 testów, format, lint, TypeScript, build.                                |
-| 4. ISO                                             | Zakończony; commit `40b2bd3` | 234 testy, format, lint, TypeScript, build.                                 |
-| 5. Tekst, sprzęt i data                            | Zakończony; commit `0ee17c9` | 235 testów, format, lint, TypeScript, build.                                |
-| 6. PNG jako zdjęcie                                | Zakończony; weryfikacja OK   | 236 testów, 6 testów E2E Chromium/WebKit, build.                            |
-| 7. Macierz realnych plików i regresja              | Oczekuje                     | Brak próbek producentów innych niż Canon; żadne zdjęcia nie zostały dodane. |
+| Etap                                               | Stan                         | Weryfikacja                                                              |
+| -------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------ |
+| 1. Kontrakt i testy charakterystycznych przypadków | Zakończony; commit `1d79474` | 225 testów, format, lint, TypeScript, build.                             |
+| 2. Ekstrakcja i pochodzenie XMP                    | Zakończony; commit `adf1bec` | 228 testów, format, lint, TypeScript, build.                             |
+| 3. Czas, przysłona i ogniskowa                     | Zakończony; commit `958c73e` | 230 testów, format, lint, TypeScript, build.                             |
+| 4. ISO                                             | Zakończony; commit `40b2bd3` | 234 testy, format, lint, TypeScript, build.                              |
+| 5. Tekst, sprzęt i data                            | Zakończony; commit `0ee17c9` | 235 testów, format, lint, TypeScript, build.                             |
+| 6. PNG jako zdjęcie                                | Zakończony; commit `30d2de7` | 236 testów, 6 testów E2E Chromium/WebKit, build.                         |
+| 7. Macierz realnych plików i regresja              | Częściowo zweryfikowany      | Canon/XMP fixture; pełny E2E 48/50, dwa WebKit timeouty przeszły osobno. |
 
 Etap 2 wydziela `extractMetadata`, zachowuje kandydatów XMP wraz z URI, ścieżką
 i językiem w istniejącym MetadataField oraz wybiera standardowe namespace dla
@@ -533,3 +533,13 @@ Dokument zdjęcia przechowuje wykryty MIME, ale eksport pozostaje JPG. Przezrocz
 PNG jest matowane białym kolorem systemowym w podglądzie i eksporcie. Obsługiwany
 jest nieskompresowany XMP i eXIf przez istniejący ExifReader; skompresowanego XMP
 nie włączono. Testy importu przebiegły w Chromium i WebKit.
+
+Etap 7 potwierdził pełne wyniki helperów na dostępnych fotografiach Canon oraz
+XMP z `Agata-104.jpg`; nie dodano plików binarnych. Brak rzeczywistych fixture'ów
+Sony, Nikon, Fujifilm, Panasonic i OM System pozostaje ograniczeniem testów, a nie
+powodem do zakładania kompatybilności producenta. Pełny przebieg E2E miał 48/50
+zaliczonych; dwa dotychczasowe testy WebKit przekroczyły timeout przy pracy całej
+macierzy, po czym przeszły osobno (5/5 testów w dwóch plikach). Zmiana asercji
+źródła autora z `xmp:creator` na rzeczywiste `xmp:dc:creator` przeszła Chromium
+i WebKit. Do realnej macierzy pozostałych producentów potrzebne są próbki, których
+nie ma w repozytorium; dodanie/pobranie takich plików wymaga osobnej zgody.
