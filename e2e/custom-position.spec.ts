@@ -38,11 +38,10 @@ test('drags a caption without a jump and exports Custom independently of margins
   const bounds = (await canvas.boundingBox())!;
   const { width, height } = wildlifeFixture.dimensions;
   const shortEdge = Math.min(width, height);
-  const scale = Math.min(
-    (bounds.width - 48) / width,
-    (bounds.height - 48) / height,
-    1,
-  );
+  const rulerBounds = (await page
+    .getByRole('group', { name: 'Horizontal margin ruler', exact: false })
+    .boundingBox())!;
+  const scale = rulerBounds.width / width;
   const x =
     bounds.x +
     (bounds.width - width * scale) / 2 +

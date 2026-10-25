@@ -43,11 +43,10 @@ test('edits independent containers, selects on canvas and exports the whole layo
   const canvas = page.locator('canvas').first();
   const bounds = (await canvas.boundingBox())!;
   const { width, height } = wildlifeFixture.dimensions;
-  const scale = Math.min(
-    (bounds.width - 48) / width,
-    (bounds.height - 48) / height,
-    1,
-  );
+  const rulerBounds = (await page
+    .getByRole('group', { name: 'Horizontal margin ruler', exact: false })
+    .boundingBox())!;
+  const scale = rulerBounds.width / width;
   const x = (bounds.width - width * scale) / 2 + shortEdge * 0.03 * scale + 3;
   const y =
     (bounds.height - height * scale) / 2 +
