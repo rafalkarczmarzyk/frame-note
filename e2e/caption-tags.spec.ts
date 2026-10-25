@@ -44,6 +44,13 @@ test('shows helpers first, keeps original namespaces and resolves a portable tem
     '{author}\n{lens}\n{date}',
   );
   await page.getByRole('button', { name: 'Browse available tags' }).click();
+  await search.fill('iso');
+  await expect(panel.getByRole('button', { name: /^iso\b/ })).toContainText(
+    'ISO 20000',
+  );
+  await expect(panel.getByRole('button', { name: /^iso\b/ })).toContainText(
+    'Source: exif:ISOSpeedRatings',
+  );
   await search.fill('author');
   await expect(panel.locator('h3')).toHaveText(['FrameNote']);
   await expect(panel.getByRole('button', { name: /^author\b/ })).toContainText(
