@@ -31,14 +31,14 @@ ani nie nadpisujemy w źródłach; wybrany tag jest pokazany w panelu.
 | `{lens}`        | EF-S24mm f/2.8 STM        | `exif:LensModel` → `xmp:LensModel` → `xmp:Lens`                                                                                          |
 | `{shutter}`     | `1/250 s` lub `3.2 s`     | `exif:ExposureTime` → `xmp:ExposureTime`                                                                                                 |
 | `{aperture}`    | `f/8`                     | `exif:FNumber` → `xmp:FNumber`                                                                                                           |
-| `{iso}`         | `400` — bez prefiksu ISO  | `exif:PhotographicSensitivity` → `exif:ISOSpeedRatings` → `exif:ISO` → `xmp:PhotographicSensitivity` → `xmp:ISOSpeedRatings` → `xmp:ISO` |
+| `{iso}`         | `ISO 400`                 | `exif:PhotographicSensitivity` → `exif:ISOSpeedRatings` → `exif:ISO` → `xmp:PhotographicSensitivity` → `xmp:ISOSpeedRatings` → `xmp:ISO` |
 | `{focalLength}` | `100 mm`                  | `exif:FocalLength` → `xmp:FocalLength`                                                                                                   |
 | `{date}`        | `2026-10-20`              | `exif:DateTimeOriginal` → `xmp:DateTimeOriginal` → `iptc:DateCreated` → `xmp:DateCreated` → `xmp:CreateDate`                             |
 | `{copyright}`   | Treść praw autorskich     | `xmp:rights` → `exif:Copyright` → `iptc:Copyright Notice` → `iptc:CopyrightNotice`                                                       |
 | `{exposure}`    | `1/250 s · f/8 · ISO 400` | Składa dostępne `{shutter}`, `{aperture}` i `{iso}`; pokazuje wszystkie użyte źródła                                                     |
 
-Czas, przysłona i ogniskowa mają już jednostki/oznaczenia. Nie dopisuj ponownie
-`s`, `f/` ani `mm`. Przy osobnym `{iso}` można wpisać `ISO {iso}`. `{exposure}`
+Czas, przysłona, ISO i ogniskowa mają już jednostki/oznaczenia. Nie dopisuj ponownie
+`s`, `f/`, `ISO` ani `mm`. `{exposure}`
 dodaje ten prefiks samodzielnie, pomija brakujące części i nie pozostawia pustych
 separatorów. Bez żadnych parametrów ekspozycji jest traktowany jako brak danych.
 
