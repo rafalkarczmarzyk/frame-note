@@ -484,3 +484,26 @@ punktami integracji PNG.
 Nie wymagają ponownego ustalania: lista publicznych helperów, zachowanie Helicon,
 brak bazy sprzętu, brak RAW/nowych formatów, brak redesignu panelu oraz zachowanie
 składni zapisanych szablonów — te ograniczenia wynikają już ze zlecenia.
+
+## 9. Postęp implementacji
+
+Plan jest realizowany etapami. Każdy etap przechodzi pełne `pnpm check` przed
+osobnym commitem.
+
+| Etap                                               | Stan                         | Weryfikacja                                                                 |
+| -------------------------------------------------- | ---------------------------- | --------------------------------------------------------------------------- |
+| 1. Kontrakt i testy charakterystycznych przypadków | Zakończony; commit `1d79474` | 225 testów, format, lint, TypeScript, build.                                |
+| 2. Ekstrakcja i pochodzenie XMP                    | W trakcie; czeka na commit   | 228 testów, format, lint, TypeScript, build.                                |
+| 3. Czas, przysłona i ogniskowa                     | Oczekuje                     | —                                                                           |
+| 4. ISO                                             | Oczekuje                     | —                                                                           |
+| 5. Tekst, sprzęt i data                            | Oczekuje                     | —                                                                           |
+| 6. PNG jako zdjęcie                                | Oczekuje                     | —                                                                           |
+| 7. Macierz realnych plików i regresja              | Oczekuje                     | Brak próbek producentów innych niż Canon; żadne zdjęcia nie zostały dodane. |
+
+Etap 2 wydziela `extractMetadata`, zachowuje kandydatów XMP wraz z URI, ścieżką
+i językiem w istniejącym MetadataField oraz wybiera standardowe namespace dla
+author/camera/lens/shutter/aperture/ISO/focalLength/date/copyright. Źródło helpera
+może teraz wskazywać np. `xmp:tiff:Model`. `@xmldom/xmldom` jest zależnością
+developerską dla testów Node; aplikacja webowa korzysta z wbudowanego DOMParser.
+Testy obejmują namespace kolidujące w obu kolejnościach, zapis atrybutowy,
+RDF Seq/Alt oraz prawdziwe XMP z `Agata-104.jpg`.

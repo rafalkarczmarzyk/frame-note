@@ -11,6 +11,7 @@ import {
   xmpPortraitFixture,
 } from './fixtures.ts';
 import ExifReader from 'exifreader';
+import { DOMParser } from '@xmldom/xmldom';
 
 it.each([
   wildlifeFixture,
@@ -157,3 +158,47 @@ it.each(helperFixtures)(
     }
   },
 );
+
+it('preserves XMP namespace provenance while resolving an existing photo', async () => {
+  const bytes = await readFile(xmpPortraitFixture.path);
+  const extractMetadataPath = '../src/features/photo/extract-metadata.ts';
+  const captionTagsPath = '../src/domain/caption-tags.ts';
+  const { extractMetadata } = await import(extractMetadataPath);
+  const { captionTags } = await import(captionTagsPath);
+  const parser = new DOMParser({
+    onError: (level, message) => {
+      if (level === 'error' || level === 'fatalError') throw new Error(message);
+    },
+  });
+  const metadata = await extractMetadata(
+    bytes.buffer.slice(
+      bytes.byteOffset,
+      bytes.byteOffset + bytes.byteLength,
+    ) as ArrayBuffer,
+    parser,
+  );
+  const resolvedHelpers = captionTags(metadata) as {
+    key: string;
+    displayValue: string;
+    sources: readonly string[];
+  }[];
+  const helpers = new Map(
+    resolvedHelpers.map(({ key, displayValue, sources }) => [
+      key,
+      { displayValue, sources },
+    ]),
+  );
+
+  expect(helpers.get('author')).toMatchObject({
+    displayValue: 'PAULINA PECZEK',
+    sources: ['xmp:dc:creator'],
+  });
+  expect(helpers.get('lens')).toMatchObject({
+    displayValue: 'EF-S24mm f/2.8 STM',
+    sources: ['xmp:exifEX:LensModel'],
+  });
+  expect(helpers.get('date')).toMatchObject({
+    displayValue: '2020-07-22',
+    sources: ['xmp:photoshop:DateCreated'],
+  });
+});

@@ -1,5 +1,5 @@
 import { heliconDetails, parseHeliconComment } from './helicon';
-import type { MetadataField } from './metadata';
+import type { MetadataCandidate, MetadataField } from './metadata';
 
 export interface CaptionTag extends MetadataField {
   sources: readonly string[];
@@ -35,7 +35,57 @@ const definitions = {
     'iptc:CopyrightNotice',
   ],
 } as const;
+const xmpNamespaces = {
+  'author:xmp:creator': ['http://purl.org/dc/elements/1.1/'],
+  'camera:xmp:Model': ['http://ns.adobe.com/tiff/1.0/'],
+  'lens:xmp:LensModel': ['http://cipa.jp/exif/1.0/'],
+  'lens:xmp:Lens': ['http://ns.adobe.com/exif/1.0/aux/'],
+  'shutter:xmp:ExposureTime': ['http://ns.adobe.com/exif/1.0/'],
+  'aperture:xmp:FNumber': ['http://ns.adobe.com/exif/1.0/'],
+  'iso:xmp:PhotographicSensitivity': [
+    'http://cipa.jp/exif/1.0/',
+    'http://ns.adobe.com/exif/1.0/',
+  ],
+  'iso:xmp:ISOSpeedRatings': ['http://ns.adobe.com/exif/1.0/'],
+  'iso:xmp:ISO': ['http://ns.adobe.com/exif/1.0/'],
+  'focalLength:xmp:FocalLength': ['http://ns.adobe.com/exif/1.0/'],
+  'date:xmp:DateTimeOriginal': ['http://ns.adobe.com/exif/1.0/'],
+  'date:xmp:DateCreated': ['http://ns.adobe.com/photoshop/1.0/'],
+  'date:xmp:CreateDate': ['http://ns.adobe.com/xap/1.0/'],
+  'heliconStack:xmp:UserComment': ['http://ns.adobe.com/exif/1.0/'],
+  'heliconStackCount:xmp:UserComment': ['http://ns.adobe.com/exif/1.0/'],
+  'copyright:xmp:rights': ['http://purl.org/dc/elements/1.1/'],
+} as const satisfies Record<string, readonly string[]>;
 export const captionTagNames = [...Object.keys(definitions), 'exposure'];
+
+function sourceField(
+  name: string,
+  source: string,
+  field: MetadataField,
+): { field: MetadataField; source: string } | null {
+  if (!source.startsWith('xmp:') || !field.candidates) return { field, source };
+  const acceptedNamespaces =
+    xmpNamespaces[`${name}:${source}` as keyof typeof xmpNamespaces];
+  if (!acceptedNamespaces) return null;
+  const candidate = field.candidates.find(
+    (value) =>
+      value.name === field.name &&
+      acceptedNamespaces.some((namespace) => namespace === value.namespaceUri),
+  );
+  if (!candidate) return null;
+  return { field: candidateField(field, candidate), source: candidate.source };
+}
+
+function candidateField(
+  field: MetadataField,
+  candidate: MetadataCandidate,
+): MetadataField {
+  return {
+    ...field,
+    rawValue: candidate.rawValue,
+    displayValue: candidate.displayValue,
+  };
+}
 
 function numeric(raw: unknown): number | null {
   if (typeof raw === 'number') return Number.isFinite(raw) ? raw : null;
@@ -109,15 +159,17 @@ export function captionTags(fields: readonly MetadataField[]): CaptionTag[] {
       for (const source of candidates) {
         const field = byKey.get(source);
         if (!field || !field.displayValue.trim()) continue;
-        const displayValue = format(name, field);
+        const selected = sourceField(name, source, field);
+        if (!selected || !selected.field.displayValue.trim()) continue;
+        const displayValue = format(name, selected.field);
         if (displayValue)
           return {
             key: name,
             name,
             group: 'FrameNote',
             displayValue,
-            rawValue: field.rawValue,
-            sources: [source],
+            rawValue: selected.field.rawValue,
+            sources: [selected.source],
           };
       }
       return {
