@@ -1,9 +1,8 @@
 import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
+import { comparePhotoExport } from './photo-export-image.js';
 
-test('edits mixed SVG and PNG content, preserves image selection and restores portable assets', async ({
-  page,
-}) => {
+test('Photo export / mixed inline SVG and PNG', async ({ page }, testInfo) => {
   await page.goto('/');
   const jpeg = await page.evaluate(() => {
     const canvas = document.createElement('canvas');
@@ -139,4 +138,15 @@ test('edits mixed SVG and PNG content, preserves image selection and restores po
   await expect(raster).toBeVisible();
   await raster.click();
   await expect(height).toHaveValue('100');
+  const finalDownload = page.waitForEvent('download');
+  await ready.click();
+  const finalPath = await (await finalDownload).path();
+  if (!finalPath) throw new Error('The mixed image export is missing.');
+  await comparePhotoExport(
+    page,
+    testInfo,
+    'mixed-inline-svg-png',
+    await readFile(finalPath),
+    { width: 1200, height: 800 },
+  );
 });

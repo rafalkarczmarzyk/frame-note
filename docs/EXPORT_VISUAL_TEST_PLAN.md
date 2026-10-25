@@ -53,6 +53,26 @@ w pliku wynikowym. Obecny eksport nie kopiuje źródłowych tagów.
   `pnpm test:photo-export --project=chromium` — 5/5. Ponowne przebiegi nie
   zmieniły pikseli zapisanych JPG.
 
+### Zrealizowano — etap 2
+
+- Rozszerzono `Photo export` do 40 przypadków dla Chromium/macOS. Siedem zdjęć
+  × trzy wbudowane presety daje 21 pełnoobrazowych wzorców. Brakujący komentarz
+  Helicon jest potwierdzany przez użytkownika testowego; warstwa nie pojawia się
+  na innych zdjęciach bez rozpoznanych danych.
+- Plansza 1200 × 800 sprawdza wszystkie dziewięć anchorów z marginesami
+  L=100, R=60, T=40, B=80. Zielony prostokąt 48 × 24 px w JPG mierzymy względem
+  niezależnych oczekiwań, w tym środek X=596/Y=368 oraz prawy dolny X=1092/Y=696.
+  Dodatkowa pozycja Manual 25%/75% potwierdza punkt odniesienia środka bloku
+  (piksele X=276–323, Y=588–611) przy zdefiniowanych marginesach.
+- Dodano cztery pełnoobrazowe warianty fontu: Montserrat Regular/Bold i Advercase
+  Regular/Bold. Tekst zawiera `Żółw © · ×`; test potwierdza też gotowość konkretnej
+  rodziny i grubości fontu.
+- Eksport mieszanej warstwy tekstowej z SVG i PNG sprawdza pełny wynik po
+  odtworzeniu zasobów z presetu.
+- Weryfikacja: `pnpm check` — 237 testów jednostkowych, lint, typy i build;
+  pełny `pnpm test:photo-export --project=chromium` — 40/40. Wszystkie
+  zapisane pełne obrazy mają zerową różnicę pikseli.
+
 ## Trzy uzupełniające się kontrole
 
 1. **Treść i ustawienia.** Do pary zdjęcie + preset dołączamy ręcznie sprawdzony
