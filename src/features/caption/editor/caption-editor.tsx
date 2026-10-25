@@ -292,13 +292,25 @@ export function CaptionEditor({
             }
           }
           if (!alive() || text === undefined) return;
-          const doc = view.state.schema.nodeFromJSON(templateDocument(text));
-          view.dispatch(
-            view.state.tr
+          try {
+            const doc = view.state.schema.nodeFromJSON(templateDocument(text));
+            const transaction = view.state.tr
               .setSelection(selection)
               .replaceSelection(new Slice(Fragment.from(doc.content), 1, 1))
-              .scrollIntoView(),
-          );
+              .scrollIntoView();
+            checkImageRetention(
+              documentTemplate(transaction.doc.toJSON()),
+              imageAssets.current,
+            );
+            view.dispatch(transaction);
+            setError('');
+          } catch (cause) {
+            setError(
+              cause instanceof Error
+                ? cause.message
+                : 'Could not paste content.',
+            );
+          }
         })().catch(() => {
           if (!view.isDestroyed) setError('Could not paste content.');
         });

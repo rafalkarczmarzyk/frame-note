@@ -35,3 +35,24 @@ it('counts active references separately from retained undo resources', () => {
     ),
   ).toThrow('undo history');
 });
+
+it('allows 100 distinct active image references and rejects the 101st', () => {
+  const assets = Array.from({ length: 101 }, (_, index) => ({
+    ...asset,
+    id: `image-${index}`,
+  }));
+  const templateFor = (items: readonly ImageAsset[]) =>
+    items
+      .map(
+        (item) =>
+          `{${imageToken({ assetId: item.id, height: 2, unit: 'font', colorMode: 'original' })}}`,
+      )
+      .join(' ');
+
+  expect(() =>
+    checkImageRetention(templateFor(assets.slice(0, 100)), assets),
+  ).not.toThrow();
+  expect(() => checkImageRetention(templateFor(assets), assets)).toThrow(
+    '100 active images',
+  );
+});
