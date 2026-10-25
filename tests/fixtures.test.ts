@@ -43,7 +43,7 @@ const helperFixtures = [
   {
     fixture: wildlifeFixture,
     expected: {
-      author: ['Rafal Karczmarzyk', 'xmp:creator'],
+      author: ['Rafal Karczmarzyk', 'xmp:dc:creator'],
       camera: ['Canon EOS R6m2', 'exif:Model'],
       lens: [
         'RF100-500mm F4.5-7.1 L IS USM + EXTENDER RF1.4x',
@@ -54,34 +54,69 @@ const helperFixtures = [
       iso: ['ISO 20000', 'exif:ISOSpeedRatings'],
       focalLength: ['700 mm', 'exif:FocalLength'],
       date: ['2026-05-20', 'exif:DateTimeOriginal'],
-      copyright: ['Recursive Tomatoes', 'xmp:rights'],
+      heliconStack: ['', ''],
+      heliconStackCount: ['', ''],
+      copyright: ['Recursive Tomatoes', 'xmp:dc:rights'],
+      exposure: [
+        '1/1600 s · f/10 · ISO 20000',
+        'exif:ExposureTime,exif:FNumber,exif:ISOSpeedRatings',
+      ],
     },
   },
   {
     fixture: portraitFixture,
     expected: {
+      author: ['Rafal Karczmarzyk', 'xmp:dc:creator'],
       camera: ['Canon EOS R6m2', 'exif:Model'],
+      lens: ['RF200-800mm F6.3-9 IS USM + EXTENDER RF1.4x', 'exif:LensModel'],
       shutter: ['1/1250 s', 'exif:ExposureTime'],
       aperture: ['f/13', 'exif:FNumber'],
       iso: ['ISO 1000', 'exif:ISOSpeedRatings'],
       focalLength: ['1120 mm', 'exif:FocalLength'],
+      date: ['2026-10-21', 'exif:DateTimeOriginal'],
+      heliconStack: ['', ''],
+      heliconStackCount: ['', ''],
+      copyright: ['Recursive Tomatoes', 'xmp:dc:rights'],
+      exposure: [
+        '1/1250 s · f/13 · ISO 1000',
+        'exif:ExposureTime,exif:FNumber,exif:ISOSpeedRatings',
+      ],
     },
   },
   {
     fixture: brightBackgroundFixture,
     expected: {
+      author: ['Rafal Karczmarzyk', 'xmp:creator'],
       camera: ['Canon EOS R6m2', 'exif:Model'],
+      lens: ['RF200-800mm F6.3-9 IS USM', 'exif:LensModel'],
       shutter: ['1/3200 s', 'exif:ExposureTime'],
       aperture: ['f/10', 'exif:FNumber'],
       iso: ['ISO 1600', 'exif:ISOSpeedRatings'],
       focalLength: ['800 mm', 'exif:FocalLength'],
+      date: ['2026-04-05', 'exif:DateTimeOriginal'],
+      heliconStack: ['', ''],
+      heliconStackCount: ['', ''],
+      copyright: ['Recursive Tomatoes', 'xmp:rights'],
+      exposure: [
+        '1/3200 s · f/10 · ISO 1600',
+        'exif:ExposureTime,exif:FNumber,exif:ISOSpeedRatings',
+      ],
     },
   },
   {
     fixture: macroFixture,
     expected: {
+      author: ['Rafal Karczmarzyk', 'xmp:dc:creator'],
       camera: ['Canon EOS R6m2', 'exif:Model'],
       lens: ['RF100mm F2.8 L MACRO IS USM', 'exif:LensModel'],
+      shutter: ['1/100 s', 'exif:ExposureTime'],
+      aperture: ['f/8', 'exif:FNumber'],
+      iso: ['ISO 800', 'exif:ISOSpeedRatings'],
+      focalLength: ['100 mm', 'exif:FocalLength'],
+      date: ['2026-10-21', 'exif:DateTimeOriginal'],
+      heliconStack: ['', ''],
+      heliconStackCount: ['', ''],
+      copyright: ['Recursive Tomatoes', 'xmp:dc:rights'],
       exposure: [
         '1/100 s · f/8 · ISO 800',
         'exif:ExposureTime,exif:FNumber,exif:ISOSpeedRatings',
@@ -91,6 +126,14 @@ const helperFixtures = [
   {
     fixture: heliconFixture,
     expected: {
+      author: ['Rafal Karczmarzyk', 'xmp:dc:creator'],
+      camera: ['Canon EOS R6m2', 'exif:Model'],
+      lens: ['RF100mm F2.8 L MACRO IS USM', 'exif:LensModel'],
+      shutter: ['1/250 s', 'exif:ExposureTime'],
+      aperture: ['f/9', 'exif:FNumber'],
+      iso: ['ISO 400', 'exif:ISOSpeedRatings'],
+      focalLength: ['100 mm', 'exif:FocalLength'],
+      date: ['2026-10-20', 'exif:DateTimeOriginal'],
       exposure: [
         '1/250 s · f/9 · ISO 400',
         'exif:ExposureTime,exif:FNumber,exif:ISOSpeedRatings',
@@ -100,23 +143,44 @@ const helperFixtures = [
         'exif:UserComment',
       ],
       heliconStackCount: ['15', 'exif:UserComment'],
+      copyright: ['Recursive Tomatoes', 'xmp:dc:rights'],
     },
   },
   {
     fixture: nightFixture,
     expected: {
+      author: ['Rafal Karczmarzyk', 'xmp:dc:creator'],
       camera: ['Canon EOS RP', 'exif:Model'],
+      lens: ['RF24-105mm F4 L IS USM', 'exif:LensModel'],
       shutter: ['3.2 s', 'exif:ExposureTime'],
       aperture: ['f/4', 'exif:FNumber'],
       iso: ['ISO 2000', 'exif:ISOSpeedRatings'],
+      focalLength: ['25 mm', 'exif:FocalLength'],
+      date: ['2021-02-28', 'exif:DateTimeOriginal'],
+      heliconStack: ['', ''],
+      heliconStackCount: ['', ''],
+      copyright: ['LiptuN Entertainment', 'xmp:dc:rights'],
+      exposure: [
+        '3.2 s · f/4 · ISO 2000',
+        'exif:ExposureTime,exif:FNumber,exif:ISOSpeedRatings',
+      ],
     },
   },
   {
     fixture: xmpPortraitFixture,
     expected: {
-      author: ['PAULINA PECZEK', 'xmp:creator'],
-      lens: ['EF-S24mm f/2.8 STM', 'xmp:LensModel'],
-      date: ['2020-07-22', 'xmp:DateCreated'],
+      author: ['PAULINA PECZEK', 'xmp:dc:creator'],
+      camera: ['', ''],
+      lens: ['EF-S24mm f/2.8 STM', 'xmp:exifEX:LensModel'],
+      shutter: ['', ''],
+      aperture: ['', ''],
+      iso: ['', ''],
+      focalLength: ['', ''],
+      date: ['2020-07-22', 'xmp:photoshop:DateCreated'],
+      heliconStack: ['', ''],
+      heliconStackCount: ['', ''],
+      copyright: ['', ''],
+      exposure: ['', ''],
     },
   },
 ] as const;
@@ -125,20 +189,23 @@ it.each(helperFixtures)(
   'records existing helper values and selected sources for $fixture.path',
   async ({ fixture, expected }) => {
     const captionTagsPath = '../src/domain/caption-tags.ts';
-    const normalizeMetadataPath = '../src/features/photo/metadata.ts';
-    const [{ captionTags }, { normalizeMetadata }] = await Promise.all([
+    const extractMetadataPath = '../src/features/photo/extract-metadata.ts';
+    const [{ captionTags }, { extractMetadata }] = await Promise.all([
       import(captionTagsPath),
-      import(normalizeMetadataPath),
+      import(extractMetadataPath),
     ]);
     const bytes = await readFile(fixture.path);
-    const tags = await ExifReader.load(
-      bytes.buffer.slice(
-        bytes.byteOffset,
-        bytes.byteOffset + bytes.byteLength,
-      ) as ArrayBuffer,
-      { expanded: true, async: true },
-    );
-    const resolvedHelpers = captionTags(normalizeMetadata(tags)) as {
+    const buffer = bytes.buffer.slice(
+      bytes.byteOffset,
+      bytes.byteOffset + bytes.byteLength,
+    ) as ArrayBuffer;
+    let metadata;
+    try {
+      metadata = await extractMetadata(buffer, new DOMParser());
+    } catch {
+      metadata = await extractMetadata(buffer);
+    }
+    const resolvedHelpers = captionTags(metadata) as {
       key: string;
       displayValue: string;
       sources: readonly string[];
