@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { captionTags, metadataGroups } from './caption-tags';
-import { createMetadataField, type MetadataField } from './metadata';
+import {
+  createMetadataField,
+  type MetadataCandidate,
+  type MetadataField,
+} from './metadata';
 import { resolveTemplate } from '../features/caption/template';
 
 function field(
@@ -18,6 +22,18 @@ function field(
 }
 const get = (fields: MetadataField[], name: string) =>
   captionTags(fields).find((tag) => tag.key === name)!;
+function xmpField(
+  name: string,
+  candidates: MetadataCandidate[],
+): MetadataField {
+  return createMetadataField({
+    group: 'xmp',
+    name,
+    displayValue: candidates[0]?.displayValue ?? '',
+    rawValue: candidates[0]?.rawValue ?? null,
+    candidates,
+  });
+}
 describe('FrameNote caption helpers', () => {
   it('chooses the first non-empty source and reports its provenance', () => {
     const fields = [
@@ -83,6 +99,103 @@ describe('FrameNote caption helpers', () => {
     expect(get(fields, 'iso')).toMatchObject({
       displayValue: 'ISO 800',
       sources: ['xmp:ISOSpeedRatings'],
+    });
+  });
+  it('uses a primary photographic sensitivity when its EXIF type is absent or unspecified', () => {
+    for (const fields of [
+      [field('exif:PhotographicSensitivity', '640', 640)],
+      [
+        field('exif:PhotographicSensitivity', '640', 640),
+        field('exif:SensitivityType', '0', 0),
+      ],
+    ]) {
+      expect(get(fields, 'iso')).toMatchObject({
+        displayValue: 'ISO 640',
+        sources: ['exif:PhotographicSensitivity'],
+      });
+    }
+  });
+  it('resolves the 65535 sentinel only through an indicated full ISO speed in the same group', () => {
+    const valid = [
+      field('exif:PhotographicSensitivity', '65535', 65535),
+      field('exif:SensitivityType', '3', 3),
+      field('exif:ISOSpeed', '12800', 12800),
+    ];
+    expect(get(valid, 'iso')).toMatchObject({
+      displayValue: 'ISO 12800',
+      sources: ['exif:ISOSpeed', 'exif:SensitivityType'],
+    });
+    expect(
+      get(
+        [
+          field('exif:PhotographicSensitivity', '65535', 65535),
+          field('exif:SensitivityType', '3', 3),
+          field('xmp:ISOSpeed', '12800', 12800),
+        ],
+        'iso',
+      ).displayValue,
+    ).toBe('');
+    expect(
+      get(
+        [
+          field('exif:PhotographicSensitivity', '65535', 65535),
+          ...valid.slice(1, 2),
+        ],
+        'iso',
+      ).displayValue,
+    ).toBe('');
+  });
+  it('follows SensitivityType and rejects SOS-only, REI-only, contradictions, and list values', () => {
+    for (const type of [1, 2, 4]) {
+      expect(
+        get(
+          [
+            field('exif:PhotographicSensitivity', '800', 800),
+            field('exif:SensitivityType', String(type), type),
+          ],
+          'iso',
+        ).displayValue,
+      ).toBe('');
+    }
+    expect(
+      get(
+        [
+          field('exif:PhotographicSensitivity', '800', 800),
+          field('exif:SensitivityType', '3', 3),
+          field('exif:ISOSpeed', '1600', 1600),
+        ],
+        'iso',
+      ).displayValue,
+    ).toBe('');
+    expect(
+      get([field('exif:ISOSpeedRatings', '100, 200', [100, 200])], 'iso')
+        .displayValue,
+    ).toBe('');
+  });
+  it('resolves XMP ISO from allowed namespaces and preserves candidate provenance', () => {
+    const candidates: MetadataCandidate[] = [
+      {
+        group: 'xmp',
+        name: 'PhotographicSensitivity',
+        source: 'xmp:other:PhotographicSensitivity',
+        rawValue: 3200,
+        displayValue: '3200',
+        namespaceUri: 'urn:unrelated',
+      },
+      {
+        group: 'xmp',
+        name: 'PhotographicSensitivity',
+        source: 'xmp:exif:PhotographicSensitivity',
+        rawValue: 1600,
+        displayValue: '1600',
+        namespaceUri: 'http://ns.adobe.com/exif/1.0/',
+      },
+    ];
+    expect(
+      get([xmpField('PhotographicSensitivity', candidates)], 'iso'),
+    ).toMatchObject({
+      displayValue: 'ISO 1600',
+      sources: ['xmp:exif:PhotographicSensitivity'],
     });
   });
   it('converts APEX shutter and aperture values after direct values', () => {

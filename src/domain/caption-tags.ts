@@ -1,5 +1,6 @@
 import { heliconDetails, parseHeliconComment } from './helicon';
 import type { MetadataCandidate, MetadataField } from './metadata';
+import { resolvePhotographicIso } from './photographic-metadata';
 
 export interface CaptionTag extends MetadataField {
   sources: readonly string[];
@@ -190,6 +191,17 @@ export function captionTags(fields: readonly MetadataField[]): CaptionTag[] {
   const byKey = new Map(fields.map((field) => [field.key, field]));
   const helpers = Object.entries(definitions).map(
     ([name, candidates]): CaptionTag => {
+      if (name === 'iso') {
+        const resolved = resolvePhotographicIso(fields);
+        return {
+          key: name,
+          name,
+          group: 'FrameNote',
+          displayValue: resolved ? `ISO ${resolved.value}` : '',
+          rawValue: resolved?.rawValue ?? null,
+          sources: resolved?.sources ?? [],
+        };
+      }
       for (const source of candidates) {
         const field = byKey.get(source);
         if (!field || !field.displayValue.trim()) continue;

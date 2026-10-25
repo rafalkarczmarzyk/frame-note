@@ -51,7 +51,7 @@ const helperFixtures = [
       ],
       shutter: ['1/1600 s', 'exif:ExposureTime'],
       aperture: ['f/10', 'exif:FNumber'],
-      iso: ['ISO 20000', 'exif:ISOSpeedRatings'],
+      iso: ['', ''],
       focalLength: ['700 mm', 'exif:FocalLength'],
       date: ['2026-05-20', 'exif:DateTimeOriginal'],
       copyright: ['Recursive Tomatoes', 'xmp:rights'],
@@ -63,7 +63,7 @@ const helperFixtures = [
       camera: ['Canon EOS R6m2', 'exif:Model'],
       shutter: ['1/1250 s', 'exif:ExposureTime'],
       aperture: ['f/13', 'exif:FNumber'],
-      iso: ['ISO 1000', 'exif:ISOSpeedRatings'],
+      iso: ['', ''],
       focalLength: ['1120 mm', 'exif:FocalLength'],
     },
   },
@@ -73,7 +73,7 @@ const helperFixtures = [
       camera: ['Canon EOS R6m2', 'exif:Model'],
       shutter: ['1/3200 s', 'exif:ExposureTime'],
       aperture: ['f/10', 'exif:FNumber'],
-      iso: ['ISO 1600', 'exif:ISOSpeedRatings'],
+      iso: ['', ''],
       focalLength: ['800 mm', 'exif:FocalLength'],
     },
   },
@@ -82,19 +82,13 @@ const helperFixtures = [
     expected: {
       camera: ['Canon EOS R6m2', 'exif:Model'],
       lens: ['RF100mm F2.8 L MACRO IS USM', 'exif:LensModel'],
-      exposure: [
-        '1/100 s · f/8 · ISO 800',
-        'exif:ExposureTime,exif:FNumber,exif:ISOSpeedRatings',
-      ],
+      exposure: ['1/100 s · f/8', 'exif:ExposureTime,exif:FNumber'],
     },
   },
   {
     fixture: heliconFixture,
     expected: {
-      exposure: [
-        '1/250 s · f/9 · ISO 400',
-        'exif:ExposureTime,exif:FNumber,exif:ISOSpeedRatings',
-      ],
+      exposure: ['1/250 s · f/9', 'exif:ExposureTime,exif:FNumber'],
       heliconStack: [
         'Focus stack · 15 images · Method A · R=8 · S=4',
         'exif:UserComment',
@@ -108,7 +102,7 @@ const helperFixtures = [
       camera: ['Canon EOS RP', 'exif:Model'],
       shutter: ['3.2 s', 'exif:ExposureTime'],
       aperture: ['f/4', 'exif:FNumber'],
-      iso: ['ISO 2000', 'exif:ISOSpeedRatings'],
+      iso: ['', ''],
     },
   },
   {
