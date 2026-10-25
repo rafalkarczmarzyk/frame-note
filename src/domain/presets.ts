@@ -11,6 +11,10 @@ export interface LayoutPreset {
   layout: CaptionLayout;
   icons: SvgAsset[];
 }
+export const presetNameLimit = 80;
+export const presetByteLimit = 5_000_000;
+export const copyPresetName = (name: string) =>
+  `${name.slice(0, presetNameLimit - 5).trimEnd()} copy`;
 export const presetStorageKey = 'framenote.presets.v1';
 const invalid = () => {
   throw Error('This is not a valid FrameNote preset.');
@@ -47,12 +51,12 @@ export function parsePreset(
   source: string,
   validateSvg: (name: string, svg: string) => SvgAsset,
 ): LayoutPreset {
-  if (source.length > 5_000_000)
+  if (new Blob([source]).size > presetByteLimit)
     throw Error('Preset must be smaller than 5 MB.');
   const data = record(JSON.parse(source));
   if (data.version !== 1 && data.version !== 2)
     throw Error('Unsupported preset version.');
-  const name = text(data.name, 80).trim();
+  const name = text(data.name, presetNameLimit).trim();
   if (!name) return invalid();
   const asset = (value: unknown, logo = false) => {
     const data = record(value);
