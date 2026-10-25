@@ -495,8 +495,8 @@ osobnym commitem.
 | 1. Kontrakt i testy charakterystycznych przypadków | Zakończony; commit `1d79474` | 225 testów, format, lint, TypeScript, build.                                |
 | 2. Ekstrakcja i pochodzenie XMP                    | Zakończony; commit `adf1bec` | 228 testów, format, lint, TypeScript, build.                                |
 | 3. Czas, przysłona i ogniskowa                     | Zakończony; commit `958c73e` | 230 testów, format, lint, TypeScript, build.                                |
-| 4. ISO                                             | Zakończony; weryfikacja OK   | 234 testy, format, lint, TypeScript, build.                                 |
-| 5. Tekst, sprzęt i data                            | Oczekuje                     | —                                                                           |
+| 4. ISO                                             | Zakończony; commit `40b2bd3` | 234 testy, format, lint, TypeScript, build.                                 |
+| 5. Tekst, sprzęt i data                            | Zakończony; weryfikacja OK   | Testy domeny i fixture, pełna weryfikacja przed commitem.                   |
 | 6. PNG jako zdjęcie                                | Oczekuje                     | —                                                                           |
 | 7. Macierz realnych plików i regresja              | Oczekuje                     | Brak próbek producentów innych niż Canon; żadne zdjęcia nie zostały dodane. |
 
@@ -520,3 +520,9 @@ sentinela 65535 przy zgodnym typie. W testowanych fotografiach Canon
 SensitivityType=2 oznacza Recommended Exposure Index, więc dotychczasowe
 ISOSpeedRatings nie jest prezentowane jako ISO. Testy fixture zostały
 zaktualizowane zgodnie z tą semantyką.
+
+Etap 5 waliduje dzień kalendarzowy, zachowując dzień zapisany w wartości nawet
+przy offsetcie; obsługuje daty IPTC `YYYYMMDD` i pomija XMP CreateDate jako
+potencjalny czas eksportu. Autor obsługuje XMP tiff:Artist, a alternatywy
+językowe wybierają x-default, potem angielski, potem pierwszą wartość. Nazwy
+aparatu i obiektywu pozostają tekstem źródłowym; LensID nie jest fallbackiem.

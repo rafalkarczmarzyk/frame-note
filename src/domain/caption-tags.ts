@@ -6,7 +6,13 @@ export interface CaptionTag extends MetadataField {
   sources: readonly string[];
 }
 const definitions = {
-  author: ['xmp:creator', 'exif:Artist', 'iptc:By-line', 'iptc:Byline'],
+  author: [
+    'xmp:creator',
+    'xmp:Artist',
+    'exif:Artist',
+    'iptc:By-line',
+    'iptc:Byline',
+  ],
   camera: ['exif:Model', 'xmp:Model'],
   lens: ['exif:LensModel', 'xmp:LensModel', 'xmp:Lens'],
   shutter: [
@@ -35,7 +41,6 @@ const definitions = {
     'xmp:DateTimeOriginal',
     'iptc:DateCreated',
     'xmp:DateCreated',
-    'xmp:CreateDate',
   ],
   heliconStack: ['exif:UserComment', 'xmp:UserComment'],
   heliconStackCount: ['exif:UserComment', 'xmp:UserComment'],
@@ -48,6 +53,7 @@ const definitions = {
 } as const;
 const xmpNamespaces = {
   'author:xmp:creator': ['http://purl.org/dc/elements/1.1/'],
+  'author:xmp:Artist': ['http://ns.adobe.com/tiff/1.0/'],
   'camera:xmp:Model': ['http://ns.adobe.com/tiff/1.0/'],
   'lens:xmp:LensModel': ['http://cipa.jp/exif/1.0/'],
   'lens:xmp:Lens': ['http://ns.adobe.com/exif/1.0/aux/'],
@@ -64,7 +70,6 @@ const xmpNamespaces = {
   'focalLength:xmp:FocalLength': ['http://ns.adobe.com/exif/1.0/'],
   'date:xmp:DateTimeOriginal': ['http://ns.adobe.com/exif/1.0/'],
   'date:xmp:DateCreated': ['http://ns.adobe.com/photoshop/1.0/'],
-  'date:xmp:CreateDate': ['http://ns.adobe.com/xap/1.0/'],
   'heliconStack:xmp:UserComment': ['http://ns.adobe.com/exif/1.0/'],
   'heliconStackCount:xmp:UserComment': ['http://ns.adobe.com/exif/1.0/'],
   'copyright:xmp:rights': ['http://purl.org/dc/elements/1.1/'],
@@ -85,8 +90,22 @@ function sourceField(
       value.name === field.name &&
       acceptedNamespaces.some((namespace) => namespace === value.namespaceUri),
   );
+  const candidates = field.candidates.filter(
+    (value) =>
+      value.name === field.name &&
+      acceptedNamespaces.some((namespace) => namespace === value.namespaceUri),
+  );
   if (!candidate) return null;
-  return { field: candidateField(field, candidate), source: candidate.source };
+  const preferred =
+    candidates.find((value) => value.language === 'x-default') ??
+    candidates.find((value) =>
+      value.language?.toLowerCase().startsWith('en'),
+    ) ??
+    candidate;
+  return {
+    field: candidateField(field, preferred),
+    source: preferred.source,
+  };
 }
 
 function candidateField(
@@ -98,6 +117,25 @@ function candidateField(
     rawValue: candidate.rawValue,
     displayValue: candidate.displayValue,
   };
+}
+
+function formattedDate(text: string): string {
+  const match = text
+    .trim()
+    .match(/^(\d{4})[:-]?(\d{2})[:-]?(\d{2})(?:(?:[ T]|$).*)$/u);
+  if (!match) return '';
+  const [, yearText, monthText, dayText] = match;
+  const year = Number(yearText);
+  const month = Number(monthText);
+  const day = Number(dayText);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() !== month - 1 ||
+    date.getUTCDate() !== day
+  )
+    return '';
+  return `${yearText}-${monthText}-${dayText}`;
 }
 
 function numeric(raw: unknown, rational = true): number | null {
@@ -178,8 +216,7 @@ function format(name: string, field: MetadataField): string {
         : '';
     }
     case 'date': {
-      const match = text.match(/^(\d{4})[:-]?(\d{2})[:-]?(\d{2})(?:\b|T)/);
-      return match ? `${match[1]}-${match[2]}-${match[3]}` : '';
+      return formattedDate(text);
     }
     default:
       return text;
