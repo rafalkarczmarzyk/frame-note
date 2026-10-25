@@ -291,3 +291,59 @@ test('restores SVG assets, blank lines and custom positions across photo orienta
     expect(result.lineRed).toBeGreaterThan(200);
   }
 });
+
+test('keeps long-name duplicates and valid presets alongside damaged entries', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const data = await page.evaluate(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 80;
+    canvas.height = 60;
+    return canvas.toDataURL('image/jpeg').split(',')[1]!;
+  });
+  const photo = {
+    name: 'small.jpg',
+    mimeType: 'image/jpeg',
+    buffer: Buffer.from(data, 'base64'),
+  };
+  await page.getByLabel('Choose JPG photo').setInputFiles(photo);
+  await page.getByRole('button', { name: 'Save preset', exact: true }).click();
+  const name = 'x'.repeat(80);
+  await page.getByLabel('Preset name', { exact: true }).fill(name);
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await page
+    .getByRole('button', { name: `Duplicate ${name}`, exact: true })
+    .click();
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await page.evaluate(() => {
+    const key = 'framenote.presets.v1';
+    const saved = JSON.parse(localStorage.getItem(key)!);
+    saved.push({ damaged: 'retain this data' });
+    localStorage.setItem(key, JSON.stringify(saved));
+  });
+  await page.reload();
+  await page.getByLabel('Choose JPG photo').setInputFiles(photo);
+  await expect(page.getByRole('alert')).toContainText(
+    'original data is preserved',
+  );
+  await expect(
+    page.getByRole('button', { name: 'Download recovery copy' }),
+  ).toBeVisible();
+  await page
+    .getByRole('button', { name: 'Manage presets', exact: true })
+    .click();
+  await expect(page.getByRole('button', { name, exact: true })).toBeVisible();
+  const copy = `${'x'.repeat(75)} copy`;
+  await expect(
+    page.getByRole('button', { name: copy, exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole('button', { name: `Delete ${copy}`, exact: true })
+    .click();
+  expect(
+    await page.evaluate(() =>
+      JSON.parse(localStorage.getItem('framenote.presets.v1')!),
+    ),
+  ).toContainEqual({ damaged: 'retain this data' });
+});

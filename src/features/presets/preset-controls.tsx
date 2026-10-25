@@ -1,3 +1,4 @@
+import { PresetStore } from './preset-store';
 import { createId } from '@/lib/create-id';
 import { Select } from '@/components/ui/select';
 import { PickerList } from '@/components/ui/picker-list';
@@ -26,7 +27,8 @@ import type { SvgAsset } from '@/domain/svg-asset';
 import {
   createPreset,
   parsePreset,
-  presetStorageKey,
+  copyPresetName,
+  presetNameLimit,
   type LayoutPreset,
 } from '@/domain/presets';
 import { loadIcon } from '../caption/svg-icons';
@@ -53,19 +55,19 @@ export function PresetControls({
 }) {
   const importInput = useRef<HTMLInputElement>(null);
   const [error, setError] = useState('');
-  const [presets, setPresets] = useState<LayoutPreset[]>(() => {
-    if (!persist) return [];
-    try {
-      const stored: unknown = JSON.parse(
-        localStorage.getItem(presetStorageKey) ?? '[]',
-      );
-      return Array.isArray(stored)
-        ? stored.map((item) => parsePreset(JSON.stringify(item), svgIcon))
-        : [];
-    } catch {
-      return [];
-    }
-  });
+  const [collection] = useState(
+    () =>
+      new PresetStore(
+        persist
+          ? {
+              getItem: (key) => localStorage.getItem(key),
+              setItem: (key, value) => localStorage.setItem(key, value),
+            }
+          : null,
+        svgIcon,
+      ),
+  );
+  const [presets, setPresets] = useState(collection.presets);
   const [selected, setSelected] = useState('');
   const [name, setName] = useState('');
   const [naming, setNaming] = useState(false);
@@ -85,28 +87,18 @@ export function PresetControls({
     ) !== JSON.stringify(current);
   const startCopy = () => {
     setRenameId(null);
-    setName(current ? `${current.name} copy` : '');
+    setName(current ? copyPresetName(current.name) : '');
     setNaming(true);
     onBrowse();
   };
-  const store = (next: LayoutPreset[]) => {
-    if (
-      next.some(
-        (preset) =>
-          new Blob([JSON.stringify(preset, null, 2)]).size > 5_000_000,
-      )
-    ) {
-      setError('Preset exceeds 5 MB. Use smaller image files or fewer images.');
-      return false;
-    }
+  const store = (update: (current: LayoutPreset[]) => LayoutPreset[]) => {
     try {
-      if (persist) localStorage.setItem(presetStorageKey, JSON.stringify(next));
-      setPresets(next);
+      setPresets(collection.commit(update));
       setError('');
       return true;
-    } catch {
+    } catch (cause) {
       setError(
-        'Could not save presets. Browser storage may be full or unavailable. Export your preset to keep a copy.',
+        cause instanceof Error ? cause.message : 'Could not save presets.',
       );
       return false;
     }
@@ -123,10 +115,10 @@ export function PresetControls({
       layout,
       icons,
     );
-    const next =
+    const next = (latest: LayoutPreset[]) =>
       replace && current && !builtin
-        ? presets.map((item) => (item.id === current.id ? preset : item))
-        : [...presets, preset];
+        ? latest.map((item) => (item.id === current.id ? preset : item))
+        : [...latest, preset];
     if (store(next)) {
       setSelected(preset.id);
       setNaming(false);
@@ -150,8 +142,8 @@ export function PresetControls({
             return;
           }
           if (
-            store(
-              presets.map((p) =>
+            store((latest) =>
+              latest.map((p) =>
                 p.id === renameId ? { ...p, name: name.trim() } : p,
               ),
             )
@@ -167,7 +159,7 @@ export function PresetControls({
           <Input
             id={id}
             value={name}
-            maxLength={80}
+            maxLength={presetNameLimit}
             autoFocus
             disabled={disabled}
             onChange={(event) => setName(event.target.value)}
@@ -204,6 +196,33 @@ export function PresetControls({
         persist={persist}
       >
         <div className="space-y-3">
+          {collection.warning && (
+            <div className="space-y-2">
+              <p role="alert" className="text-xs text-content-secondary">
+                {collection.warning}
+              </p>
+              {collection.original !== null && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const url = URL.createObjectURL(
+                      new Blob([collection.original!], {
+                        type: 'application/json',
+                      }),
+                    );
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'framenote-presets-recovery.json';
+                    link.click();
+                    setTimeout(() => URL.revokeObjectURL(url), 1000);
+                  }}
+                >
+                  Download recovery copy
+                </Button>
+              )}
+            </div>
+          )}
           <Field label="Saved preset">
             {(id) => (
               <Select
@@ -295,6 +314,16 @@ export function PresetControls({
                         layout,
                         icons,
                       );
+                      try {
+                        parsePreset(JSON.stringify(preset), svgIcon);
+                      } catch (cause) {
+                        setError(
+                          cause instanceof Error
+                            ? cause.message
+                            : 'Invalid preset.',
+                        );
+                        return;
+                      }
                       const blob = new Blob([JSON.stringify(preset, null, 2)], {
                         type: 'application/json',
                       });
@@ -357,9 +386,9 @@ export function PresetControls({
                               const copy = {
                                 ...structuredClone(preset),
                                 id: createId(),
-                                name: `${preset.name} copy`,
+                                name: copyPresetName(preset.name),
                               };
-                              if (store([...presets, copy])) {
+                              if (store((latest) => [...latest, copy])) {
                                 setRenameId(copy.id);
                                 setName(copy.name);
                                 setNaming(true);
@@ -387,8 +416,8 @@ export function PresetControls({
                                 disabled={disabled}
                                 onClick={() => {
                                   if (
-                                    store(
-                                      presets.filter((p) => p.id !== preset.id),
+                                    store((latest) =>
+                                      latest.filter((p) => p.id !== preset.id),
                                     )
                                   ) {
                                     if (selected === preset.id) setSelected('');
@@ -444,7 +473,7 @@ export function PresetControls({
                 ),
               ),
             );
-            if (store([...presets, preset])) apply(preset);
+            if (store((latest) => [...latest, preset])) apply(preset);
           } catch (cause) {
             setError(
               cause instanceof Error
