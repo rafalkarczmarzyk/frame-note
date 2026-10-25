@@ -1,4 +1,12 @@
-import { useId, useRef, useState, type ReactNode } from 'react';
+import { edgeScrollSpeed, scrollAncestor } from '@/lib/drag-scroll';
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import { Check, GripVertical } from 'lucide-react';
 
 export interface PickerItem {
@@ -34,6 +42,47 @@ export function PickerList({
   const root = useRef<HTMLDivElement>(null);
   const [drag, setDrag] = useState<{ id: string; gap: number } | null>(null);
   const dragRef = useRef<{ id: string; gap: number } | null>(null);
+  const pointerY = useRef(0);
+  const scrollHost = useRef<HTMLElement | null>(null);
+  const updateGap = useCallback((y: number) => {
+    const current = dragRef.current;
+    const rows =
+      root.current?.querySelectorAll<HTMLElement>('[data-picker-row]');
+    if (!current || !rows?.length) return;
+    let gap = rows.length;
+    for (let row = 0; row < rows.length; row++) {
+      const box = rows[row]!.getBoundingClientRect();
+      if (y < box.top + box.height / 2) {
+        gap = row;
+        break;
+      }
+    }
+    if (current.gap !== gap) {
+      dragRef.current = { ...current, gap };
+      setDrag(dragRef.current);
+    }
+  }, []);
+  const draggingId = drag?.id;
+  useEffect(() => {
+    if (!draggingId) return;
+    let frame = 0;
+    const tick = () => {
+      if (!dragRef.current) return;
+      const host = scrollHost.current;
+      if (host) {
+        const bounds = host.getBoundingClientRect();
+        host.scrollTop += edgeScrollSpeed(
+          pointerY.current,
+          Math.max(0, bounds.top),
+          Math.min(window.innerHeight, bounds.bottom),
+        );
+      }
+      updateGap(pointerY.current);
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [draggingId, updateGap]);
   const cancel = () => {
     dragRef.current = null;
     setDrag(null);
@@ -81,34 +130,15 @@ export function PickerList({
                 event.preventDefault();
                 event.currentTarget.focus();
                 event.currentTarget.setPointerCapture(event.pointerId);
+                pointerY.current = event.clientY;
+                scrollHost.current = scrollAncestor(root.current);
                 dragRef.current = { id: item.id, gap: index };
                 setDrag(dragRef.current);
               }}
               onPointerMove={(event) => {
                 if (!dragRef.current) return;
-                const rows =
-                  root.current?.querySelectorAll<HTMLElement>(
-                    '[data-picker-row]',
-                  );
-                if (!rows?.length) return;
-                let gap = rows.length;
-                for (let row = 0; row < rows.length; row++) {
-                  const box = rows[row]!.getBoundingClientRect();
-                  if (event.clientY < box.top + box.height / 2) {
-                    gap = row;
-                    break;
-                  }
-                }
-                const scrollHost = root.current?.closest('aside');
-                if (scrollHost) {
-                  const bounds = scrollHost.getBoundingClientRect();
-                  if (event.clientY < bounds.top + 40)
-                    scrollHost.scrollTop -= 12;
-                  if (event.clientY > bounds.bottom - 40)
-                    scrollHost.scrollTop += 12;
-                }
-                dragRef.current = { ...dragRef.current, gap };
-                setDrag(dragRef.current);
+                pointerY.current = event.clientY;
+                updateGap(event.clientY);
               }}
               onPointerUp={() => {
                 const current = dragRef.current;

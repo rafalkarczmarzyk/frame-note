@@ -2,7 +2,7 @@
 
 Data: 2026-10-25.
 Źródło: statyczny audyt techniczny repozytorium opisany w rozmowie z użytkownikiem.
-Status: realizacja etapowa; szczegółowy stan i dowody poniżej.
+Status: wszystkie sześć etapów wdrożone i zweryfikowane; szczegóły poniżej.
 
 ## Jak korzystać z planu
 
@@ -36,7 +36,7 @@ wszystkich stories ani rzeczywistego hostingu. Nie potwierdza zgodności WCAG.
 | 3    | Bezpieczne operacje asynchroniczne i schowek | FN-04, FN-05 | P2        | Medium | etap 2     | zweryfikowany |
 | 4    | Stabilność przygotowanego eksportu           | FN-06        | P2        | Small  | brak       | zweryfikowany |
 | 5    | Nawigacja klawiaturą w panelach              | FN-07        | P2        | Medium | brak       | zweryfikowany |
-| 6    | Przewijanie podczas przeciągania warstw      | FN-08        | P3        | Small  | brak       | nierozpoczęty |
+| 6    | Przewijanie podczas przeciągania warstw      | FN-08        | P3        | Small  | brak       | zweryfikowany |
 
 Kolejność minimalizuje powtórną pracę. Medium/Small to względny nakład, nie estymacja czasu.
 Nie stwierdzono potwierdzonych ustaleń Critical ani prac P0.
@@ -333,8 +333,8 @@ Poniższe obserwacje nie są dodatkowymi zatwierdzonymi etapami:
 - Nowa warstwa otrzymuje pustą kolekcję obrazów, duplikat tylko użyte zasoby.
 - Model dokumentu i presety przechowują aktywne zasoby. Zamontowany edytor
   zachowuje osobną kolekcję dla undo/redo, także po usunięciu ostatniego tokenu.
-- Polityka: do 100 aktywnych obrazów; cache historii do 1000 zasobów i 64 MB
-  zakodowanych źródeł. Przekroczenie daje jawny błąd; zmiana warstwy zwalnia
+- Polityka: do 100 aktywnych obrazów; cache edytora (treść i historia) do 1000 zasobów
+  i 64 MB zakodowanych źródeł. Przekroczenie daje jawny błąd; zmiana warstwy zwalnia
   historię tej instancji edytora. Limit nie jest pomiarem pamięci zdekodowanych grafik.
 - Test schowka zaczyna od rzeczywiście pustej warstwy. Test obejmuje również
   odtworzenie usuniętej grafiki i jej rozmiaru przez undo.
@@ -382,3 +382,29 @@ Poniższe obserwacje nie są dodatkowymi zatwierdzonymi etapami:
 - Luka: nie wykonano ręcznego testu z czytnikiem ekranu.
 - Weryfikacja: pnpm check (216 testów), 2/2 E2E fokusu oraz 10/10
   E2E edytora i presetów w Chromium/WebKit. Build Storybooka zaliczony.
+
+### Etap 6 — wykonanie 2026-10-25
+
+- PickerList rozpoznaje rzeczywistego przewijalnego przodka po overflow
+  i wymiarach, bez zależności od znacznika aside.
+- requestAnimationFrame przewija również przy nieruchomym wskaźniku
+  i oblicza pozycję upuszczenia po każdym przesunięciu listy.
+- Escape, pointercancel, utrata pointer capture i odmontowanie zatrzymują
+  pętlę; obsługa klawiatury pozostaje w istniejącym kontrakcie.
+- Dodano test domenowy stref przewijania, E2E 30 warstw oraz story
+  LongReorderList; story uruchomiono i obejrzano w Chromium.
+
+### Weryfikacja integracyjna
+
+- Pełny zestaw: 44/44 E2E Chromium/WebKit, 217 testów jednostkowych
+  w pnpm check, build aplikacji i Storybooka. Wzorce pikseli niezmienione.
+- Końcowy przegląd doprecyzował komunikat anulowania wymiany obrazu po
+  usunięciu jego celu; ta ścieżka otrzymała dodatkowy scenariusz E2E.
+- Ograniczenia: ręczny test czytnika ekranu i systemowego schowka między
+  aplikacjami nie został wykonany. Nie rozszerzano zakresu o dalsze
+  rekomendacje i pomiary z audytu.
+- Dodatkowa weryfikacja po końcowej korekcie: 8/8 E2E operacji asynchronicznych
+  w Chromium/WebKit, w tym anulowanie wymiany usuniętej grafiki.
+- Etap 6: pnpm check (217 testów), 2/2 E2E przewijania i anulowania,
+  build Storybooka i przegląd LongReorderList. Gotowe do zapisu w commicie
+  zgodnie z poleceniem automatycznego przechodzenia po weryfikacji.
