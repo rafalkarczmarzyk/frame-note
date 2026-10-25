@@ -1,3 +1,4 @@
+import { createId } from '@/lib/create-id';
 import { Select } from '@/components/ui/select';
 import { PickerList } from '@/components/ui/picker-list';
 import { builtinPresets } from '@/domain/builtin-presets';
@@ -107,7 +108,7 @@ export function PresetControls({
       return;
     }
     const preset = createPreset(
-      replace && current && !builtin ? current.id : crypto.randomUUID(),
+      replace && current && !builtin ? current.id : createId(),
       title,
       layout,
       icons,
@@ -279,7 +280,7 @@ export function PresetControls({
                     disabled={disabled}
                     onClick={() => {
                       const preset = createPreset(
-                        current?.id ?? crypto.randomUUID(),
+                        current?.id ?? createId(),
                         current?.name ?? 'Untitled',
                         layout,
                         icons,
@@ -340,7 +341,7 @@ export function PresetControls({
                             onClick={() => {
                               const copy = {
                                 ...structuredClone(preset),
-                                id: crypto.randomUUID(),
+                                id: createId(),
                                 name: `${preset.name} copy`,
                               };
                               if (store([...presets, copy])) {
@@ -415,7 +416,7 @@ export function PresetControls({
               throw Error('Preset must be smaller than 5 MB.');
             const preset = {
               ...parsePreset(await file.text(), svgIcon),
-              id: crypto.randomUUID(),
+              id: createId(),
             };
             if (store([...presets, preset])) apply(preset);
           } catch (cause) {

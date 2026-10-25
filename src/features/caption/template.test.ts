@@ -45,3 +45,21 @@ describe('template', () => {
     expect(resolveTemplate('{exif:Artist}', values).text).toBe('{literal}');
   });
 });
+
+it('preserves intentional blank lines but drops lines emptied by missing metadata', () => {
+  expect(resolveTemplate('A\n\n{exif:Missing}\nB', []).text).toBe('A\n\nB');
+  expect(resolveTemplate('\nA\n\n', []).text).toBe('\nA\n\n');
+});
+
+it('treats an existing metadata field with an empty value as missing', () => {
+  const empty = createMetadataField({
+    group: 'exif',
+    name: 'Artist',
+    displayValue: '  ',
+    rawValue: null,
+  });
+  expect(resolveTemplate('{exif:Artist}', [empty])).toMatchObject({
+    text: '',
+    missing: ['exif:Artist'],
+  });
+});

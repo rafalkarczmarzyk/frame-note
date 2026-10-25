@@ -47,3 +47,13 @@ describe('inline caption content', () => {
     ]);
   });
 });
+
+it('preserves empty lines with icons but removes missing-only icon lines', () => {
+  const result = resolveCaptionContent(
+    'A\n\n{icon:missing}\n{icon:aperture}',
+    [],
+    [aperture],
+  );
+  expect(result.text).toBe(`A\n\n${iconMarker(0)}`);
+  expect(result.missing).toEqual(['icon:missing']);
+});

@@ -365,3 +365,11 @@ fractional precision. Field labels remain accessible; hover/focus highlights
 affected inner edges. None/Pairs/All
 linking sits below the model. The diagram is schematic, not a scaled preview.
 Canvas rulers and dragging margins remain outside this change.
+
+## MVP verification update
+
+The renderer preserves intentional blank source lines while dropping lines
+containing only missing values. Empty metadata values count as missing.
+The same resolution feeds canvas and JPG. Preset validation and SVG restoration
+are exercised after browser reload and across landscape/portrait source images.
+Current verification and its limits: [MVP_VERIFICATION.md](MVP_VERIFICATION.md).
