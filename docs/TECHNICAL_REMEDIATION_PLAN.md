@@ -34,7 +34,7 @@ wszystkich stories ani rzeczywistego hostingu. Nie potwierdza zgodności WCAG.
 | 1    | Integralność i współbieżność presetów        | FN-01, FN-02 | P1        | Medium | brak       | zweryfikowany |
 | 2    | Własność i retencja zasobów warstwy          | FN-03        | P2        | Medium | brak       | zweryfikowany |
 | 3    | Bezpieczne operacje asynchroniczne i schowek | FN-04, FN-05 | P2        | Medium | etap 2     | zweryfikowany |
-| 4    | Stabilność przygotowanego eksportu           | FN-06        | P2        | Small  | brak       | nierozpoczęty |
+| 4    | Stabilność przygotowanego eksportu           | FN-06        | P2        | Small  | brak       | zweryfikowany |
 | 5    | Nawigacja klawiaturą w panelach              | FN-07        | P2        | Medium | brak       | nierozpoczęty |
 | 6    | Przewijanie podczas przeciągania warstw      | FN-08        | P3        | Small  | brak       | nierozpoczęty |
 
@@ -357,3 +357,14 @@ Poniższe obserwacje nie są dodatkowymi zatwierdzonymi etapami:
   zaliczonych (17 w przebiegu głównym, poprawiony scenariusz obrazów ponownie
   2/2). Regresja pikseli JPG bez zmiany wzorców. Build Storybooka zaliczony;
   ręczny przegląd stories niewykonany.
+
+### Etap 4 — wykonanie 2026-10-25
+
+- Wejście renderera ma stabilną kompozycję zależną od warstw, jednostki
+  i marginesów; activeId pozostaje wyłącznie stanem interfejsu.
+- Nie ma porównywania całych dokumentów ani źródeł base64. Kolejka LatestJob
+  i kontrola aktualności wyniku pozostają bez zmian.
+- Nowy E2E liczy kodowania canvas → JPG, sprawdza brak wyłączenia eksportu
+  przy wyborze/hoverze i ponowne kodowanie po zmianie treści.
+- Weryfikacja: pnpm check (216 testów), 2/2 E2E stabilności eksportu,
+  4/4 E2E kolejności warstw i pikseli JPG w Chromium/WebKit. Bez aktualizacji wzorców.

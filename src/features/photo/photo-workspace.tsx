@@ -275,12 +275,17 @@ function PhotoWorkspaceContent({
     icons,
     settings.images,
   );
+  const { containers, sizingUnit, margins, marginLinkMode } = layout;
+  const composition = useMemo(
+    () => ({ containers, sizingUnit, margins, marginLinkMode, activeId: null }),
+    [containers, sizingUnit, margins, marginLinkMode],
+  );
   const renderedCaptions = useMemo(
     () =>
-      layout.containers
+      composition.containers
         .filter((container) => container.visible !== false)
         .map((container) => {
-          const caption = containerCaption(layout, container);
+          const caption = containerCaption(composition, container);
           const resolved = resolveCaptionContent(
             caption.template,
             photo.document.photo.metadata,
@@ -294,7 +299,7 @@ function PhotoWorkspaceContent({
           );
           return { id: container.id, caption, ...resolved, color };
         }),
-    [layout, photo, icons],
+    [composition, photo, icons],
   );
   const exportCaptions = useMemo(
     () =>
