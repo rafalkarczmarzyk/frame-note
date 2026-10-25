@@ -1,5 +1,5 @@
 import { HexColorPicker } from 'react-colorful';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { FloatingPanel } from '@/components/layout/floating-panel';
 import { Input } from '@/components/ui/input';
 import { Field } from '@/components/ui/field';
@@ -37,14 +37,6 @@ export function ColorPickerPanel({
   const draft = draftState.value === value ? draftState.text : resolve(value);
   const setDraft = (text: string) => setDraftState({ value, text });
   const [error, setError] = useState('');
-  const opener = useRef(document.activeElement);
-  useEffect(
-    () => () => {
-      if (opener.current instanceof HTMLElement && opener.current.isConnected)
-        opener.current.focus({ preventScroll: true });
-    },
-    [],
-  );
   const choose = (color: string) => {
     onChange(color);
     setDraft(

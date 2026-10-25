@@ -560,3 +560,13 @@ selection and geometry. Hidden layers remain selectable and editable, use muted
 row text, and are excluded from preview, JPG and missing-data export warnings.
 Presets preserve ordering and visibility; absent visibility means visible.
 Story: Components/UI/PickerList/ReorderLayers.
+
+### Panel keyboard focus — technical remediation
+
+FloatingPanel owns non-modal focus entry and return for tags, fonts, colors,
+icons and presets. It focuses a field or list item, with the dialog itself as
+a fallback. Escape and the close action restore the opener when it exists,
+otherwise the current caption editor or an available workspace button. Switching
+panel content transfers focus without trapping it. ColorPickerPanel uses this
+shared behavior. Components/Layout/FloatingPanel/KeyboardFocus demonstrates
+entry and return. Screen reader behavior has not been manually verified.

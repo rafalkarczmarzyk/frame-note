@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import { useId, type ReactNode } from 'react';
+import { useId, useLayoutEffect, useRef, type ReactNode } from 'react';
 import { IconButton } from '../ui/icon-button';
 import { cn } from '@/lib/utils';
 
@@ -26,10 +26,71 @@ export function FloatingPanel({
   className,
   surface = 'glass',
 }: FloatingPanelProps) {
+  const root = useRef<HTMLElement>(null);
+  const opener = useRef(document.activeElement);
+  const pointerTarget = useRef<HTMLElement | null>(null);
+  useLayoutEffect(() => {
+    const rememberPointer = (event: PointerEvent) => {
+      const button =
+        event.target instanceof Element
+          ? event.target.closest<HTMLElement>('button')
+          : null;
+      if (button && !root.current?.contains(button))
+        pointerTarget.current = button;
+    };
+    document.addEventListener('pointerdown', rememberPointer, true);
+    return () =>
+      document.removeEventListener('pointerdown', rememberPointer, true);
+  }, []);
+  useLayoutEffect(() => {
+    const panel = root.current;
+    if (!panel) return;
+    if (pointerTarget.current?.isConnected)
+      opener.current = pointerTarget.current;
+    else if (
+      !panel.contains(document.activeElement) &&
+      document.activeElement !== document.body
+    )
+      opener.current = document.activeElement;
+    pointerTarget.current = null;
+    if (!panel.contains(document.activeElement)) {
+      const initial =
+        panel.querySelector<HTMLElement>(
+          'input:not([type="file"]):not([type="hidden"]):not([disabled]), [data-panel-initial-focus], button[aria-pressed]:not([disabled])',
+        ) ?? panel;
+      initial.focus({ preventScroll: true });
+    }
+    return () => {
+      const focused = document.activeElement;
+      if (!panel.contains(focused) && focused !== document.body) return;
+      const trigger = opener.current;
+      queueMicrotask(() => {
+        // A newly opened panel or an explicit user action owns its own focus.
+        if (
+          document.activeElement !== focused &&
+          document.activeElement !== document.body
+        )
+          return;
+        const target =
+          trigger instanceof HTMLElement &&
+          trigger.isConnected &&
+          trigger !== document.body &&
+          trigger !== document.documentElement
+            ? trigger
+            : (document.querySelector<HTMLElement>('[aria-label="Caption"]') ??
+              document.querySelector<HTMLElement>(
+                'main button:not([disabled])',
+              ));
+        target?.focus({ preventScroll: true });
+      });
+    };
+  }, [title]);
   const titleId = useId();
   const descriptionId = useId();
   return (
     <aside
+      ref={root}
+      tabIndex={-1}
       id={id}
       role="dialog"
       aria-modal="false"
