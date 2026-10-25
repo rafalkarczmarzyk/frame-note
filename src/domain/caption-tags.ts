@@ -8,8 +8,18 @@ const definitions = {
   author: ['xmp:creator', 'exif:Artist', 'iptc:By-line', 'iptc:Byline'],
   camera: ['exif:Model', 'xmp:Model'],
   lens: ['exif:LensModel', 'xmp:LensModel', 'xmp:Lens'],
-  shutter: ['exif:ExposureTime', 'xmp:ExposureTime'],
-  aperture: ['exif:FNumber', 'xmp:FNumber'],
+  shutter: [
+    'exif:ExposureTime',
+    'xmp:ExposureTime',
+    'exif:ShutterSpeedValue',
+    'xmp:ShutterSpeedValue',
+  ],
+  aperture: [
+    'exif:FNumber',
+    'xmp:FNumber',
+    'exif:ApertureValue',
+    'xmp:ApertureValue',
+  ],
   iso: [
     'exif:PhotographicSensitivity',
     'exif:ISOSpeedRatings',
@@ -41,7 +51,9 @@ const xmpNamespaces = {
   'lens:xmp:LensModel': ['http://cipa.jp/exif/1.0/'],
   'lens:xmp:Lens': ['http://ns.adobe.com/exif/1.0/aux/'],
   'shutter:xmp:ExposureTime': ['http://ns.adobe.com/exif/1.0/'],
+  'shutter:xmp:ShutterSpeedValue': ['http://ns.adobe.com/exif/1.0/'],
   'aperture:xmp:FNumber': ['http://ns.adobe.com/exif/1.0/'],
+  'aperture:xmp:ApertureValue': ['http://ns.adobe.com/exif/1.0/'],
   'iso:xmp:PhotographicSensitivity': [
     'http://cipa.jp/exif/1.0/',
     'http://ns.adobe.com/exif/1.0/',
@@ -87,27 +99,47 @@ function candidateField(
   };
 }
 
-function numeric(raw: unknown): number | null {
+function numeric(raw: unknown, rational = true): number | null {
   if (typeof raw === 'number') return Number.isFinite(raw) ? raw : null;
   if (typeof raw === 'string' && raw.trim()) {
-    const fraction = raw.trim().match(/^(\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)$/);
+    const fraction = rational
+      ? raw.trim().match(/^([+-]?\d+(?:\.\d+)?)\/([+-]?\d+(?:\.\d+)?)$/)
+      : null;
+    if (fraction && Number(fraction[2]) === 0) return null;
     const result = fraction
       ? Number(fraction[1]) / Number(fraction[2])
       : Number(raw);
     return Number.isFinite(result) ? result : null;
   }
   if (Array.isArray(raw)) {
-    if (raw.length === 2 && raw.every((n) => typeof n === 'number')) {
+    if (
+      rational &&
+      raw.length === 2 &&
+      raw.every((n) => typeof n === 'number')
+    ) {
+      if (raw[1] === 0) return null;
       const result = raw[0]! / raw[1]!;
       return Number.isFinite(result) ? result : null;
     }
-    if (raw.length === 1) return numeric(raw[0]);
+    if (raw.length === 1) return numeric(raw[0], rational);
   }
   return null;
 }
 function format(name: string, field: MetadataField): string {
   const text = field.displayValue.trim();
-  const number = numeric(field.rawValue);
+  const allowRational = name !== 'iso';
+  const number = numeric(field.rawValue, allowRational);
+  const textNumber =
+    typeof field.rawValue === 'string'
+      ? numeric(
+          text
+            .replace(/^ISO\s*/i, '')
+            .replace(/^f\s*\/?\s*/i, '')
+            .replace(/\s*(?:s|sec|seconds?|mm)$/i, ''),
+          allowRational,
+        )
+      : null;
+  const value = number ?? textNumber;
   switch (name) {
     case 'heliconStackCount': {
       const details = heliconDetails(text);
@@ -116,29 +148,31 @@ function format(name: string, field: MetadataField): string {
     case 'heliconStack':
       return parseHeliconComment(text) ?? '';
     case 'shutter': {
-      if (number !== null && number > 0) {
-        const reciprocal = 1 / number;
-        return number < 1 &&
+      const apex = field.name === 'ShutterSpeedValue';
+      const seconds = apex && value !== null ? 2 ** -value : value;
+      if (seconds !== null && Number.isFinite(seconds) && seconds > 0) {
+        const reciprocal = 1 / seconds;
+        return seconds < 1 &&
           Math.abs(reciprocal - Math.round(reciprocal)) < 0.01
           ? `1/${Math.round(reciprocal)} s`
-          : `${Number(number.toPrecision(6))} s`;
+          : `${Number(seconds.toPrecision(6))} s`;
       }
-      const fallback = numeric(text.replace(/\s*(?:s|sec|seconds?)$/i, ''));
-      return fallback !== null && fallback > 0 ? `${fallback} s` : '';
+      return '';
     }
     case 'aperture': {
-      const value = number ?? Number(text.replace(/^f\s*\/?\s*/i, ''));
-      return Number.isFinite(value) && value > 0
-        ? `f/${Number(value.toFixed(2))}`
+      const apex = field.name === 'ApertureValue';
+      const fNumber = apex && value !== null ? 2 ** (value / 2) : value;
+      return fNumber !== null && Number.isFinite(fNumber) && fNumber > 0
+        ? `f/${Number(fNumber.toFixed(2))}`
         : '';
     }
     case 'iso': {
-      const value = number ?? Number(text.replace(/^ISO\s*/i, ''));
-      return Number.isFinite(value) && value > 0 ? `ISO ${value}` : '';
+      return value !== null && Number.isInteger(value) && value > 0
+        ? `ISO ${value}`
+        : '';
     }
     case 'focalLength': {
-      const value = number ?? Number(text.replace(/\s*mm$/i, ''));
-      return Number.isFinite(value) && value > 0
+      return value !== null && Number.isFinite(value) && value > 0
         ? `${Number(value.toFixed(2))} mm`
         : '';
     }

@@ -65,6 +65,53 @@ describe('FrameNote caption helpers', () => {
     expect(get([], 'exposure').displayValue).toBe('');
     expect(get([], 'camera').sources).toEqual([]);
   });
+  it('parses rational values by tag meaning and keeps ISO lists out of fractions', () => {
+    const fields = [
+      field('exif:ExposureTime', '1/250', [1, 250]),
+      field('exif:FNumber', 'f/2.8', [28, 10]),
+      field('exif:FocalLength', '100 mm', [100, 1]),
+      field('exif:ISOSpeedRatings', '100, 200', [100, 200]),
+      field('xmp:ISOSpeedRatings', 'ISO 800', '800'),
+    ];
+
+    expect(get(fields, 'shutter')).toMatchObject({
+      displayValue: '1/250 s',
+      sources: ['exif:ExposureTime'],
+    });
+    expect(get(fields, 'aperture').displayValue).toBe('f/2.8');
+    expect(get(fields, 'focalLength').displayValue).toBe('100 mm');
+    expect(get(fields, 'iso')).toMatchObject({
+      displayValue: 'ISO 800',
+      sources: ['xmp:ISOSpeedRatings'],
+    });
+  });
+  it('converts APEX shutter and aperture values after direct values', () => {
+    const fields = [
+      field('exif:ShutterSpeedValue', '1/128', [7, 1]),
+      field('exif:ApertureValue', '8.00', [6, 1]),
+    ];
+
+    expect(get(fields, 'shutter')).toMatchObject({
+      displayValue: '1/128 s',
+      sources: ['exif:ShutterSpeedValue'],
+    });
+    expect(get(fields, 'aperture')).toMatchObject({
+      displayValue: 'f/8',
+      sources: ['exif:ApertureValue'],
+    });
+    expect(
+      get([field('exif:ShutterSpeedValue', '4', [-2, 1])], 'shutter'),
+    ).toMatchObject({ displayValue: '4 s' });
+    expect(
+      get(
+        [
+          field('exif:ExposureTime', 'not a rational', [0, 0]),
+          field('xmp:ExposureTime', '1/125', '1/125'),
+        ],
+        'shutter',
+      ),
+    ).toMatchObject({ displayValue: '1/125 s', sources: ['xmp:ExposureTime'] });
+  });
   it('normalizes capture date without time zone conversion', () => {
     expect(
       get([field('exif:DateTimeOriginal', '2020:07:22 17:06:17')], 'date')
