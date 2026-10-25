@@ -20,7 +20,12 @@ test('edits mixed SVG and PNG content, preserves image selection and restores po
   await expect(
     page.getByRole('button', { name: 'Add logo', exact: true }),
   ).toHaveCount(0);
-  await page.getByLabel('Caption', { exact: true }).fill('');
+  await page.getByLabel('Caption', { exact: true }).press('ControlOrMeta+a');
+  await page.getByLabel('Caption', { exact: true }).press('Backspace');
+  await expect(page.getByLabel('Caption', { exact: true })).toHaveAttribute(
+    'data-template',
+    '',
+  );
   await page
     .getByLabel('Upload image', { exact: true })
     .setInputFiles('tests/fixtures/logos/rt.png');

@@ -2,7 +2,7 @@
 
 Data: 2026-10-25.
 Źródło: statyczny audyt techniczny repozytorium opisany w rozmowie z użytkownikiem.
-Status: zapisane do późniejszej realizacji; żaden etap nie został rozpoczęty.
+Status: realizacja etapowa; szczegółowy stan i dowody poniżej.
 
 ## Jak korzystać z planu
 
@@ -31,9 +31,9 @@ wszystkich stories ani rzeczywistego hostingu. Nie potwierdza zgodności WCAG.
 
 | Etap | Zakres                                       | Ustalenia    | Priorytet | Nakład | Zależności | Stan          |
 | ---- | -------------------------------------------- | ------------ | --------- | ------ | ---------- | ------------- |
-| 1    | Integralność i współbieżność presetów        | FN-01, FN-02 | P1        | Medium | brak       | nierozpoczęty |
-| 2    | Własność i retencja zasobów warstwy          | FN-03        | P2        | Medium | brak       | nierozpoczęty |
-| 3    | Bezpieczne operacje asynchroniczne i schowek | FN-04, FN-05 | P2        | Medium | etap 2     | nierozpoczęty |
+| 1    | Integralność i współbieżność presetów        | FN-01, FN-02 | P1        | Medium | brak       | zweryfikowany |
+| 2    | Własność i retencja zasobów warstwy          | FN-03        | P2        | Medium | brak       | zweryfikowany |
+| 3    | Bezpieczne operacje asynchroniczne i schowek | FN-04, FN-05 | P2        | Medium | etap 2     | zweryfikowany |
 | 4    | Stabilność przygotowanego eksportu           | FN-06        | P2        | Small  | brak       | nierozpoczęty |
 | 5    | Nawigacja klawiaturą w panelach              | FN-07        | P2        | Medium | brak       | nierozpoczęty |
 | 6    | Przewijanie podczas przeciągania warstw      | FN-08        | P3        | Small  | brak       | nierozpoczęty |
@@ -340,3 +340,20 @@ Poniższe obserwacje nie są dodatkowymi zatwierdzonymi etapami:
   odtworzenie usuniętej grafiki i jej rozmiaru przez undo.
 - Weryfikacja: pnpm check (216 testów), 10/10 E2E obrazów i presetów
   Chromium/WebKit, build Storybooka. Ręczny przegląd stories niewykonany.
+
+### Etap 3 — wykonanie 2026-10-25
+
+- Import pliku, schowek i import presetu używają wspólnego przygotowania obrazów:
+  walidacja struktury, limitów, dekodowania i rzeczywistych wymiarów PNG.
+- Wstawianie chroni rewizja dokumentu; dowolna zmiana treści anuluje operację
+  z komunikatem. Zmiana samego zaznaczenia nie przenosi celu wklejania.
+- Usunięcie warstwy i zniszczenie edytora odrzucają spóźniony wynik.
+- Schowek waliduje węzły, remapuje kolidujące ID i zachowuje tekstowy fallback.
+- Workspace ładuje zasoby używane przez widoczne warstwy, zachowuje poprawne
+  wyniki niezależnie od błędnych, identyfikuje błąd grafiki i blokuje niepełny JPG.
+- Testy schowka używają syntetycznych ClipboardEvent; systemowy schowek między
+  aplikacjami pozostaje ograniczeniem weryfikacji.
+- Weryfikacja: pnpm check (216 testów), 18 scenariuszy E2E Chromium/WebKit
+  zaliczonych (17 w przebiegu głównym, poprawiony scenariusz obrazów ponownie
+  2/2). Regresja pikseli JPG bez zmiany wzorców. Build Storybooka zaliczony;
+  ręczny przegląd stories niewykonany.

@@ -1,5 +1,6 @@
+import { validateImageAssets } from '@/domain/image-validation';
 import type { ImageAsset } from '@/domain/inline-image';
-import { svgIcon, svgUrl } from './svg-icons';
+import { loadIcon, svgIcon, svgUrl } from './svg-icons';
 
 export const imageSource = (asset: ImageAsset) =>
   asset.format === 'png' ? asset.source : svgUrl(asset.source);
@@ -34,20 +35,46 @@ export async function importImage(file: File, id: string): Promise<ImageAsset> {
       reader.onerror = () => reject(Error('Could not read PNG.'));
       reader.readAsDataURL(new Blob([bytes], { type: 'image/png' }));
     });
-    const image = new Image();
-    image.src = source;
-    await image.decode();
-    if (image.naturalWidth !== width || image.naturalHeight !== height)
-      throw Error('Invalid PNG dimensions.');
-    return { id, name: file.name, format: 'png', source, width, height };
+    return (
+      await prepareImageAssets([
+        { id, name: file.name, format: 'png', source, width, height },
+      ])
+    )[0]!;
   }
   const svg = svgIcon('image', new TextDecoder().decode(bytes));
-  return {
-    id,
-    name: file.name,
-    format: 'svg',
-    source: svg.svg,
-    width: svg.aspect,
-    height: 1,
-  };
+  return (
+    await prepareImageAssets([
+      {
+        id,
+        name: file.name,
+        format: 'svg',
+        source: svg.svg,
+        width: svg.aspect,
+        height: 1,
+      },
+    ])
+  )[0]!;
+}
+
+/** All ingress paths check cheap structural limits before decoding. */
+export async function prepareImageAssets(
+  value: unknown,
+): Promise<ImageAsset[]> {
+  const assets = validateImageAssets(value, svgIcon);
+  await Promise.all(
+    assets.map(async (asset) => {
+      const decoded = await loadIcon({
+        name: asset.name,
+        svg: asset.source,
+        aspect: asset.width / asset.height,
+      });
+      if (
+        asset.format === 'png' &&
+        (decoded.naturalWidth !== asset.width ||
+          decoded.naturalHeight !== asset.height)
+      )
+        throw Error(`Invalid PNG dimensions: ${asset.name}`);
+    }),
+  );
+  return assets;
 }

@@ -6,15 +6,13 @@ import type { ReactNode } from 'react';
 import { ImagePlus } from 'lucide-react';
 import { createId } from '@/lib/create-id';
 import type { JSONContent } from '@tiptap/core';
-import { validateImageAssets } from '@/domain/image-validation';
-import { svgIcon } from '../svg-icons';
 import { NodeSelection } from '@tiptap/pm/state';
 import {
   imageToken,
   parseImageToken,
   type ImageAsset,
 } from '@/domain/inline-image';
-import { importImage } from '../image-assets';
+import { importImage, prepareImageAssets } from '../image-assets';
 import { Button } from '@/components/ui/button';
 import { NumberField } from '@/components/ui/number-field';
 import { SegmentedControl } from '@/components/ui/segmented-control';
@@ -67,6 +65,7 @@ export function CaptionEditor({
   useEffect(() => {
     callbacks.current = { onChange, onFocus, onBlur, onReady };
   });
+  const revision = useRef(0);
   const imageAssets = useRef<ImageAsset[]>([...images]);
   useEffect(() => {
     const retained = new Map(
@@ -112,6 +111,7 @@ export function CaptionEditor({
         ),
       ),
     onTransaction: ({ editor, transaction }) => {
+      if (transaction.docChanged) revision.current++;
       const selection = editor.state.selection;
       if (
         selection instanceof NodeSelection &&
@@ -198,69 +198,110 @@ export function CaptionEditor({
         const rich = event.clipboardData?.getData(
           'application/x-framenote-content',
         );
-        if (rich && rich.length <= 5_000_000) {
-          try {
-            const data = JSON.parse(rich);
-            const incoming = validateImageAssets(data.images, svgIcon);
-            const merged = [...imageAssets.current];
-            const remap = new Map<string, string>();
-            for (const image of incoming) {
-              const existing = merged.find((item) => item.id === image.id);
-              const id =
-                existing && existing.source !== image.source
-                  ? createId()
-                  : image.id;
-              remap.set(image.id, id);
-              if (!merged.some((item) => item.id === id))
-                merged.push({ ...image, id });
-            }
-
-            const rewrite = (node: JSONContent): JSONContent => {
-              const ref = parseImageToken(String(node.attrs?.token));
-              return {
-                ...node,
-                ...(ref
-                  ? {
-                      attrs: {
-                        ...node.attrs,
-                        token: imageToken({
-                          ...ref,
-                          assetId: remap.get(ref.assetId) ?? ref.assetId,
-                        }),
-                      },
-                    }
-                  : {}),
-                ...(node.content ? { content: node.content.map(rewrite) } : {}),
-              };
-            };
-            const slice = Slice.fromJSON(view.state.schema, {
-              ...data.content,
-              content: data.content.content.map(rewrite),
-            });
-            const transaction = view.state.tr
-              .replaceSelection(slice)
-              .scrollIntoView();
-            checkImageRetention(
-              documentTemplate(transaction.doc.toJSON()),
-              merged,
-            );
-            imageAssets.current = merged;
-            view.dispatch(transaction);
-            event.preventDefault();
-            return true;
-          } catch {
-            /* Fall back to portable text for invalid clipboard content. */
-          }
-        }
         const text = event.clipboardData?.getData('text/plain');
-        if (text === undefined) return false;
+        if (!rich && text === undefined) return false;
         event.preventDefault();
-        const doc = view.state.schema.nodeFromJSON(templateDocument(text));
-        view.dispatch(
-          view.state.tr
-            .replaceSelection(new Slice(Fragment.from(doc.content), 1, 1))
-            .scrollIntoView(),
-        );
+        const startRevision = revision.current;
+        const selection = view.state.selection;
+        const alive = () => {
+          if (view.isDestroyed) return false;
+          if (revision.current !== startRevision) {
+            setError(
+              'Content changed while the image was loading. Paste again at the desired position.',
+            );
+            return false;
+          }
+          return true;
+        };
+        void (async () => {
+          if (rich && new Blob([rich]).size <= 5_000_000) {
+            try {
+              const data = JSON.parse(rich);
+              const incoming = await prepareImageAssets(data.images);
+              if (!alive()) return;
+              const merged = [...imageAssets.current];
+              const remap = new Map<string, string>();
+              for (const image of incoming) {
+                const existing = merged.find((item) => item.id === image.id);
+                const id =
+                  existing && existing.source !== image.source
+                    ? createId()
+                    : image.id;
+                remap.set(image.id, id);
+                if (!merged.some((item) => item.id === id))
+                  merged.push({ ...image, id });
+              }
+
+              const rewrite = (node: JSONContent): JSONContent => {
+                const ref = parseImageToken(String(node.attrs?.token));
+                return {
+                  ...node,
+                  ...(ref
+                    ? {
+                        attrs: {
+                          ...node.attrs,
+                          token: imageToken({
+                            ...ref,
+                            assetId: remap.get(ref.assetId) ?? ref.assetId,
+                          }),
+                        },
+                      }
+                    : {}),
+                  ...(node.content
+                    ? { content: node.content.map(rewrite) }
+                    : {}),
+                };
+              };
+              if (!data.content || !Array.isArray(data.content.content))
+                throw Error('Invalid clipboard content.');
+              const slice = Slice.fromJSON(view.state.schema, {
+                ...data.content,
+                content: data.content.content.map(rewrite),
+              });
+              slice.content.descendants((node) => {
+                if (
+                  !['paragraph', 'text', 'hardBreak', 'captionToken'].includes(
+                    node.type.name,
+                  ) ||
+                  node.marks.length
+                )
+                  throw Error('Invalid clipboard content.');
+                if (
+                  node.type.name === 'captionToken' &&
+                  typeof node.attrs.token !== 'string'
+                )
+                  throw Error('Invalid clipboard token.');
+              });
+              const transaction = view.state.tr
+                .setSelection(selection)
+                .replaceSelection(slice)
+                .scrollIntoView();
+              checkImageRetention(
+                documentTemplate(transaction.doc.toJSON()),
+                merged,
+              );
+              imageAssets.current = merged;
+              view.dispatch(transaction);
+              setError('');
+              return;
+            } catch {
+              if (!alive()) return;
+              setError(
+                'Could not paste images. Portable text was used instead.',
+              );
+            }
+          }
+          if (!alive() || text === undefined) return;
+          const doc = view.state.schema.nodeFromJSON(templateDocument(text));
+          view.dispatch(
+            view.state.tr
+              .setSelection(selection)
+              .replaceSelection(new Slice(Fragment.from(doc.content), 1, 1))
+              .scrollIntoView(),
+          );
+        })().catch(() => {
+          if (!view.isDestroyed) setError('Could not paste content.');
+        });
         return true;
       },
     },
@@ -358,6 +399,7 @@ export function CaptionEditor({
               if (!file || !editor) return;
               setLoading(true);
               setError('');
+              const startRevision = revision.current;
               const insertion = {
                 from: editor.state.selection.from,
                 to: editor.state.selection.to,
@@ -379,6 +421,10 @@ export function CaptionEditor({
                       previousToken)
                 )
                   return;
+                if (revision.current !== startRevision)
+                  throw Error(
+                    'Content changed while the image was loading. Add the image again at the desired position.',
+                  );
                 const existing = imageAssets.current.find(
                   (item) => item.source === asset.source,
                 );
@@ -428,13 +474,14 @@ export function CaptionEditor({
                   )
                   .run();
               } catch (cause) {
+                if (editor.isDestroyed) return;
                 setError(
                   cause instanceof Error
                     ? cause.message
                     : 'Could not load image.',
                 );
               } finally {
-                setLoading(false);
+                if (!editor.isDestroyed) setLoading(false);
               }
             }}
           />
