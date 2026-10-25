@@ -22,7 +22,7 @@ export function resolveCaptionContent(
       return iconMarker(icons.length - 1);
     },
   );
-  const result = resolveTemplate(replaced, fields);
+  const result = resolveTemplate(replaced, fields, template);
   return {
     ...result,
     missing: [...new Set([...result.missing, ...missing])],

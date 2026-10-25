@@ -1,6 +1,6 @@
 # FrameNote — kontekst produktu, pre-MVP i MVP
 
-Stan dokumentu: 24 października 2026. Pre-MVP zostało zaakceptowane przez
+Stan dokumentu: 25 października 2026. Pre-MVP zostało zaakceptowane przez
 użytkownika i zapisane w commicie `9a627af` na branchu `master`.
 
 Ten dokument przekazuje kontekst kolejnym agentom. Opisuje wykonane prace,
@@ -172,12 +172,12 @@ oraz jego potwierdzenia przed przejściem dalej. Etap 1 zaakceptowano i zapisano
 | Etap                       | Zakres                                                                                                         | Stan                            |
 | -------------------------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------- |
 | 1. Próba Tiptap            | Tekst, badge’e, ikony SVG, zaznaczanie, przeciąganie, undo/redo i schowek `{klucz}`                            | Zaakceptowana; commit `bacbda4` |
-| 2. Wiele kontenerów        | Dodawanie, duplikowanie, usuwanie; wybór z listy i canvasu; osobny styl i anchor; globalne marginesy           | Zaimplementowany; do oceny      |
+| 2. Wiele kontenerów        | Dodawanie, duplikowanie, usuwanie; wybór z listy i canvasu; osobny styl i anchor; globalne marginesy           | Zaakceptowany                   |
 | 3. Custom position         | Przeciąganie na zdjęciu, X/Y względne do zdjęcia, przełączanie Anchor/Custom                                   | Zaakceptowany; commit `addfa4f` |
 | 4. Docelowy edytor i ikony | Tiptap w sidebarze, picker metadanych, własne SVG z nazwami `{icon:aperture}`, układ tekstu i ikon w eksporcie | Zaakceptowany; commit `a4afee3` |
-| 5. Logo SVG                | Osobny kontener, proporcjonalne wymiary, opacity, oryginalne kolory lub jeden kolor, pozycjonowanie            | Zaimplementowany; do oceny      |
-| 6. Presety                 | Zapis, wybór, aktualizacja, Save as, usuwanie, trwałość lokalna, import/eksport wraz z SVG                     | Oczekuje                        |
-| 7. Weryfikacja             | Różne zdjęcia/orientacje, brakujące dane, presety, zgodność podglądu i JPG, Chromium/WebKit                    | Oczekuje                        |
+| 5. Logo SVG                | Osobny kontener, proporcjonalne wymiary, opacity, oryginalne kolory lub jeden kolor, pozycjonowanie            | Zaakceptowany; commit `91b4389` |
+| 6. Presety                 | Zapis, wybór, aktualizacja, Save as, usuwanie, trwałość lokalna, import/eksport wraz z SVG                     | Zaakceptowany; commit `e8f5583` |
+| 7. Weryfikacja             | Różne zdjęcia/orientacje, brakujące dane, presety, zgodność podglądu i JPG, Chromium/WebKit                    | Zaimplementowana; do oceny      |
 
 Nazwy kontenerów nie są wymagane: lista pokazuje fragment treści lub miniaturę SVG.
 Sidebar edytuje aktywny kontener; na canvasie wybiera się i przesuwa cały blok.
@@ -334,3 +334,12 @@ Save as new, usuwanie i import/eksport JSON v1 z użytymi SVG. Bez zdjęcia,
 wartości metadanych i jakości JPG. Import sprawdza strukturę, zakresy wartości
 i SVG; nie nadpisuje istniejących presetów. Etap pozostaje do oceny użytkownika;
 nie rozpoczęto etapu 7.
+
+### Etap 7 — końcowa weryfikacja MVP
+
+Wykonano sprawdzenie pełnego przepływu, presetów z SVG po odświeżeniu,
+bezpiecznego odrzucania błędnego importu, dwóch orientacji oraz wzorców JPG
+w Chromium/WebKit. Siedem oryginalnych zdjęć sprawdzono w obu silnikach.
+Poprawiono zachowanie celowych pustych wierszy i generowanie ID na HTTP w LAN.
+Raport: [MVP_VERIFICATION.md](MVP_VERIFICATION.md). Zmiany pozostają do oceny
+użytkownika; bez automatycznego commita.

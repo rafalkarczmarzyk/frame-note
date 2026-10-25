@@ -22,7 +22,7 @@ export function TokenView({
     ? icons
       ? !asset
       : !['icon:aperture', 'icon:camera'].includes(token)
-    : !values[token];
+    : !values[token]?.trim();
   return (
     <NodeViewWrapper
       as="span"

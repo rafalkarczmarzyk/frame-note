@@ -122,3 +122,172 @@ test('offers built-in Default and Macro and resolves the Helicon fixture', async
     '{author}\n{lens}\n{exposure}',
   );
 });
+
+test('restores SVG assets, blank lines and custom positions across photo orientations', async ({
+  page,
+}) => {
+  const { readFile } = await import('node:fs/promises');
+  const square = {
+    name: 'custom-square',
+    svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" fill="currentColor"/></svg>',
+    aspect: 1,
+  };
+  const green = {
+    ...square,
+    name: 'Signature.svg',
+    svg: square.svg.replace('currentColor', '#00ff00'),
+  };
+  const style = {
+    fontFamily: 'Montserrat Variable',
+    fontWeight: 400,
+    fontSize: 12,
+    color: '#FF0000',
+    opacity: 1,
+    lineHeight: 1.4,
+    textAlign: 'left',
+  };
+  const preset = {
+    version: 1,
+    id: 'portable-svg',
+    name: 'Portable SVG',
+    icons: [square],
+    layout: {
+      sizingUnit: 'short-edge',
+      margins: { top: 3, right: 3, bottom: 3, left: 3 },
+      marginLinkMode: 'none',
+      activeId: 'signature',
+      containers: [
+        {
+          id: 'text',
+          template: '{icon:custom-square}\n\nLine',
+          style,
+          position: { anchor: 'top-left' },
+        },
+        {
+          id: 'signature',
+          template: '',
+          style,
+          position: { anchor: 'center', custom: { x: 80, y: 20 } },
+          logo: { asset: green, width: 20, colorMode: 'original' },
+        },
+      ],
+    },
+  };
+  await page.goto('/');
+  // Exercise preset creation without the secure-context-only randomUUID API (LAN HTTP).
+  await page.evaluate(() =>
+    Object.defineProperty(crypto, 'randomUUID', {
+      value: undefined,
+      configurable: true,
+    }),
+  );
+  const uploadPhoto = async (width: number, height: number) => {
+    const bytes = await page.evaluate(
+      ({ width, height }) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const context = canvas.getContext('2d')!;
+        context.fillStyle = 'black';
+        context.fillRect(0, 0, width, height);
+        return canvas.toDataURL('image/jpeg').split(',')[1]!;
+      },
+      { width, height },
+    );
+    await page.getByLabel('Choose JPG photo').setInputFiles({
+      name: 'orientation.jpg',
+      mimeType: 'image/jpeg',
+      buffer: Buffer.from(bytes, 'base64'),
+    });
+  };
+  await uploadPhoto(1200, 800);
+  await page
+    .getByRole('button', { name: 'Manage presets', exact: true })
+    .click();
+  const unsafe = structuredClone(preset);
+  unsafe.icons[0]!.svg =
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><script>alert(1)</script></svg>';
+  await page.getByLabel('Import preset file').setInputFiles({
+    name: 'unsafe.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify(unsafe)),
+  });
+  await expect(page.getByRole('alert')).toContainText(
+    'Unsupported SVG element',
+  );
+  await page.getByLabel('Import preset file').setInputFiles({
+    name: 'portable.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify(preset)),
+  });
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  await page
+    .getByRole('button', { name: 'Close manage presets', exact: true })
+    .click();
+  await page.reload();
+  await page.evaluate(() =>
+    Object.defineProperty(crypto, 'randomUUID', {
+      value: undefined,
+      configurable: true,
+    }),
+  );
+  await uploadPhoto(1200, 800);
+  await page
+    .getByRole('combobox', { name: 'Saved preset', exact: true })
+    .click();
+  await page.getByRole('option', { name: 'Portable SVG', exact: true }).click();
+  for (const [width, height] of [
+    [1200, 800],
+    [800, 1200],
+  ] as const) {
+    await uploadPhoto(width, height);
+    const ready = page.getByRole('button', { name: 'Export JPG', exact: true });
+    await expect(ready).toBeEnabled();
+    const pending = page.waitForEvent('download');
+    await ready.click();
+    const bytes = await readFile((await (await pending).path())!);
+    const result = await page.evaluate(async (data) => {
+      const image = new Image();
+      image.src = `data:image/jpeg;base64,${data}`;
+      await image.decode();
+      const canvas = document.createElement('canvas');
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const context = canvas.getContext('2d')!;
+      context.drawImage(image, 0, 0);
+      const green = Array.from(
+        context.getImageData(
+          Math.round(image.width * 0.8),
+          Math.round(image.height * 0.2),
+          1,
+          1,
+        ).data,
+      );
+      const red = Array.from(context.getImageData(72, 90, 1, 1).data);
+      const redPixels = (y: number, height: number) => {
+        const pixels = context.getImageData(24, y, 450, height).data;
+        let count = 0;
+        for (let i = 0; i < pixels.length; i += 4)
+          if (pixels[i]! > 200 && pixels[i + 1]! < 30 && pixels[i + 2]! < 30)
+            count++;
+        return count;
+      };
+      return {
+        width: image.width,
+        height: image.height,
+        green,
+        red,
+        gapRed: redPixels(165, 110),
+        lineRed: redPixels(300, 150),
+      };
+    }, bytes.toString('base64'));
+    expect(result.width).toBe(width);
+    expect(result.height).toBe(height);
+    expect(result.green[1]).toBeGreaterThan(240);
+    expect(result.green[0]).toBeLessThan(15);
+    expect(result.red[0]).toBeGreaterThan(240);
+    expect(result.red[1]).toBeLessThan(15);
+    expect(result.gapRed).toBe(0);
+    expect(result.lineRed).toBeGreaterThan(200);
+  }
+});

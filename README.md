@@ -108,9 +108,10 @@ funkcjonalne i pomiar kolorów bez porównywania do wzorców Chromium.
 - Kodowanie jest kolejkowane z opóźnieniem 450 ms i ignorowaniem spóźnionych wyników,
   ale rysowanie dużych obrazów może chwilowo obciążyć główny wątek.
 - Wszystkie kontenery, ich style i pozycje oraz jakość eksportu pozostają przy wymianie zdjęcia,
-  ale nie są zapisywane między odświeżeniami aplikacji. Presety użytkownika,
-  wiele zdjęć, parser Helicon, zoom/pan i wersja desktopowa
-  pozostają poza pre-MVP.
+  ale bieżąca niezapisana sesja nie wraca po odświeżeniu. Zapisane presety
+  są trwałe w tej przeglądarce; można je odtworzyć po ponownym imporcie zdjęcia.
+- Poza MVP pozostają batch, zoom/pan i wersja desktopowa. Parser Helicon
+  obsługuje udokumentowany format UserComment, bez deklaracji obsługi innych programów.
 
 ## Podpisy i zdjęcia testowe
 
@@ -293,3 +294,17 @@ presety są stałe; Save as new zapisuje własną kopię. Bez rozpoznanego komen
 blok nie jest renderowany i zachowuje standardowe ostrzeżenie brakującego tagu.
 
 **Default dark** zachowuje układ Default i używa ciemnego koloru tekstu Charcoal.
+
+## Weryfikacja MVP — etap 7
+
+Końcowe sprawdzenie obejmuje testy domeny, Chromium/WebKit, wzorce pikseli JPG
+oraz siedem oryginalnych zdjęć w Storybooku. Zapisane SVG, pozycje Custom
+i odstępy między wierszami przechodzą także kontrolę pikseli eksportu na zdjęciu
+poziomym i pionowym po odświeżeniu. Błędny import SVG pozostawia bieżący układ.
+
+Puste wiersze wprowadzone Enterem tworzą odstęp. Wiersze opróżnione przez
+brakujące tagi/ikony są pomijane, a brakujące pola pozostają raportowane.
+Identyfikatory presetów nie wymagają API dostępnego wyłącznie przez HTTPS,
+więc zapis może działać również przy otwarciu aplikacji przez HTTP w LAN.
+
+Zakres, dowody i ograniczenia: [raport weryfikacji](docs/MVP_VERIFICATION.md).

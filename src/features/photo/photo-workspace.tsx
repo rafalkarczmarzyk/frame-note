@@ -1,3 +1,4 @@
+import { createId } from '@/lib/create-id';
 import { defaultTemplate } from '@/domain/builtin-presets';
 import { PresetControls } from '../presets/preset-controls';
 import { LogoControls } from '../caption/logo-controls';
@@ -216,14 +217,7 @@ export function PhotoWorkspace({
   };
   const addContainer = (duplicate = false) => {
     setLayout((value) =>
-      addCaption(
-        value,
-        Array.from(crypto.getRandomValues(new Uint32Array(4)), (part) =>
-          part.toString(16).padStart(8, '0'),
-        ).join(''),
-        duplicate,
-        photo.document.photo.dimensions,
-      ),
+      addCaption(value, createId(), duplicate, photo.document.photo.dimensions),
     );
   };
   const [exporting, setExporting] = useState(false);
