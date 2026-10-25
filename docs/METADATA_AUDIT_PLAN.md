@@ -493,8 +493,8 @@ osobnym commitem.
 | Etap                                               | Stan                         | Weryfikacja                                                                 |
 | -------------------------------------------------- | ---------------------------- | --------------------------------------------------------------------------- |
 | 1. Kontrakt i testy charakterystycznych przypadków | Zakończony; commit `1d79474` | 225 testów, format, lint, TypeScript, build.                                |
-| 2. Ekstrakcja i pochodzenie XMP                    | W trakcie; czeka na commit   | 228 testów, format, lint, TypeScript, build.                                |
-| 3. Czas, przysłona i ogniskowa                     | Oczekuje                     | —                                                                           |
+| 2. Ekstrakcja i pochodzenie XMP                    | Zakończony; commit `adf1bec` | 228 testów, format, lint, TypeScript, build.                                |
+| 3. Czas, przysłona i ogniskowa                     | Zakończony; czeka na commit  | 230 testów, format, lint, TypeScript, build.                                |
 | 4. ISO                                             | Oczekuje                     | —                                                                           |
 | 5. Tekst, sprzęt i data                            | Oczekuje                     | —                                                                           |
 | 6. PNG jako zdjęcie                                | Oczekuje                     | —                                                                           |
@@ -507,3 +507,9 @@ może teraz wskazywać np. `xmp:tiff:Model`. `@xmldom/xmldom` jest zależności�
 developerską dla testów Node; aplikacja webowa korzysta z wbudowanego DOMParser.
 Testy obejmują namespace kolidujące w obu kolejnościach, zapis atrybutowy,
 RDF Seq/Alt oraz prawdziwe XMP z `Agata-104.jpg`.
+
+Etap 3 dodaje signed rational parsing dla tagów liczbowych oraz przeliczenie
+APEX ShutterSpeedValue/ApertureValue dokładnie raz. Bezpośrednie ExposureTime
+i FNumber mają pierwszeństwo; listy ISO nie są dzielone. Testy obejmują
+ułamki, zero w mianowniku, racjonalną ogniskową, listę ISO, konwersje Tv/Av
+i fallback do XMP po niepoprawnym EXIF.
