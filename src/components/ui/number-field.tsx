@@ -14,7 +14,6 @@ export function NumberField({
   hint,
   unit,
   hideLabel = false,
-  showSteppers = false,
 }: {
   label: string;
   title?: string;
@@ -27,7 +26,6 @@ export function NumberField({
   hint?: string;
   unit?: string;
   hideLabel?: boolean;
-  showSteppers?: boolean;
 }) {
   return (
     <Field label={label} hint={hint} hideLabel={hideLabel}>
@@ -42,7 +40,7 @@ export function NumberField({
           max,
           step,
           disabled,
-          stepperLabel: showSteppers ? label : undefined,
+          stepperLabel: label,
         };
         return unit ? (
           <DimensionInput {...props} unit={unit} />

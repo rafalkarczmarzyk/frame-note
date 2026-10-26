@@ -1,3 +1,4 @@
+import { effectiveFontStyle, supportsItalic } from '../../domain/font-style';
 import { Switch } from '@/components/ui/switch';
 import {
   defaultExportMetadata,
@@ -254,7 +255,7 @@ function PhotoWorkspaceContent({
     ...new Set(
       layout.containers.map(
         (container) =>
-          `${container.style.fontWeight} 16px "${container.style.fontFamily}"`,
+          `${effectiveFontStyle(container)} ${container.style.fontWeight} 16px "${container.style.fontFamily}"`,
       ),
     ),
   ]
@@ -775,6 +776,11 @@ function PhotoWorkspaceContent({
                     style: {
                       ...value.style,
                       fontFamily: id as typeof value.style.fontFamily,
+                      fontStyle: supportsItalic(
+                        id as typeof value.style.fontFamily,
+                      )
+                        ? value.style.fontStyle
+                        : 'normal',
                     },
                   }))
                 }

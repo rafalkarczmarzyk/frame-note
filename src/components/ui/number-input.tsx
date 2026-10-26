@@ -30,7 +30,7 @@ export function NumberInput({
   max,
   step = 0.01,
   suffix,
-  stepperLabel,
+  stepperLabel = 'value',
   disabled,
   className,
   onFocus,
@@ -93,28 +93,26 @@ export function NumberInput({
             onValueChange(next);
         }}
       />
-      {stepperLabel && (
-        <span className="numeric-steppers">
-          <button
-            type="button"
-            aria-label={`Increase ${stepperLabel}`}
-            disabled={disabled || value >= max}
-            onMouseDown={(event) => event.preventDefault()}
-            onClick={() => nudge(1)}
-          >
-            <ChevronUp aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            aria-label={`Decrease ${stepperLabel}`}
-            disabled={disabled || value <= min}
-            onMouseDown={(event) => event.preventDefault()}
-            onClick={() => nudge(-1)}
-          >
-            <ChevronDown aria-hidden="true" />
-          </button>
-        </span>
-      )}
+      <span className="numeric-steppers">
+        <button
+          type="button"
+          aria-label={`Increase ${stepperLabel}`}
+          disabled={disabled || value >= max}
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => nudge(1)}
+        >
+          <ChevronUp aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          aria-label={`Decrease ${stepperLabel}`}
+          disabled={disabled || value <= min}
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => nudge(-1)}
+        >
+          <ChevronDown aria-hidden="true" />
+        </button>
+      </span>
       {suffix && (
         <span className="numeric-unit" id={unitId}>
           {suffix}

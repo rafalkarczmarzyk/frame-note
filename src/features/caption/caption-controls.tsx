@@ -1,3 +1,5 @@
+import { supportsItalic, effectiveFontStyle } from '@/domain/font-style';
+import { AlignAuto } from '@/components/icons/align-auto';
 import { InspectorSection } from '@/components/layout/inspector-section';
 import { IconButton } from '@/components/ui/icon-button';
 import { ColorControls } from './color-controls';
@@ -11,7 +13,10 @@ import {
   ChevronRight,
   Ruler,
   Bold,
+  Italic,
   ArrowDownUp,
+  Type,
+  ALargeSmall,
 } from 'lucide-react';
 import { Select } from '@/components/ui/select';
 import { Field } from '@/components/ui/field';
@@ -149,51 +154,52 @@ export function CaptionControls({
                 disabled={disabled}
                 className="space-y-2 disabled:opacity-70"
               >
-                <Field label="Font" hideLabel>
-                  {(id) => (
-                    <button
-                      type="button"
-                      id={id}
-                      aria-haspopup="dialog"
-                      onClick={onBrowseFonts}
-                      className="control-field flex h-9 w-full items-center justify-between px-3 text-xs"
-                    >
-                      <span>
-                        {caption.style.fontFamily.replace(' Variable', '')}
-                      </span>
-                      <ChevronRight className="size-3.5" aria-hidden="true" />
-                    </button>
-                  )}
-                </Field>
-                <div className="grid grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)] items-center gap-2">
-                  <NumberField
-                    key={caption.sizingUnit}
-                    label="Font size"
-                    hideLabel
-                    unit={unit}
-                    value={caption.style.fontSize}
-                    min={0.01 / factor}
-                    max={Math.max(dimensions.width, dimensions.height) / factor}
-                    step="any"
-                    disabled={disabled}
-                    onValueChange={(fontSize) => style({ fontSize })}
+                <div className="grid min-w-0 grid-cols-[1rem_minmax(0,1fr)] items-center gap-1">
+                  <Type
+                    className="size-4 shrink-0 text-content-secondary"
+                    aria-hidden="true"
                   />
-                  <IconButton
-                    label="Bold"
-                    aria-pressed={caption.style.fontWeight === 700}
-                    disabled={disabled}
-                    className={
-                      caption.style.fontWeight === 700 ? 'control-selected' : ''
-                    }
-                    onClick={() =>
-                      style({
-                        fontWeight:
-                          caption.style.fontWeight === 700 ? 400 : 700,
-                      })
-                    }
+                  <Field label="Font" hideLabel>
+                    {(id) => (
+                      <button
+                        type="button"
+                        id={id}
+                        aria-haspopup="dialog"
+                        onClick={onBrowseFonts}
+                        className="control-field flex h-9 w-full items-center justify-between px-3 text-xs"
+                      >
+                        <span className="flex min-w-0 items-center gap-2">
+                          {caption.style.fontFamily.replace(' Variable', '')}
+                        </span>
+                        <ChevronRight className="size-3.5" aria-hidden="true" />
+                      </button>
+                    )}
+                  </Field>
+                </div>
+                <div className="grid grid-cols-2 items-center gap-2">
+                  <div
+                    className="grid min-w-0 grid-cols-[1rem_minmax(0,1fr)] items-center gap-1"
+                    title="Font size"
                   >
-                    <Bold aria-hidden="true" />
-                  </IconButton>
+                    <ALargeSmall
+                      className="size-4 shrink-0 text-content-secondary"
+                      aria-hidden="true"
+                    />
+                    <NumberField
+                      key={caption.sizingUnit}
+                      label="Font size"
+                      hideLabel
+                      unit={unit}
+                      value={caption.style.fontSize}
+                      min={0.01 / factor}
+                      max={
+                        Math.max(dimensions.width, dimensions.height) / factor
+                      }
+                      step="any"
+                      disabled={disabled}
+                      onValueChange={(fontSize) => style({ fontSize })}
+                    />
+                  </div>
                   <div
                     className="grid min-w-0 grid-cols-[1rem_minmax(0,1fr)] items-center gap-1"
                     title="Line spacing: multiplier of font size"
@@ -214,13 +220,19 @@ export function CaptionControls({
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 items-start gap-2">
+                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
                   <SegmentedControl
                     disabled={disabled}
                     label="Text align"
                     value={caption.style.textAlign}
                     onValueChange={(textAlign) => style({ textAlign })}
                     options={[
+                      {
+                        value: 'auto',
+                        label: 'Auto align',
+                        title: 'Auto — match alignment to anchor',
+                        content: <AlignAuto />,
+                      },
                       {
                         value: 'left',
                         label: 'Align left',
@@ -238,14 +250,57 @@ export function CaptionControls({
                       },
                     ]}
                   />
-                  <ColorControls
-                    value={caption.style.color}
-                    onChange={(color) => style({ color })}
-                    onBrowse={onBrowseColors}
-                    disabled={disabled}
-                    compact
-                  />
+                  <div
+                    role="group"
+                    aria-label="Font style"
+                    className="control-segments flex gap-1 p-1"
+                  >
+                    <IconButton
+                      label="Bold"
+                      aria-pressed={caption.style.fontWeight === 700}
+                      disabled={disabled}
+                      className={`control-segment size-7 ${caption.style.fontWeight === 700 ? 'control-selected' : ''}`}
+                      onClick={() =>
+                        style({
+                          fontWeight:
+                            caption.style.fontWeight === 700 ? 400 : 700,
+                        })
+                      }
+                    >
+                      <Bold aria-hidden="true" />
+                    </IconButton>
+                    <IconButton
+                      label="Italic"
+                      title={
+                        supportsItalic(caption.style.fontFamily)
+                          ? 'Italic'
+                          : 'Italic unavailable for this font'
+                      }
+                      disabled={
+                        disabled || !supportsItalic(caption.style.fontFamily)
+                      }
+                      aria-pressed={effectiveFontStyle(caption) === 'italic'}
+                      className={`control-segment size-7 ${effectiveFontStyle(caption) === 'italic' ? 'control-selected' : ''}`}
+                      onClick={() =>
+                        style({
+                          fontStyle:
+                            effectiveFontStyle(caption) === 'italic'
+                              ? 'normal'
+                              : 'italic',
+                        })
+                      }
+                    >
+                      <Italic aria-hidden="true" />
+                    </IconButton>
+                  </div>
                 </div>
+                <ColorControls
+                  value={caption.style.color}
+                  onChange={(color) => style({ color })}
+                  onBrowse={onBrowseColors}
+                  disabled={disabled}
+                  compact
+                />
                 <div className="grid grid-cols-[auto_minmax(0,1fr)_5rem] items-center gap-2">
                   <span className="text-xs text-label">Opacity</span>
                   <div className="space-y-2">

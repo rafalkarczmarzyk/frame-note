@@ -14,6 +14,17 @@ function example() {
   ]);
 }
 describe('layout presets', () => {
+  it.each(['auto', 'left', 'center', 'right'] as const)(
+    'preserves %s alignment',
+    (alignment) => {
+      const preset = example();
+      preset.layout.containers[0]!.style.textAlign = alignment;
+      expect(
+        parsePreset(JSON.stringify(preset), validate).layout.containers[0]!
+          .style.textAlign,
+      ).toBe(alignment);
+    },
+  );
   it('round trips layout and only referenced icons without photo data', () => {
     const preset = example();
     expect(preset.icons).toEqual([icon]);

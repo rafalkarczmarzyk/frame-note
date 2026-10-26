@@ -181,7 +181,6 @@ export function MarginEditor({
               label={side.charAt(0).toUpperCase() + side.slice(1)}
               hideLabel
               unit={unitLabel}
-              showSteppers
               value={value[side]}
               min={0}
               max={limits[side]}

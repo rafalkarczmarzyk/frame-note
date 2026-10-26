@@ -1,3 +1,5 @@
+import { canvasFontStyle } from '../../domain/font-style';
+import { resolvedTextAlign } from '../../domain/document';
 import Konva from 'konva';
 import type { Caption, ImageDimensions } from '@/domain/document';
 import { toPixels } from '../../domain/sizing';
@@ -37,7 +39,7 @@ export function inlineLayout(
               text: run.text,
               fontSize,
               fontFamily: caption.style.fontFamily,
-              fontStyle: caption.style.fontWeight === 700 ? 'bold' : 'normal',
+              fontStyle: canvasFontStyle(caption),
               wrap: 'none',
             })
           : null;
@@ -103,9 +105,9 @@ export function inlineLayout(
     const y = rowY;
     rowY += line.height;
     const offset =
-      caption.style.textAlign === 'right'
+      resolvedTextAlign(caption) === 'right'
         ? block.width - line.width
-        : caption.style.textAlign === 'center'
+        : resolvedTextAlign(caption) === 'center'
           ? (block.width - line.width) / 2
           : 0;
     return line.runs.map((run) => ({

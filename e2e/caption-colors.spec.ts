@@ -24,28 +24,27 @@ test('chooses presets, validates custom HEX and exports the chosen color', async
     .getByRole('spinbutton', { name: 'Font size', exact: true })
     .fill('8');
   await page.getByRole('button', { name: 'Color', exact: true }).click();
-  await page.getByRole('button', { name: 'More colors…', exact: true }).click();
   const panel = page.getByRole('dialog', { name: 'Choose a color' });
   await panel.getByRole('button', { name: 'Sage', exact: true }).click();
   await expect(
-    page.getByRole('button', { name: 'Color', exact: true }),
-  ).toContainText('Sage');
+    page.getByRole('button', { name: 'Custom color', exact: true }),
+  ).toHaveAttribute('title', 'Sage');
   const custom = panel.getByRole('textbox', { name: 'Custom color (HEX)' });
   await custom.fill('invalid');
   await custom.blur();
   await expect(panel.getByRole('alert')).toContainText('valid HEX');
   await expect(
-    page.getByRole('button', { name: 'Color', exact: true }),
-  ).toContainText('Sage');
+    page.getByRole('button', { name: 'Custom color', exact: true }),
+  ).toHaveAttribute('title', 'Sage');
   await custom.fill('abc');
   await expect(
-    page.getByRole('button', { name: 'Color', exact: true }),
-  ).toContainText('#AABBCC');
+    page.getByRole('button', { name: 'Custom color', exact: true }),
+  ).toHaveAttribute('title', '#AABBCC');
   await custom.fill('abcd');
   await expect(custom).toHaveValue('abcd');
   await expect(
-    page.getByRole('button', { name: 'Color', exact: true }),
-  ).toContainText('#AABBCC');
+    page.getByRole('button', { name: 'Custom color', exact: true }),
+  ).toHaveAttribute('title', '#AABBCC');
   await custom.fill('aabbcc');
   await custom.blur();
   await expect(custom).toHaveValue('#AABBCC');
