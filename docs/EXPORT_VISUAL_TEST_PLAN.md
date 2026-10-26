@@ -92,6 +92,16 @@ w pliku wynikowym. Obecny eksport nie kopiuje źródłowych tagów.
   z istniejących wzorców bez ich aktualizacji; wszystkie piksele pełnych JPG
   zgadzały się dokładnie.
 
+### Dodano — rzeczywisty raster podpisu
+
+- PNG wskazany przez użytkownika jest identyczny z istniejącym `rt.png` (ta sama
+  suma SHA-256), dlatego zachowujemy jeden oryginalny plik bez duplikatu.
+- Osobny eksport umieszcza sam obraz w prawym dolnym rogu testowego zdjęcia,
+  z wysokością 120 px i asymetrycznymi marginesami. Test mierzy czerwony obszar
+  źródłowej grafiki i zapisany JPG, potwierdzając położenie oraz skalę, a potem
+  porównuje cały JPG piksel po pikselu.
+- Zdjęcie ma 1200 × 800 px; wzorce pozostają osobne dla Chromium i WebKit.
+
 ## Trzy uzupełniające się kontrole
 
 1. **Treść i ustawienia.** Do pary zdjęcie + preset dołączamy ręcznie sprawdzony

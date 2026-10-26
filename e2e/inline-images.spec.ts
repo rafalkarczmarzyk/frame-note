@@ -1,6 +1,163 @@
 import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
+import { fileURLToPath } from 'node:url';
 import { comparePhotoExport } from './photo-export-image.js';
+
+test('Photo export / tomato raster preserves its preset size and position', async ({
+  page,
+}, testInfo) => {
+  const rasterBytes = await readFile(
+    fileURLToPath(new URL('../tests/fixtures/logos/rt.png', import.meta.url)),
+  );
+  const assetWidth = 14524;
+  const assetHeight = 1884;
+  const imageHeight = 120;
+  const imageWidth = (imageHeight * assetWidth) / assetHeight;
+  const expectedOrigin = {
+    x: 1200 - 50 - imageWidth,
+    y: 800 - 60 - imageHeight,
+  };
+  await page.goto('/');
+  const photo = await page.evaluate(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 800;
+    const context = canvas.getContext('2d')!;
+    context.fillStyle = '#364152';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL('image/jpeg').split(',')[1]!;
+  });
+  await page.getByLabel('Choose JPG or PNG photo').setInputFiles({
+    name: 'tomato-raster-background.jpg',
+    mimeType: 'image/jpeg',
+    buffer: Buffer.from(photo, 'base64'),
+  });
+  const asset = {
+    id: 'tomato-signature',
+    name: 'rt.png',
+    format: 'png',
+    source: `data:image/png;base64,${rasterBytes.toString('base64')}`,
+    width: assetWidth,
+    height: assetHeight,
+  };
+  const preset = {
+    version: 2,
+    id: 'tomato-raster-geometry',
+    name: 'Tomato raster geometry',
+    icons: [],
+    layout: {
+      sizingUnit: 'px',
+      margins: { top: 30, right: 50, bottom: 60, left: 40 },
+      marginLinkMode: 'none',
+      activeId: 'tomato-signature-layer',
+      containers: [
+        {
+          id: 'tomato-signature-layer',
+          template: '{image:tomato-signature:120:document:original}',
+          images: [asset],
+          style: {
+            fontFamily: 'Montserrat Variable',
+            fontWeight: 400,
+            fontSize: 24,
+            color: 'porcelain',
+            opacity: 1,
+            lineHeight: 1.4,
+            textAlign: 'left',
+          },
+          position: { anchor: 'bottom-right' },
+        },
+      ],
+    },
+  };
+  await page.getByLabel('Import preset file').setInputFiles({
+    name: 'tomato-raster-geometry.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify(preset)),
+  });
+  await expect(
+    page.getByRole('combobox', { name: 'Saved preset' }),
+  ).toContainText('Tomato raster geometry');
+
+  const button = page.getByRole('button', { name: 'Export JPG', exact: true });
+  await expect(button).toBeEnabled();
+  const download = page.waitForEvent('download');
+  await button.click();
+  const downloadPath = await (await download).path();
+  if (!downloadPath) throw new Error('The tomato raster export is missing.');
+  const jpegBytes = await readFile(downloadPath);
+
+  const bounds = await page.evaluate(
+    async ({ source, actual }) => {
+      const redBounds = async (src: string) => {
+        const image = new Image();
+        image.src = src;
+        await image.decode();
+        const canvas = document.createElement('canvas');
+        canvas.width = image.naturalWidth;
+        canvas.height = image.naturalHeight;
+        const context = canvas.getContext('2d')!;
+        context.drawImage(image, 0, 0);
+        const { data } = context.getImageData(
+          0,
+          0,
+          canvas.width,
+          canvas.height,
+        );
+        let minX = canvas.width;
+        let minY = canvas.height;
+        let maxX = -1;
+        let maxY = -1;
+        for (let y = 0; y < canvas.height; y++) {
+          for (let x = 0; x < canvas.width; x++) {
+            const offset = (y * canvas.width + x) * 4;
+            const red = data[offset]!;
+            const green = data[offset + 1]!;
+            const blue = data[offset + 2]!;
+            if (red > 150 && red > green * 1.6 && red > blue * 1.6) {
+              minX = Math.min(minX, x);
+              minY = Math.min(minY, y);
+              maxX = Math.max(maxX, x);
+              maxY = Math.max(maxY, y);
+            }
+          }
+        }
+        return { minX, minY, maxX, maxY };
+      };
+      return {
+        source: await redBounds(source),
+        actual: await redBounds(actual),
+      };
+    },
+    {
+      source: asset.source,
+      actual: `data:image/jpeg;base64,${jpegBytes.toString('base64')}`,
+    },
+  );
+  const scale = imageHeight / assetHeight;
+  const expectedRedBounds = {
+    minX: expectedOrigin.x + bounds.source.minX * scale,
+    minY: expectedOrigin.y + bounds.source.minY * scale,
+    maxX: expectedOrigin.x + (bounds.source.maxX + 1) * scale - 1,
+    maxY: expectedOrigin.y + (bounds.source.maxY + 1) * scale - 1,
+  };
+  for (const edge of ['minX', 'minY', 'maxX', 'maxY'] as const) {
+    expect(
+      Math.abs(bounds.actual[edge] - expectedRedBounds[edge]),
+      `${edge} of the red artwork in the saved JPG`,
+    ).toBeLessThanOrEqual(2);
+  }
+
+  await comparePhotoExport(
+    page,
+    testInfo,
+    'tomato-raster-bottom-right',
+    jpegBytes,
+    {
+      width: 1200,
+      height: 800,
+    },
+  );
+});
 
 test('Photo export / mixed inline SVG and PNG', async ({ page }, testInfo) => {
   await page.goto('/');
