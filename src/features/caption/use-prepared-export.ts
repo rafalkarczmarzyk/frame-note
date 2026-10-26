@@ -1,3 +1,8 @@
+import type { MetadataField } from '@/domain/metadata';
+import {
+  addExportMetadata,
+  type ExportMetadataOptions,
+} from './export-metadata';
 import { useEffect, useMemo, useState } from 'react';
 import type { ImageDimensions } from '../../domain/document';
 import { LatestJob } from '../../lib/latest-job';
@@ -8,18 +13,24 @@ export interface ExportRequest {
   dimensions: ImageDimensions;
   captions: readonly RenderedCaption[];
   quality: number;
+  metadata: readonly MetadataField[];
+  metadataOptions: ExportMetadataOptions;
 }
 
 export function usePreparedExport(request: ExportRequest, enabled: boolean) {
   const queue = useMemo(
     () =>
       new LatestJob<ExportRequest, Blob>(
-        (input) =>
-          exportPhotoCaptions(
-            input.image,
-            input.dimensions,
-            input.captions,
-            input.quality,
+        async (input) =>
+          addExportMetadata(
+            await exportPhotoCaptions(
+              input.image,
+              input.dimensions,
+              input.captions,
+              input.quality,
+            ),
+            input.metadata,
+            input.metadataOptions,
           ),
         450,
       ),

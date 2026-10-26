@@ -48,6 +48,14 @@
 
 /* Base palette above is also used by photo captions. UI roles below are independent. */
 :root {
+  --switch-thumb-background: linear-gradient(
+    160deg,
+    var(--color-porcelain),
+    color-mix(in srgb, var(--color-porcelain) 75%, var(--color-slate))
+  );
+  --switch-track-background: var(--tone-surface);
+  --switch-edge: var(--color-porcelain);
+  --switch-shadow: var(--color-charcoal-dark);
   color-scheme: dark;
   --radius: 0.5rem;
   --tone-surface: color-mix(
@@ -847,4 +855,65 @@
     var(--color-violet),
     var(--color-crimson)
   );
+}
+
+/* Shared switch material: colors derive exclusively from semantic UI roles. */
+.glass-switch {
+  width: 44px;
+  height: 26px;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid var(--input-border);
+  background: var(--switch-track-background);
+  box-shadow: inset 0 1px 2px var(--switch-shadow);
+  cursor: pointer;
+  transition: background 180ms ease;
+}
+.glass-switch[aria-checked='true'] {
+  background: var(--accent-color);
+}
+.glass-switch-thumb {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--switch-thumb-background);
+  border: 1px solid var(--switch-edge);
+  box-shadow:
+    0 1px 3px var(--color-charcoal-dark),
+    inset 0 1px 1px var(--color-porcelain);
+  transition: transform 180ms ease;
+}
+.glass-switch[aria-checked='true'] .glass-switch-thumb {
+  transform: translateX(18px);
+}
+.glass-switch:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+.glass-switch:disabled,
+fieldset:disabled .glass-switch {
+  opacity: 0.45;
+  cursor: default;
+}
+@media (prefers-reduced-motion: reduce) {
+  .glass-switch,
+  .glass-switch-thumb {
+    transition: none;
+  }
+}
+@media (forced-colors: active) {
+  .glass-switch {
+    border: 1px solid ButtonText;
+  }
+  .glass-switch-thumb {
+    background: ButtonText;
+    border-color: ButtonText;
+  }
+  .glass-switch[aria-checked='true'] {
+    background: Highlight;
+  }
+  .glass-switch[aria-checked='true'] .glass-switch-thumb {
+    background: HighlightText;
+  }
 }
