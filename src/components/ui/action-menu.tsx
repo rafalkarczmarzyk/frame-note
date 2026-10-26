@@ -78,7 +78,7 @@ export function ActionMenu({
     const buttons = menu.current.querySelectorAll<HTMLButtonElement>(
       '[role="menuitem"]:not(:disabled)',
     );
-    buttons[lastItem.current ? buttons.length - 1 : 0]?.focus({
+    (buttons[lastItem.current ? buttons.length - 1 : 0] ?? menu.current).focus({
       preventScroll: true,
     });
     // A trigger may still be scrolling into view when its click opens the menu.
@@ -126,6 +126,12 @@ export function ActionMenu({
           setOpen(!open);
         }}
         onKeyDown={(event) => {
+          if (event.key === 'Escape' && open) {
+            event.preventDefault();
+            event.stopPropagation();
+            close(true);
+            return;
+          }
           if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
           event.preventDefault();
           lastItem.current = event.key === 'ArrowUp';
@@ -140,6 +146,7 @@ export function ActionMenu({
             ref={menu}
             id={id}
             role="menu"
+            tabIndex={-1}
             aria-label={label}
             className="fixed z-50 min-w-40 rounded-lg border border-panel-border bg-menu-base p-1 text-menu-text shadow-menu"
             style={position}

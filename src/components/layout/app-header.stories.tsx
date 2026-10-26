@@ -1,5 +1,5 @@
 import { Download } from 'lucide-react';
-import { PhotoIcon } from '@/components/icons/photo-icon';
+import { PhotoActions } from '@/features/photo/photo-actions';
 import { expect, userEvent, within } from 'storybook/test';
 import { useCallback, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -11,6 +11,7 @@ import { builtinPresets } from '@/domain/builtin-presets';
 function HeaderPreview({ width = 1100 }: { width?: number }) {
   const [toolbarHost, setToolbarHost] = useState<HTMLElement | null>(null);
   const [panelHost, setPanelHost] = useState<HTMLDivElement | null>(null);
+  const [hasPhoto, setHasPhoto] = useState(true);
   const [open, setOpen] = useState(false);
   const [layout, setLayout] = useState(() =>
     structuredClone(builtinPresets[0]!.layout),
@@ -26,10 +27,11 @@ function HeaderPreview({ width = 1100 }: { width?: number }) {
     >
       <AppHeader
         photoAction={
-          <Button size="sm" variant="outline" aria-label="Change photo">
-            <PhotoIcon className="lg:hidden" />
-            <span className="hidden lg:inline">Change photo</span>
-          </Button>
+          <PhotoActions
+            hasPhoto={hasPhoto}
+            onOpen={() => setHasPhoto(true)}
+            onClose={() => setHasPhoto(false)}
+          />
         }
       >
         <Button size="sm" aria-label="Export JPG">

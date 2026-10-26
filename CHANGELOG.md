@@ -44,6 +44,9 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Changed
 
+- Photo import uses an Open photo split button with a Close photo action that
+  returns to the empty canvas while preserving the layout, preset and session
+  settings. Menus with only disabled actions support keyboard focus and Escape.
 - Compact 48 px header with photo import beside the brand and preset selection,
   split save actions and JPG export on the right. User presets are separated
   from built-ins in the selector; management stays in the searchable docked panel.
