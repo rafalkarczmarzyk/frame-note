@@ -55,10 +55,9 @@ test('auto-scrolls a long layer list with a stationary pointer and preserves can
   await page
     .getByRole('button', { name: 'Close manage presets', exact: true })
     .click();
-  const firstGrip = page.getByRole('button', {
-    name: 'Reorder layer 1',
-    exact: true,
-  });
+  const firstGrip = page.locator(
+    '[data-picker-row="0"] > [data-picker-choice]',
+  );
   await firstGrip.scrollIntoViewIfNeeded();
   await firstGrip.evaluate((node) => {
     for (
@@ -100,11 +99,11 @@ test('auto-scrolls a long layer list with a stationary pointer and preserves can
   const row = (index: number) =>
     page.locator(`[data-picker-row="${index}"] > button[aria-pressed]`);
   await expect(row(29)).toContainText('Layer 30');
+  await expect(row(29)).toBeInViewport();
   await expect(row(29)).toHaveAttribute('aria-pressed', 'true');
-  const lastGrip = page.getByRole('button', {
-    name: 'Reorder layer 30',
-    exact: true,
-  });
+  const lastGrip = page.locator(
+    '[data-picker-row="29"] > [data-picker-choice]',
+  );
   await lastGrip.scrollIntoViewIfNeeded();
   const last = (await lastGrip.boundingBox())!;
   const bottomScroll = await host.evaluate((node) => node.scrollTop);
@@ -120,9 +119,10 @@ test('auto-scrolls a long layer list with a stationary pointer and preserves can
         .locator('[data-picker-row="0"]')
         .evaluate((node) => node.getBoundingClientRect().top),
     )
-    .toBeGreaterThan(bounds.y + 4);
+    .toBeGreaterThanOrEqual(bounds.y);
   await page.mouse.up();
   await expect(row(0)).toContainText('Layer 30');
+  await expect(row(0)).toBeInViewport();
   await firstGrip.scrollIntoViewIfNeeded();
   const grip = (await firstGrip.boundingBox())!;
   await page.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2);
@@ -162,7 +162,7 @@ test('auto-scrolls a long layer list with a stationary pointer and preserves can
   await firstGrip.press('End');
   await expect(row(29)).toContainText('Layer 30');
   await page
-    .getByRole('button', { name: 'Reorder layer 30', exact: true })
+    .locator('[data-picker-row="29"] > [data-picker-choice]')
     .press('Home');
   await expect(row(0)).toContainText('Layer 30');
 });

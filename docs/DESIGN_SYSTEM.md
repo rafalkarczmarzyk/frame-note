@@ -617,3 +617,101 @@ reduced motion disables the fade. The large standalone brand icon is removed.
 Unsupported backdrop filtering and reduced transparency use a solid dark
 fallback. Pointer events pass through; existing drop/cancel behavior is unchanged.
 Story: Screens/StartScreen/DraggingPhoto.
+
+### Layer list content previews
+
+Layers uses the shared LayerList composition with a leftmost reorder grip, a
+persistent visibility control, a passive content preview and a single actions
+menu. Duplicate and Delete live in the menu, which supports arrow keys,
+Home/End, Escape with focus return, Tab and outside dismissal. Deleting a layer
+focuses the selected remaining row or Add layer when the list becomes empty.
+
+Previews use the editor's template parser and show plain text, metadata badges
+without braces, inline symbols and bounded SVG/PNG thumbnails. They use UI
+styling independently of caption typography, flatten line breaks, and clamp to
+two lines without splitting metadata names. A single graphic also shows its
+asset name. Missing content keeps an explicit warning; empty content reads
+Empty layer. Hidden rows retain selection and editing with muted content.
+The secondary line shows the anchor or Manual, without a visible layer index.
+A capped scrolling list keeps Add layer outside its scroll area.
+
+Components/UI/LayerList includes ContentAndStates, Narrow, SingleLayer, Empty
+and Actions. The examples cover matching templates at different positions,
+long text/tags, missing metadata, SVG, PNG, inline icons and hidden layers.
+
+The layer actions menu also offers Move up, Move down, Bring to front and Send
+to back. These reuse the same front-to-back ordering as drag and keyboard moves,
+preserve selection/geometry/visibility, and keep focus on the moved layer's menu
+trigger. Unavailable directions are disabled at the top/bottom (all four for a
+single layer), and arrow navigation skips them. Separators group ordering between
+Duplicate and Delete. SingleLayer and OrderActions include interaction assertions.
+
+Layer content previews sit inside a padded, rounded surface with a subtle border
+and dedicated layer-preview background/border roles. This enclosure groups text,
+badges and artwork while visibility, reordering, position and actions stay outside.
+It remains a passive part of the layer selection button, with no extra tab stop.
+
+Preview spacing uses 8 px enclosure padding and a wrapping flow with 4 px gaps
+between items and rows. Items occupy 24 px rows; the preview caps at two complete
+rows (52 px), with a separately reserved ellipsis when content overflows. Plain
+text wraps at word boundaries, and metadata names truncate inside their badges.
+This replaces inline margins and text line-clamping, which could crowd badges or
+clip their edges at a line boundary.
+
+The position summary now uses a fixed icon column to the right of the content
+preview, inside the layer selection target and before its actions menu. Anchor
+arrows/dot or the Manual move icon replace the secondary text line, reducing row
+height. A native title and screen-reader text retain the full position label;
+the indicator adds no tab stop and selecting it selects the layer.
+
+### Layer controls layout proposal
+
+LayerList and PickerList offer an opt-in controlsLayout="grid" variant for review.
+It groups grip/visibility above position/actions in a 2 × 2 block to the left of
+the preview, with 28 px control targets. The application retains the inline
+layout pending review. Components/UI/LayerList includes GroupedControls,
+GroupedControlsNarrow, GroupedOrderActions and ControlsComparison; both variants
+share the same content preview, menu and reorder handlers.
+
+### Compact layer list concept — Storybook only
+
+CompactLayerListConcept proposes single-line text summaries with an always-visible
+eye control, neutral selection, and a small thumbnail only for standalone artwork.
+Metadata identifiers use text separated by middle dots, without braces or badges.
+A fixed footer outside the list scroll shows the selected layer's position and
+one actions menu. Whole-row native dragging and Arrow Up/Down, Home/End reorder
+layers; operations preserve selection. The empty footer is disabled, and deleting
+the last layer returns focus to Add layer.
+
+CleanList, CleanListNarrow, CleanListEmpty, CleanListInteractions and
+CleanListDeleteLast demonstrate this separate proposal. ControlsComparison now
+compares the current application layout with this concept. The application has
+not switched to the concept; native dragging here is a review implementation,
+not a replacement for the production pointer-capture reorder behavior.
+
+The compact concept now keeps an always-visible position icon at the right end
+of every row (anchor arrow/dot or Manual move symbol). A native title and accessible
+image label give its full meaning without selecting the layer. The footer retains
+only selected-layer actions, labeled Layer actions, rather than repeating position.
+
+### Accepted compact layer list — application
+
+The application now uses LayerList appearance="compact", shared with the CleanList
+stories. Each 40 px row contains an always-visible eye, a one-line template
+summary (plain metadata names separated by middle dots), a position icon, and
+its own action menu. Standalone graphics get a small thumbnail and filename.
+Rows use neutral selection and muted hidden content; content has no nested card.
+Layer actions and position remain available for every row without selecting it.
+
+SidebarSection exposes contentPadding="none"; Layers opts out of the default
+body padding, owns a small horizontal list inset, and pads Add layer separately.
+The layer list has no height cap or scrolling area: the workspace sidebar handles
+scrolling. Errors and the overlap warning keep their own padded spacing.
+
+Reordering the compact list uses PickerList's existing pointer capture,
+insertion indicators, auto-scroll, cancellation and Arrow Up/Down/Home/End.
+A 4 px movement threshold distinguishes row dragging from selection. Dropping
+preserves selection and suppresses the following native click. The separate grip
+remains available for the historical preview variant and other reorder stories.
+The earlier footer/native-drag concepts above are historical; CleanList is now
+a review composition of the production component, not a second implementation.

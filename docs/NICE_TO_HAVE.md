@@ -43,9 +43,11 @@ polecenia. Nowe decyzje dopisujemy lub aktualizujemy w istniejącym wpisie.
 
 ## NTH-003 — Przyciski zmiany kolejności warstw
 
-- **Status:** odłożone.
+- **Status:** zrealizowane — 2026-10-26.
 - **Data decyzji:** 2026-10-25.
 - **Źródło:** użytkownik wybrał przeciąganie listy od początku, a przyciski na później.
 - **Pomysł:** akcje przenieś wyżej, niżej, na sam spód oraz na sam wierzch.
-- **Granica zakresu:** obecnie wdrażamy przeciąganie, jego obsługę klawiaturą
-  oraz widoczność przez oko po lewej. Osobnych przycisków przenoszenia nie dodawać.
+- **Decyzja 2026-10-26:** użytkownik zlecił dodanie czterech akcji do menu
+  warstwy podczas redesignu listy: Move up, Move down, Bring to front i Send to back.
+  Akcje korzystają z tej samej kolejności co przeciąganie; na krańcach listy
+  niedostępne kierunki są wyłączone. Nie dokładamy przycisków do samego wiersza.

@@ -10,6 +10,7 @@ when explicitly requested; a commit does not automatically create a release.
 ### Added
 
 - Dedicated link preview artwork and metadata for Open Graph and X/Twitter.
+- Per-layer menu commands to move up, move down, bring to front, and send to back.
 
 ### Changed
 
@@ -19,6 +20,14 @@ when explicitly requested; a commit does not automatically create a release.
   to GitHub and the changelog. The editor retains its full action header.
 - Restyled the photo drop overlay with dark glass, a thin dashed outline and
   a gentle fade-in, including reduced-motion and reduced-transparency fallbacks.
+- Simplified the layer list with single-line content summaries, persistent
+  visibility, position and menu controls, and whole-row dragging. The list uses
+  the sidebar's scrolling area and leaves Add layer below the rows.
+
+### Fixed
+
+- Warning notices, including overlapping layers, now use yellow instead of
+  the green primary-action accent.
 
 ## 1.0.0-alpha.1 — 2026-10-26
 

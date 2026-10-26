@@ -1,7 +1,6 @@
 import { activeImageAssets } from '@/domain/image-retention';
 import { moveLayer, toggleLayerVisibility } from '@/domain/caption-layout';
-import { Eye, EyeOff } from 'lucide-react';
-import { migrateLogo, parseImageToken } from '@/domain/inline-image';
+import { migrateLogo } from '@/domain/inline-image';
 import { MarginRulers } from './margin-rulers';
 import { MarginPreviewProvider } from '@/components/ui/margin-preview-provider';
 import { InspectorSection } from '@/components/layout/inspector-section';
@@ -10,7 +9,6 @@ import { defaultTemplate } from '@/domain/builtin-presets';
 import { PresetControls } from '../presets/preset-controls';
 import { logoLayout } from '../caption/logo-layout';
 import { tintedIcon } from '../caption/inline-layout';
-import { svgUrl } from '../caption/svg-icons';
 import { brandIcons } from '../caption/brand-icons';
 import { iconMarker } from '../caption/inline-content';
 import { builtinIcons } from '../caption/builtin-icons';
@@ -22,7 +20,7 @@ import { resolveCaptionContent } from '../caption/inline-content';
 import { inlineLayout } from '../caption/inline-layout';
 import { InlinePreview } from '../caption/inline-preview';
 import { customPoint, customPosition } from '../caption/layout';
-import { AnchorIcon } from '@/components/ui/anchor-picker';
+import { LayerList } from '../layers/layer-list';
 import {
   addCaption,
   containerCaption,
@@ -32,21 +30,11 @@ import {
   type CaptionLayout,
 } from '@/domain/caption-layout';
 import { createCaption, type Caption } from '@/domain/document';
-import { IconButton } from '@/components/ui/icon-button';
 import { MetadataPicker } from '../caption/metadata-picker';
 import { metadataGroups } from '@/domain/caption-tags';
 import { ColorPickerPanel } from '../caption/color-picker-panel';
 import { resolveCaptionColor } from '@/domain/caption-colors';
-import {
-  Download,
-  Layers,
-  Plus,
-  Copy,
-  Trash2,
-  Tags,
-  Shapes,
-  Type,
-} from 'lucide-react';
+import { Download, Layers, Plus, Tags, Shapes, Type } from 'lucide-react';
 import { PhotoIcon } from '@/components/icons/photo-icon';
 import {
   EditorWorkspace,
@@ -853,115 +841,44 @@ function PhotoWorkspaceContent({
           <SidebarSection
             id="containers"
             title="Layers"
+            contentPadding="none"
             iconTone="caption"
             icon={<Layers />}
           >
             {(error || assetError) && (
-              <p role="alert" className="mb-3 text-xs">
+              <p role="alert" className="px-4 pt-2 pb-3 text-xs">
                 {error || assetError}
               </p>
             )}
-            <PickerList
+            <LayerList
+              appearance="compact"
+              layout={layout}
+              fields={fields}
+              icons={icons}
               onMove={(id, index) =>
                 setLayout((value) => moveLayer(value, id, index))
               }
-              items={[...layout.containers]
-                .reverse()
-                .map((container, index) => ({
-                  muted: container.visible === false,
-                  controlsLeft: (
-                    <IconButton
-                      aria-pressed={container.visible !== false}
-                      label={`${container.visible === false ? 'Show' : 'Hide'} layer ${index + 1}`}
-                      onClick={() =>
-                        setLayout((value) =>
-                          toggleLayerVisibility(value, container.id),
-                        )
-                      }
-                    >
-                      {container.visible === false ? <EyeOff /> : <Eye />}
-                    </IconButton>
-                  ),
-                  id: container.id,
-                  leading: container.logo ? (
-                    <img
-                      src={svgUrl(container.logo.asset.svg)}
-                      alt=""
-                      className="size-6 shrink-0 rounded bg-content-primary p-0.5"
-                    />
-                  ) : undefined,
-                  label:
-                    container.logo?.asset.name ||
-                    container.template
-                      .replace(/\{(image:[^{}]*)\}/gu, (_, token: string) => {
-                        const reference = parseImageToken(token);
-                        return (
-                          container.images?.find(
-                            (image) => image.id === reference?.assetId,
-                          )?.name ?? 'Missing image'
-                        );
-                      })
-                      .trim()
-                      .replace(/\s+/gu, ' ')
-                      .slice(0, 70) ||
-                    'Empty caption',
-                  description: (
-                    <span className="flex items-center gap-1.5">
-                      <span>{index + 1} ·</span>
-                      <AnchorIcon
-                        value={container.position.anchor}
-                        className="size-3.5 shrink-0"
-                      />
-                      <span>
-                        {container.position.custom ? 'Manual · ' : ''}
-                        {container.position.anchor.replaceAll('-', ' ')}
-                      </span>
-                    </span>
-                  ),
-                  selected: layout.activeId === container.id,
-                  actions: (
-                    <div className="flex items-center">
-                      <IconButton
-                        label={`Duplicate layer ${index + 1}`}
-                        onClick={() => {
-                          setEditingId(null);
-                          setLayout((value) =>
-                            addCaption(
-                              { ...value, activeId: container.id },
-                              Array.from(
-                                crypto.getRandomValues(new Uint32Array(4)),
-                                (part) => part.toString(16).padStart(8, '0'),
-                              ).join(''),
-                              true,
-                              photo.document.photo.dimensions,
-                            ),
-                          );
-                        }}
-                      >
-                        <Copy />
-                      </IconButton>
-                      <IconButton
-                        label={`Delete layer ${index + 1}`}
-                        onClick={() => {
-                          if (layout.activeId === container.id) {
-                            setEditingId(null);
-                          }
-                          setHoveredId(null);
-                          setLayout((value) =>
-                            removeCaption(value, container.id),
-                          );
-                        }}
-                      >
-                        <Trash2 />
-                      </IconButton>
-                    </div>
-                  ),
-                }))}
-              selectionTone="container"
-              selectedLabel=""
+              onToggleVisibility={(id) =>
+                setLayout((value) => toggleLayerVisibility(value, id))
+              }
               onChoose={selectContainer}
               onHover={setHoveredId}
-              emptyText="Add a layer to begin."
+              onDuplicate={(id) => {
+                setEditingId(null);
+                setLayout((value) =>
+                  addCaption(
+                    { ...value, activeId: id },
+                    createId(),
+                    true,
+                    photo.document.photo.dimensions,
+                  ),
+                );
+              }}
+              onDelete={(id) => {
+                if (layout.activeId === id) setEditingId(null);
+                setHoveredId(null);
+                setLayout((value) => removeCaption(value, id));
+              }}
             />
             {activeContainer &&
               activeContainer.visible !== false &&
@@ -973,15 +890,16 @@ function PhotoWorkspaceContent({
                   !activeContainer.position.custom &&
                   container.position.anchor === activeContainer.position.anchor,
               ) && (
-                <InlineNotice tone="warning" className="mt-3">
+                <InlineNotice tone="warning" className="mx-4 mt-3">
                   Multiple layers use this anchor and may overlap. Select each
                   from the list to change its anchor.
                 </InlineNotice>
               )}
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 px-4 pt-3 pb-4">
               <Button
                 variant="outline"
                 size="sm"
+                data-add-layer=""
                 onClick={() => addContainer()}
               >
                 <Plus aria-hidden="true" />

@@ -12,6 +12,7 @@ interface SidebarSectionProps {
   persist?: boolean;
   children: ReactNode;
   surface?: 'default' | 'container';
+  contentPadding?: 'default' | 'none';
 }
 
 /** Native details gives keyboard access and keeps editor controls mounted. */
@@ -24,6 +25,7 @@ export function SidebarSection({
   persist = true,
   children,
   surface = 'default',
+  contentPadding = 'default',
 }: SidebarSectionProps) {
   const [open, setOpen] = useState(() => {
     if (!persist) return defaultOpen;
@@ -79,9 +81,11 @@ export function SidebarSection({
       </summary>
       <div
         className={
-          surface === 'container'
-            ? '[&>details]:mx-2 [&>details]:my-2'
-            : 'px-4 pt-2 pb-4'
+          contentPadding === 'none'
+            ? ''
+            : surface === 'container'
+              ? '[&>details]:mx-2 [&>details]:my-2'
+              : 'px-4 pt-2 pb-4'
         }
       >
         {children}
