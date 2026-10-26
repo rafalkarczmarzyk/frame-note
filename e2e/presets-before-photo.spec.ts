@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('edits and saves a layout before import and retains the mounted editor on first photo and replacement', async ({
+test('edits and saves a layout before import and retains the mounted editor across photo opening, closing and reopening', async ({
   page,
 }) => {
   await page.goto('/');
@@ -24,6 +24,13 @@ test('edits and saves a layout before import and retains the mounted editor on f
     .fill('Before import');
   await page.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(preset).toContainText('Before import');
+  await page
+    .getByRole('button', { name: 'Photo actions', exact: true })
+    .click();
+  await expect(
+    page.getByRole('menuitem', { name: 'Close photo' }),
+  ).toBeDisabled();
+  await page.keyboard.press('Escape');
   const editorNode = await caption.elementHandle();
   const data = await page.evaluate(() => {
     const canvas = document.createElement('canvas');
@@ -49,5 +56,28 @@ test('edits and saves a layout before import and retains the mounted editor on f
     await expect(
       page.getByRole('button', { name: 'Export JPG', exact: true }),
     ).toBeEnabled();
+    await expect(
+      page.getByRole('button', { name: 'Open photo', exact: true }),
+    ).toBeEnabled();
+    const photoActions = page.getByRole('button', {
+      name: 'Photo actions',
+      exact: true,
+    });
+    await photoActions.focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(
+      page.getByRole('menuitem', { name: 'Close photo' }),
+    ).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(
+      page.getByRole('img', { name: `Photo preview: ${name}`, exact: true }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole('button', { name: 'Export JPG', exact: true }),
+    ).toBeDisabled();
+    await expect(caption).toHaveAttribute('data-template', 'Prepared {author}');
+    await expect(preset).toContainText('Before import');
+    expect(await editorNode!.evaluate((node) => node.isConnected)).toBe(true);
+    await expect(photoActions).toBeFocused();
   }
 });

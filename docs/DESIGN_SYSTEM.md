@@ -1053,3 +1053,13 @@ trigger if an explanation is needed.
 Components/UI/Tooltip includes standard, long text, existing description and
 viewport-edge examples. Quick color swatches show names; custom/palette actions
 show their purpose, and palette swatches show name plus HEX.
+
+### Photo actions
+
+The header uses PhotoActions with the shared outline SplitButton at size sm.
+The main action always reads Open photo; the arrow opens Photo actions with
+Close photo disabled when no photo is loaded. Both segments are disabled during
+import. Closing returns to the empty canvas, releases photo resources and clears
+photo errors while retaining the mounted layout editor, presets and session UI.
+Export requires a photo. Components/UI/PhotoActions covers empty, loaded,
+importing and interactive states; AppHeader uses the same production control.

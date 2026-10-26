@@ -150,6 +150,8 @@ existing entries. The format is still evolving during development; compatibility
 with older presets is not a stable contract.
 
 Replacing a photo preserves the current layout, export quality, and metadata choices in the session.
+Use the arrow beside **Open photo → Close photo** to return to the empty canvas
+while retaining the layout, preset selection, and session settings.
 The layout editor and preset management are available before opening a photo.
 The first import preserves the prepared layout; document-unit conversions wait
 for real image dimensions, and JPG export requires a photo.

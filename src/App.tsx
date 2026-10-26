@@ -11,7 +11,7 @@ import {
 import { AppHeader } from '@/components/layout/app-header';
 import { EmptyWorkspace } from '@/features/photo/empty-workspace';
 import { Download } from 'lucide-react';
-import { PhotoIcon } from '@/components/icons/photo-icon';
+import { PhotoActions } from '@/features/photo/photo-actions';
 import { Button } from '@/components/ui/button';
 
 const loadWorkspace = () => import('@/features/photo/photo-workspace');
@@ -70,6 +70,16 @@ export default function App() {
         setLoading(false);
       }
     }
+  }, []);
+  const closePhoto = useCallback(() => {
+    requestId.current += 1;
+    importing.current = false;
+    currentPhoto.current = null;
+    setPhoto(null);
+    setLoading(false);
+    setPreviewLoading(false);
+    setIsDragging(false);
+    setError('');
   }, []);
   useEffect(() => {
     // Retire old bitmaps only after the replacement has committed to the UI.
@@ -164,19 +174,12 @@ export default function App() {
     <div className="flex h-svh flex-col overflow-hidden bg-app-base text-content-primary">
       <AppHeader
         photoAction={
-          <Button
-            variant="outline"
-            size="sm"
-            aria-label={photo ? 'Change photo' : 'Open photo'}
-            className="px-2 sm:px-3"
-            onClick={() => input.current?.click()}
-            disabled={loading}
-          >
-            <PhotoIcon className="lg:hidden" />
-            <span className="hidden lg:inline">
-              {photo ? 'Change photo' : 'Open photo'}
-            </span>
-          </Button>
+          <PhotoActions
+            hasPhoto={!!photo}
+            loading={loading}
+            onOpen={() => input.current?.click()}
+            onClose={closePhoto}
+          />
         }
       >
         <div
