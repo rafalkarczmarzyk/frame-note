@@ -1,4 +1,5 @@
-import { canvasFontStyle, effectiveFontStyle } from '../../domain/font-style';
+import { ensureCaptionFont } from './font-loading';
+import { canvasFontStyle } from '../../domain/font-style';
 import { resolvedTextAlign } from '../../domain/document';
 import type { InlineAsset } from '@/domain/inline-image';
 import { logoLayout } from './logo-layout';
@@ -108,11 +109,7 @@ export async function exportPhotoCaptions(
     .trim();
   const quality = jpegQuality(qualityPercent);
   await Promise.all(
-    captions.map(({ caption }) =>
-      document.fonts.load(
-        `${effectiveFontStyle(caption)} ${caption.style.fontWeight} 16px "${caption.style.fontFamily}"`,
-      ),
-    ),
+    captions.map(({ caption, text }) => ensureCaptionFont(caption.style, text)),
   );
   const container = document.createElement('div');
   const stage = new Konva.Stage({

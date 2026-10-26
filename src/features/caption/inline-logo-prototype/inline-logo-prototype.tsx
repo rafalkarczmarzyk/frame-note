@@ -376,6 +376,7 @@ export function InlineLogoPrototype({
       <InspectorSection title="Typography">
         <NumberField
           label="Font size"
+          step={0.25}
           value={fontSize}
           min={10}
           max={48}

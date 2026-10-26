@@ -28,13 +28,14 @@ export function NumberInput({
   onValueChange,
   min,
   max,
-  step = 0.01,
+  step = 1,
   suffix,
   stepperLabel = 'value',
   disabled,
   className,
   onFocus,
   onBlur,
+  onKeyDown,
   ...props
 }: NumberInputProps) {
   const unitId = useId();
@@ -73,7 +74,8 @@ export function NumberInput({
         value={focused ? draft : format(value)}
         min={min}
         max={max}
-        step={step}
+        // Custom steppers own increments; manual values may lie between steps.
+        step="any"
         disabled={disabled}
         title={props.title ?? `${format(value)}${suffix ? ` ${suffix}` : ''}`}
         onFocus={(event) => {
@@ -84,6 +86,14 @@ export function NumberInput({
         onBlur={(event) => {
           setFocused(false);
           onBlur?.(event);
+        }}
+        onKeyDown={(event) => {
+          onKeyDown?.(event);
+          if (event.defaultPrevented) return;
+          if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+            event.preventDefault();
+            nudge(event.key === 'ArrowUp' ? 1 : -1);
+          }
         }}
         onChange={(event) => {
           setDraft(event.target.value);

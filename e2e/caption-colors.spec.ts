@@ -50,7 +50,7 @@ test('chooses presets, validates custom HEX and exports the chosen color', async
   await expect(custom).toHaveValue('#AABBCC');
   await expect(
     panel.getByRole('textbox', { name: 'Search colors' }),
-  ).toHaveCount(0);
+  ).toHaveCount(1);
   await expect(panel.getByRole('button', { name: 'Apply color' })).toHaveCount(
     0,
   );

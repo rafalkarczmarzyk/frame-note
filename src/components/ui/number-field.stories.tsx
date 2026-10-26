@@ -8,6 +8,7 @@ const meta = {
   args: {
     label: 'Size (% short edge)',
     value: 1.35,
+    step: 0.25,
     min: 0.01,
     max: 20,
     onValueChange: () => {},
@@ -56,5 +57,56 @@ export const StepperLimits: Story = {
     await expect(increase).toBeDisabled();
     await userEvent.click(decrease);
     await expect(input).toHaveValue(0.1);
+  },
+};
+
+export const FontSizeStep: Story = {
+  args: {
+    label: 'Font size',
+    value: 2,
+    min: 0.0001,
+    max: 20,
+    step: 0.25,
+    unit: '% S',
+  },
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    const input = c.getByRole('spinbutton');
+    await userEvent.click(
+      c.getByRole('button', { name: 'Increase Font size' }),
+    );
+    await expect(input).toHaveValue(2.25);
+    input.focus();
+    await userEvent.keyboard('{ArrowUp}');
+    await expect(input).toHaveValue(2.5);
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(input).toHaveValue(2.25);
+    // Values entered by hand retain precision; steppers add rather than snap.
+    await userEvent.clear(input);
+    await userEvent.type(input, '2.13');
+    await expect(input).toBeValid();
+    await userEvent.keyboard('{ArrowUp}');
+    await expect(input).toHaveValue(2.38);
+  },
+};
+export const LineSpacingStep: Story = {
+  args: {
+    label: 'Line spacing',
+    value: 1.4,
+    min: 0.5,
+    max: 3,
+    step: 0.1,
+    unit: '×',
+  },
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    await userEvent.click(
+      c.getByRole('button', { name: 'Increase Line spacing' }),
+    );
+    await expect(c.getByRole('spinbutton')).toHaveValue(1.5);
+    await userEvent.click(
+      c.getByRole('button', { name: 'Decrease Line spacing' }),
+    );
+    await expect(c.getByRole('spinbutton')).toHaveValue(1.4);
   },
 };

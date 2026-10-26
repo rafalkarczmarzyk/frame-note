@@ -34,9 +34,11 @@ export function PickerList({
   onMove,
   controlsLayout = 'inline',
   appearance = 'default',
+  density = 'default',
   reorderHandle = 'grip',
 }: {
   appearance?: 'default' | 'compact';
+  density?: 'default' | 'dense';
   reorderHandle?: 'grip' | 'row';
   controlsLayout?: 'inline' | 'grid';
   items: readonly PickerItem[];
@@ -290,7 +292,7 @@ export function PickerList({
                 }
                 onChoose(item.id);
               }}
-              className={`control-button ${item.muted ? 'text-content-muted' : ''} block min-w-0 flex-1 rounded-lg ${appearance === 'compact' ? 'h-10 px-1' : item.content ? 'px-1 py-2' : 'p-3'} ${reorderHandle === 'row' ? 'cursor-grab touch-none active:cursor-grabbing' : ''} text-left ${selectionTone === 'default' ? 'aria-pressed:text-accent-color' : ''}`}
+              className={`control-button ${item.muted ? 'text-content-muted' : ''} block min-w-0 flex-1 rounded-lg ${appearance === 'compact' ? 'h-10 px-1' : item.content ? 'px-1 py-2' : density === 'dense' ? 'px-3 py-2' : 'p-3'} ${reorderHandle === 'row' ? 'cursor-grab touch-none active:cursor-grabbing' : ''} text-left ${selectionTone === 'default' ? 'aria-pressed:text-accent-color' : ''}`}
             >
               <span
                 className={`flex justify-between gap-2 ${item.trailing && controlsLayout === 'inline' ? 'items-center' : 'items-start'}`}
@@ -326,7 +328,11 @@ export function PickerList({
                 </span>
               )}
               {item.preview && (
-                <span className="mt-3 block">{item.preview}</span>
+                <span
+                  className={density === 'dense' ? 'mt-1 block' : 'mt-3 block'}
+                >
+                  {item.preview}
+                </span>
               )}
             </button>
             {item.actions && controlsLayout === 'inline' && (

@@ -26,6 +26,7 @@ export const WithInput: Story = {
       label="Line height"
       unit="×"
       value={1.4}
+      step={0.1}
       min={0.5}
       max={3}
       onValueChange={() => {}}

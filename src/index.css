@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './caption-fonts.css';
 @import '@fontsource-variable/montserrat';
 @import '@fontsource-variable/montserrat/wght-italic.css';
 
