@@ -111,8 +111,8 @@ export default function App() {
 
   return (
     <div className="flex h-svh flex-col overflow-hidden bg-app-base text-content-primary">
-      <AppHeader>
-        {photo && (
+      {photo && (
+        <AppHeader>
           <div className="flex items-center gap-3">
             <Button
               variant="outline"
@@ -123,8 +123,8 @@ export default function App() {
             </Button>
             <div id="export-actions" />
           </div>
-        )}
-      </AppHeader>
+        </AppHeader>
+      )}
       <input
         ref={input}
         type="file"
