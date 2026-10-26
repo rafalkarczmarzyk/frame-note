@@ -212,8 +212,12 @@
   --menu-text: var(--content-primary);
   --accent-color: var(--color-emerald);
   --notice-warning: var(--accent-color);
-  --drop-base: var(--color-slate);
-  --drop-text: var(--app-base);
+  --drop-base: var(--color-charcoal-dark);
+  --drop-glass: color-mix(in srgb, var(--color-caption-black) 40%, transparent);
+  --drop-text: var(--color-porcelain);
+  --drop-secondary: color-mix(in srgb, var(--drop-text) 85%, transparent);
+  --drop-border: color-mix(in srgb, var(--drop-text) 45%, transparent);
+  --drop-blur: 8px;
   --preview-placeholder: var(--tone-surface);
 
   /* Materials and effects share recipes rather than inventing per-component colors. */
@@ -314,6 +318,8 @@
   --color-notice-warning: var(--notice-warning);
   --color-drop-base: var(--drop-base);
   --color-drop-text: var(--drop-text);
+  --color-drop-secondary: var(--drop-secondary);
+  --color-drop-border: var(--drop-border);
   --color-preview-placeholder: var(--preview-placeholder);
   --shadow-panel: var(--panel-shadow);
   --shadow-menu: var(--menu-shadow);
@@ -333,6 +339,40 @@
 }
 
 @layer components {
+  .photo-drop-overlay {
+    background: var(--drop-base);
+    animation: photo-drop-fade-in 180ms ease-out;
+  }
+
+  @keyframes photo-drop-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .photo-drop-overlay {
+      animation: none;
+    }
+  }
+
+  @supports (backdrop-filter: blur(1px)) {
+    .photo-drop-overlay {
+      background: var(--drop-glass);
+      backdrop-filter: blur(var(--drop-blur));
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .photo-drop-overlay {
+      background: var(--drop-base);
+      backdrop-filter: none;
+    }
+  }
+
   .start-screen-gradient {
     background: linear-gradient(
       to bottom,
