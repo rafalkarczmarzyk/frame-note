@@ -1,3 +1,4 @@
+import type { FontFamily } from './fonts';
 import type { ImageAsset } from './inline-image';
 import type { LogoContent } from './svg-asset';
 import type { Margins, SizingUnit, MarginLinkMode } from './sizing';
@@ -35,7 +36,7 @@ export interface Caption {
   template: string;
   sizingUnit: SizingUnit;
   style: {
-    fontFamily: 'Montserrat Variable' | 'Advercase';
+    fontFamily: FontFamily;
     fontWeight: 400 | 700;
     fontStyle?: 'normal' | 'italic';
     /** Uses the document sizing unit, never the viewport. */

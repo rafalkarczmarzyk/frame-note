@@ -9,7 +9,7 @@ export function NumberField({
   onValueChange,
   min,
   max,
-  step = 0.01,
+  step = 1,
   disabled = false,
   hint,
   unit,

@@ -8,6 +8,26 @@ test('renders true italic, exports it and disables unavailable font variants', a
   await page
     .getByLabel('Choose JPG or PNG photo')
     .setInputFiles(wildlifeFixture.path);
+  const fontSize = page.getByRole('spinbutton', {
+    name: 'Font size',
+    exact: true,
+  });
+  await page
+    .getByRole('button', { name: 'Increase Font size', exact: true })
+    .click();
+  await expect(fontSize).toHaveValue('2.25');
+  await fontSize.press('ArrowUp');
+  await expect(fontSize).toHaveValue('2.5');
+  const lineSpacing = page.getByRole('spinbutton', {
+    name: 'Line spacing',
+    exact: true,
+  });
+  await page
+    .getByRole('button', { name: 'Increase Line spacing', exact: true })
+    .click();
+  await expect(lineSpacing).toHaveValue('1.5');
+  await lineSpacing.press('ArrowDown');
+  await expect(lineSpacing).toHaveValue('1.4');
   await page
     .getByLabel('Caption', { exact: true })
     .fill('Italic Łódź\nBold italic');

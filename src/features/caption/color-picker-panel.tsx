@@ -1,3 +1,5 @@
+import { CategoryFilter } from '@/components/ui/category-filter';
+import { filterByCategory } from '@/lib/category-filter';
 import { HexColorPicker } from 'react-colorful';
 import { useState } from 'react';
 import { FloatingPanel } from '@/components/layout/floating-panel';
@@ -37,6 +39,15 @@ export function ColorPickerPanel({
   const draft = draftState.value === value ? draftState.text : resolve(value);
   const setDraft = (text: string) => setDraftState({ value, text });
   const [error, setError] = useState('');
+  const [category, setCategory] = useState('all');
+  const [query, setQuery] = useState('');
+  const filtered = filterByCategory(
+    captionColors,
+    category,
+    (color) => [color.group],
+    query,
+    (color) => color.label,
+  );
   const choose = (color: string) => {
     onChange(color);
     setDraft(
@@ -55,6 +66,26 @@ export function ColorPickerPanel({
       onClose={onClose}
       className={className}
       surface={surface}
+      toolbar={
+        <>
+          <Input
+            aria-label="Search colors"
+            placeholder="Search colors…"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+          <CategoryFilter
+            label="Color categories"
+            className="mt-2 -mb-3"
+            categories={['Neutrals', 'Soft colors'].map((group) => ({
+              value: group,
+              label: group,
+            }))}
+            value={category}
+            onValueChange={setCategory}
+          />
+        </>
+      }
     >
       <section aria-label="Visual color picker" className="mb-4">
         <HexColorPicker
@@ -79,6 +110,7 @@ export function ColorPickerPanel({
               <div className="flex items-center gap-2">
                 <ColorSwatch value={normalizeHex(draft) ?? value} />
                 <Input
+                  data-panel-initial-focus
                   id={id}
                   aria-describedby={descriptionId}
                   aria-invalid={!!error}
@@ -104,8 +136,13 @@ export function ColorPickerPanel({
           </Field>
         </div>
       </section>
+      {filtered.length === 0 && (
+        <p className="p-3 text-xs text-content-secondary" role="status">
+          No matching colors.
+        </p>
+      )}
       {(['Neutrals', 'Soft colors'] as const).map((group) => {
-        const items = captionColors.filter((color) => color.group === group);
+        const items = filtered.filter((color) => color.group === group);
         return (
           items.length > 0 && (
             <section key={group} className="mb-4">

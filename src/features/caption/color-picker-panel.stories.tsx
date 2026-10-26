@@ -1,3 +1,4 @@
+import { expect, userEvent, within } from 'storybook/test';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { ColorPickerPanel } from './color-picker-panel';
@@ -34,4 +35,24 @@ export const Default: Story = {
 };
 export const Custom: Story = {
   render: () => <Interactive initial={normalizeHex('abc')!} />,
+};
+export const SearchAndCategories: Story = {
+  render: () => <Interactive initial="porcelain" />,
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    await userEvent.click(c.getByRole('radio', { name: 'Soft colors' }));
+    await userEvent.type(
+      c.getByRole('textbox', { name: 'Search colors' }),
+      'Ivory',
+    );
+    await userEvent.click(c.getByRole('button', { name: /Ivory/ }));
+    await userEvent.click(c.getByRole('radio', { name: 'Neutrals' }));
+    await expect(c.getByText('No matching colors.')).toBeVisible();
+    await userEvent.clear(c.getByRole('textbox', { name: 'Search colors' }));
+    await userEvent.click(c.getByRole('radio', { name: 'Soft colors' }));
+    await expect(c.getByRole('button', { name: /Ivory/ })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+  },
 };

@@ -9,6 +9,11 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Added
 
+- Shared category filters for fonts, metadata tags and colors, combined with search
+  in fixed panel headers without changing existing selections.
+- A curated library of 25 Google Fonts families alongside Advercase, with local
+  on-demand loading, compact live previews, supported Bold/Italic variants,
+  preserved preset identifiers and font readiness before JPG export.
 - Automatic text alignment following the layer anchor, including Manual position,
   with explicit left, center and right overrides preserved in presets.
 - True Montserrat Italic and Bold Italic in preview, JPG export and presets;
@@ -29,8 +34,10 @@ when explicitly requested; a commit does not automatically create a release.
 - Reorganized Typography into sizing, alignment and style, color, and opacity
   rows, with font icons, grouped Bold/Italic toggles, neutral color swatches and
   direct access to the color panel.
-- All numeric fields now show increase/decrease arrows, respecting their steps,
-  limits and disabled states, including compact margin fields.
+- All numeric fields show increase/decrease arrows with field-specific increments:
+  0.25 for font size, 0.1 for line spacing and percentage positions, 1 for opacity,
+  and unit-appropriate increments for margins and graphics. Keyboard arrows use
+  the same steps and limits while manual entry preserves fractional precision.
 - Use the custom photo symbol and primary photo-selection button in the empty
   workspace.
 

@@ -1,4 +1,8 @@
-import { supportsItalic, effectiveFontStyle } from '@/domain/font-style';
+import {
+  supportsBold,
+  supportsItalic,
+  effectiveFontStyle,
+} from '@/domain/font-style';
 import { AlignAuto } from '@/components/icons/align-auto';
 import { InspectorSection } from '@/components/layout/inspector-section';
 import { IconButton } from '@/components/ui/icon-button';
@@ -195,7 +199,7 @@ export function CaptionControls({
                       max={
                         Math.max(dimensions.width, dimensions.height) / factor
                       }
-                      step="any"
+                      step={0.25}
                       disabled={disabled}
                       onValueChange={(fontSize) => style({ fontSize })}
                     />
@@ -213,6 +217,7 @@ export function CaptionControls({
                       hideLabel
                       unit="×"
                       value={caption.style.lineHeight}
+                      step={0.1}
                       min={0.5}
                       max={3}
                       disabled={disabled}
@@ -257,9 +262,14 @@ export function CaptionControls({
                   >
                     <IconButton
                       label="Bold"
-                      aria-pressed={caption.style.fontWeight === 700}
-                      disabled={disabled}
-                      className={`control-segment size-7 ${caption.style.fontWeight === 700 ? 'control-selected' : ''}`}
+                      aria-pressed={
+                        supportsBold(caption.style.fontFamily) &&
+                        caption.style.fontWeight === 700
+                      }
+                      disabled={
+                        disabled || !supportsBold(caption.style.fontFamily)
+                      }
+                      className={`control-segment size-7 ${supportsBold(caption.style.fontFamily) && caption.style.fontWeight === 700 ? 'control-selected' : ''}`}
                       onClick={() =>
                         style({
                           fontWeight:
@@ -371,7 +381,7 @@ export function CaptionControls({
                     value={coordinates.x}
                     min={0}
                     max={100}
-                    step="any"
+                    step={0.1}
                     disabled={disabled || !caption.position.custom}
                     onValueChange={(x) =>
                       position({ custom: { ...coordinates, x } })
@@ -383,7 +393,7 @@ export function CaptionControls({
                     value={coordinates.y}
                     min={0}
                     max={100}
-                    step="any"
+                    step={0.1}
                     disabled={disabled || !caption.position.custom}
                     onValueChange={(y) =>
                       position({ custom: { ...coordinates, y } })

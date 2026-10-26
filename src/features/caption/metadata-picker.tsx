@@ -1,3 +1,4 @@
+import { filterByCategory } from '@/lib/category-filter';
 import {
   Layers,
   Camera,
@@ -41,13 +42,19 @@ export function MetadataPicker({
   query,
   used,
   onChoose,
+  category = 'all',
 }: {
   fields: readonly MetadataField[];
   query: string;
+  category?: string;
   used: ReadonlySet<string>;
   onChoose: (key: string) => void;
 }) {
-  const groups = metadataGroups(fields, query);
+  const groups = filterByCategory(
+    metadataGroups(fields, query),
+    category,
+    (group) => [group.name],
+  );
   return (
     <div className="space-y-4">
       {groups.length === 0 && (

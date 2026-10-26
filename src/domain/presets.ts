@@ -1,3 +1,4 @@
+import { fontIds } from './fonts';
 import { migrateLogo, parseImageToken } from './inline-image';
 import { validateImageAssets } from './image-validation';
 import type { CaptionLayout } from './caption-layout';
@@ -101,7 +102,7 @@ export function parsePreset(
         : {}),
       template: text(c.template, 100_000),
       style: {
-        fontFamily: oneOf(s.fontFamily, ['Montserrat Variable', 'Advercase']),
+        fontFamily: oneOf(s.fontFamily, fontIds),
         fontWeight: oneOf(s.fontWeight, [400, 700]),
         ...(s.fontStyle === undefined
           ? {}

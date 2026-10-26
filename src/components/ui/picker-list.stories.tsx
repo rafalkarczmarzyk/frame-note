@@ -111,3 +111,29 @@ export const LongReorderList: Story = {
     );
   },
 };
+
+export const DensePreviews: Story = {
+  args: {
+    density: 'dense',
+    items: [
+      {
+        id: 'exif:Artist',
+        label: 'Montserrat',
+        preview: (
+          <span className="block h-6 text-base leading-6">
+            Leave your mark.
+          </span>
+        ),
+      },
+      {
+        id: 'second',
+        label: 'Another option',
+        preview: (
+          <span className="block h-6 text-base leading-6">
+            Leave your mark.
+          </span>
+        ),
+      },
+    ],
+  },
+};

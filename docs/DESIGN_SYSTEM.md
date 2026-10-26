@@ -762,3 +762,46 @@ directly. Opacity remains below. Montserrat loads real italic and bold italic;
 Advercase has no italic asset and disables Italic. Switching to Advercase clears
 italic. Presets preserve fontStyle; absent style means normal. Preview, inline
 measurement, font readiness and export use the same effective font variant.
+
+### Category filters and font library
+
+CategoryFilter supplies shared single-select category chips, with All, configurable
+labels, wrapping, arrow navigation and visible focus. Font, metadata and color
+pickers combine categories with text search while retaining their own row content
+and selection behavior. Search and category controls live in the fixed FloatingPanel
+toolbar, outside the scrolling list, so scrollbar appearance cannot reflow chips.
+
+FontPicker now offers the 25 curated Google Fonts families plus legacy Advercase.
+Every preview uses the same “Leave your mark.” text, in the actual family after
+loading. Only visible preview rows load, and caption preview/export await the chosen
+variant. Unavailable Bold and Italic variants are disabled. Font identifiers remain
+independent of asset paths and old presets retain their family names.
+See [font delivery, license and coverage details](FONT_LIBRARY.md).
+
+Stories: Components/UI/CategoryFilter, FontPicker, MetadataPicker and ColorPicker.
+
+Font rows use PickerList density="dense": 8 px vertical padding, a 4 px preview
+gap, a 20 px live sample, and no category/variant description. Category chips stay
+in the fixed toolbar. Other picker lists retain their existing density.
+
+### Numeric increment audit
+
+Arrow buttons and Arrow Up/Down keys add the same increment to the current value,
+without snapping manually entered or converted values to a grid based on `min`.
+Both paths clamp at field limits. Text entry retains fractional precision.
+The generic NumberInput/NumberField default is 1; domain fields set explicit steps.
+
+| Field                                          | Increment                                           |
+| ---------------------------------------------- | --------------------------------------------------- |
+| Font size (all document units, also prototype) | 0.25                                                |
+| Line spacing                                   | 0.1×                                                |
+| Layer/logo opacity                             | 1 percentage point                                  |
+| Manual X/Y                                     | 0.1 percentage point of the image                   |
+| Margins                                        | 1 px or 0.1 in relative document units              |
+| Logo width/height                              | 1 px or 0.1 in relative document units              |
+| Inline image height                            | 0.25× font, 1 px, or 0.1 in relative document units |
+| Prototype image height                         | 0.25× font or 1 px                                  |
+| JPEG quality (slider)                          | 1 percentage point                                  |
+
+NumberField/FontSizeStep and LineSpacingStep exercise the requested increments,
+keyboard equivalence and preserving a manually entered value off the step grid.

@@ -1,0 +1,546 @@
+[
+  {
+    "id": "Inter",
+    "label": "Inter",
+    "category": "Sans-serif",
+    "faces": [
+      {
+        "file": "/fonts/google/inter/Inter[opsz,wght].woff2",
+        "weight": "100 900",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "474ac5e1d44e94b76d6078ac297aa5cec267d94eeefff49ef8e9bd61a4ed8bf2",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/inter/Inter%5Bopsz%2Cwght%5D.ttf"
+      },
+      {
+        "file": "/fonts/google/inter/Inter-Italic[opsz,wght].woff2",
+        "weight": "100 900",
+        "style": "italic",
+        "missingPolish": "",
+        "sha256": "db4c9dd3b1b770153b354ba045d7703805a33ec2556a2417b938ecd09c90eeaf",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/inter/Inter-Italic%5Bopsz%2Cwght%5D.ttf"
+      }
+    ]
+  },
+  {
+    "id": "DM Sans",
+    "label": "DM Sans",
+    "category": "Sans-serif",
+    "faces": [
+      {
+        "file": "/fonts/google/dmsans/DMSans[opsz,wght].woff2",
+        "weight": "100 1000",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "908b3bf37099e2fe502d106dd3a5f6e67bc00d679697de8d940942bb93000e07",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/dmsans/DMSans%5Bopsz%2Cwght%5D.ttf"
+      },
+      {
+        "file": "/fonts/google/dmsans/DMSans-Italic[opsz,wght].woff2",
+        "weight": "100 1000",
+        "style": "italic",
+        "missingPolish": "",
+        "sha256": "10f4b3071f345f9059b1906ba4f6e0db8c86522d279f4c0861c0f3a7b8f483e3",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/dmsans/DMSans-Italic%5Bopsz%2Cwght%5D.ttf"
+      }
+    ]
+  },
+  {
+    "id": "Manrope",
+    "label": "Manrope",
+    "category": "Sans-serif",
+    "faces": [
+      {
+        "file": "/fonts/google/manrope/Manrope[wght].woff2",
+        "weight": "200 800",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "a2e6fa6e52ac03eac1f94913f6593560d75a7351e5807fb6e5aeaf78e7c97ea5",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/manrope/Manrope%5Bwght%5D.ttf"
+      }
+    ]
+  },
+  {
+    "id": "Poppins",
+    "label": "Poppins",
+    "category": "Sans-serif",
+    "faces": [
+      {
+        "file": "/fonts/google/poppins/Poppins-Regular.woff2",
+        "weight": "400",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "9d29e09a0c94aca81f181b52abb2e63fce5661b0045ce015bd7d2a91fff7082c",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Regular.ttf"
+      },
+      {
+        "file": "/fonts/google/poppins/Poppins-Italic.woff2",
+        "weight": "400",
+        "style": "italic",
+        "missingPolish": "",
+        "sha256": "859eb12c7227ceec64e2631289c94b3b90facc0e664415b7dba03ffddb56bc10",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Italic.ttf"
+      },
+      {
+        "file": "/fonts/google/poppins/Poppins-Bold.woff2",
+        "weight": "700",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "385faccf30e2f4e3fb08765366576fc184b90c946fda7913f7e72cb0899f24f8",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Bold.ttf"
+      },
+      {
+        "file": "/fonts/google/poppins/Poppins-BoldItalic.woff2",
+        "weight": "700",
+        "style": "italic",
+        "missingPolish": "",
+        "sha256": "d584e75424d4a81c1952a7bbbe9bc066ff19a862dd435a5efb3087d3b010ccf9",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-BoldItalic.ttf"
+      }
+    ]
+  },
+  {
+    "id": "Raleway",
+    "label": "Raleway",
+    "category": "Sans-serif",
+    "faces": [
+      {
+        "file": "/fonts/google/raleway/Raleway[wght].woff2",
+        "weight": "100 900",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "af158f066db4caad542b1b318c06afe9c3e3a58fb4a1479d93e373bd21910f3a",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/raleway/Raleway%5Bwght%5D.ttf"
+      },
+      {
+        "file": "/fonts/google/raleway/Raleway-Italic[wght].woff2",
+        "weight": "100 900",
+        "style": "italic",
+        "missingPolish": "",
+        "sha256": "8d316209c7ac6f655c52e160174616815b7efc75c587232eba861ad8dc3c0c33",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/raleway/Raleway-Italic%5Bwght%5D.ttf"
+      }
+    ]
+  },
+  {
+    "id": "Outfit",
+    "label": "Outfit",
+    "category": "Sans-serif",
+    "faces": [
+      {
+        "file": "/fonts/google/outfit/Outfit[wght].woff2",
+        "weight": "100 900",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "1a8e7c947e3433473fcfc1f6c576888cb8bb7b5c0e0dbb8e192a85a9619ad276",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/outfit/Outfit%5Bwght%5D.ttf"
+      }
+    ]
+  },
+  {
+    "id": "Work Sans",
+    "label": "Work Sans",
+    "category": "Sans-serif",
+    "faces": [
+      {
+        "file": "/fonts/google/worksans/WorkSans[wght].woff2",
+        "weight": "100 900",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "6acd1ed2ded6262a1b5efec3e0fdb5a4f31539143792c88e047a40c1309bd6ba",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/worksans/WorkSans%5Bwght%5D.ttf"
+      },
+      {
+        "file": "/fonts/google/worksans/WorkSans-Italic[wght].woff2",
+        "weight": "100 900",
+        "style": "italic",
+        "missingPolish": "",
+        "sha256": "8d96f7c723747a623d07ee51326e3deb63f8d9d7d1d48af9fcd29e08c8a9bcba",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/worksans/WorkSans-Italic%5Bwght%5D.ttf"
+      }
+    ]
+  },
+  {
+    "id": "Playfair Display",
+    "label": "Playfair Display",
+    "category": "Serif",
+    "faces": [
+      {
+        "file": "/fonts/google/playfairdisplay/PlayfairDisplay[wght].woff2",
+        "weight": "400 900",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "bf0a98324907c36ff4ca082623baa91348ac8279d6163b38ad000da4c91e3e49",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/playfairdisplay/PlayfairDisplay%5Bwght%5D.ttf"
+      },
+      {
+        "file": "/fonts/google/playfairdisplay/PlayfairDisplay-Italic[wght].woff2",
+        "weight": "400 900",
+        "style": "italic",
+        "missingPolish": "",
+        "sha256": "fd8c975663d90e32eff19b80a3c38c777008112b6ef5629916122af2a02530a1",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/playfairdisplay/PlayfairDisplay-Italic%5Bwght%5D.ttf"
+      }
+    ]
+  },
+  {
+    "id": "Cormorant Garamond",
+    "label": "Cormorant Garamond",
+    "category": "Serif",
+    "faces": [
+      {
+        "file": "/fonts/google/cormorantgaramond/CormorantGaramond[wght].woff2",
+        "weight": "300 700",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "8c8eececfdb385b844ab2006db96e0a042db2ccfffb6c401e780c70c89e4c97e",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/cormorantgaramond/CormorantGaramond%5Bwght%5D.ttf"
+      },
+      {
+        "file": "/fonts/google/cormorantgaramond/CormorantGaramond-Italic[wght].woff2",
+        "weight": "300 700",
+        "style": "italic",
+        "missingPolish": "",
+        "sha256": "62fc142e0947018a42ee70f7aafbb8e68ed8ad02d1054504f17cf0b60ea6332f",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/cormorantgaramond/CormorantGaramond-Italic%5Bwght%5D.ttf"
+      }
+    ]
+  },
+  {
+    "id": "DM Serif Display",
+    "label": "DM Serif Display",
+    "category": "Serif",
+    "faces": [
+      {
+        "file": "/fonts/google/dmserifdisplay/DMSerifDisplay-Regular.woff2",
+        "weight": "400",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "e29bc507bec69e47f1ec653707cb7f2f25d5c077c815e1017eb7ff945829dd89",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/dmserifdisplay/DMSerifDisplay-Regular.ttf"
+      },
+      {
+        "file": "/fonts/google/dmserifdisplay/DMSerifDisplay-Italic.woff2",
+        "weight": "400",
+        "style": "italic",
+        "missingPolish": "",
+        "sha256": "0712c35de331593f356117cbf4756c4c164cb65535c71f0c50326d520f3b61b6",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/dmserifdisplay/DMSerifDisplay-Italic.ttf"
+      }
+    ]
+  },
+  {
+    "id": "Libre Baskerville",
+    "label": "Libre Baskerville",
+    "category": "Serif",
+    "faces": [
+      {
+        "file": "/fonts/google/librebaskerville/LibreBaskerville[wght].woff2",
+        "weight": "400 700",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "e17e6b34a08ce0371099d99390577306cd702c5773692c56933a3cf4b25ba8c7",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/librebaskerville/LibreBaskerville%5Bwght%5D.ttf"
+      },
+      {
+        "file": "/fonts/google/librebaskerville/LibreBaskerville-Italic[wght].woff2",
+        "weight": "400 700",
+        "style": "italic",
+        "missingPolish": "",
+        "sha256": "87cc237db1c8fe0225b3156006011ae829d7e8dc14947737a0986f65de58f590",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/librebaskerville/LibreBaskerville-Italic%5Bwght%5D.ttf"
+      }
+    ]
+  },
+  {
+    "id": "Lora",
+    "label": "Lora",
+    "category": "Serif",
+    "faces": [
+      {
+        "file": "/fonts/google/lora/Lora[wght].woff2",
+        "weight": "400 700",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "f7ef8705e215d755f1c9685f59f74bf35fbc96cd17a38d5ac3039485cd4ae919",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/lora/Lora%5Bwght%5D.ttf"
+      },
+      {
+        "file": "/fonts/google/lora/Lora-Italic[wght].woff2",
+        "weight": "400 700",
+        "style": "italic",
+        "missingPolish": "",
+        "sha256": "e224b5ea23d6b745ba7de73cb8d9243da00d05bfd6cceadb92f0dbc06628bead",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/lora/Lora-Italic%5Bwght%5D.ttf"
+      }
+    ]
+  },
+  {
+    "id": "Bodoni Moda",
+    "label": "Bodoni Moda",
+    "category": "Serif",
+    "faces": [
+      {
+        "file": "/fonts/google/bodonimoda/BodoniModa[opsz,wght].woff2",
+        "weight": "400 900",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "d5ea6f098ada4a115ad75f46678aa6296667bb2c06bb344a25b4d1da2ff75174",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/bodonimoda/BodoniModa%5Bopsz%2Cwght%5D.ttf"
+      },
+      {
+        "file": "/fonts/google/bodonimoda/BodoniModa-Italic[opsz,wght].woff2",
+        "weight": "400 900",
+        "style": "italic",
+        "missingPolish": "",
+        "sha256": "d6f273324c168da371575dfbe65955fb1f2b9df8b8d76abb9441d703a77810de",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/bodonimoda/BodoniModa-Italic%5Bopsz%2Cwght%5D.ttf"
+      }
+    ]
+  },
+  {
+    "id": "Fraunces",
+    "label": "Fraunces",
+    "category": "Serif",
+    "faces": [
+      {
+        "file": "/fonts/google/fraunces/Fraunces[SOFT,WONK,opsz,wght].woff2",
+        "weight": "100 900",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "15c1f971f44a61c357a9f302177d8fcdab5de29922f4f0909490d65e14c474bc",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/fraunces/Fraunces%5BSOFT%2CWONK%2Copsz%2Cwght%5D.ttf"
+      },
+      {
+        "file": "/fonts/google/fraunces/Fraunces-Italic[SOFT,WONK,opsz,wght].woff2",
+        "weight": "100 900",
+        "style": "italic",
+        "missingPolish": "",
+        "sha256": "d73a315b725d882a8252c8684c3c5ded91d2bff8e791ee06d2b804a42b8c8f49",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/fraunces/Fraunces-Italic%5BSOFT%2CWONK%2Copsz%2Cwght%5D.ttf"
+      }
+    ]
+  },
+  {
+    "id": "Prata",
+    "label": "Prata",
+    "category": "Serif",
+    "faces": [
+      {
+        "file": "/fonts/google/prata/Prata-Regular.woff2",
+        "weight": "400",
+        "style": "normal",
+        "missingPolish": "\u0105\u0107\u0119\u0142\u0144\u015b\u017a\u017c\u0104\u0106\u0118\u0141\u0143\u015a\u0179\u017b",
+        "sha256": "e8854313af50d254cec9621c9d341d7d06269e3771c066300994bc6182230f1d",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/prata/Prata-Regular.ttf"
+      }
+    ]
+  },
+  {
+    "id": "JetBrains Mono",
+    "label": "JetBrains Mono",
+    "category": "Monospace",
+    "faces": [
+      {
+        "file": "/fonts/google/jetbrainsmono/JetBrainsMono[wght].woff2",
+        "weight": "100 800",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "f13cc6aa4e445dab3610d8bcad596493597104a24a2cdf27e8f3370b4ae1c92e",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/jetbrainsmono/JetBrainsMono%5Bwght%5D.ttf"
+      },
+      {
+        "file": "/fonts/google/jetbrainsmono/JetBrainsMono-Italic[wght].woff2",
+        "weight": "100 800",
+        "style": "italic",
+        "missingPolish": "",
+        "sha256": "426e7e128ae676777ef53e5c9fbbe6fc9f38b14c08bdcc056e64d3843b42f290",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/jetbrainsmono/JetBrainsMono-Italic%5Bwght%5D.ttf"
+      }
+    ]
+  },
+  {
+    "id": "IBM Plex Mono",
+    "label": "IBM Plex Mono",
+    "category": "Monospace",
+    "faces": [
+      {
+        "file": "/fonts/google/ibmplexmono/IBMPlexMono-Regular.woff2",
+        "weight": "400",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "c25f5abf7dfc48be382aa511c14801546227f9d623df4db9084fc048cfbfe6a0",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/ibmplexmono/IBMPlexMono-Regular.ttf"
+      },
+      {
+        "file": "/fonts/google/ibmplexmono/IBMPlexMono-Italic.woff2",
+        "weight": "400",
+        "style": "italic",
+        "missingPolish": "",
+        "sha256": "4543cf356934a21f7df10ca06dad0aa35d0d97051159be3ac7e2f41e0028e92a",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/ibmplexmono/IBMPlexMono-Italic.ttf"
+      },
+      {
+        "file": "/fonts/google/ibmplexmono/IBMPlexMono-Bold.woff2",
+        "weight": "700",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "6e07bf7b7a59487db7ba3a1e025d38cdeee5c333ca58f83fae3a7e023e2d4b9a",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/ibmplexmono/IBMPlexMono-Bold.ttf"
+      },
+      {
+        "file": "/fonts/google/ibmplexmono/IBMPlexMono-BoldItalic.woff2",
+        "weight": "700",
+        "style": "italic",
+        "missingPolish": "",
+        "sha256": "7eb871ce6ca268dc5f553be469bab29de777047caf1ba53b45fac7a370dae9f9",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/ibmplexmono/IBMPlexMono-BoldItalic.ttf"
+      }
+    ]
+  },
+  {
+    "id": "Space Mono",
+    "label": "Space Mono",
+    "category": "Monospace",
+    "faces": [
+      {
+        "file": "/fonts/google/spacemono/SpaceMono-Regular.woff2",
+        "weight": "400",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "d134d1b3e40fd37cc4f572ac2075d7b6b40975de090c9fe601da222ba72169dd",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/spacemono/SpaceMono-Regular.ttf"
+      },
+      {
+        "file": "/fonts/google/spacemono/SpaceMono-Italic.woff2",
+        "weight": "400",
+        "style": "italic",
+        "missingPolish": "",
+        "sha256": "a6a09b4c65c4efcd56bd0ec4ccbe89234d1784ba5b3ee990b6e1239e06fdaefc",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/spacemono/SpaceMono-Italic.ttf"
+      },
+      {
+        "file": "/fonts/google/spacemono/SpaceMono-Bold.woff2",
+        "weight": "700",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "e2877e5d9d95f8cff161e60123caecd6193553f53ed98d7be5f37a33708c9fd1",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/spacemono/SpaceMono-Bold.ttf"
+      },
+      {
+        "file": "/fonts/google/spacemono/SpaceMono-BoldItalic.woff2",
+        "weight": "700",
+        "style": "italic",
+        "missingPolish": "",
+        "sha256": "6caee296cda0065c52a760fec42ffa1f10acc9b71d9beee11b8103f312481a06",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/spacemono/SpaceMono-BoldItalic.ttf"
+      }
+    ]
+  },
+  {
+    "id": "Roboto Mono",
+    "label": "Roboto Mono",
+    "category": "Monospace",
+    "faces": [
+      {
+        "file": "/fonts/google/robotomono/RobotoMono[wght].woff2",
+        "weight": "100 700",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "ab7c359ab9ef65cbbdc3eab3e546d1c8df0ec58150b0b69e5dae4f0b50e6d87a",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/robotomono/RobotoMono%5Bwght%5D.ttf"
+      },
+      {
+        "file": "/fonts/google/robotomono/RobotoMono-Italic[wght].woff2",
+        "weight": "100 700",
+        "style": "italic",
+        "missingPolish": "",
+        "sha256": "5ece5391546df1e1c2742ed701f9cb500a4bd1f70b751705b10ff4317fd90ce7",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/robotomono/RobotoMono-Italic%5Bwght%5D.ttf"
+      }
+    ]
+  },
+  {
+    "id": "DM Mono",
+    "label": "DM Mono",
+    "category": "Monospace",
+    "faces": [
+      {
+        "file": "/fonts/google/dmmono/DMMono-Regular.woff2",
+        "weight": "400",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "80a98c2df39fd145f9d5a4ea18cd71f28a3f48090976af8cc6398e2613199254",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/dmmono/DMMono-Regular.ttf"
+      },
+      {
+        "file": "/fonts/google/dmmono/DMMono-Italic.woff2",
+        "weight": "400",
+        "style": "italic",
+        "missingPolish": "",
+        "sha256": "c9c17ffc7c5106f239f6c5fe248f9a0496b769df86e88544b978d4be77b22959",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/dmmono/DMMono-Italic.ttf"
+      }
+    ]
+  },
+  {
+    "id": "Bebas Neue",
+    "label": "Bebas Neue",
+    "category": "Display",
+    "faces": [
+      {
+        "file": "/fonts/google/bebasneue/BebasNeue-Regular.woff2",
+        "weight": "400",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "9a48da0d35e405b2cf2c0726ab18eaab237a88efaa0e119652c5ba02354f4b35",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/bebasneue/BebasNeue-Regular.ttf"
+      }
+    ]
+  },
+  {
+    "id": "Oswald",
+    "label": "Oswald",
+    "category": "Display",
+    "faces": [
+      {
+        "file": "/fonts/google/oswald/Oswald[wght].woff2",
+        "weight": "200 700",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "345da6dab36dfa9dfcad2c666adac6beed2e88bfb3854f0c76baa8cbebd2deae",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/oswald/Oswald%5Bwght%5D.ttf"
+      }
+    ]
+  },
+  {
+    "id": "Archivo Black",
+    "label": "Archivo Black",
+    "category": "Display",
+    "faces": [
+      {
+        "file": "/fonts/google/archivoblack/ArchivoBlack-Regular.woff2",
+        "weight": "400",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "23ee8584e15d056a0b3c7653c65a89e2940c5a18560f712812ca6b87a0c0f207",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/archivoblack/ArchivoBlack-Regular.ttf"
+      }
+    ]
+  },
+  {
+    "id": "Cinzel",
+    "label": "Cinzel",
+    "category": "Display",
+    "faces": [
+      {
+        "file": "/fonts/google/cinzel/Cinzel[wght].woff2",
+        "weight": "400 900",
+        "style": "normal",
+        "missingPolish": "",
+        "sha256": "dfbfcaed26b1ab4f59e371b728192bccbaebece05b97f8b1adc801508bad1346",
+        "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/cinzel/Cinzel%5Bwght%5D.ttf"
+      }
+    ]
+  }
+]

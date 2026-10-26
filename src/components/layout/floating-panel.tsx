@@ -56,8 +56,12 @@ export function FloatingPanel({
     if (!panel.contains(document.activeElement)) {
       const initial =
         panel.querySelector<HTMLElement>(
-          'input:not([type="file"]):not([type="hidden"]):not([disabled]), [data-panel-initial-focus], button[aria-pressed]:not([disabled])',
-        ) ?? panel;
+          '[data-panel-initial-focus]:not([disabled])',
+        ) ??
+        panel.querySelector<HTMLElement>(
+          'input:not([type="file"]):not([type="hidden"]):not([disabled]), button[aria-pressed]:not([disabled])',
+        ) ??
+        panel;
       initial.focus({ preventScroll: true });
     }
     return () => {

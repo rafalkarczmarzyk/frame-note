@@ -1,4 +1,7 @@
-import { effectiveFontStyle, supportsItalic } from '../../domain/font-style';
+import type { FontSelection } from '@/domain/font-style';
+import { CategoryFilter } from '@/components/ui/category-filter';
+import { fontCategories } from '@/domain/fonts';
+import { supportsBold, supportsItalic } from '../../domain/font-style';
 import { Switch } from '@/components/ui/switch';
 import {
   defaultExportMetadata,
@@ -50,7 +53,8 @@ import { FloatingPanel } from '@/components/layout/floating-panel';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { SegmentedControl } from '@/components/ui/segmented-control';
-import { PickerList } from '@/components/ui/picker-list';
+import { FontPicker } from '../caption/font-picker';
+import { ensureCaptionFont } from '../caption/font-loading';
 import { SidebarSection } from '@/components/layout/sidebar-section';
 import { InlineNotice } from '@/components/ui/inline-notice';
 import { formatBytes } from '@/lib/format-bytes';
@@ -97,7 +101,6 @@ function PhotoWorkspaceContent({
         .trim(),
     [],
   );
-  const [error, setError] = useState('');
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -121,6 +124,8 @@ function PhotoWorkspaceContent({
   const [presetHost, setPresetHost] = useState<HTMLDivElement | null>(null);
   const tagsOpen = activePanel === 'tags';
   const [fontQuery, setFontQuery] = useState('');
+  const [fontCategory, setFontCategory] = useState('all');
+  const [tagCategory, setTagCategory] = useState('all');
   const [size, setSize] = useState({ width: 1, height: 1 });
   const [query, setQuery] = useState('');
   const [layout, setLayout] = useState(() =>
@@ -251,17 +256,10 @@ function PhotoWorkspaceContent({
   const [quality, setQuality] = useState(95);
   const [metadataOptions, setMetadataOptions] = useState(defaultExportMetadata);
   const [loadedFont, setLoadedFont] = useState('');
-  const fontKey = [
-    ...new Set(
-      layout.containers.map(
-        (container) =>
-          `${effectiveFontStyle(container)} ${container.style.fontWeight} 16px "${container.style.fontFamily}"`,
-      ),
-    ),
-  ]
-    .sort()
-    .join('|');
-  const fontReady = loadedFont === fontKey;
+  const [fontFailure, setFontFailure] = useState<{
+    key: string;
+    message: string;
+  } | null>(null);
   const used = usedTokens(template);
   const exportTarget = document.getElementById('export-actions');
   const addToken = (key: string) => {
@@ -324,19 +322,38 @@ function PhotoWorkspaceContent({
     }),
     [photo, exportCaptions, quality, metadataOptions],
   );
+  const fontKey = JSON.stringify(
+    exportCaptions.map(({ caption, text }) => ({
+      style: {
+        fontFamily: caption.style.fontFamily,
+        fontWeight: caption.style.fontWeight,
+        fontStyle: caption.style.fontStyle,
+      },
+      text,
+    })),
+  );
+  const fontReady = loadedFont === fontKey;
+  const fontError = fontFailure?.key === fontKey ? fontFailure.message : '';
   const prepared = usePreparedExport(exportRequest, fontReady && iconsReady);
   useEffect(() => {
     let active = true;
     void Promise.all(
-      fontKey
-        ? fontKey.split('|').map((font) => document.fonts.load(font))
-        : [],
+      (JSON.parse(fontKey) as { style: FontSelection; text: string }[]).map(
+        ({ style, text }) => ensureCaptionFont(style, text),
+      ),
     )
       .then(() => {
         if (active) setLoadedFont(fontKey);
       })
-      .catch(() => {
-        if (active) setError('Could not load the caption font.');
+      .catch((error: unknown) => {
+        if (active)
+          setFontFailure({
+            key: fontKey,
+            message:
+              error instanceof Error
+                ? error.message
+                : 'Could not load the caption font.',
+          });
       });
     return () => {
       active = false;
@@ -382,10 +399,9 @@ function PhotoWorkspaceContent({
     1,
   );
   const fields = photo.document.photo.metadata;
-  const matchingFieldCount = metadataGroups(fields, query).reduce(
-    (count, group) => count + group.fields.length,
-    0,
-  );
+  const matchingFieldCount = metadataGroups(fields, query)
+    .filter((group) => tagCategory === 'all' || group.name === tagCategory)
+    .reduce((count, group) => count + group.fields.length, 0);
   return (
     <EditorWorkspace>
       {exportTarget &&
@@ -717,65 +733,68 @@ function PhotoWorkspaceContent({
                     placeholder="Search fields or values…"
                     className="bg-preview-placeholder"
                   />
+                  <CategoryFilter
+                    label="Tag categories"
+                    className="mt-2"
+                    value={tagCategory}
+                    onValueChange={setTagCategory}
+                    categories={metadataGroups(fields, '').map((group) => ({
+                      value: group.name,
+                      label:
+                        group.name === 'FrameNote'
+                          ? group.name
+                          : group.name.toUpperCase(),
+                    }))}
+                  />
                   <p className="mt-2 text-xs text-content-secondary">
                     {matchingFieldCount} tags
                   </p>
                 </>
               ) : (
-                <Input
-                  aria-label="Search fonts"
-                  value={fontQuery}
-                  onChange={(event) => setFontQuery(event.target.value)}
-                  placeholder="Search fonts…"
-                  className="bg-preview-placeholder"
-                />
+                <>
+                  <Input
+                    aria-label="Search fonts"
+                    value={fontQuery}
+                    onChange={(event) => setFontQuery(event.target.value)}
+                    placeholder="Search fonts…"
+                    className="bg-preview-placeholder"
+                  />
+                  <CategoryFilter
+                    label="Font categories"
+                    className="mt-2 -mb-3"
+                    value={fontCategory}
+                    onValueChange={setFontCategory}
+                    categories={fontCategories.map((value) => ({
+                      value,
+                      label: value,
+                    }))}
+                  />
+                </>
               )
             }
           >
             {tagsOpen ? (
               <MetadataPicker
+                category={tagCategory}
                 fields={fields}
                 query={query}
                 used={used}
                 onChoose={addToken}
               />
             ) : (
-              <PickerList
-                items={[
-                  {
-                    id: 'Montserrat Variable',
-                    label: 'Montserrat',
-                    description: 'Sans serif · Regular / Bold',
-                    preview: (
-                      <span className="font-sans text-xl">
-                        Leave your mark.
-                      </span>
-                    ),
-                  },
-                  {
-                    id: 'Advercase',
-                    label: 'Advercase',
-                    description: 'Display serif · Regular / Bold',
-                    preview: (
-                      <span className="font-display text-2xl">
-                        Leave your mark.
-                      </span>
-                    ),
-                  },
-                ]
-                  .filter((font) =>
-                    font.label.toLowerCase().includes(fontQuery.toLowerCase()),
-                  )
-                  .map((font) => ({
-                    ...font,
-                    selected: settings.style.fontFamily === font.id,
-                  }))}
+              <FontPicker
+                category={fontCategory}
+                value={settings.style.fontFamily}
+                query={fontQuery}
                 onChoose={(id) =>
                   setSettings((value) => ({
                     ...value,
                     style: {
                       ...value.style,
-                      fontFamily: id as typeof value.style.fontFamily,
+                      fontFamily: id,
+                      fontWeight: supportsBold(id)
+                        ? value.style.fontWeight
+                        : 400,
                       fontStyle: supportsItalic(
                         id as typeof value.style.fontFamily,
                       )
@@ -784,7 +803,6 @@ function PhotoWorkspaceContent({
                     },
                   }))
                 }
-                emptyText="No matching fonts."
               />
             )}
           </FloatingPanel>
@@ -859,9 +877,9 @@ function PhotoWorkspaceContent({
             iconTone="caption"
             icon={<Layers />}
           >
-            {(error || assetError) && (
+            {(assetError || fontError) && (
               <p role="alert" className="px-4 pt-2 pb-3 text-xs">
-                {error || assetError}
+                {assetError || fontError}
               </p>
             )}
             <LayerList

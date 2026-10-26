@@ -1,3 +1,4 @@
+import { expect, userEvent, within } from 'storybook/test';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { CaptionControls } from './caption-controls';
@@ -69,5 +70,42 @@ export const NoItalicInspector: Story = {
       ...createCaption(),
       style: { ...createCaption().style, fontFamily: 'Advercase' },
     },
+  },
+};
+
+export const NumericSteps: Story = {
+  args: CustomInspector.args,
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    await userEvent.click(
+      c.getByRole('button', { name: 'Increase Font size' }),
+    );
+    await expect(c.getByRole('spinbutton', { name: 'Font size' })).toHaveValue(
+      2.25,
+    );
+    await userEvent.click(
+      c.getByRole('button', { name: 'Increase Line spacing' }),
+    );
+    await expect(
+      c.getByRole('spinbutton', { name: 'Line spacing' }),
+    ).toHaveValue(1.5);
+    await userEvent.click(
+      c.getByRole('button', { name: 'Decrease Opacity value' }),
+    );
+    await expect(
+      c.getByRole('spinbutton', { name: 'Opacity value' }),
+    ).toHaveValue(99);
+    await userEvent.click(
+      c.getByRole('button', { name: 'Increase X position' }),
+    );
+    await expect(c.getByRole('spinbutton', { name: 'X position' })).toHaveValue(
+      25.1,
+    );
+    await userEvent.click(
+      c.getByRole('button', { name: 'Decrease Y position' }),
+    );
+    await expect(c.getByRole('spinbutton', { name: 'Y position' })).toHaveValue(
+      74.9,
+    );
   },
 };

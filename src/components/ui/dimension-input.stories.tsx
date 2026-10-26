@@ -9,7 +9,7 @@ const meta = {
     value: 115.68,
     min: 0,
     max: 10000,
-    step: 'any',
+    step: 1,
     unit: 'px',
     onValueChange: () => {},
   },
@@ -42,8 +42,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Pixels: Story = {};
-export const ShortEdge: Story = { args: { unit: '% S', value: 3 } };
-export const LongEdge: Story = { args: { unit: '% L', value: 2 } };
+export const ShortEdge: Story = { args: { unit: '% S', value: 3, step: 0.1 } };
+export const LongEdge: Story = { args: { unit: '% L', value: 2, step: 0.1 } };
 export const Percent: Story = { args: { unit: '%', value: 75 } };
-export const Multiplier: Story = { args: { unit: '×', value: 1.4 } };
+export const Multiplier: Story = { args: { unit: '×', value: 1.4, step: 0.1 } };
 export const Disabled: Story = { args: { disabled: true } };

@@ -69,7 +69,7 @@ Each suffix number identifies a deliberately prepared prerelease, not a commit.
   editable and are excluded from the preview and export.
 - **Flexible positioning.** Use nine anchors within shared margins, or drag a
   layer into Manual positioning with X/Y coordinates relative to the photo.
-- **Consistent styling.** Choose Montserrat or Advercase, Regular or Bold,
+- **Consistent styling.** Choose from 25 Google Fonts families plus Advercase, supported Bold/Italic variants,
   alignment, line spacing, opacity, quick colors, or a custom HEX color. Size
   content in pixels or as a percentage of the short or long image edge.
 - **Precise margins.** Adjust four margins independently, in pairs, or together
@@ -234,6 +234,8 @@ UI colors are defined in `src/index.css` and consumed through semantic tokens.
 `pnpm check:tokens` checks this convention. The accessibility addon supports
 component review; it is not a complete accessibility audit.
 
+The caption library offers 25 Google Fonts families plus Advercase, with category
+filters and local fonts loaded on demand. See [font delivery and licenses](docs/FONT_LIBRARY.md).
 Montserrat is bundled through `@fontsource-variable/montserrat`. Advercase files
 are stored in `public/fonts/advercase`; the supplied archive did not include a
 license file, so its licensing needs review before distribution.

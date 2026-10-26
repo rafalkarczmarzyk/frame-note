@@ -74,7 +74,7 @@ export function LogoControls({
               unit={sizingLabels[caption.sizingUnit]}
               min={0.01 / factor}
               max={Math.max(dimensions.width, dimensions.height) / factor}
-              step="any"
+              step={caption.sizingUnit === 'px' ? 1 : 0.1}
               value={logo.width}
               onValueChange={(width) =>
                 onChange({ ...caption, logo: { ...logo, width } })
@@ -85,7 +85,7 @@ export function LogoControls({
               unit={sizingLabels[caption.sizingUnit]}
               min={0.01 / factor}
               max={Math.max(dimensions.width, dimensions.height) / factor}
-              step="any"
+              step={caption.sizingUnit === 'px' ? 1 : 0.1}
               value={logo.width / logo.asset.aspect}
               onValueChange={(height) =>
                 onChange({
@@ -128,6 +128,7 @@ export function LogoControls({
             </div>
             <NumberField
               label="Logo opacity value"
+              step={1}
               hideLabel
               unit="%"
               min={0}
