@@ -63,7 +63,6 @@ export function LayerContentPreview({
         return (
           <span
             key={index}
-            title={missing ? `Missing: ${name}` : name}
             className={`inline-flex h-6 max-w-full items-center gap-1 ${isGraphic ? '' : `control-neutral rounded px-1.5 ${missing ? 'border border-dashed' : ''}`}`}
             data-layer-token={token}
             data-missing={missing || undefined}

@@ -1,3 +1,4 @@
+import { Tooltip } from './tooltip';
 import * as ToggleGroup from '@radix-ui/react-toggle-group';
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
@@ -7,6 +8,7 @@ export interface SegmentOption<T extends string> {
   label: string;
   content?: ReactNode;
   title?: string;
+  tooltip?: string;
 }
 export function SegmentedControl<T extends string>({
   label,
@@ -37,17 +39,26 @@ export function SegmentedControl<T extends string>({
         gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))`,
       }}
     >
-      {options.map((option) => (
-        <ToggleGroup.Item
-          key={option.value}
-          value={option.value}
-          aria-label={option.label}
-          title={option.title ?? option.label}
-          className="control-segment flex h-7 min-w-0 items-center justify-center gap-1 px-2 text-xs [&_svg]:size-4"
-        >
-          {option.content ?? option.label}
-        </ToggleGroup.Item>
-      ))}
+      {options.map((option) => {
+        const item = (
+          <ToggleGroup.Item
+            key={option.value}
+            value={option.value}
+            aria-label={option.label}
+            title={option.tooltip ? undefined : (option.title ?? option.label)}
+            className="control-segment flex h-7 min-w-0 items-center justify-center gap-1 px-2 text-xs [&_svg]:size-4"
+          >
+            {option.content ?? option.label}
+          </ToggleGroup.Item>
+        );
+        return option.tooltip ? (
+          <Tooltip key={option.value} content={option.tooltip}>
+            {item}
+          </Tooltip>
+        ) : (
+          item
+        );
+      })}
     </ToggleGroup.Root>
   );
 }

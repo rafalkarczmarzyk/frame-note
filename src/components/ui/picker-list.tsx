@@ -1,3 +1,4 @@
+import { Tooltip } from './tooltip';
 import { edgeScrollSpeed, scrollAncestor } from '@/lib/drag-scroll';
 import {
   useCallback,
@@ -13,6 +14,7 @@ import { Check, GripVertical } from 'lucide-react';
 export interface PickerItem {
   id: string;
   label: string;
+  tooltip?: string;
   /** Optional visual summary; label remains the accessible text. */
   content?: ReactNode;
   description?: ReactNode;
@@ -274,67 +276,76 @@ export function PickerList({
                 )}
               </>
             )}
-            <button
-              type="button"
-              data-picker-choice=""
-              aria-pressed={!!item.selected}
-              {...(reorderHandle === 'row' && onMove ? reorderProps : {})}
-              aria-describedby={
-                reorderHandle === 'row' && onMove ? helpId : undefined
-              }
-              aria-label={appearance === 'compact' ? item.label : undefined}
-              title={appearance === 'compact' ? item.label : undefined}
-              onClick={(event) => {
-                if (suppressClick.current) {
-                  event.preventDefault();
-                  suppressClick.current = false;
-                  return;
-                }
-                onChoose(item.id);
-              }}
-              className={`control-button ${item.muted ? 'text-content-muted' : ''} block min-w-0 flex-1 rounded-lg ${appearance === 'compact' ? 'h-10 px-1' : item.content ? 'px-1 py-2' : density === 'dense' ? 'px-3 py-2' : 'p-3'} ${reorderHandle === 'row' ? 'cursor-grab touch-none active:cursor-grabbing' : ''} text-left ${selectionTone === 'default' ? 'aria-pressed:text-accent-color' : ''}`}
+            <Tooltip
+              disabled={!item.tooltip || !!drag}
+              content="Drag to reorder layers"
+              overflowContent={item.tooltip?.slice(0, 500)}
             >
-              <span
-                className={`flex justify-between gap-2 ${item.trailing && controlsLayout === 'inline' ? 'items-center' : 'items-start'}`}
+              <button
+                type="button"
+                data-picker-choice=""
+                aria-pressed={!!item.selected}
+                {...(reorderHandle === 'row' && onMove ? reorderProps : {})}
+                aria-describedby={
+                  reorderHandle === 'row' && onMove ? helpId : undefined
+                }
+                aria-label={appearance === 'compact' ? item.label : undefined}
+
+                onClick={(event) => {
+                  if (suppressClick.current) {
+                    event.preventDefault();
+                    suppressClick.current = false;
+                    return;
+                  }
+                  onChoose(item.id);
+                }}
+                className={`control-button ${item.muted ? 'text-content-muted' : ''} block min-w-0 flex-1 rounded-lg ${appearance === 'compact' ? 'h-10 px-1' : item.content ? 'px-1 py-2' : density === 'dense' ? 'px-3 py-2' : 'p-3'} ${reorderHandle === 'row' ? 'cursor-grab touch-none active:cursor-grabbing' : ''} text-left ${selectionTone === 'default' ? 'aria-pressed:text-accent-color' : ''}`}
               >
-                <span className="flex min-w-0 flex-1 items-center gap-2 text-xs">
-                  {item.leading}
-                  <span
-                    className={`min-w-0 flex-1 ${appearance === 'compact' ? 'block truncate' : item.content ? '' : 'break-all'}`}
-                  >
-                    {item.content ? (
-                      <>
-                        <span className="sr-only">{item.label}</span>
-                        <span aria-hidden="true">{item.content}</span>
-                      </>
-                    ) : (
-                      item.label
-                    )}
-                  </span>
-                </span>
-                {item.trailing && controlsLayout === 'inline' && (
-                  <span className="shrink-0">{item.trailing}</span>
-                )}
-                {item.selected && selectedLabel && (
-                  <span className="flex shrink-0 items-center gap-1 text-[10px]">
-                    <Check aria-hidden="true" className="size-3.5" />
-                    {selectedLabel}
-                  </span>
-                )}
-              </span>
-              {item.description && (
-                <span className="mt-1 block break-all text-xs leading-5 text-content-secondary">
-                  {item.description}
-                </span>
-              )}
-              {item.preview && (
                 <span
-                  className={density === 'dense' ? 'mt-1 block' : 'mt-3 block'}
+                  className={`flex justify-between gap-2 ${item.trailing && controlsLayout === 'inline' ? 'items-center' : 'items-start'}`}
                 >
-                  {item.preview}
+                  <span className="flex min-w-0 flex-1 items-center gap-2 text-xs">
+                    {item.leading}
+                    <span
+                      data-tooltip-truncate=""
+                      className={`min-w-0 flex-1 ${appearance === 'compact' ? 'block truncate' : item.content ? '' : 'break-all'}`}
+                    >
+                      {item.content ? (
+                        <>
+                          <span className="sr-only">{item.label}</span>
+                          <span aria-hidden="true">{item.content}</span>
+                        </>
+                      ) : (
+                        item.label
+                      )}
+                    </span>
+                  </span>
+                  {item.trailing && controlsLayout === 'inline' && (
+                    <span className="shrink-0">{item.trailing}</span>
+                  )}
+                  {item.selected && selectedLabel && (
+                    <span className="flex shrink-0 items-center gap-1 text-[10px]">
+                      <Check aria-hidden="true" className="size-3.5" />
+                      {selectedLabel}
+                    </span>
+                  )}
                 </span>
-              )}
-            </button>
+                {item.description && (
+                  <span className="mt-1 block break-all text-xs leading-5 text-content-secondary">
+                    {item.description}
+                  </span>
+                )}
+                {item.preview && (
+                  <span
+                    className={
+                      density === 'dense' ? 'mt-1 block' : 'mt-3 block'
+                    }
+                  >
+                    {item.preview}
+                  </span>
+                )}
+              </button>
+            </Tooltip>
             {item.actions && controlsLayout === 'inline' && (
               <div
                 className={

@@ -1,3 +1,4 @@
+import { Tooltip } from './tooltip';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { useId, useState, type ComponentProps } from 'react';
 import { cn } from '@/lib/utils';
@@ -104,24 +105,46 @@ export function NumberInput({
         }}
       />
       <span className="numeric-steppers">
-        <button
-          type="button"
-          aria-label={`Increase ${stepperLabel}`}
-          disabled={disabled || value >= max}
-          onMouseDown={(event) => event.preventDefault()}
-          onClick={() => nudge(1)}
+        <Tooltip
+          focusWithin
+          content={
+            value >= max
+              ? `Maximum ${stepperLabel.toLowerCase()} reached`
+              : `Increase ${stepperLabel.toLowerCase()}`
+          }
         >
-          <ChevronUp aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          aria-label={`Decrease ${stepperLabel}`}
-          disabled={disabled || value <= min}
-          onMouseDown={(event) => event.preventDefault()}
-          onClick={() => nudge(-1)}
+          <span className="flex min-h-0 flex-1">
+            <button
+              type="button"
+              aria-label={`Increase ${stepperLabel}`}
+              disabled={disabled || value >= max}
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => nudge(1)}
+            >
+              <ChevronUp aria-hidden="true" />
+            </button>
+          </span>
+        </Tooltip>
+        <Tooltip
+          focusWithin
+          content={
+            value <= min
+              ? `Minimum ${stepperLabel.toLowerCase()} reached`
+              : `Decrease ${stepperLabel.toLowerCase()}`
+          }
         >
-          <ChevronDown aria-hidden="true" />
-        </button>
+          <span className="flex min-h-0 flex-1">
+            <button
+              type="button"
+              aria-label={`Decrease ${stepperLabel}`}
+              disabled={disabled || value <= min}
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => nudge(-1)}
+            >
+              <ChevronDown aria-hidden="true" />
+            </button>
+          </span>
+        </Tooltip>
       </span>
       {suffix && (
         <span className="numeric-unit" id={unitId}>

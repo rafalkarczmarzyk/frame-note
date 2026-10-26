@@ -74,3 +74,30 @@ export const ViewportEdges: Story = {
     ),
   ],
 };
+
+export const DisabledControl: Story = {
+  args: {
+    content: 'Open a photo to export a JPG',
+    disabledTrigger: true,
+    wrapTrigger: true,
+    children: (
+      <Button disabled aria-label="Export JPG">
+        Export JPG
+      </Button>
+    ),
+  },
+};
+export const TruncatedLabel: Story = {
+  args: {
+    overflowOnly: true,
+    content: 'Wildlife · camera, lens and exposure · long preset name',
+    children: (
+      <button
+        type="button"
+        className="control-field w-40 truncate px-3 py-2 text-xs"
+      >
+        Wildlife · camera, lens and exposure · long preset name
+      </button>
+    ),
+  },
+};

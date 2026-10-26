@@ -37,7 +37,11 @@ export function Select({
         {...props}
         className="control-field flex h-9 w-full min-w-0 items-center justify-between gap-2 px-3 text-left text-xs"
       >
-        <SelectPrimitive.Value placeholder={placeholder} />
+        <SelectPrimitive.Value
+          data-tooltip-truncate
+          className="block min-w-0 truncate"
+          placeholder={placeholder}
+        />
         <SelectPrimitive.Icon>
           <ChevronDown className="size-3.5 shrink-0" aria-hidden="true" />
         </SelectPrimitive.Icon>

@@ -1,3 +1,4 @@
+import { Tooltip } from '@/components/ui/tooltip';
 import type { ReactNode } from 'react';
 import { Save } from 'lucide-react';
 import { Select, type SelectOption } from '@/components/ui/select';
@@ -35,32 +36,46 @@ export function PresetToolbar({
       data-preset-live={live || undefined}
     >
       <div className="w-28 min-w-0 sm:w-44 lg:w-56 [&_button]:h-8 [&_button>span:first-child]:truncate">
-        <Select
-          aria-label="Saved preset"
-          value={selected}
-          options={options}
-          onValueChange={onSelect}
-          disabled={disabled}
-          placeholder="Presets…"
-        />
+        <Tooltip
+          overflowOnly
+          content={
+            options.find((item) => item.value === selected)?.label ?? 'Presets'
+          }
+        >
+          <Select
+            aria-label="Saved preset"
+            value={selected}
+            options={options}
+            onValueChange={onSelect}
+            disabled={disabled}
+            placeholder="Presets…"
+          />
+        </Tooltip>
       </div>
       {modified && (
-        <span
-          role="status"
-          title="Unsaved changes"
-          className="shrink-0 text-xs text-content-secondary"
-        >
-          <span className="hidden lg:inline">Modified</span>
-          <span className="lg:hidden" aria-label="Modified">
-            •
+        <Tooltip content="The current layout has unsaved changes">
+          <span
+            role="status"
+            className="shrink-0 text-xs text-content-secondary"
+          >
+            <span className="hidden lg:inline">Modified</span>
+            <span className="lg:hidden" aria-label="Modified">
+              •
+            </span>
           </span>
-        </span>
+        </Tooltip>
       )}
       <SplitButton
         variant="outline"
         size="sm"
         aria-label="Save preset"
-        title="Save preset"
+        primaryTooltip={
+          saveDisabled
+            ? 'The selected preset is up to date'
+            : selected && !selected.startsWith('builtin-')
+              ? 'Update the selected preset'
+              : 'Save the current layout as a new preset'
+        }
         menuLabel="Preset actions"
         disabled={disabled}
         primaryDisabled={saveDisabled}

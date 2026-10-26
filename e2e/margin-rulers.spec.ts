@@ -8,6 +8,7 @@ test('drags large labeled margin handles with linked edges, cancellation and key
   await page
     .getByLabel('Choose JPG or PNG photo')
     .setInputFiles(wildlifeFixture.path);
+  await page.locator('details[data-section="sizing"] > summary').click();
   const left = page.getByRole('slider', { name: 'Left margin', exact: true });
   const right = page.getByRole('slider', { name: 'Right margin', exact: true });
   const field = (name: string) =>

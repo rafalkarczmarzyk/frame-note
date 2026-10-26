@@ -1,3 +1,4 @@
+import { Tooltip } from '@/components/ui/tooltip';
 import { useMemo, useRef } from 'react';
 import {
   ArrowUp,
@@ -130,6 +131,7 @@ export function LayerList({
                 </span>
               ),
             muted: container.visible === false,
+            tooltip: layerContentLabel(container),
             selected: layout.activeId === container.id,
             controlsLeft: (
               <IconButton
@@ -142,29 +144,32 @@ export function LayerList({
               </IconButton>
             ),
             trailing: (
-              <span
-                className="flex size-6 items-center justify-center text-content-secondary"
-                role="img"
-                aria-label={
+              <Tooltip
+                content={
                   container.position.custom
-                    ? 'Manual position'
-                    : `Anchor: ${container.position.anchor.replaceAll('-', ' ')}`
-                }
-                title={
-                  container.position.custom
-                    ? 'Manual position'
-                    : `Anchor: ${container.position.anchor.replaceAll('-', ' ')}`
+                    ? `Manual position · X ${Number(container.position.custom.x.toFixed(2))}%, Y ${Number(container.position.custom.y.toFixed(2))}%`
+                    : `Anchor · ${container.position.anchor.replaceAll('-', ' ')}`
                 }
               >
-                {container.position.custom ? (
-                  <Move aria-hidden="true" className="size-3.5" />
-                ) : (
-                  <AnchorIcon
-                    value={container.position.anchor}
-                    className="size-3.5"
-                  />
-                )}
-              </span>
+                <span
+                  className="flex size-6 items-center justify-center text-content-secondary"
+                  role="img"
+                  aria-label={
+                    container.position.custom
+                      ? 'Manual position'
+                      : `Anchor: ${container.position.anchor.replaceAll('-', ' ')}`
+                  }
+                >
+                  {container.position.custom ? (
+                    <Move aria-hidden="true" className="size-3.5" />
+                  ) : (
+                    <AnchorIcon
+                      value={container.position.anchor}
+                      className="size-3.5"
+                    />
+                  )}
+                </span>
+              </Tooltip>
             ),
             actions: (
               <ActionMenu
@@ -177,6 +182,7 @@ export function LayerList({
                   },
                   {
                     label: 'Move up',
+                    disabledReason: 'This layer is already at the front',
                     icon: <ArrowUp aria-hidden="true" />,
                     disabled: index === 0,
                     separatorBefore: true,
@@ -184,18 +190,21 @@ export function LayerList({
                   },
                   {
                     label: 'Move down',
+                    disabledReason: 'This layer is already at the back',
                     icon: <ArrowDown aria-hidden="true" />,
                     disabled: index === layout.containers.length - 1,
                     onSelect: () => moveFromMenu(container.id, index + 1),
                   },
                   {
                     label: 'Bring to front',
+                    disabledReason: 'This layer is already at the front',
                     icon: <ArrowUpToLine aria-hidden="true" />,
                     disabled: index === 0,
                     onSelect: () => moveFromMenu(container.id, 0),
                   },
                   {
                     label: 'Send to back',
+                    disabledReason: 'This layer is already at the back',
                     icon: <ArrowDownToLine aria-hidden="true" />,
                     disabled: index === layout.containers.length - 1,
                     onSelect: () =>
