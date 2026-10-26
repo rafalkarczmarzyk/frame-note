@@ -107,3 +107,32 @@ export const NumericSteps: Story = {
     );
   },
 };
+
+export const TooltipHelp: Story = {
+  args: { scope: 'local' },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Hover or focus font, size, spacing, alignment and style controls to inspect glass help. Escape dismisses help without changing values.',
+      },
+    },
+  },
+};
+export const UnavailableFontStyles: Story = {
+  args: {
+    scope: 'local',
+    caption: {
+      ...createCaption(),
+      style: { ...createCaption().style, fontFamily: 'Prata' },
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Unavailable font styles remain described and focusable through aria-disabled, while activation leaves the caption unchanged. The global disabled state still uses native disabled controls.',
+      },
+    },
+  },
+};

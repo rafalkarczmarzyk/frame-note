@@ -1,3 +1,4 @@
+import { Tooltip } from './tooltip';
 import {
   useEffect,
   useId,
@@ -17,6 +18,7 @@ export interface ActionMenuItem {
   icon?: ReactNode;
   onSelect: () => void;
   disabled?: boolean;
+  disabledReason?: string;
   separatorBefore?: boolean;
 }
 
@@ -110,36 +112,38 @@ export function ActionMenu({
   const Trigger = triggerAppearance ? Button : IconButton;
   return (
     <>
-      <Trigger
-        {...triggerAppearance}
-        ref={trigger}
-        aria-label={label}
-        title={label}
-        label={label}
-        disabled={disabled}
-        className={triggerClassName}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        aria-controls={open ? id : undefined}
-        onClick={() => {
-          lastItem.current = false;
-          setOpen(!open);
-        }}
-        onKeyDown={(event) => {
-          if (event.key === 'Escape' && open) {
+      <Tooltip content={label} disabled={open}>
+        <Trigger
+          {...triggerAppearance}
+          ref={trigger}
+          aria-label={label}
+          title=""
+          label={label}
+          disabled={disabled}
+          className={triggerClassName}
+          aria-haspopup="menu"
+          aria-expanded={open}
+          aria-controls={open ? id : undefined}
+          onClick={() => {
+            lastItem.current = false;
+            setOpen(!open);
+          }}
+          onKeyDown={(event) => {
+            if (event.key === 'Escape' && open) {
+              event.preventDefault();
+              event.stopPropagation();
+              close(true);
+              return;
+            }
+            if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
             event.preventDefault();
-            event.stopPropagation();
-            close(true);
-            return;
-          }
-          if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
-          event.preventDefault();
-          lastItem.current = event.key === 'ArrowUp';
-          setOpen(true);
-        }}
-      >
-        {triggerIcon ?? <Ellipsis />}
-      </Trigger>
+            lastItem.current = event.key === 'ArrowUp';
+            setOpen(true);
+          }}
+        >
+          {triggerIcon ?? <Ellipsis />}
+        </Trigger>
+      </Tooltip>
       {open &&
         createPortal(
           <div
@@ -148,6 +152,12 @@ export function ActionMenu({
             role="menu"
             tabIndex={-1}
             aria-label={label}
+            aria-description={
+              items
+                .filter((item) => item.disabled && item.disabledReason)
+                .map((item) => `${item.label}: ${item.disabledReason}`)
+                .join('. ') || undefined
+            }
             className="fixed z-50 min-w-40 rounded-lg border border-panel-border bg-menu-base p-1 text-menu-text shadow-menu"
             style={position}
             onKeyDown={(event) => {
@@ -192,20 +202,27 @@ export function ActionMenu({
                     className="my-1 border-t border-panel-border"
                   />
                 )}
-                <button
-                  type="button"
-                  role="menuitem"
-                  disabled={item.disabled}
-                  tabIndex={-1}
-                  className="control-button flex w-full items-center gap-2 rounded px-3 py-2 text-left text-xs enabled:hover:bg-menu-item-hover disabled:opacity-40 focus-visible:bg-menu-item-hover focus-visible:outline-2 focus-visible:outline-input-focus-ring [&_svg]:size-4"
-                  onClick={() => {
-                    close(true);
-                    item.onSelect();
-                  }}
+                <Tooltip
+                  disabled={!item.disabledReason || !item.disabled}
+                  content={item.disabledReason}
                 >
-                  {item.icon}
-                  {item.label}
-                </button>
+                  <span className="block">
+                    <button
+                      type="button"
+                      role="menuitem"
+                      disabled={item.disabled}
+                      tabIndex={-1}
+                      className="control-button flex w-full items-center gap-2 rounded px-3 py-2 text-left text-xs enabled:hover:bg-menu-item-hover disabled:opacity-40 focus-visible:bg-menu-item-hover focus-visible:outline-2 focus-visible:outline-input-focus-ring [&_svg]:size-4"
+                      onClick={() => {
+                        close(true);
+                        item.onSelect();
+                      }}
+                    >
+                      {item.icon}
+                      {item.label}
+                    </button>
+                  </span>
+                </Tooltip>
               </div>
             ))}
           </div>,

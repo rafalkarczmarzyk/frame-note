@@ -1,3 +1,4 @@
+import { Tooltip } from '@/components/ui/tooltip';
 import { useState, type ReactNode } from 'react';
 import { AboutSplash } from '@/features/about/about-splash';
 import { FrameNoteLogo } from '@/components/brand/frame-note-logo';
@@ -15,16 +16,17 @@ export function AppHeader({
   const [aboutOpen, setAboutOpen] = useState(false);
   return (
     <header className="flex h-12 shrink-0 items-center gap-2 border-b border-border-subtle bg-header-base px-3 text-content-primary sm:gap-4 sm:px-5">
-      <button
-        type="button"
-        aria-label="About FrameNote"
-        title="About FrameNote"
-        className="shrink-0 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring"
-        onClick={() => setAboutOpen(true)}
-      >
-        <FrameNoteLogo className="hidden h-[22px] w-auto sm:block" />
-        <FrameNoteIcon className="size-[22px] sm:hidden" />
-      </button>
+      <Tooltip content="About FrameNote">
+        <button
+          type="button"
+          aria-label="About FrameNote"
+          className="shrink-0 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring"
+          onClick={() => setAboutOpen(true)}
+        >
+          <FrameNoteLogo className="hidden h-[22px] w-auto sm:block" />
+          <FrameNoteIcon className="size-[22px] sm:hidden" />
+        </button>
+      </Tooltip>
       {aboutOpen && <AboutSplash onClose={() => setAboutOpen(false)} />}
       {photoAction}
       <div className="min-w-0 flex-1" />

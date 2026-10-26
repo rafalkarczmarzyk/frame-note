@@ -1,3 +1,4 @@
+import { Tooltip } from './tooltip';
 import type { ComponentProps, ReactNode } from 'react';
 import { ChevronDown, LoaderCircle } from 'lucide-react';
 import { Button } from './button';
@@ -16,6 +17,7 @@ export interface SplitButtonProps extends Omit<
   menuDisabled?: boolean;
   loading?: boolean;
   fullWidth?: boolean;
+  primaryTooltip?: string;
 }
 
 /** A primary action with a separate, attached menu of secondary actions. */
@@ -32,6 +34,7 @@ export function SplitButton({
   loading = false,
   fullWidth = false,
   className,
+  primaryTooltip,
   ...props
 }: SplitButtonProps) {
   return (
@@ -40,27 +43,36 @@ export function SplitButton({
       aria-label={props['aria-label'] ?? menuLabel}
       className={cn(
         'inline-flex min-w-0 shrink-0 items-stretch',
-        fullWidth && 'w-full',
+        fullWidth && 'w-full [&>[data-tooltip-trigger-wrapper]]:flex-1',
         className,
       )}
     >
-      <Button
-        {...props}
-        variant={variant}
-        size={size}
-        color={color}
-        disabled={disabled || primaryDisabled || loading}
-        aria-busy={loading || undefined}
-        className={cn('min-w-0 rounded-r-none', fullWidth && 'flex-1')}
+      <Tooltip
+        wrapTrigger={!!primaryTooltip}
+        disabled={!primaryTooltip}
+        content={primaryTooltip}
+        disabledTrigger={
+          !!primaryTooltip && (disabled || primaryDisabled || loading)
+        }
       >
-        {loading && (
-          <LoaderCircle
-            className="animate-spin motion-reduce:animate-none"
-            aria-hidden="true"
-          />
-        )}
-        {children}
-      </Button>
+        <Button
+          {...props}
+          variant={variant}
+          size={size}
+          color={color}
+          disabled={disabled || primaryDisabled || loading}
+          aria-busy={loading || undefined}
+          className={cn('min-w-0 rounded-r-none', fullWidth && 'flex-1')}
+        >
+          {loading && (
+            <LoaderCircle
+              className="animate-spin motion-reduce:animate-none"
+              aria-hidden="true"
+            />
+          )}
+          {children}
+        </Button>
+      </Tooltip>
       <ActionMenu
         label={menuLabel}
         items={items}

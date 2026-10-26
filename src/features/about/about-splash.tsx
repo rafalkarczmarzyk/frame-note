@@ -51,7 +51,12 @@ export function AboutSplash({ onClose }: { onClose: () => void }) {
         <div className="pointer-events-none absolute inset-0 -z-10 bg-app-base opacity-60" />
         <header className="flex shrink-0 items-center justify-between gap-4 px-5 py-4 sm:px-8 sm:py-6">
           <FrameNoteLogo className="h-7 w-auto" />
-          <IconButton label="Close about FrameNote" onClick={onClose} autoFocus>
+          <IconButton
+            tooltip="Close About FrameNote"
+            label="Close about FrameNote"
+            onClick={onClose}
+            autoFocus
+          >
             <X aria-hidden="true" />
           </IconButton>
         </header>

@@ -1,3 +1,4 @@
+import { Tooltip } from './tooltip';
 import { RotateCcw } from 'lucide-react';
 import { Button } from './button';
 import { HelperText } from '@/components/ui/helper-text';
@@ -61,29 +62,31 @@ export function MarginEditor({
   const compact = appearance === 'compact';
   const limits = marginLimits(value, unit, dimensions, linkMode);
   const resetButton = (
-    <Button
-      variant="outline"
-      size="sm"
-      className={
-        compact
-          ? 'absolute right-2 bottom-2 z-10 h-6 gap-1 px-1.5 text-xs'
-          : 'h-6 gap-1 px-1.5 text-xs'
-      }
-      aria-label="Reset margins"
-      title={compact ? undefined : 'Reset all margins to 3% of the short edge'}
-      disabled={disabled}
-      onClick={() => {
-        const defaults = convertSizing(createCaption(), unit, dimensions)
-          .position.margins;
-        onChange(
-          setMarginLinkMode(defaults, 'all', unit, dimensions),
-          linkMode,
-        );
-      }}
-    >
-      <RotateCcw aria-hidden="true" />
-      Reset
-    </Button>
+    <Tooltip content="Reset all margins to 3% of the short edge">
+      <Button
+        variant="outline"
+        size="sm"
+        className={
+          compact
+            ? 'absolute right-2 bottom-2 z-10 h-6 gap-1 px-1.5 text-xs'
+            : 'h-6 gap-1 px-1.5 text-xs'
+        }
+        aria-label="Reset margins"
+        title=""
+        disabled={disabled}
+        onClick={() => {
+          const defaults = convertSizing(createCaption(), unit, dimensions)
+            .position.margins;
+          onChange(
+            setMarginLinkMode(defaults, 'all', unit, dimensions),
+            linkMode,
+          );
+        }}
+      >
+        <RotateCcw aria-hidden="true" />
+        Reset
+      </Button>
+    </Tooltip>
   );
   const linking = (
     <div className="space-y-2">
@@ -100,17 +103,17 @@ export function MarginEditor({
           {
             value: 'none',
             label: compact ? 'Individual' : 'None',
-            title: compact ? '' : 'Edit each margin independently',
+            tooltip: 'Edit each margin independently',
           },
           {
             value: 'pairs',
             label: compact ? 'Paired' : 'Pairs',
-            title: compact ? '' : 'Link top/bottom and left/right',
+            tooltip: 'Link top/bottom and left/right',
           },
           {
             value: 'all',
             label: compact ? 'Linked' : 'All',
-            title: compact ? '' : 'Link all four margins',
+            tooltip: 'Link all four margins',
           },
         ]}
       />
@@ -152,9 +155,6 @@ export function MarginEditor({
           <div
             key={side}
             className="margin-model-value"
-            title={
-              compact ? undefined : side.charAt(0).toUpperCase() + side.slice(1)
-            }
             style={{ gridArea: side }}
             onMouseEnter={() => {
               if (disabled) return;
@@ -177,7 +177,7 @@ export function MarginEditor({
             }}
           >
             <NumberField
-              title={compact ? '' : undefined}
+              tooltip={`${side.charAt(0).toUpperCase() + side.slice(1)} margin`}
               label={side.charAt(0).toUpperCase() + side.slice(1)}
               hideLabel
               unit={unitLabel}

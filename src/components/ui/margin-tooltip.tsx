@@ -16,7 +16,7 @@ export function MarginTooltip({
     <div
       role="tooltip"
       className={cn(
-        'pointer-events-none absolute z-20 whitespace-nowrap rounded-md border bg-sidebar-base px-2 py-1 text-xs text-content-primary shadow-lg',
+        'pointer-events-none absolute z-20 whitespace-nowrap rounded-md border border-panel-border glass-popover glass-tooltip px-2 py-1 text-xs text-content-primary shadow-lg',
         className,
       )}
       {...props}

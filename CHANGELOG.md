@@ -9,8 +9,13 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Added
 
-- Reusable translucent glass tooltips for color controls, with hover and keyboard
-  focus, Escape dismissal, viewport-aware placement and Storybook examples.
+- Reusable translucent glass tooltips throughout typography, colors, margins,
+  positioning, layers, inline content, photo/preset actions and export controls.
+  Help appears after 750 ms on hover or immediately on keyboard focus, stays
+  inside the viewport, explains unavailable actions and dismisses on Escape or
+  activation without disrupting editing or dragging. Long labels reveal their
+  full text; numeric steppers explain actions and limits. Includes Storybook
+  examples and shared help for icon buttons, menus and split buttons.
 
 - Nine built-in layouts, including Signature, Compact EXIF, Camera & Lens,
   Focus Stack (formerly Macro), EXIF Icons, Astrophotography and Long Exposure.

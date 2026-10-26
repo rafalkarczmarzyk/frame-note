@@ -19,6 +19,9 @@ export function PhotoActions({
       size="sm"
       aria-label="Open photo"
       menuLabel="Photo actions"
+      primaryTooltip={
+        hasPhoto ? 'Open another photo · keep the current layout' : 'Open photo'
+      }
       onClick={onOpen}
       disabled={loading}
       items={[
@@ -26,6 +29,7 @@ export function PhotoActions({
           label: 'Close photo',
           icon: <X />,
           disabled: !hasPhoto,
+          disabledReason: 'No photo is open',
           onSelect: onClose,
         },
       ]}

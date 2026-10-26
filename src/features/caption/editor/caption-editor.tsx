@@ -1,3 +1,4 @@
+import { Tooltip } from '@/components/ui/tooltip';
 import {
   activeImageAssets,
   checkImageRetention,
@@ -548,18 +549,20 @@ export function CaptionEditor({
         </div>
         <div className="mt-2 flex items-center justify-end gap-2">
           {actions}
-          <Button
-            size="sm"
-            variant="outline"
-            disabled={loading}
-            onClick={() => {
-              replacePosition.current = null;
-              upload.current?.click();
-            }}
-          >
-            <ImagePlus aria-hidden="true" />
-            Image
-          </Button>
+          <Tooltip content="Insert an SVG or PNG at the text cursor">
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={loading}
+              onClick={() => {
+                replacePosition.current = null;
+                upload.current?.click();
+              }}
+            >
+              <ImagePlus aria-hidden="true" />
+              Image
+            </Button>
+          </Tooltip>
           <input
             ref={upload}
             type="file"
@@ -601,8 +604,16 @@ export function CaptionEditor({
               label="Image sizing"
               value={token.unit}
               options={[
-                { value: 'font', label: 'Relative to font' },
-                { value: 'document', label: 'Fixed height' },
+                {
+                  value: 'font',
+                  label: 'Relative to font',
+                  tooltip: 'Scale image height with the font size',
+                },
+                {
+                  value: 'document',
+                  label: 'Fixed height',
+                  tooltip: 'Set image height in document units',
+                },
               ]}
               onValueChange={(unit) => {
                 const font = Math.max(
@@ -639,8 +650,16 @@ export function CaptionEditor({
                 label="Image colors"
                 value={token.colorMode}
                 options={[
-                  { value: 'original', label: 'Original colors' },
-                  { value: 'single', label: 'Layer color' },
+                  {
+                    value: 'original',
+                    label: 'Original colors',
+                    tooltip: 'Keep the SVG’s original colors',
+                  },
+                  {
+                    value: 'single',
+                    label: 'Layer color',
+                    tooltip: 'Use the layer’s text color for this SVG',
+                  },
                 ]}
                 onValueChange={(colorMode) =>
                   updateImage({ ...token, colorMode })

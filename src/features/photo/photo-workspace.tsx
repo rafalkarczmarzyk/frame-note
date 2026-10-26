@@ -1,3 +1,4 @@
+import { Tooltip } from '@/components/ui/tooltip';
 import type { ColorSelectionSource } from '@/domain/caption-colors';
 import { EmptyPhotoCanvas } from './empty-workspace';
 import type { MetadataField } from '@/domain/metadata';
@@ -462,24 +463,32 @@ function PhotoWorkspaceContent({
     <EditorWorkspace>
       {exportTarget &&
         createPortal(
-          <Button
-            size="sm"
-            aria-label={exportLabel}
-            aria-busy={preparingExport || exporting || undefined}
-            className="px-2 sm:px-3"
-            disabled={!photo || !prepared.blob || exporting}
-            onClick={download}
-          >
-            {preparingExport || exporting ? (
-              <LoaderCircle
-                className="animate-spin motion-reduce:animate-none"
-                aria-hidden="true"
-              />
-            ) : (
-              <Download className="md:hidden" aria-hidden="true" />
-            )}
-            <span className="hidden md:inline">{exportLabel}</span>
-          </Button>,
+          <span data-export-live className="inline-flex">
+            <Tooltip
+              content={!photo ? 'Open a photo to export a JPG' : exportLabel}
+              wrapTrigger
+              disabledTrigger={!photo || !prepared.blob || exporting}
+            >
+              <Button
+                size="sm"
+                aria-label={exportLabel}
+                aria-busy={preparingExport || exporting || undefined}
+                className="px-2 sm:px-3"
+                disabled={!photo || !prepared.blob || exporting}
+                onClick={download}
+              >
+                {preparingExport || exporting ? (
+                  <LoaderCircle
+                    className="animate-spin motion-reduce:animate-none"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <Download className="md:hidden" aria-hidden="true" />
+                )}
+                <span className="hidden md:inline">{exportLabel}</span>
+              </Button>
+            </Tooltip>
+          </span>,
           exportTarget,
         )}
       <div
@@ -925,12 +934,13 @@ function PhotoWorkspaceContent({
                 <p className="mt-2 text-xs text-content-secondary">
                   {width} × {height} px
                 </p>
-                <p
-                  className="mt-1 text-xs text-content-secondary"
-                  title={`${photo.document.photo.byteLength.toLocaleString('en-US')} bytes`}
+                <Tooltip
+                  content={`${photo.document.photo.byteLength.toLocaleString('en-US')} bytes`}
                 >
-                  Input: {formatBytes(photo.document.photo.byteLength)}
-                </p>
+                  <p className="mt-1 text-xs text-content-secondary">
+                    Input: {formatBytes(photo.document.photo.byteLength)}
+                  </p>
+                </Tooltip>
               </>
             ) : (
               <p className="text-xs text-content-secondary">
@@ -1075,39 +1085,43 @@ function PhotoWorkspaceContent({
                     onReady={editorReady}
                     actions={
                       <>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          aria-label={
-                            tagsOpen
-                              ? 'Hide available tags'
-                              : 'Browse available tags'
-                          }
-                          aria-expanded={tagsOpen}
-                          aria-controls="auxiliary-panel"
-                          onClick={() =>
-                            setActivePanel((value) =>
-                              value === 'tags' ? null : 'tags',
-                            )
-                          }
-                        >
-                          <Tags aria-hidden="true" />
-                          Tags
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          aria-label="Browse icons"
-                          aria-expanded={activePanel === 'icons'}
-                          onClick={() =>
-                            setActivePanel((value) =>
-                              value === 'icons' ? null : 'icons',
-                            )
-                          }
-                        >
-                          <Shapes aria-hidden="true" />
-                          Icons
-                        </Button>
+                        <Tooltip content="Insert photo metadata at the text cursor">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            aria-label={
+                              tagsOpen
+                                ? 'Hide available tags'
+                                : 'Browse available tags'
+                            }
+                            aria-expanded={tagsOpen}
+                            aria-controls="auxiliary-panel"
+                            onClick={() =>
+                              setActivePanel((value) =>
+                                value === 'tags' ? null : 'tags',
+                              )
+                            }
+                          >
+                            <Tags aria-hidden="true" />
+                            Tags
+                          </Button>
+                        </Tooltip>
+                        <Tooltip content="Insert a built-in or uploaded SVG icon">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            aria-label="Browse icons"
+                            aria-expanded={activePanel === 'icons'}
+                            onClick={() =>
+                              setActivePanel((value) =>
+                                value === 'icons' ? null : 'icons',
+                              )
+                            }
+                          >
+                            <Shapes aria-hidden="true" />
+                            Icons
+                          </Button>
+                        </Tooltip>
                       </>
                     }
                   />
@@ -1185,9 +1199,21 @@ function PhotoWorkspaceContent({
                   onValueChange={(value) => setQuality(Number(value))}
                   disabled={exporting}
                   options={[
-                    { value: '60', label: 'Small', title: '60%' },
-                    { value: '75', label: 'Balanced', title: '75%' },
-                    { value: '95', label: 'Best', title: '95%' },
+                    {
+                      value: '60',
+                      label: 'Small',
+                      tooltip: 'JPEG quality · 60%',
+                    },
+                    {
+                      value: '75',
+                      label: 'Balanced',
+                      tooltip: 'JPEG quality · 75%',
+                    },
+                    {
+                      value: '95',
+                      label: 'Best',
+                      tooltip: 'JPEG quality · 95%',
+                    },
                   ]}
                 />
               </div>
@@ -1248,27 +1274,30 @@ function PhotoWorkspaceContent({
               </div>
               <div className="mt-5 border-t border-border-subtle pt-4">
                 <h3 className="mb-3 text-xs font-semibold">Output file</h3>
-                <p
-                  className="text-xs font-medium"
-                  role="status"
-                  aria-live="polite"
-                  data-testid="output-size"
-                  data-bytes={prepared.blob?.size}
-                  title={
+                <Tooltip
+                  content={
                     prepared.blob
                       ? `${prepared.blob.size.toLocaleString('en-US')} bytes`
                       : undefined
                   }
                 >
-                  Output:{' '}
-                  {prepared.blob
-                    ? formatBytes(prepared.blob.size)
-                    : !photo
-                      ? 'Open a photo to prepare export.'
-                      : prepared.error
-                        ? 'Unavailable'
-                        : 'Calculating…'}
-                </p>
+                  <p
+                    className="text-xs font-medium"
+                    role="status"
+                    aria-live="polite"
+                    data-testid="output-size"
+                    data-bytes={prepared.blob?.size}
+                  >
+                    Output:{' '}
+                    {prepared.blob
+                      ? formatBytes(prepared.blob.size)
+                      : !photo
+                        ? 'Open a photo to prepare export.'
+                        : prepared.error
+                          ? 'Unavailable'
+                          : 'Calculating…'}
+                  </p>
+                </Tooltip>
                 {photo &&
                   prepared.blob &&
                   prepared.blob.size > photo.document.photo.byteLength && (

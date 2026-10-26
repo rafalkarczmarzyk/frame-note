@@ -1037,7 +1037,7 @@ Tooltip wraps one focusable React element without introducing a layout wrapper
 (via Slot). Supply noninteractive `content` and keep an accessible label on an
 icon-only trigger. Avoid native `title` on controls using Tooltip. It composes
 existing descriptions and refs rather than replacing them. Hover opens after
-450 ms (configurable `delay`); keyboard focus opens immediately. Hovering the
+750 ms (configurable `delay`); keyboard focus opens immediately. Hovering the
 bubble keeps it visible; Escape, blur and activation dismiss it without moving
 focus. Touch activation does not leave help open.
 
@@ -1063,3 +1063,33 @@ import. Closing returns to the empty canvas, releases photo resources and clears
 photo errors while retaining the mounted layout editor, presets and session UI.
 Export requires a photo. Components/UI/PhotoActions covers empty, loaded,
 importing and interactive states; AppHeader uses the same production control.
+
+### Typography and margin help
+
+CaptionControls uses Tooltip for font selection, size, line spacing, alignment,
+and font styles. Unsupported Bold/Italic variants use aria-disabled with guarded
+activation so hover and keyboard focus can explain the missing variant. Global
+disabled editing remains native disabled. SegmentedControl options accept an
+optional `tooltip`; only those options replace their native title with shared
+help, preserving other existing segmented controls. NumberField accepts optional
+`tooltip` and forwards description and focus to the actual numeric input, while
+suppressing the native value title. Units and existing hints remain described.
+Margin mode segments, Reset and the four numeric margin fields use this help.
+The remaining application help covers anchor/manual positioning, ruler handles,
+layer visibility/position/order, content insertion, tokens and SVG image modes,
+header photo/preset actions, export quality and exact file sizes, numeric steppers,
+and sidebar resizing. IconButton supplies help from its label by default; use
+`tooltip` for alternative text or false (or an empty title) for an externally
+provided Tooltip. Native titles are omitted. SplitButton supports `primaryTooltip`.
+ActionMenu supports disabledReason on items; its root describes unavailable items
+to keyboard readers, while hover reveals each reason. Disabled actions stay inert.
+
+Tooltip accepts disabled (suppress help), overflowOnly/overflowContent (use the
+marked data-tooltip-truncate descendant), selectionActive (keyboard-selected
+Tiptap tokens), and wrapTrigger/disabledTrigger (a stable wrapper with focus only
+while the native action is unavailable). Wrappers remain stable across loading
+changes to preserve pointer activation. Only the latest tooltip is visible; any
+pointer activation dismisses help and drag gestures do not open it. Token help
+never takes editor focus or adds a Tab stop; values are bounded to 500 characters.
+Ruler handle badges remain visible while dragging and numeric values stay in
+aria-valuetext; tooltip help is dismissed during the gesture.

@@ -24,8 +24,9 @@ polecenia. Nowe decyzje dopisujemy lub aktualizujemy w istniejącym wpisie.
 
 - **Decyzja 2026-10-26:** użytkownik zlecił wspólny tooltip liquid glass,
   przezroczysty jak custom picker, oraz użycie go przy kolorach. Zakres obejmuje
-  hover, fokus, Escape, dopasowanie do okna i izolowane stories. Zastosowania
-  przy Margins i pozostałych kontrolkach pozostają do osobnego zlecenia.
+  hover, fokus, Escape, dopasowanie do okna i izolowane stories. Użytkownik 2026-10-27 zlecił także wszystkie pozostałe zastosowania z
+  docs/TOOLTIP_PLAN.md: marginesy, pozycję, warstwy, treść, grafiki, header,
+  presety i eksport. Wdrożono je w ramach tego planu.
 
 ## NTH-002 — Wersjonowane schematy presetów i migracje
 

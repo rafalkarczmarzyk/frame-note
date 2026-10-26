@@ -129,7 +129,11 @@ export function FloatingPanel({
           >
             {title}
           </h2>
-          <IconButton label={`Close ${title.toLowerCase()}`} onClick={onClose}>
+          <IconButton
+            tooltip={`Close ${{ 'Choose a color': 'color palette', 'Choose a font': 'font picker', 'Available tags': 'metadata browser', 'Inline icons': 'icon picker', 'Manage presets': 'preset manager' }[title] ?? title}`}
+            label={`Close ${title.toLowerCase()}`}
+            onClick={onClose}
+          >
             <X aria-hidden="true" />
           </IconButton>
         </div>

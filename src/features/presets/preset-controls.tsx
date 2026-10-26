@@ -239,6 +239,9 @@ export function PresetControls({
               },
               {
                 label: 'Duplicate',
+                disabledReason: !current
+                  ? 'Select a preset to duplicate it'
+                  : undefined,
                 icon: <Copy />,
                 disabled: disabled || !current,
                 onSelect: () => {
@@ -259,6 +262,11 @@ export function PresetControls({
               },
               {
                 label: 'Rename',
+                disabledReason: !current
+                  ? 'Select a user preset to rename it'
+                  : builtin
+                    ? 'Built-in presets cannot be renamed'
+                    : undefined,
                 icon: <Pencil />,
                 disabled: disabled || !current || builtin,
                 onSelect: () => {

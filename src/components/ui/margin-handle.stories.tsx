@@ -91,7 +91,7 @@ function HandleExample(args: MarginHandleProps) {
             }}
           />
         </div>
-        {active && (
+        {dragging && (
           <MarginTooltip
             side={args.side}
             value={value}

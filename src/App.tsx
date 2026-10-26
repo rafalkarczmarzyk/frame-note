@@ -184,7 +184,7 @@ export default function App() {
       >
         <div
           id="export-actions"
-          className="[&:has(>button)>.export-placeholder]:hidden"
+          className="[&:has(>[data-export-live])>.export-placeholder]:hidden"
         >
           <div className="export-placeholder">
             <Button

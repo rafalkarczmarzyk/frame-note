@@ -125,7 +125,9 @@ export function ColorControls({
           </button>
         </Tooltip>
       ))}
-      <Tooltip content={`Custom color · ${captionColorLabel(value)}`}>
+      <Tooltip
+        content={`Custom color · ${normalizeHex(resolvedColor(value)) ?? resolvedColor(value)}`}
+      >
         <button
           ref={trigger}
           type="button"
@@ -202,7 +204,11 @@ export function ColorControls({
       >
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-sm">Custom color</h3>
-          <IconButton label="Close custom color" onClick={close}>
+          <IconButton
+            tooltip="Close color picker"
+            label="Close custom color"
+            onClick={close}
+          >
             <X aria-hidden="true" />
           </IconButton>
         </div>

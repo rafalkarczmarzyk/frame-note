@@ -195,6 +195,7 @@ test('Photo export / mixed inline SVG and PNG', async ({ page }, testInfo) => {
   await expect(height).toHaveValue('3.25');
   await expect(height).toBeFocused();
   await expect(raster.locator('..')).toHaveCSS('outline-width', '2px');
+  await page.locator('details[data-section="sizing"] > summary').click();
   await page
     .getByRole('combobox', { name: 'Sizing unit', exact: true })
     .click();

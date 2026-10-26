@@ -1,3 +1,4 @@
+import { Tooltip } from './tooltip';
 import {
   ArrowUpLeft,
   ArrowUp,
@@ -53,20 +54,26 @@ export function AnchorPicker({
       {anchorOptions.map((anchor) => {
         const Icon = anchorIcons[anchor];
         return (
-          <button
-            type="button"
+          <Tooltip
             key={anchor}
-            disabled={disabled}
-            aria-label={anchor}
-            aria-pressed={anchor === value}
-            onClick={() => onValueChange(anchor)}
-            className={cn(
-              'control-segment flex h-9 items-center justify-center text-lg',
-              anchor === value && 'control-selected',
-            )}
+            content={anchor
+              .replaceAll('-', ' ')
+              .replace(/^./, (c) => c.toUpperCase())}
           >
-            <Icon className="size-4" aria-hidden="true" />
-          </button>
+            <button
+              type="button"
+              disabled={disabled}
+              aria-label={anchor}
+              aria-pressed={anchor === value}
+              onClick={() => onValueChange(anchor)}
+              className={cn(
+                'control-segment flex h-9 items-center justify-center text-lg',
+                anchor === value && 'control-selected',
+              )}
+            >
+              <Icon className="size-4" aria-hidden="true" />
+            </button>
+          </Tooltip>
         );
       })}
     </div>

@@ -45,3 +45,150 @@ test('color help supports hover, keyboard, dismissal and viewport edges', async 
     page.getByRole('dialog', { name: 'Choose a color' }),
   ).toBeVisible();
 });
+
+test('typography and margin help preserves editing and explains unavailable styles', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const tooltip = page.getByRole('tooltip');
+  const font = page.getByRole('button', { name: 'Font', exact: true });
+  await font.hover();
+  await expect(tooltip).toHaveText('Choose a font');
+  const size = page.getByRole('spinbutton', { name: 'Font size', exact: true });
+  await size.focus();
+  await expect(tooltip).toHaveText('Font size');
+  await expect(size).toHaveAttribute('title', '');
+  await size.fill('2.3');
+  await size.press('ArrowUp');
+  await expect(size).toHaveValue('2.55');
+  await size.press('Escape');
+  await expect(size).toBeFocused();
+  const spacing = page.getByRole('spinbutton', {
+    name: 'Line spacing',
+    exact: true,
+  });
+  await spacing.focus();
+  await expect(tooltip).toHaveText('Line spacing · multiple of font size');
+  const auto = page.getByRole('radio', { name: 'Auto align', exact: true });
+  await auto.focus();
+  await expect(tooltip).toHaveText('Auto align · follows the layer anchor');
+  await auto.press('ArrowRight');
+  const left = page.getByRole('radio', { name: 'Align left', exact: true });
+  await expect(left).toBeFocused();
+  await expect(tooltip).toHaveText('Align left');
+  await left.press('Space');
+  await expect(left).toBeChecked();
+  await font.click();
+  await page
+    .getByRole('dialog', { name: 'Choose a font' })
+    .getByRole('button', { name: /Advercase/ })
+    .click();
+  await page.getByRole('button', { name: 'Close choose a font' }).click();
+  const italic = page.getByRole('button', { name: 'Italic', exact: true });
+  await italic.focus();
+  await expect(tooltip).toHaveText('Italic is unavailable for this font');
+  await expect(italic).toHaveAttribute('aria-disabled', 'true');
+  await italic.press('Enter');
+  await expect(italic).toHaveAttribute('aria-pressed', 'false');
+  await page.getByText('Sizing & Margins', { exact: true }).click();
+  await expect(
+    page.getByText('Open a photo to change document units.'),
+  ).toBeVisible();
+  const individual = page.getByRole('radio', {
+    name: 'Individual',
+    exact: true,
+  });
+  await individual.focus();
+  await expect(tooltip).toHaveText('Edit each margin independently');
+  await individual.press('Space');
+  const top = page.getByRole('spinbutton', { name: 'Top', exact: true });
+  await top.focus();
+  await expect(tooltip).toHaveText('Top margin');
+  const description = await top.getAttribute('aria-describedby');
+  expect(description).toContain(await tooltip.getAttribute('id'));
+  await top.fill('4');
+  await top.press('ArrowUp');
+  await expect(top).toHaveValue('4.1');
+  await page
+    .getByRole('button', { name: 'Reset margins', exact: true })
+    .hover();
+  await expect(tooltip).toHaveText('Reset all margins to 3% of the short edge');
+});
+
+test('remaining help explains position, disabled actions and token values without blocking menus', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await expect(page.locator('[data-export-live]')).toBeVisible();
+  const help = page.getByRole('tooltip');
+  await page
+    .getByRole('button', { name: 'Export JPG', exact: true })
+    .locator('..')
+    .focus();
+  await expect(help).toHaveText('Open a photo to export a JPG');
+  await page
+    .getByRole('button', { name: 'Photo actions', exact: true })
+    .click();
+  const closePhoto = page.getByRole('menuitem', {
+    name: 'Close photo',
+    exact: true,
+  });
+  await closePhoto.locator('..').hover();
+  await expect(help).toHaveText('No photo is open');
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('menu')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('menu')).toHaveCount(0);
+  const topLeft = page.getByRole('button', { name: 'top-left', exact: true });
+  await topLeft.hover();
+  await expect(help).toHaveText('Top left');
+  await page.getByRole('radio', { name: 'Manual', exact: true }).click();
+  const x = page.getByRole('spinbutton', { name: 'X position', exact: true });
+  await x.focus();
+  await expect(help).toHaveText(
+    'Horizontal position of the layer reference point · % of photo width',
+  );
+  await x.fill('100');
+  await page
+    .getByRole('button', { name: 'Increase X position', exact: true })
+    .locator('..')
+    .hover();
+  await expect(help).toHaveText('Maximum x position reached');
+  await page
+    .getByRole('group', { name: 'Anchor position', exact: true })
+    .focus();
+  await expect(help).toHaveText('Switch to Anchor to use the position grid');
+  await page.locator('[data-token="author"]').hover();
+  await expect(help).toContainText('author');
+  const editor = page.getByLabel('Caption', { exact: true });
+  await editor.fill('Tooltip test {author}');
+  await expect(editor).toHaveAttribute(
+    'data-template',
+    'Tooltip test {author}',
+  );
+  await page
+    .getByRole('button', { name: 'Preset actions', exact: true })
+    .click();
+  const rename = page.getByRole('menuitem', { name: 'Rename', exact: true });
+  await rename.locator('..').hover();
+  await expect(help).toHaveText('Built-in presets cannot be renamed');
+  await expect(rename).toBeDisabled();
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('Escape');
+  await page
+    .getByRole('button', { name: 'About FrameNote', exact: true })
+    .click();
+  const about = page.getByRole('dialog', {
+    name: 'Leave your mark.',
+    exact: true,
+  });
+  await expect(about).toBeVisible();
+  await about
+    .getByRole('button', { name: 'Close about FrameNote', exact: true })
+    .focus();
+  await expect(about.getByRole('tooltip')).toHaveText('Close About FrameNote');
+  await page.keyboard.press('Escape');
+  await expect(about).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(about).not.toBeVisible();
+});

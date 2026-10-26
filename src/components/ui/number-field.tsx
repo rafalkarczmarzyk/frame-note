@@ -1,3 +1,4 @@
+import { Tooltip } from './tooltip';
 import { Field } from './field';
 import { NumberInput } from './number-input';
 import { DimensionInput } from './dimension-input';
@@ -5,6 +6,7 @@ import { DimensionInput } from './dimension-input';
 export function NumberField({
   label,
   title,
+  tooltip,
   value,
   onValueChange,
   min,
@@ -17,6 +19,7 @@ export function NumberField({
 }: {
   label: string;
   title?: string;
+  tooltip?: string;
   value: number;
   onValueChange: (value: number) => void;
   min: number;
@@ -32,7 +35,7 @@ export function NumberField({
       {(id, descriptionId) => {
         const props = {
           id,
-          title,
+          title: tooltip ? '' : title,
           'aria-describedby': descriptionId,
           value,
           onValueChange,
@@ -42,10 +45,15 @@ export function NumberField({
           disabled,
           stepperLabel: label,
         };
-        return unit ? (
+        const control = unit ? (
           <DimensionInput {...props} unit={unit} />
         ) : (
           <NumberInput {...props} />
+        );
+        return tooltip ? (
+          <Tooltip content={tooltip}>{control}</Tooltip>
+        ) : (
+          control
         );
       }}
     </Field>
