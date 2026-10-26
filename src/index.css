@@ -125,6 +125,8 @@
     var(--color-porcelain)
   );
   --container-settings-border: var(--tone-edge);
+  --layer-preview-base: var(--color-charcoal);
+  --layer-preview-border: var(--tone-edge);
   --selected-element-base: color-mix(
     in srgb,
     var(--container-settings-base) 88%,
@@ -211,7 +213,7 @@
   --menu-item-selected: var(--tone-hover);
   --menu-text: var(--content-primary);
   --accent-color: var(--color-emerald);
-  --notice-warning: var(--accent-color);
+  --notice-warning: var(--color-yellow);
   --drop-base: var(--color-charcoal-dark);
   --drop-glass: color-mix(in srgb, var(--color-caption-black) 40%, transparent);
   --drop-text: var(--color-porcelain);
@@ -263,6 +265,8 @@
   --color-start-screen-text: var(--start-screen-text);
   --color-container-settings-base: var(--container-settings-base);
   --color-container-settings-border: var(--container-settings-border);
+  --color-layer-preview-base: var(--layer-preview-base);
+  --color-layer-preview-border: var(--layer-preview-border);
   --color-selected-element-base: var(--selected-element-base);
   --color-accordion-base: var(--accordion-base);
   --color-accordion-header-hover: var(--accordion-header-hover);

@@ -77,8 +77,9 @@ test('edits independent containers, selects on canvas and exports the whole layo
   await page.getByRole('button', { name: /First caption/ }).click();
   const both = await downloadImage();
   await page
-    .getByRole('button', { name: 'Delete layer 2', exact: true })
+    .getByRole('button', { name: 'Layer 2 actions', exact: true })
     .click();
+  await page.getByRole('menuitem', { name: 'Delete', exact: true }).click();
   await expect(caption).toHaveAttribute('data-template', 'Second caption');
   const secondOnly = await downloadImage();
   const changes = await page.evaluate(
@@ -122,18 +123,36 @@ test('edits independent containers, selects on canvas and exports the whole layo
   );
   expect(changes.bottomLeft).toBeGreaterThan(100);
   expect(changes.topRight).toBe(0);
+  const actions = page.getByRole('button', {
+    name: 'Layer 1 actions',
+    exact: true,
+  });
+  await actions.press('ArrowUp');
+  await expect(
+    page.getByRole('menuitem', { name: 'Delete', exact: true }),
+  ).toBeFocused();
+  await page.keyboard.press('Home');
+  await expect(
+    page.getByRole('menuitem', { name: 'Duplicate', exact: true }),
+  ).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(actions).toBeFocused();
+  await expect(page.getByRole('menu')).toHaveCount(0);
   await page
-    .getByRole('button', { name: 'Duplicate layer 1', exact: true })
+    .getByRole('button', { name: 'Layer 1 actions', exact: true })
     .click();
+  await page.getByRole('menuitem', { name: 'Duplicate', exact: true }).click();
   await expect(
     page.getByRole('button', { name: /Second caption/ }),
   ).toHaveCount(2);
   await page
-    .getByRole('button', { name: 'Delete layer 1', exact: true })
+    .getByRole('button', { name: 'Layer 1 actions', exact: true })
     .click();
+  await page.getByRole('menuitem', { name: 'Delete', exact: true }).click();
   await page
-    .getByRole('button', { name: 'Delete layer 1', exact: true })
+    .getByRole('button', { name: 'Layer 1 actions', exact: true })
     .click();
+  await page.getByRole('menuitem', { name: 'Delete', exact: true }).click();
   await expect(page.getByText('Add a layer to begin.')).toBeVisible();
   await expect(globalLeft).toHaveValue('100');
   await page.getByRole('button', { name: 'Add layer', exact: true }).click();

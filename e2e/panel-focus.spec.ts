@@ -91,8 +91,9 @@ test('panels receive keyboard focus and return it to their opener', async ({
   await page.getByRole('button', { name: 'Add layer', exact: true }).click();
   await page.getByRole('button', { name: 'Font', exact: true }).click();
   await page
-    .getByRole('button', { name: 'Delete layer 1', exact: true })
+    .getByRole('button', { name: 'Layer 1 actions', exact: true })
     .click();
+  await page.getByRole('menuitem', { name: 'Delete', exact: true }).click();
   await page
     .getByRole('textbox', { name: 'Search fonts', exact: true })
     .press('Escape');
