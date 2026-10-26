@@ -56,9 +56,7 @@ export const FontContent: Story = {
             id: 'montserrat',
             label: 'Montserrat',
             preview: (
-              <span className="font-sans text-xl">
-                Every frame has a story.
-              </span>
+              <span className="font-sans text-xl">Leave your mark.</span>
             ),
           },
           {
@@ -66,9 +64,7 @@ export const FontContent: Story = {
             label: 'Advercase',
             selected: true,
             preview: (
-              <span className="font-display text-2xl">
-                Every frame has a story.
-              </span>
+              <span className="font-display text-2xl">Leave your mark.</span>
             ),
           },
         ]}

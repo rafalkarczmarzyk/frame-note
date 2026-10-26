@@ -61,8 +61,8 @@ Use `control-field` for field-like triggers such as the font picker so they matc
 Input and Select. Button outline is a neutral raised surface; IconButton is quiet.
 All controls retain visible keyboard focus and disabled states. Invalid fields
 use a dashed contrasting edge with an associated error message when applicable.
-Blur is limited to floating menus and panels, with opaque fallbacks and reduced
-transparency support. Motion respects reduced-motion preferences. This is a web
+Blur is limited to floating menus/panels and the start screen footer, with opaque
+fallbacks and reduced transparency support. Motion respects reduced-motion preferences. This is a web
 interpretation of Apple surface principles, not native Liquid Glass rendering.
 
 ## UI components
@@ -579,3 +579,27 @@ continuous scrolling even if the pointer stops moving. The insertion gap follows
 the scrolling rows. Escape, pointer cancellation and lost capture cancel the
 move; Arrow Up/Down, Home and End retain their existing behavior.
 Components/UI/PickerList/LongReorderList demonstrates a constrained list.
+
+### Photo start screen
+
+The start screen uses a single photo background filling the entire window.
+Its logo floats in the top-left corner without a header bar; the editor retains
+the full header and actions after a photo is imported. The centered cover image
+has a light upper gradient. The Advercase “Leave your mark.” heading, short
+description, Choose a photo, JPG/PNG drop guidance and small privacy note with a
+lock icon sit in the clear upper area. The content position follows the window
+and centered photo crop, with a slight downward offset on taller screens.
+Compact typography and spacing support short, wide and narrow windows.
+
+A compact rounded glass footer floats at the bottom over the photograph. It
+contains the copyright, version from package.json linked to GitHub and a direct
+Changelog link. Links open in a new tab, use Lucide ExternalLink icons and wrap
+on narrow screens. The footer has an opaque fallback for unsupported or
+reduced-transparency settings. There are no feature columns. The layout fills
+the available window without a fixed photo aspect ratio or forced minimum
+height; content can scroll only when it cannot fit.
+
+File selection and the global drop overlay retain their behavior. Font picker
+and typography stories use the new sample phrase. The background is an optimized
+bundled JPG; the original test fixture is unchanged. Stories include Default,
+DraggingPhoto and Loading.

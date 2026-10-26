@@ -50,7 +50,7 @@ export const Typography: Story = {
         <p className="mb-2 text-xs text-content-secondary">
           Display / Advercase
         </p>
-        <h1 className="font-display text-5xl">Every frame has a story.</h1>
+        <h1 className="font-display text-5xl">Leave your mark.</h1>
       </div>
       <div>
         <p className="mb-2 text-xs text-content-secondary">

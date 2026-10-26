@@ -121,7 +121,7 @@ function EditorDemo({
                     label: 'Montserrat',
                     preview: (
                       <span className="font-sans text-xl">
-                        Every frame has a story.
+                        Leave your mark.
                       </span>
                     ),
                   },
@@ -130,7 +130,7 @@ function EditorDemo({
                     label: 'Advercase',
                     preview: (
                       <span className="font-display text-2xl">
-                        Every frame has a story.
+                        Leave your mark.
                       </span>
                     ),
                   },

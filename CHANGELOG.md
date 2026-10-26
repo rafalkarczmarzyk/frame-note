@@ -7,6 +7,13 @@ when explicitly requested; a commit does not automatically create a release.
 
 ## Unreleased
 
+### Changed
+
+- Redesigned the start screen with a centered photo background, an overlaid logo,
+  responsive “Leave your mark.” typography and a local-processing note.
+- Added a compact glass footer with the current application version and links
+  to GitHub and the changelog. The editor retains its full action header.
+
 ## 1.0.0-alpha.1 — 2026-10-26
 
 ### Added
