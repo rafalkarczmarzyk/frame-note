@@ -16,7 +16,8 @@ Section accents use semantic `section-*` roles: turquoise for Photo, rose-brown
 for Caption, violet for Typography, yellow for Sizing and Margins, crimson for Position,
 and primary for Export. They color icon badges only. Collapsed accordions show
 only their title and icon, without summaries. Primary uses emerald (`#14CC60`) through `--accent-color`, with charcoal-dark button text.
-The drag-and-drop background stays slate (`#9CAFB7`) independently of primary. Caption presets are independent of UI accents.
+The drag-and-drop overlay uses dark translucent glass and porcelain text,
+independently of primary. Caption presets are independent of UI accents.
 All 18 shared color recipes live in `:root` as private `--tone-*` values,
 button hover recipes and the panel glass material. Components consume usage roles exposed by `@theme inline`.
 
@@ -61,9 +62,10 @@ Use `control-field` for field-like triggers such as the font picker so they matc
 Input and Select. Button outline is a neutral raised surface; IconButton is quiet.
 All controls retain visible keyboard focus and disabled states. Invalid fields
 use a dashed contrasting edge with an associated error message when applicable.
-Blur is limited to floating menus/panels and the start screen footer, with opaque
-fallbacks and reduced transparency support. Motion respects reduced-motion preferences. This is a web
-interpretation of Apple surface principles, not native Liquid Glass rendering.
+Blur is limited to floating menus/panels, the photo drop overlay and the start
+screen footer, with opaque fallbacks and reduced transparency support. Motion
+respects reduced-motion preferences. This is a web interpretation of Apple
+surface principles, not native Liquid Glass rendering.
 
 ## UI components
 
@@ -603,3 +605,15 @@ File selection and the global drop overlay retain their behavior. Font picker
 and typography stories use the new sample phrase. The background is an optimized
 bundled JPG; the original test fixture is unchanged. Stories include Default,
 DraggingPhoto and Loading.
+
+### Photo drop overlay
+
+Dragging a file shows a full-window dark glass overlay over the current start
+screen or editor. An 8 px backdrop blur and 40% dark tint retain context. A thin
+2 px dashed porcelain outline sits inside the window edges. The centered
+Advercase “Drop your photo.” prompt is followed by “Release to open · JPG or PNG”
+and a small lock/privacy note. The overlay fades in over 180 ms with ease-out;
+reduced motion disables the fade. The large standalone brand icon is removed.
+Unsupported backdrop filtering and reduced transparency use a solid dark
+fallback. Pointer events pass through; existing drop/cancel behavior is unchanged.
+Story: Screens/StartScreen/DraggingPhoto.

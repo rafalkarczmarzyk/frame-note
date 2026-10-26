@@ -13,6 +13,8 @@ when explicitly requested; a commit does not automatically create a release.
   responsive “Leave your mark.” typography and a local-processing note.
 - Added a compact glass footer with the current application version and links
   to GitHub and the changelog. The editor retains its full action header.
+- Restyled the photo drop overlay with dark glass, a thin dashed outline and
+  a gentle fade-in, including reduced-motion and reduced-transparency fallbacks.
 
 ## 1.0.0-alpha.1 — 2026-10-26
 
