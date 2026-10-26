@@ -1,3 +1,4 @@
+import type { ColorSelectionSource } from '@/domain/caption-colors';
 import { EmptyPhotoCanvas } from './empty-workspace';
 import type { MetadataField } from '@/domain/metadata';
 import { PhotoDropOverlay } from './photo-drop-overlay';
@@ -150,6 +151,9 @@ function PhotoWorkspaceContent({
   const [activePanel, setActivePanel] = useState<
     'tags' | 'fonts' | 'colors' | 'icons' | 'presets' | null
   >(null);
+  const [colorSelections, setColorSelections] = useState<
+    Record<string, { value: string; source: ColorSelectionSource }>
+  >({});
   const [presetHost, setPresetHost] = useState<HTMLDivElement | null>(null);
   const tagsOpen = activePanel === 'tags';
   const [fontQuery, setFontQuery] = useState('');
@@ -789,12 +793,17 @@ function PhotoWorkspaceContent({
       {activePanel === 'colors' && (
         <ColorPickerPanel
           value={settings.style.color}
-          onChange={(color) =>
+          onChange={(color) => {
+            if (activeContainer)
+              setColorSelections((entries) => ({
+                ...entries,
+                [activeContainer.id]: { value: color, source: 'palette' },
+              }));
             setSettings((value) => ({
               ...value,
               style: { ...value.style, color },
-            }))
-          }
+            }));
+          }}
           onClose={() => setActivePanel(null)}
           surface="solid"
           className="max-h-[40vh] w-full shrink-0 rounded-none shadow-none md:max-h-none md:w-80"
@@ -943,6 +952,7 @@ function PhotoWorkspaceContent({
             disabled={exporting}
             persist={!initialLayout}
             onApply={(preset) => {
+              setColorSelections({});
               setLayout(structuredClone(preset.layout));
               setIcons([
                 ...preset.icons,
@@ -1114,6 +1124,18 @@ function PhotoWorkspaceContent({
                 </InspectorSection>
               </>
               <CaptionControls
+                colorSelectionSource={
+                  colorSelections[activeContainer.id]?.value ===
+                  settings.style.color
+                    ? colorSelections[activeContainer.id]?.source
+                    : undefined
+                }
+                onColorSelectionSourceChange={(source, color) =>
+                  setColorSelections((entries) => ({
+                    ...entries,
+                    [activeContainer.id]: { value: color, source },
+                  }))
+                }
                 scope="local"
                 dimensions={dimensions}
                 caption={settings}

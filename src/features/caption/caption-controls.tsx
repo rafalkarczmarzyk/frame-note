@@ -1,3 +1,4 @@
+import type { ColorSelectionSource } from '@/domain/caption-colors';
 import {
   supportsBold,
   supportsItalic,
@@ -44,6 +45,8 @@ export function CaptionControls({
   disabled,
   onBrowseFonts,
   onBrowseColors,
+  colorSelectionSource,
+  onColorSelectionSourceChange,
   scope = 'all',
   hideTypography = false,
   canConvertUnits = true,
@@ -57,6 +60,11 @@ export function CaptionControls({
   disabled: boolean;
   onBrowseFonts: () => void;
   onBrowseColors: () => void;
+  colorSelectionSource?: ColorSelectionSource;
+  onColorSelectionSourceChange?: (
+    source: ColorSelectionSource,
+    color: string,
+  ) => void;
 }) {
   const style = (patch: Partial<Caption['style']>) =>
     onChange({ ...caption, style: { ...caption.style, ...patch } });
@@ -230,7 +238,7 @@ export function CaptionControls({
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+                <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)] items-center gap-2">
                   <SegmentedControl
                     disabled={disabled}
                     label="Text align"
@@ -263,7 +271,7 @@ export function CaptionControls({
                   <div
                     role="group"
                     aria-label="Font style"
-                    className="control-segments flex gap-1 p-1"
+                    className="control-segments grid grid-cols-2 gap-1 p-1"
                   >
                     <IconButton
                       label="Bold"
@@ -274,7 +282,7 @@ export function CaptionControls({
                       disabled={
                         disabled || !supportsBold(caption.style.fontFamily)
                       }
-                      className={`control-segment size-7 ${supportsBold(caption.style.fontFamily) && caption.style.fontWeight === 700 ? 'control-selected' : ''}`}
+                      className={`control-segment h-7 w-full ${supportsBold(caption.style.fontFamily) && caption.style.fontWeight === 700 ? 'control-selected' : ''}`}
                       onClick={() =>
                         style({
                           fontWeight:
@@ -295,7 +303,7 @@ export function CaptionControls({
                         disabled || !supportsItalic(caption.style.fontFamily)
                       }
                       aria-pressed={effectiveFontStyle(caption) === 'italic'}
-                      className={`control-segment size-7 ${effectiveFontStyle(caption) === 'italic' ? 'control-selected' : ''}`}
+                      className={`control-segment h-7 w-full ${effectiveFontStyle(caption) === 'italic' ? 'control-selected' : ''}`}
                       onClick={() =>
                         style({
                           fontStyle:
@@ -313,8 +321,9 @@ export function CaptionControls({
                   value={caption.style.color}
                   onChange={(color) => style({ color })}
                   onBrowse={onBrowseColors}
+                  selectionSource={colorSelectionSource}
+                  onSelectionSourceChange={onColorSelectionSourceChange}
                   disabled={disabled}
-                  compact
                 />
                 <div className="grid grid-cols-[auto_minmax(0,1fr)_5rem] items-center gap-2">
                   <span className="text-xs text-label">Opacity</span>

@@ -28,6 +28,12 @@
   --color-porcelain: #fdfffc;
   --color-slate: #9cafb7;
   /* Caption presets, independent of UI roles. */
+  --color-caption-charcoal: #292b30;
+  --color-caption-graphite: #45474c;
+  --color-caption-warm-gray: #756c62;
+  --color-caption-champagne: #e7d8b8;
+  --color-caption-muted-gold: #c6aa70;
+  --color-caption-steel-blue: #718c9e;
   --color-caption-white: #ffffff;
   --color-caption-dark-gray: #555555;
   --color-caption-silver: #dedede;
@@ -224,6 +230,8 @@
   /* Materials and effects share recipes rather than inventing per-component colors. */
   --panel-glass: color-mix(in srgb, var(--panel-base) 98%, transparent);
   --menu-glass: var(--panel-glass);
+  --glass-popover: color-mix(in srgb, var(--panel-base) 42%, transparent);
+  --tooltip-glass: color-mix(in srgb, var(--panel-base) 22%, transparent);
   --surface-reflection: linear-gradient(
     to bottom,
     var(--tone-edge),
@@ -927,6 +935,29 @@ fieldset:disabled .glass-switch {
   @media (prefers-reduced-transparency: reduce) {
     .about-splash::backdrop {
       background: var(--drop-base);
+      backdrop-filter: none;
+    }
+  }
+}
+
+@layer components {
+  .glass-popover {
+    background: var(--panel-base);
+  }
+  @supports (backdrop-filter: blur(1px)) {
+    .glass-popover {
+      background: var(--glass-popover);
+      backdrop-filter: blur(16px) saturate(160%);
+      -webkit-backdrop-filter: blur(16px) saturate(160%);
+    }
+    .glass-popover.glass-tooltip {
+      background: var(--tooltip-glass);
+    }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .glass-popover,
+    .glass-popover.glass-tooltip {
+      background: var(--panel-base);
       backdrop-filter: none;
     }
   }

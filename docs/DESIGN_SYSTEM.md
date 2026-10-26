@@ -995,3 +995,61 @@ The tools sidebar resize range is 384–560 px, with 384 px as its default.
 Pointer and keyboard changes share this lower bound so resizing cannot compress
 the current controls below their supported desktop width. Narrow-window stacked
 layouts continue to use the available window width.
+
+### Caption color palette and custom picker
+
+ColorPickerPanel contains sixteen caption tones in one compact 4 × 4 swatch grid,
+without group headings, search or filters. The entire grid shares one glass
+segmented-control surface; selection uses its raised segment treatment, without
+a checkmark or persistent focus outline.
+The selected name and HEX remain visible in its footer. Caption dark tones
+have their own tokens independent of interface surfaces; legacy tokens still
+resolve in existing layouts.
+
+ColorControls provides White, Ivory, Dark gray, Blue charcoal (the application
+background) and Black quick swatches, a rainbow Custom swatch, and a matching round palette-icon
+button.
+No color names occupy space in the sidebar. It shares these controls
+between text and single-color graphics. Custom opens a native floating popover
+above the sidebar with react-colorful and a HEX field. Valid RGB/RRGGBB values
+apply live; incomplete or invalid input preserves the last valid color. Escape
+and outside clicks dismiss the popover. Opacity stays a separate control.
+Components/UI/ColorPicker documents palette selection and custom editing.
+
+### Docked auxiliary sidebar surfaces
+
+Solid FloatingPanel instances (colors, fonts, metadata, icons and presets) are
+opaque workspace columns, never overlays on the photo. They have no outer border
+or header/footer rules. The header is an inset rounded surface using the same
+background as the main sidebar sections; footer content has its own inset rounded
+surface. Spacing separates the independently scrolling content from these fixed
+areas. Floating glass panels retain their existing overlay treatment.
+
+The compact sidebar color row uses the shared glass segmented treatment, without
+a green selection ring. Selection tracks the interaction source per layer during
+the session: quick swatch, palette, or custom HEX/picker. A HEX matching a ready
+color still selects Custom; picking even White from the palette selects Palette.
+This UI source is independent of the saved color and resets when applying a preset.
+
+### Shared Tooltip
+
+Tooltip wraps one focusable React element without introducing a layout wrapper
+(via Slot). Supply noninteractive `content` and keep an accessible label on an
+icon-only trigger. Avoid native `title` on controls using Tooltip. It composes
+existing descriptions and refs rather than replacing them. Hover opens after
+450 ms (configurable `delay`); keyboard focus opens immediately. Hovering the
+bubble keeps it visible; Escape, blur and activation dismiss it without moving
+focus. Touch activation does not leave help open.
+
+Manual native popovers keep tooltips above floating pickers and outside clipped
+scroll containers. Placement follows scroll/resize, prefers above, flips below
+and clamps to the viewport. The shared `glass-popover` material supplies the same tint and blur for Tooltip
+and the custom color picker. Tooltips reduce the tint opacity to 22% (picker: 42%)
+for a comparable glass appearance on smaller surfaces. Both have an opaque
+reduced-transparency and unsupported-browser fallback. No interactive controls
+belong inside a tooltip. For disabled controls, provide a separate focusable help
+trigger if an explanation is needed.
+
+Components/UI/Tooltip includes standard, long text, existing description and
+viewport-edge examples. Quick color swatches show names; custom/palette actions
+show their purpose, and palette swatches show name plus HEX.

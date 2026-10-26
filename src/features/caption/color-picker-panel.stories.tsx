@@ -2,8 +2,8 @@ import { expect, userEvent, within } from 'storybook/test';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { ColorPickerPanel } from './color-picker-panel';
-import { captionColorLabel, normalizeHex } from '@/domain/caption-colors';
-import { ColorSwatch } from '@/components/ui/color-swatch';
+import { normalizeHex } from '@/domain/caption-colors';
+import { ColorControls } from './color-controls';
 
 const meta = {
   title: 'Components/UI/ColorPicker',
@@ -18,15 +18,15 @@ function Interactive({ initial }: { initial: string }) {
   return (
     <div className="flex flex-wrap items-start gap-6 p-6">
       <ColorPickerPanel
+        surface="solid"
         value={value}
         onChange={setValue}
         onClose={() => {}}
-        className="h-[660px] max-h-[calc(100dvh-3rem)] w-80"
+        className="h-[560px] max-h-[calc(100dvh-3rem)] w-80"
       />
-      <p className="flex items-center gap-2 text-xs">
-        <ColorSwatch value={value} />
-        {captionColorLabel(value)}
-      </p>
+      <div className="w-80 rounded-xl bg-panel-base p-4">
+        <ColorControls value={value} onChange={setValue} onBrowse={() => {}} />
+      </div>
     </div>
   );
 }
@@ -36,23 +36,18 @@ export const Default: Story = {
 export const Custom: Story = {
   render: () => <Interactive initial={normalizeHex('abc')!} />,
 };
-export const SearchAndCategories: Story = {
+export const SelectPaletteColor: Story = {
   render: () => <Interactive initial="porcelain" />,
   play: async ({ canvasElement }) => {
     const c = within(canvasElement);
-    await userEvent.click(c.getByRole('radio', { name: 'Soft colors' }));
-    await userEvent.type(
-      c.getByRole('textbox', { name: 'Search colors' }),
-      'Ivory',
-    );
-    await userEvent.click(c.getByRole('button', { name: /Ivory/ }));
-    await userEvent.click(c.getByRole('radio', { name: 'Neutrals' }));
-    await expect(c.getByText('No matching colors.')).toBeVisible();
-    await userEvent.clear(c.getByRole('textbox', { name: 'Search colors' }));
-    await userEvent.click(c.getByRole('radio', { name: 'Soft colors' }));
-    await expect(c.getByRole('button', { name: /Ivory/ })).toHaveAttribute(
+    await userEvent.click(c.getByRole('button', { name: 'Sage' }));
+    await expect(c.getByRole('button', { name: 'Sage' })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
+    await userEvent.click(c.getByRole('button', { name: 'Custom color' }));
+    await expect(
+      c.getByRole('textbox', { name: 'Custom color (HEX)' }),
+    ).toBeVisible();
   },
 };
