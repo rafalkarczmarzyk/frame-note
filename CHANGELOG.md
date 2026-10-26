@@ -7,6 +7,10 @@ when explicitly requested; a commit does not automatically create a release.
 
 ## Unreleased
 
+### Added
+
+- Dedicated link preview artwork and metadata for Open Graph and X/Twitter.
+
 ### Changed
 
 - Redesigned the start screen with a centered photo background, an overlaid logo,
