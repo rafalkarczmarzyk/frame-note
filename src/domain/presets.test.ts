@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createCaptionLayout } from './caption-layout';
+import { captionColors, legacyCaptionColors } from './caption-colors';
 import { createPreset, parsePreset } from './presets';
 
 const icon = { name: 'camera', svg: 'artwork', aspect: 1 };
@@ -25,6 +26,18 @@ describe('layout presets', () => {
       ).toBe(alignment);
     },
   );
+  it.each([
+    ...captionColors.map((color) => color.value),
+    ...legacyCaptionColors,
+    '#AABBCC',
+  ])('round trips caption color %s', (color) => {
+    const preset = example();
+    preset.layout.containers[0]!.style.color = color;
+    expect(
+      parsePreset(JSON.stringify(preset), validate).layout.containers[0]!.style
+        .color,
+    ).toBe(color);
+  });
   it('round trips layout and only referenced icons without photo data', () => {
     const preset = example();
     expect(preset.icons).toEqual([icon]);

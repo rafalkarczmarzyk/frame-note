@@ -6,7 +6,7 @@ polecenia. Nowe decyzje dopisujemy lub aktualizujemy w istniejącym wpisie.
 
 ## NTH-001 — Wspólny Tooltip i pomoc kontekstowa
 
-- **Status:** odłożone.
+- **Status:** zrealizowane w uzgodnionym zakresie — 2026-10-26.
 - **Data decyzji:** 2026-10-25.
 - **Źródło:** rozmowa o kompaktowaniu sekcji Margins; użytkownik zdecydował,
   żeby tooltipy zostawić na później.
@@ -17,10 +17,15 @@ polecenia. Nowe decyzje dopisujemy lub aktualizujemy w istniejącym wpisie.
   przeciąganiu nazwa i wartość pozostają widoczne oraz aktualizowane na żywo.
 - **Przy powrocie do tematu:** przygotować izolowane stories dla etykiet,
   dłuższej pomocy, fokusu i położenia przy krawędziach okna.
-- **Granica zakresu:** nie implementować teraz ani nie usuwać istniejących
+- **Pierwotna granica zakresu (2026-10-25):** nie implementować wtedy ani nie usuwać istniejących
   etykiet uchwytów. Tooltipy nie blokują osobno planowanego kompaktowania
   Margins; w tym planie użytkownik odrzucił również samą ikonę zdjęcia
   w środku diagramu jako mylącą.
+
+- **Decyzja 2026-10-26:** użytkownik zlecił wspólny tooltip liquid glass,
+  przezroczysty jak custom picker, oraz użycie go przy kolorach. Zakres obejmuje
+  hover, fokus, Escape, dopasowanie do okna i izolowane stories. Zastosowania
+  przy Margins i pozostałych kontrolkach pozostają do osobnego zlecenia.
 
 ## NTH-002 — Wersjonowane schematy presetów i migracje
 

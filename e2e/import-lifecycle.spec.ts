@@ -143,10 +143,13 @@ test('keeps caption settings when replacing landscape and portrait photos', asyn
   await page
     .getByRole('spinbutton', { name: 'Opacity value', exact: true })
     .fill('65');
-  await page.getByRole('button', { name: 'Color', exact: true }).click();
-  const colors = page.getByRole('dialog', { name: 'Choose a color' });
+  await page.getByRole('button', { name: 'Custom color', exact: true }).click();
+  const colors = page.getByRole('dialog', {
+    name: 'Custom color',
+    exact: true,
+  });
   await colors.getByRole('textbox', { name: 'Custom color (HEX)' }).fill('bcd');
-  await colors.getByRole('button', { name: 'Close choose a color' }).click();
+  await colors.getByRole('button', { name: 'Close custom color' }).click();
   await page.getByRole('button', { name: 'top-right', exact: true }).click();
   await page
     .getByRole('radiogroup', { name: 'Text align' })
@@ -178,7 +181,7 @@ test('keeps caption settings when replacing landscape and portrait photos', asyn
     ).toContainText('Advercase');
     await expect(
       page.getByRole('button', { name: 'Custom color', exact: true }),
-    ).toHaveAttribute('title', '#BBCCDD');
+    ).toHaveAttribute('data-color-value', '#BBCCDD');
     await expect(
       page.getByRole('combobox', { name: 'Sizing unit', exact: true }),
     ).toContainText('% of short edge');

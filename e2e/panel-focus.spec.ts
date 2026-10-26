@@ -70,7 +70,7 @@ test('panels receive keyboard focus and return it to their opener', async ({
     exact: true,
   });
   await expect(
-    colors.getByRole('textbox', { name: 'Custom color (HEX)', exact: true }),
+    colors.getByRole('button', { name: 'White', exact: true }),
   ).toBeFocused();
   await page
     .getByRole('button', { name: 'Close choose a color', exact: true })

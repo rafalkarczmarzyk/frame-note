@@ -3,7 +3,11 @@ import { migrateLogo, parseImageToken } from './inline-image';
 import { validateImageAssets } from './image-validation';
 import type { CaptionLayout } from './caption-layout';
 import type { SvgAsset } from './svg-asset';
-import { captionColors, normalizeHex } from './caption-colors';
+import {
+  captionColors,
+  legacyCaptionColors,
+  normalizeHex,
+} from './caption-colors';
 
 export interface LayoutPreset {
   version: 1 | 2;
@@ -87,7 +91,8 @@ export function parsePreset(
     const color = text(s.color, 64);
     if (
       !normalizeHex(color) &&
-      !captionColors.some((item) => item.value === color)
+      !captionColors.some((item) => item.value === color) &&
+      !legacyCaptionColors.some((item) => item === color)
     )
       return invalid();
     const custom = p.custom === undefined ? undefined : record(p.custom);

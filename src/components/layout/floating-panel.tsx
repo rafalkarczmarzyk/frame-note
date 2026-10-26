@@ -107,12 +107,21 @@ export function FloatingPanel({
         }
       }}
       className={cn(
-        'flex min-h-0 flex-col overflow-hidden rounded-xl border border-panel-border text-panel-text shadow-panel',
-        surface === 'glass' ? 'glass-panel' : 'bg-panel-base',
+        'flex min-h-0 flex-col overflow-hidden text-panel-text',
+        surface === 'glass'
+          ? 'glass-panel rounded-xl border border-panel-border shadow-panel'
+          : 'bg-panel-base',
         className,
       )}
     >
-      <header className="shrink-0 border-b border-panel-border bg-panel-header-base p-4">
+      <header
+        className={cn(
+          'shrink-0',
+          surface === 'glass'
+            ? 'border-b border-panel-border bg-panel-header-base p-4'
+            : 'mx-3 mt-3 rounded-xl bg-panel-header-base p-4',
+        )}
+      >
         <div className="flex items-center justify-between gap-3">
           <h2
             id={titleId}
@@ -138,7 +147,14 @@ export function FloatingPanel({
         {children}
       </div>
       {footer && (
-        <footer className="shrink-0 border-t border-panel-border p-4">
+        <footer
+          className={cn(
+            'shrink-0',
+            surface === 'glass'
+              ? 'border-t border-panel-border p-4'
+              : 'mx-3 mb-3 rounded-xl bg-panel-header-base p-3',
+          )}
+        >
           {footer}
         </footer>
       )}

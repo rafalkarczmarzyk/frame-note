@@ -9,6 +9,9 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Added
 
+- Reusable translucent glass tooltips for color controls, with hover and keyboard
+  focus, Escape dismissal, viewport-aware placement and Storybook examples.
+
 - Nine built-in layouts, including Signature, Compact EXIF, Camera & Lens,
   Focus Stack (formerly Macro), EXIF Icons, Astrophotography and Long Exposure.
   The new `{shutterDuration}` helper formats long exposures as hours, minutes
@@ -19,7 +22,7 @@ when explicitly requested; a commit does not automatically create a release.
   using the same validation and limits as the file picker, with a local drop overlay.
 - Canvas-centered photo loading indicator and separate export preparation feedback.
 
-- Shared category filters for fonts, metadata tags, colors and presets, combined with search
+- Shared category filters for fonts, metadata tags and presets, combined with search
   in fixed panel headers without changing existing selections.
 - A curated library of 25 Google Fonts families alongside Advercase, with local
   on-demand loading, compact live previews, supported Bold/Italic variants,
@@ -53,8 +56,14 @@ when explicitly requested; a commit does not automatically create a release.
   reload; Photo, Sizing & Margins and Export start collapsed.
 
 - Reorganized Typography into sizing, alignment and style, color, and opacity
-  rows, with font icons, grouped Bold/Italic toggles, neutral color swatches and
-  direct access to the color panel.
+  rows, with balanced alignment/Bold/Italic controls and full-width glass color
+  segments. Quick colors include White, Ivory, Dark gray, Blue charcoal and Black;
+  separate rainbow and palette controls indicate how the color was chosen.
+- Curated sixteen-color palette in one compact grid and a separate translucent
+  floating custom picker with live HEX editing. HEX input stays marked as custom
+  even when matching a palette color; existing preset colors remain supported.
+- Borderless docked auxiliary sidebars with inset rounded headers and footers,
+  preserving opaque surfaces alongside the photo.
 - All numeric fields show increase/decrease arrows with field-specific increments:
   0.25 for font size, 0.1 for line spacing and percentage positions, 1 for opacity,
   and unit-appropriate increments for margins and graphics. Keyboard arrows use
