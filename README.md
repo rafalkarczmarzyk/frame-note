@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/status-toward%201.0-14CC60?style=for-the-badge" alt="Status: working toward release 1.0" /></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/status-alpha-14CC60?style=for-the-badge" alt="Status: alpha" /></a>
   <img src="https://img.shields.io/badge/photo%20processing-local-00BFB3?style=for-the-badge" alt="Photo processing: local in your browser" />
 </p>
 
@@ -39,10 +39,22 @@ compose a layout with text and graphics, preview your changes, and download a JP
 with the finished design rendered into its pixels. No account or backend is
 required for this workflow; photo processing happens in your browser.
 
-The project is under active development. The pre-MVP has been completed and
-accepted; implemented MVP features and subsequent improvements are documented
-below. Product milestones and review status live in the
+The project is currently in **alpha** and under active development. Features
+and preset formats may change. The pre-MVP has been completed and accepted;
+implemented MVP features and subsequent improvements are documented below.
+Product milestones and review status live in the
 [product plan](docs/PRODUCT_PLAN.md).
+
+## Versioning
+
+The current numbered version is **1.0.0-alpha.1**. Subsequent development commits
+accumulate in the changelog's **Unreleased** section without changing the version.
+Version numbers change only on an explicit request to prepare a numbered version;
+committing does not automatically create a release, Git tag, or publication.
+
+The intended [SemVer](https://semver.org/) progression is
+`1.0.0-alpha.1` → `1.0.0-alpha.2` → `1.0.0-beta.1` → `1.0.0-rc.1` → `1.0.0`.
+Each suffix number identifies a deliberately prepared prerelease, not a commit.
 
 ## Features
 
@@ -234,7 +246,7 @@ tests/fixtures/     Original test photos and graphics
 
 Some internal product and planning documents are maintained in Polish.
 
-- [Changelog: Pre-MVP, MVP, and work toward 1.0](CHANGELOG.md)
+- [Changelog: alpha development and historical milestones](CHANGELOG.md)
 - [Product context and milestone plan](docs/PRODUCT_PLAN.md)
 - [Design system](docs/DESIGN_SYSTEM.md)
 - [Caption helpers and token syntax](docs/CAPTION_TAGS.md)

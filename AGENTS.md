@@ -13,16 +13,16 @@ wymagają uzgodnienia zakresu. Pracujemy etapami: implementacja, ocena użytkown
 poprawki, a następnie jego potwierdzenie przejścia dalej. Nie realizuj kolejnego
 etapu ani nie wykonuj commita bez polecenia użytkownika.
 
-## Changelog przed commitem
+## Prowadzenie changeloga
 
-Gdy użytkownik prosi o commit po realizacji zaplanowanego zadania albo po
-iterowaniu rozwiązania, zastosuj projektowy skill
-[changelog-checkpoint](.agents/skills/changelog-checkpoint/SKILL.md) i zapytaj,
-czy zaktualizować `CHANGELOG.md` dla tego wyniku. Nie pytaj przy każdym commicie:
-zapisy pośrednie oraz zwykłe samodzielne zmiany dokumentacji lub konfiguracji
-nie uruchamiają pytania. Wyraźna decyzja aktualizacji lub pominięcia changeloga
-dla danego wyniku jest już odpowiedzią — nie pytaj ponownie. Commit sam w sobie
-nie oznacza oddania zadania, akceptacji etapu ani wydania.
+Przy commicie ukończonego zadania lub rozwiązania dopracowanego w iteracjach
+zastosuj projektowy skill
+[maintain-changelog](.agents/skills/maintain-changelog/SKILL.md).
+Aktualizuj `CHANGELOG.md` bez dodatkowego potwierdzenia, uwzględniając istotne
+zmiany i scalając wpisy dotyczące tego samego wyniku. Pomijaj zapisy pośrednie
+oraz rutynowe zmiany dokumentacji, konfiguracji i samego skilla. Respektuj
+wyraźne polecenie pominięcia aktualizacji. Commit nie oznacza akceptacji etapu
+ani wydania; zmiana wersji i publikowanie wymagają osobnego polecenia.
 
 ## Pomysły na później
 

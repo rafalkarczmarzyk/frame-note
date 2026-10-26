@@ -1,10 +1,13 @@
 # Changelog
 
-Notable user-facing changes in FrameNote. Pre-MVP and MVP are development
-milestones, not numbered releases. Current work is collected under Unreleased
-until the first 1.0 release.
+Notable user-facing changes in FrameNote. The project is currently in alpha.
+Pre-MVP and MVP are historical development milestones, not numbered releases.
+Development changes accumulate under Unreleased. Version numbers change only
+when explicitly requested; a commit does not automatically create a release.
 
-## Unreleased — toward 1.0
+## Unreleased
+
+## 1.0.0-alpha.1 — 2026-10-26
 
 ### Added
 
