@@ -105,6 +105,10 @@ local network, use `http://<your-computer-ip>:3000` or
 
 ## Create your first caption
 
+FrameNote opens into an empty editor with a photo-selection button, JPG/PNG drop
+guidance and a privacy note in the canvas. The application version, GitHub and
+Changelog links sit at the bottom. The FrameNote logo is not a navigation link.
+
 1. Choose a JPG or PNG, or drop it onto the workspace.
 2. Edit the default caption, insert metadata from the tag browser, and add images
    through **Content → Add image**.

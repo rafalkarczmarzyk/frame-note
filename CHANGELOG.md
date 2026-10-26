@@ -14,10 +14,11 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Changed
 
-- Redesigned the start screen with a centered photo background, an overlaid logo,
-  responsive “Leave your mark.” typography and a local-processing note.
-- Added a compact glass footer with the current application version and links
-  to GitHub and the changelog. The editor retains its full action header.
+- Open directly in an empty editor with photo selection, JPG/PNG drop guidance,
+  a local-processing privacy note, and version, GitHub and changelog links at the
+  bottom of the canvas. The header and tools remain visible before import.
+- The application logo is now passive, preventing accidental navigation and
+  loss of the current editing session.
 - Restyled the photo drop overlay with dark glass, a thin dashed outline and
   a gentle fade-in, including reduced-motion and reduced-transparency fallbacks.
 - Simplified the layer list with single-line content summaries, persistent

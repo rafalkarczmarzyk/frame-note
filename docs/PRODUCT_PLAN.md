@@ -220,7 +220,8 @@ jednego kontenera. Istniejące wzorce eksportu pozostają bez zmian.
 - Ciemny interfejs z kontrolkami inspirowanymi powierzchniami macOS.
   Primary emerald (`#14CC60`) wyróżnia główną akcję Export JPG.
 - Header: logo SVG, akcje; eksport w navbarze.
-- Ekran startowy: krótki angielski hero w Advercase, wybór zdjęcia i informacja o DnD.
+- Start bezpośrednio w pustym edytorze; w pustym canvasie wybór zdjęcia,
+  informacja o drop i prywatności; na dole wersja aplikacji i linki.
 - Podczas przeciągania pliku: kontrastowy overlay, gruba przerywana zaokrąglona
   ramka odsunięta od krawędzi i komunikat upuszczenia.
 - Po imporcie: przestrzeń canvasu pod headerem, główne narzędzia po prawej.
@@ -343,3 +344,11 @@ w Chromium/WebKit. Siedem oryginalnych zdjęć sprawdzono w obu silnikach.
 Poprawiono zachowanie celowych pustych wierszy i generowanie ID na HTTP w LAN.
 Raport: [MVP_VERIFICATION.md](MVP_VERIFICATION.md). Zmiany pozostają do oceny
 użytkownika; bez automatycznego commita.
+
+### Start w pustym edytorze — 26 października 2026
+
+Po ocenie wariantów użytkownik odrzucił artwork w canvasie i wrócił do prostego
+pustego edytora: przycisk wyboru zdjęcia, informacja o drop JPG/PNG i prywatności.
+Na dole canvasu wersja aplikacji oraz GitHub i Changelog. Bez fotografii,
+osobnego splasha i timera. Logo w headerze pozostaje nieklikalne. Iteracje
+oceniamy wizualnie bez pełnych testów/buildów. Użytkownik zlecił commit tej wersji.

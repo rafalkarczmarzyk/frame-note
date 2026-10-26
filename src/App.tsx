@@ -8,7 +8,7 @@ import {
   useState,
 } from 'react';
 import { AppHeader } from '@/components/layout/app-header';
-import { StartScreen } from '@/features/photo/start-screen';
+import { EmptyWorkspace } from '@/features/photo/empty-workspace';
 import { PhotoDropOverlay } from '@/features/photo/photo-drop-overlay';
 import { Button } from '@/components/ui/button';
 
@@ -111,20 +111,24 @@ export default function App() {
 
   return (
     <div className="flex h-svh flex-col overflow-hidden bg-app-base text-content-primary">
-      {photo && (
-        <AppHeader>
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              onClick={() => input.current?.click()}
-              disabled={loading}
-            >
-              Change photo
-            </Button>
+      <AppHeader>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            onClick={() => input.current?.click()}
+            disabled={loading}
+          >
+            {photo ? 'Change photo' : 'Open photo'}
+          </Button>
+          {photo ? (
             <div id="export-actions" />
-          </div>
-        </AppHeader>
-      )}
+          ) : (
+            <Button disabled className="hidden sm:inline-flex">
+              Export JPG
+            </Button>
+          )}
+        </div>
+      </AppHeader>
       <input
         ref={input}
         type="file"
@@ -159,7 +163,7 @@ export default function App() {
           <PhotoWorkspace photo={photo} />
         </Suspense>
       ) : (
-        <StartScreen
+        <EmptyWorkspace
           loading={loading}
           onChoosePhoto={() => input.current?.click()}
         />

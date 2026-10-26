@@ -582,29 +582,19 @@ the scrolling rows. Escape, pointer cancellation and lost capture cancel the
 move; Arrow Up/Down, Home and End retain their existing behavior.
 Components/UI/PickerList/LongReorderList demonstrates a constrained list.
 
-### Photo start screen
+### Application startup
 
-The start screen uses a single photo background filling the entire window.
-Its logo floats in the top-left corner without a header bar; the editor retains
-the full header and actions after a photo is imported. The centered cover image
-has a light upper gradient. The Advercase “Leave your mark.” heading, short
-description, Choose a photo, JPG/PNG drop guidance and small privacy note with a
-lock icon sit in the clear upper area. The content position follows the window
-and centered photo crop, with a slight downward offset on taller screens.
-Compact typography and spacing support short, wide and narrow windows.
+The application opens into the empty editor. The canvas shows a neutral photo
+icon, “Drop a photo here”, JPG/PNG guidance, Choose a photo and a local-processing
+privacy note. A quiet footer at the bottom of the canvas contains the package
+version, GitHub and Changelog links. Header and tools remain visible. There is
+no photograph, splash modal, timer or dismiss action. Importing a photo replaces
+this empty state with the production photo editor. The header logo is passive.
 
-A compact rounded glass footer floats at the bottom over the photograph. It
-contains the copyright, version from package.json linked to GitHub and a direct
-Changelog link. Links open in a new tab, use Lucide ExternalLink icons and wrap
-on narrow screens. The footer has an opaque fallback for unsupported or
-reduced-transparency settings. There are no feature columns. The layout fills
-the available window without a fixed photo aspect ratio or forced minimum
-height; content can scroll only when it cannot fit.
-
-File selection and the global drop overlay retain their behavior. Font picker
-and typography stories use the new sample phrase. The background is an optimized
-bundled JPG; the original test fixture is unchanged. Stories include Default,
-DraggingPhoto and Loading.
+Screens/StartupRedesign renders the production App for EmptyEditor, DraggingPhoto
+and CompactWindow. Review visual iterations directly in Storybook without full
+tests/builds at the user's request. The photographic artwork concepts were
+rejected for this startup state.
 
 ### Photo drop overlay
 
@@ -616,7 +606,7 @@ and a small lock/privacy note. The overlay fades in over 180 ms with ease-out;
 reduced motion disables the fade. The large standalone brand icon is removed.
 Unsupported backdrop filtering and reduced transparency use a solid dark
 fallback. Pointer events pass through; existing drop/cancel behavior is unchanged.
-Story: Screens/StartScreen/DraggingPhoto.
+Story: Screens/StartupRedesign/DraggingPhoto.
 
 ### Layer list content previews
 
