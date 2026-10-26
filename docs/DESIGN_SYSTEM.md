@@ -705,3 +705,24 @@ preserves selection and suppresses the following native click. The separate grip
 remains available for the historical preview variant and other reorder stories.
 The earlier footer/native-drag concepts above are historical; CleanList is now
 a review composition of the production component, not a second implementation.
+
+### Switch and export metadata
+
+Components/UI/Switch is the shared controlled boolean switch. Its label toggles
+an associated button with role switch; Space/Enter, visible keyboard focus,
+description association, disabled controls and disabled fieldsets are supported.
+The glass thumb, inset track and emerald on state use central CSS material tokens.
+Reduced motion disables transitions; forced colors retains visible state and thumb.
+Stories cover On, Off, disabled on/off, description, long labels, a narrow parent,
+keyboard/label interactions and disabled fieldsets. Application export uses the
+same component for Remove all metadata and five metadata retention groups.
+
+Remove all metadata defaults on. Disabling it reveals Author & copyright
+(initially selected), Camera & exposure, Date & time, Location and Descriptions
+& keywords. Choices remain in the workspace session across photo replacement,
+independently of layout presets. The final prepared blob includes selected
+supported fields as XMP, so download and displayed size remain synchronized.
+
+Export separates Image quality, Metadata and Output file with visible semantic
+borders and stronger headings. Retained metadata groups share an inset surface
+with padded rows and separators; each description stays beside its own switch.

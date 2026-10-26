@@ -9,11 +9,18 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Added
 
+- Export metadata controls with removal enabled by default and five optional
+  retention groups. Supported source fields are written as XMP and included in
+  the prepared download size.
+- Reusable glass-style Switch with keyboard support, disabled states and
+  Storybook examples for interaction and layout variations.
 - Dedicated link preview artwork and metadata for Open Graph and X/Twitter.
 - Per-layer menu commands to move up, move down, bring to front, and send to back.
 
 ### Changed
 
+- Separate image quality, metadata and output file details in Export, with
+  clearly divided rows for metadata groups.
 - Open directly in an empty editor with photo selection, JPG/PNG drop guidance,
   a local-processing privacy note, and version, GitHub and changelog links at the
   bottom of the canvas. The header and tools remain visible before import.

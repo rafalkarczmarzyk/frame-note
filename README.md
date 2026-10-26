@@ -81,8 +81,8 @@ Each suffix number identifies a deliberately prepared prerelease, not a commit.
   and import/export `.framenote.json` files with their image assets. Built-in
   presets include Default, Default dark, and Macro.
 - **Controlled JPG export.** Choose quality from 1–100%, inspect the actual
-  encoded file size, and download the prepared result. Preview and export share
-  layout calculations.
+  encoded file size, choose which supported metadata groups to keep, and download
+  the prepared result. Preview and export share layout calculations.
 
 ## Quick start
 
@@ -137,7 +137,7 @@ source precedence, formatting, and missing-data behavior.
 
 Presets include layers, content templates, styles, positions, visibility,
 stacking order, document units, margins, and used graphics. They exclude the
-source photo, resolved metadata values, and JPG quality.
+source photo, resolved metadata values, and export settings.
 
 Saved presets persist in the same browser at the same origin. Clearing site data
 removes them; export a `.framenote.json` file to back them up or transfer them.
@@ -145,7 +145,7 @@ Preset imports are validated and added as new presets without overwriting
 existing entries. The format is still evolving during development; compatibility
 with older presets is not a stable contract.
 
-Replacing a photo preserves the current layout and export quality in the session.
+Replacing a photo preserves the current layout, export quality, and metadata choices in the session.
 Refreshing the page resets unsaved editor state; saved presets can be reapplied
 after importing a photo.
 
@@ -164,8 +164,16 @@ paths before importing. The editor limits active image content to 100 images.
 
 - Export produces `*-framenote.jpg` at the decoded source dimensions, with
   orientation applied to the pixels. JPG is re-encoded, so export is not lossless.
-- Source EXIF/IPTC/XMP/GPS metadata and ICC profiles are not copied. Canvas uses
-  its default sRGB behavior. Color checks cover the supplied sRGB fixtures;
+- **Remove all metadata** is on by default. Turning it off exposes five groups:
+  Author & copyright (initially selected), Camera & exposure, Date & time,
+  Location, and Descriptions & keywords. Supported fields are written as XMP;
+  this is not a byte-for-byte copy of source EXIF/IPTC/XMP. Unrecognized fields,
+  thumbnails, editing history, source dimensions and orientation are omitted.
+  Choices affect the output file only; metadata remains available for captions.
+  Metadata is included in the reported output size. Oversized XMP packets block
+  export with an error instead of silently dropping fields.
+- Original ICC profiles are not copied. Canvas uses its default sRGB behavior.
+  Color checks cover the supplied sRGB fixtures;
   Adobe RGB, Display P3, and unusual profiles need separate verification.
 - Text does not automatically wrap or shrink to fit. Large layers can extend
   beyond the image, including in Manual mode.

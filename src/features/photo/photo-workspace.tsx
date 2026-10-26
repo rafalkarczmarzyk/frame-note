@@ -1,3 +1,8 @@
+import { Switch } from '@/components/ui/switch';
+import {
+  defaultExportMetadata,
+  metadataGroups as exportMetadataGroups,
+} from '../caption/export-metadata';
 import { activeImageAssets } from '@/domain/image-retention';
 import { moveLayer, toggleLayerVisibility } from '@/domain/caption-layout';
 import { migrateLogo } from '@/domain/inline-image';
@@ -243,6 +248,7 @@ function PhotoWorkspaceContent({
   };
   const [exporting, setExporting] = useState(false);
   const [quality, setQuality] = useState(95);
+  const [metadataOptions, setMetadataOptions] = useState(defaultExportMetadata);
   const [loadedFont, setLoadedFont] = useState('');
   const fontKey = [
     ...new Set(
@@ -312,8 +318,10 @@ function PhotoWorkspaceContent({
       dimensions: photo.document.photo.dimensions,
       captions: exportCaptions,
       quality,
+      metadata: photo.document.photo.metadata,
+      metadataOptions,
     }),
-    [photo, exportCaptions, quality],
+    [photo, exportCaptions, quality, metadataOptions],
   );
   const prepared = usePreparedExport(exportRequest, fontReady && iconsReady);
   useEffect(() => {
@@ -1013,6 +1021,7 @@ function PhotoWorkspaceContent({
               </InlineNotice>
             )}
             <fieldset disabled={exporting}>
+              <h3 className="mb-3 text-xs font-semibold">Image quality</h3>
               <label
                 className="mt-2 flex items-center justify-between text-xs"
                 htmlFor="jpeg-quality"
@@ -1044,41 +1053,87 @@ function PhotoWorkspaceContent({
                   disabled={exporting}
                 />
               </div>
-              <p
-                className="mt-3 text-xs"
-                role="status"
-                aria-live="polite"
-                data-testid="output-size"
-                data-bytes={prepared.blob?.size}
-                title={
-                  prepared.blob
-                    ? `${prepared.blob.size.toLocaleString('en-US')} bytes`
-                    : undefined
-                }
-              >
-                Output:{' '}
-                {prepared.blob
-                  ? formatBytes(prepared.blob.size)
-                  : prepared.error
-                    ? 'Unavailable'
-                    : 'Calculating…'}
-              </p>
-              {prepared.blob &&
-                prepared.blob.size > photo.document.photo.byteLength && (
-                  <InlineNotice tone="warning" className="mt-2">
-                    Output is larger than the original. Try a lower JPEG
-                    quality.
-                  </InlineNotice>
+              <div className="mt-5 space-y-3 border-t border-border-subtle pt-4">
+                <h3 className="text-xs font-semibold">Metadata</h3>
+                <Switch
+                  className="[&_label]:font-medium"
+                  label="Remove all metadata"
+                  checked={metadataOptions.removeAll}
+                  disabled={exporting}
+                  onCheckedChange={(removeAll) =>
+                    setMetadataOptions((current) => ({ ...current, removeAll }))
+                  }
+                  description="Only affects the exported file. Visible captions stay on the photo."
+                />
+                {!metadataOptions.removeAll && (
+                  <div className="space-y-3">
+                    <p className="text-xs font-medium">Keep in exported file</p>
+                    <div className="divide-y divide-border-subtle overflow-hidden rounded-lg border border-border-subtle bg-input-base">
+                      {exportMetadataGroups.map((group) => (
+                        <Switch
+                          key={group.id}
+                          className="px-3 py-3 [&_label]:font-medium"
+                          label={group.label}
+                          description={group.description}
+                          checked={metadataOptions.groups[group.id]}
+                          disabled={exporting}
+                          onCheckedChange={(checked) =>
+                            setMetadataOptions((current) => ({
+                              ...current,
+                              groups: {
+                                ...current.groups,
+                                [group.id]: checked,
+                              },
+                            }))
+                          }
+                        />
+                      ))}
+                    </div>
+                    <p className="text-xs leading-5 text-content-secondary">
+                      Saved as XMP. Unrecognized fields, thumbnails and editing
+                      history are omitted.
+                    </p>
+                  </div>
                 )}
-              {prepared.error && (
-                <p role="alert" className="mt-2 text-xs">
-                  {prepared.error}
+              </div>
+              <div className="mt-5 border-t border-border-subtle pt-4">
+                <h3 className="mb-3 text-xs font-semibold">Output file</h3>
+                <p
+                  className="text-xs font-medium"
+                  role="status"
+                  aria-live="polite"
+                  data-testid="output-size"
+                  data-bytes={prepared.blob?.size}
+                  title={
+                    prepared.blob
+                      ? `${prepared.blob.size.toLocaleString('en-US')} bytes`
+                      : undefined
+                  }
+                >
+                  Output:{' '}
+                  {prepared.blob
+                    ? formatBytes(prepared.blob.size)
+                    : prepared.error
+                      ? 'Unavailable'
+                      : 'Calculating…'}
                 </p>
-              )}
-              <p className="mt-3 text-xs leading-5 text-content-secondary">
-                Original dimensions · sRGB rendering. EXIF, GPS and other source
-                metadata are removed. The original ICC profile is not copied.
-              </p>
+                {prepared.blob &&
+                  prepared.blob.size > photo.document.photo.byteLength && (
+                    <InlineNotice tone="warning" className="mt-2">
+                      Output is larger than the original. Try a lower JPEG
+                      quality.
+                    </InlineNotice>
+                  )}
+                {prepared.error && (
+                  <p role="alert" className="mt-2 text-xs">
+                    {prepared.error}
+                  </p>
+                )}
+                <p className="mt-3 text-xs leading-5 text-content-secondary">
+                  Original dimensions · sRGB rendering. The original ICC profile
+                  is not copied.
+                </p>
+              </div>
             </fieldset>
           </SidebarSection>
         </div>
