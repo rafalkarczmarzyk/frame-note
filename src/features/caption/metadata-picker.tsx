@@ -21,6 +21,7 @@ const helperIcons = {
   camera: Camera,
   lens: Focus,
   shutter: Timer,
+  shutterDuration: Timer,
   aperture: Aperture,
   iso: Sun,
   focalLength: Ruler,

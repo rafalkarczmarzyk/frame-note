@@ -41,3 +41,17 @@ export const Default: Story = {
   },
 };
 export const Disabled: Story = { args: { disabled: true } };
+
+export const PresetGroups: Story = {
+  args: {
+    'aria-label': 'Saved preset',
+    value: 'default',
+    options: [
+      { value: 'default', label: 'Default' },
+      { value: 'signature', label: 'Signature' },
+      { value: 'long-exposure', label: 'Long Exposure' },
+      { value: 'my-preset', label: 'My preset', separatorBefore: true },
+      { value: 'my-signature', label: 'My signature' },
+    ],
+  },
+};

@@ -8,21 +8,36 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { Ellipsis } from 'lucide-react';
+import type { ComponentProps } from 'react';
+import { Button } from './button';
 import { IconButton } from './icon-button';
+
+export interface ActionMenuItem {
+  label: string;
+  icon?: ReactNode;
+  onSelect: () => void;
+  disabled?: boolean;
+  separatorBefore?: boolean;
+}
 
 /** Small action menu, kept outside scrolling rows and within the viewport. */
 export function ActionMenu({
   label,
   items,
+  triggerIcon,
+  triggerClassName,
+  disabled,
+  triggerAppearance,
 }: {
   label: string;
-  items: readonly {
-    label: string;
-    icon: ReactNode;
-    onSelect: () => void;
-    disabled?: boolean;
-    separatorBefore?: boolean;
-  }[];
+  triggerIcon?: ReactNode;
+  triggerClassName?: string;
+  disabled?: boolean;
+  triggerAppearance?: Pick<
+    ComponentProps<typeof Button>,
+    'variant' | 'size' | 'color'
+  >;
+  items: readonly ActionMenuItem[];
 }) {
   const id = useId();
   const trigger = useRef<HTMLButtonElement>(null);
@@ -92,11 +107,17 @@ export function ActionMenu({
       document.removeEventListener('focusin', outside);
     };
   }, [open]);
+  const Trigger = triggerAppearance ? Button : IconButton;
   return (
     <>
-      <IconButton
+      <Trigger
+        {...triggerAppearance}
         ref={trigger}
+        aria-label={label}
+        title={label}
         label={label}
+        disabled={disabled}
+        className={triggerClassName}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={open ? id : undefined}
@@ -111,8 +132,8 @@ export function ActionMenu({
           setOpen(true);
         }}
       >
-        <Ellipsis />
-      </IconButton>
+        {triggerIcon ?? <Ellipsis />}
+      </Trigger>
       {open &&
         createPortal(
           <div

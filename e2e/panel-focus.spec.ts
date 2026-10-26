@@ -35,7 +35,7 @@ test('panels receive keyboard focus and return it to their opener', async ({
     },
     {
       trigger: page.getByRole('button', {
-        name: 'Manage presets',
+        name: 'Preset actions',
         exact: true,
       }),
       dialog: 'Manage presets',
@@ -44,6 +44,10 @@ test('panels receive keyboard focus and return it to their opener', async ({
   for (const item of cases) {
     await item.trigger.focus();
     await item.trigger.press('Enter');
+    if (item.dialog === 'Manage presets')
+      await page
+        .getByRole('menuitem', { name: 'Manage presets', exact: true })
+        .click();
     const panel = page.getByRole('dialog', { name: item.dialog, exact: true });
     await expect(panel).toBeVisible();
     if (item.input)

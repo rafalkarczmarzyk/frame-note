@@ -66,14 +66,14 @@ function ExampleContent({
       <div className="max-w-full overflow-auto rounded-lg border bg-workspace-base">
         <div
           className="relative"
-          style={{ width: width * scale + 96, height: height * scale + 96 }}
+          style={{ width: width * scale + 56, height: height * scale + 56 }}
         >
           <div
             aria-label="Neutral photo area"
             className="absolute flex bg-content-primary"
             style={{
-              left: 48,
-              top: 48,
+              left: 28,
+              top: 28,
               width: width * scale,
               height: height * scale,
             }}
@@ -86,8 +86,8 @@ function ExampleContent({
             margins={margins}
             linkMode={linkMode}
             scale={scale}
-            x={48}
-            y={48}
+            x={28}
+            y={28}
             disabled={disabled}
             onChange={setMargins}
           />

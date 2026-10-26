@@ -113,9 +113,23 @@ niezależnie od wielkości liter i dodatkowych spacji. Wynik:
 `Focus stack · 15 images · Method A · R=8 · S=4`.
 Nie zmienia oryginalnego UserComment. Przy braku pełnego rozpoznanego formatu
 wartość jest pusta, bez zgadywania liczby zdjęć z innego komentarza.
-Wbudowany preset Macro dodaje osobny kontener `{heliconStack}` w prawym dolnym rogu.
+Wbudowany preset Focus Stack (wcześniej Macro) dodaje osobny kontener `{heliconStack}` w prawym dolnym rogu.
 
 Helper `{heliconStackCount}` korzysta z tego samego parsera i źródeł co `{heliconStack}`,
 ale zwraca wyłącznie liczbę, np. `15`. Umożliwia własny podpis:
 `Stacked {heliconStackCount} images` → `Stacked 15 images`. Bez rozpoznanego komentarza
 zachowuje standardowe oznaczenie brakującej wartości.
+
+### Czytelny czas — `{shutterDuration}`
+
+Korzysta z tych samych źródeł, reguł namespace i fallbacku co `{shutter}`:
+EXIF ExposureTime → XMP ExposureTime → EXIF ShutterSpeedValue → XMP
+ShutterSpeedValue. Wartości APEX są najpierw przeliczane na sekundy.
+
+Dla czasów poniżej minuty zachowuje format `{shutter}`: `1/250 s`, `3.2 s`,
+`30 s`. Od minuty rozkłada czas na godziny, minuty i pozostałe sekundy, bez
+zaokrąglania do pełnych minut: `60 s` → `1 min`, `90 s` → `1 min 30 s`,
+`125 s` → `2 min 5 s`, `600 s` → `10 min`, `3661.5 s` → `1 h 1 min 1.5 s`.
+Pomija zerowe jednostki. Oryginalne `{shutter}` i `{exposure}` pozostają bez
+zmian. Brak poprawnej dodatniej wartości jest raportowany jak dla innych helperów.
+Astrophotography i Long Exposure używają nowego helpera.

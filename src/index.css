@@ -918,3 +918,16 @@ fieldset:disabled .glass-switch {
     background: HighlightText;
   }
 }
+
+@layer components {
+  .about-splash::backdrop {
+    background: var(--drop-glass);
+    backdrop-filter: blur(var(--drop-blur));
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .about-splash::backdrop {
+      background: var(--drop-base);
+      backdrop-filter: none;
+    }
+  }
+}

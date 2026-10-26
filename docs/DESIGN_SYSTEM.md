@@ -805,3 +805,193 @@ The generic NumberInput/NumberField default is 1; domain fields set explicit ste
 
 NumberField/FontSizeStep and LineSpacingStep exercise the requested increments,
 keyboard equivalence and preserving a manually entered value off the step grid.
+
+### Compact application header
+
+AppHeader uses a 56 px single-row toolbar with a smaller brand mark. The loaded
+editor portals PresetControls into its left workspace slot: a bounded, truncated
+preset selector, Modified status and a split Save preset button. Its primary
+segment saves the current user preset or opens naming for a new copy; the attached
+ChevronDown opens Save as new, Duplicate, Rename and Manage presets. Duplicate
+requires a selected preset, and Rename requires a user preset. On narrow screens
+the save segment retains its icon while its text hides. Photo import and primary
+Export JPG stay on the right. Presets no longer occupies a sidebar section.
+Management, naming, import/export, recovery and storage errors remain in the
+existing docked panel. AppHeader stories expose the real preset controls,
+including a long-name Modified example. Visual prototyping is currently verified
+in preview; full checks wait for the user's acceptance of the design.
+
+### Split button
+
+Components/UI/SplitButton combines the shared Button with ActionMenu. It inherits
+Button's primary/outline variants, default/small sizes and six palette choices.
+The primary segment forwards native button props, including form/type and ref;
+menuLabel names the independent arrow trigger. Menu actions never replace the
+primary action. Items support optional icons, disabled actions and separators.
+Global disabled and loading disable both segments; primaryDisabled/menuDisabled
+control them independently, and an empty menu disables its trigger. Disabled
+fieldsets retain native behavior. Loading announces aria-busy and respects reduced
+motion. fullWidth expands the main segment; className belongs to the outer group.
+
+Stories cover controls, both variants and sizes, palette, individual/global/form
+disabled states, loading, icon-only content, full width, long labels, narrow
+containers, mixed/empty menus, viewport-edge placement, interactive action feedback
+and native form submission. PresetControls now uses this shared component.
+
+The empty editor and loaded photo now share PresetToolbar: Default is selected
+from startup and the split save action remains visible. Before a photo is opened,
+preset controls and export are disabled. Export uses the same responsive icon/text
+presentation in both states. Production layout initializes directly from the
+built-in Default preset; custom initial layouts in review stories retain an
+unselected preset rather than claiming they match Default.
+
+### Photo import transition
+
+Import shows PhotoLoadingIndicator above the existing workspace without adding
+a layout row. The editor module preloads during idle time; photo replacement uses
+a React transition and Suspense retains the empty editor as a spatially stable
+fallback instead of replacing it with text. Header preset/export placeholders
+remain mounted and hide when their live portal controls arrive. Loading continues
+until the preview has dimensions, fonts and image assets and has painted; export
+encoding is independent. Preview opacity transitions over 200 ms with a reduced
+motion alternative. StartupRedesign/LoadingPreview demonstrates the indicator.
+
+The photo loading indicator is now a prominent centered card with a 36 px spinner.
+The canvas loader disappears once preview dimensions, fonts and image assets
+are ready and painted, independently of JPG encoding. While the JPG is being
+prepared, the disabled export button shows its own spinner and Preparing JPG…;
+there is no minimum duration for the canvas loader. For
+photos larger than 2048 px on the longer edge, loadPhoto asks createImageBitmap
+for a resized preview; unsupported/failed resizing falls back to the original.
+The canvas keeps original-coordinate geometry and export always uses the full
+HTML image. Preview bitmaps close when their photo is disposed.
+
+Components/UI/PhotoLoadingIndicator isolates the production loader for visual
+refinement, with editable message text, both loading messages, a photograph
+background, a narrow surface, long text and a visibility toggle. Changes to the
+component immediately affect the application and StartupRedesign/LoadingPreview.
+
+PhotoLoadingIndicator is mounted inside the photo canvas surface in both empty
+and loaded workspaces. Its center follows the canvas rather than the whole app,
+including sidebar resizing and the stacked narrow-window layout. The full-screen
+LoadingPreview story targets the same canvas surface.
+
+### Built-in preset library
+
+Nine layouts are available: Default and Default dark (unchanged), Signature
+(small author at bottom right), Compact EXIF (one exposure line), Camera & Lens
+(author left, equipment and exposure right), Focus Stack (the former Macro name
+with the same ID/layout), EXIF Icons (one row with bundled shutter/aperture/ISO
+symbols), Astrophotography (author left, camera/lens/focal length/readable exposure
+right) and Long Exposure (author left, readable exposure right). Fonts and margins
+use relative document units and anchor alignment. EXIF Icons packages only its
+three referenced SVGs. No photo or export preferences belong to a preset.
+
+Screens/TestPhotos/BuiltinPresetLibrary compares all layouts on one fixture.
+Individual Preset stories show portrait, bright, wildlife, stack and night photos.
+LongExposureTenMinutes explicitly overrides ExposureTime to 600 seconds in memory
+for a 10 min example; the original fixture is unchanged. The new shutterDuration
+helper uses the same timer icon and source selection as shutter.
+
+SelectOption supports separatorBefore, rendered as a Radix Separator before an
+option (except the first). The preset selector uses this only at the boundary
+between built-in and user presets; without user presets no separator appears.
+Components/UI/Select/PresetGroups demonstrates the shared styling.
+
+Photo file drops are accepted only within data-photo-canvas, in both empty and
+loaded workspaces. Header/sidebar file drags use dropEffect none and do not import;
+the global file guard still prevents the browser from navigating to dropped files.
+PhotoDropOverlay is absolute inside the canvas, follows its size and leaves the
+header/sidebar clear. Leaving the canvas, dropping elsewhere, Escape, dragend and
+window blur dismiss it. StartupRedesign/DraggingPhoto uses the canvas overlay.
+
+### Images dropped into Content
+
+The Content InspectorSection is an explicit data-content-image-drop target.
+CaptionEditor uses its entire enclosing section (including heading and actions),
+or its own root in standalone examples. A canvas drop replaces the photo; a
+Content drop inserts one SVG/PNG into the active layer at the retained editor
+selection. Header and the rest of the sidebar still reject file drops.
+
+ContentImageDropOverlay uses the shared drop glass/dashed treatment with compact
+copy and covers only Content. Native capture handlers prevent ProseMirror from
+moving the caret or performing its own file drop. The file picker and drop call
+the same importer: validation, decoding, deduplication, the 100-image retention
+limit and cancellation after document edits/layer removal remain shared. File
+replacement through the existing picker retains its previous behavior. A busy
+import ignores further drops; multiple files give an inline error. Leaving the
+section, Escape, window blur and dragend dismiss the overlay.
+
+Components/UI/ContentImageDrop provides Interactive, Overlay and Narrow examples.
+The focused content-image-drop flow checks SVG/PNG insertion and rejects header
+drops without replacing the photograph.
+
+### Compact photo rulers
+
+The visible ruler band is 18 px (shared rulerThickness), with unchanged 9 px
+numerals, 4 px major ticks and 2 px minor ticks. Vertical numerals rotate along
+the ruler so multi-digit values fit the narrower strip. The unit corner uses
+the same dimensions. MarginHandle keeps its 32 × 28 px hit target (transposed
+for vertical rulers); interactive letter labels sit just outside the band on
+the photo side without intercepting the pointer. The photo fit reserves 28 px
+per side, down from 40 px. MarginRulers and MarginHandle stories use the compact
+geometry; photo/export coordinates and margin values remain unchanged.
+
+The docked Manage presets panel uses the shared Input and CategoryFilter in
+FloatingPanel.toolbar, above the independently scrolling list. Search matches
+preset names case-insensitively and combines with All / Built-in / Your presets.
+Empty groups disappear, with one clear empty-result message. Creating/importing,
+duplicating or renaming reveals the resulting entry by resetting search/filter.
+Search receives focus on browsing; naming actions retain focus in Preset name.
+AppHeader/PresetBrowser opens the production panel for visual review.
+
+### Header and layout editing before photo import
+
+The header is 48 px high with 32 px controls and a 22 px brand mark. Photo import
+sits next to the brand on the left; a flexible spacer pushes preset selection
+and split save to the right, followed by a divider and Export JPG. The same
+slots and responsive icon/text actions are used throughout startup and editing.
+
+PhotoWorkspace now mounts before the first import with a nullable photo. Layout,
+icons, active layer, preset selection/management and export preferences belong
+to the workspace and survive the first photo and later replacements without
+remounting its editor/sidebar. The empty canvas remains visible while all layout
+controls, image uploads and preset create/update/duplicate/rename/delete/import/
+export operate. Only image output requires a photo; no placeholder image is ever
+encoded. Metadata values and canvas positioning resolve on import.
+
+Before import, controls use a square reference for geometry-only calculations;
+conversions between document units stay disabled until actual image dimensions
+exist. Numerical values in the current unit and percent manual positions remain
+editable. Missing-metadata warnings are deferred until a photo is present.
+StartupRedesign/PresetsBeforePhoto opens the production preset browser in this
+state. A focused flow verifies save before import, the 48 px header and retention
+of both layout and the exact editor DOM node across first import/replacement.
+
+### About FrameNote splash
+
+The header brand is now an About FrameNote button. It opens an informational
+version of the former Leave your mark photographic splash with the original
+local bird asset, app version, local-processing note, GitHub and Changelog links.
+It opens only on request and preserves the mounted editor and current layout.
+The native modal dialog contains keyboard focus and closes with its close button,
+Back to editor, Escape or a backdrop click, returning focus to the brand.
+Its backdrop uses existing drop surface tokens and a reduced-transparency fallback.
+Screens/AboutFrameNote includes open and closed previews.
+
+Photo, Sizing & Margins and Export default to collapsed when no stored preference
+exists. Native accordion toggles and the sidebar width persist in localStorage
+for the same browser and origin; stored open/closed choices take precedence over
+these defaults. The workspace stays mounted across first import and replacement.
+
+Accordion state and sidebar width are now session-only UI state. They are neither
+read from nor written to localStorage; old stored preferences are ignored. On
+reload Photo, Sizing & Margins and Export start collapsed, other sections retain
+their declared defaults, and the sidebar starts at 384 px. Resizing and toggling
+remain available and survive photo imports in the mounted workspace. Preset
+storage remains independent. The obsolete section-storage helpers were removed.
+
+The tools sidebar resize range is 384–560 px, with 384 px as its default.
+Pointer and keyboard changes share this lower bound so resizing cannot compress
+the current controls below their supported desktop width. Narrow-window stacked
+layouts continue to use the available window width.

@@ -5,6 +5,12 @@ import { resolvePhotographicIso } from './photographic-metadata';
 export interface CaptionTag extends MetadataField {
   sources: readonly string[];
 }
+const shutterSources = [
+  'exif:ExposureTime',
+  'xmp:ExposureTime',
+  'exif:ShutterSpeedValue',
+  'xmp:ShutterSpeedValue',
+] as const;
 const definitions = {
   author: [
     'xmp:creator',
@@ -15,12 +21,8 @@ const definitions = {
   ],
   camera: ['exif:Model', 'xmp:Model'],
   lens: ['exif:LensModel', 'xmp:LensModel', 'xmp:Lens'],
-  shutter: [
-    'exif:ExposureTime',
-    'xmp:ExposureTime',
-    'exif:ShutterSpeedValue',
-    'xmp:ShutterSpeedValue',
-  ],
+  shutter: shutterSources,
+  shutterDuration: shutterSources,
   aperture: [
     'exif:FNumber',
     'xmp:FNumber',
@@ -186,10 +188,30 @@ function format(name: string, field: MetadataField): string {
     }
     case 'heliconStack':
       return parseHeliconComment(text) ?? '';
-    case 'shutter': {
+    case 'shutter':
+    case 'shutterDuration': {
       const apex = field.name === 'ShutterSpeedValue';
       const seconds = apex && value !== null ? 2 ** -value : value;
       if (seconds !== null && Number.isFinite(seconds) && seconds > 0) {
+        if (
+          name === 'shutterDuration' &&
+          Number(seconds.toPrecision(12)) >= 60
+        ) {
+          // Normalize floating-point APEX/rational noise before splitting units.
+          const duration = Number(seconds.toPrecision(12));
+          const hours = Math.floor(duration / 3600);
+          const minutes = Math.floor((duration - hours * 3600) / 60);
+          const remaining = Number(
+            (duration - hours * 3600 - minutes * 60).toPrecision(12),
+          );
+          return [
+            hours ? `${hours} h` : '',
+            minutes ? `${minutes} min` : '',
+            remaining ? `${remaining} s` : '',
+          ]
+            .filter(Boolean)
+            .join(' ');
+        }
         const reciprocal = 1 / seconds;
         return seconds < 1 &&
           Math.abs(reciprocal - Math.round(reciprocal)) < 0.01
@@ -242,7 +264,11 @@ export function captionTags(fields: readonly MetadataField[]): CaptionTag[] {
       for (const source of candidates) {
         const field = byKey.get(source);
         if (!field || !field.displayValue.trim()) continue;
-        const selected = sourceField(name, source, field);
+        const selected = sourceField(
+          name === 'shutterDuration' ? 'shutter' : name,
+          source,
+          field,
+        );
         if (!selected || !selected.field.displayValue.trim()) continue;
         const displayValue = format(name, selected.field);
         if (displayValue)

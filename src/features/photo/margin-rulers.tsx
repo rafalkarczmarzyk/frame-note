@@ -1,3 +1,4 @@
+import { rulerThickness } from '@/components/ui/ruler-metrics';
 import { Ruler } from '@/components/ui/ruler';
 import { MarginHandle } from '@/components/ui/margin-handle';
 import { MarginGuides } from '@/components/ui/margin-guides';
@@ -69,8 +70,13 @@ export function MarginRulers({
     >
       <span
         aria-hidden="true"
-        className={`absolute flex h-7 w-7 items-center justify-center bg-sidebar-base text-[9px] text-content-secondary ${preview?.visible ? 'opacity-100' : 'opacity-60'}`}
-        style={{ left: -28, top: -28 }}
+        className={`absolute flex items-center justify-center bg-sidebar-base text-[9px] text-content-secondary ${preview?.visible ? 'opacity-100' : 'opacity-60'}`}
+        style={{
+          left: -rulerThickness,
+          top: -rulerThickness,
+          width: rulerThickness,
+          height: rulerThickness,
+        }}
       >
         {sizingLabels[unit]}
       </span>
@@ -86,7 +92,11 @@ export function MarginRulers({
             unitLabel={sizingLabels[unit]}
             active={preview?.visible}
             className="absolute"
-            style={horizontal ? { left: 0, top: -28 } : { left: -28, top: 0 }}
+            style={
+              horizontal
+                ? { left: 0, top: -rulerThickness }
+                : { left: -rulerThickness, top: 0 }
+            }
             onMouseEnter={() => preview?.hover('ruler')}
             onMouseLeave={() => preview?.hover(null)}
           >

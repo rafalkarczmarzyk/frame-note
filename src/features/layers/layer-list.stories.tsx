@@ -106,7 +106,6 @@ function Example({
         title="Layers"
         icon={<Layers />}
         iconTone="caption"
-        persist={false}
       >
         <LayerList
           controlsLayout={controlsLayout}

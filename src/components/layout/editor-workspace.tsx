@@ -4,12 +4,7 @@ import {
   type ComponentProps,
   type CSSProperties,
 } from 'react';
-import {
-  clampSidebarWidth,
-  readSidebarWidth,
-  saveSidebarWidth,
-  sidebarWidth,
-} from '@/lib/sidebar-width';
+import { clampSidebarWidth, sidebarWidth } from '@/lib/sidebar-width';
 import { cn } from '@/lib/utils';
 
 /** Workspace columns share the available preview area. */
@@ -34,26 +29,13 @@ export function ToolSidebar({
   style,
   ...props
 }: ComponentProps<'aside'>) {
-  const [width, setWidth] = useState(() => {
-    try {
-      return readSidebarWidth(window.localStorage);
-    } catch {
-      return sidebarWidth.default;
-    }
-  });
+  const [width, setWidth] = useState(sidebarWidth.default);
   const drag = useRef<{ x: number; width: number } | null>(null);
   const currentWidth = useRef(width);
-  const update = (value: number, persist = false) => {
+  const update = (value: number) => {
     const next = clampSidebarWidth(value);
     currentWidth.current = next;
     setWidth(next);
-    if (persist) {
-      try {
-        saveSidebarWidth(window.localStorage, next);
-      } catch {
-        /* Storage can be unavailable. */
-      }
-    }
   };
   return (
     <aside
@@ -92,18 +74,18 @@ export function ToolSidebar({
         onPointerUp={(event) => {
           if (!drag.current) return;
           drag.current = null;
-          update(currentWidth.current, true);
+          update(currentWidth.current);
           if (event.currentTarget.hasPointerCapture(event.pointerId))
             event.currentTarget.releasePointerCapture(event.pointerId);
         }}
         onPointerCancel={() => {
           drag.current = null;
-          update(currentWidth.current, true);
+          update(currentWidth.current);
         }}
         onLostPointerCapture={() => {
           drag.current = null;
         }}
-        onDoubleClick={() => update(sidebarWidth.default, true)}
+        onDoubleClick={() => update(sidebarWidth.default)}
         onKeyDown={(event) => {
           const next =
             event.key === 'ArrowLeft'
@@ -119,7 +101,7 @@ export function ToolSidebar({
                       : null;
           if (next !== null) {
             event.preventDefault();
-            update(next, true);
+            update(next);
           }
         }}
       >

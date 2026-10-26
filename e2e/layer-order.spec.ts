@@ -58,7 +58,10 @@ test('reorders overlapping layers by dragging and keyboard and hides them from e
     },
   };
   await page
-    .getByRole('button', { name: 'Manage presets', exact: true })
+    .getByRole('button', { name: 'Preset actions', exact: true })
+    .click();
+  await page
+    .getByRole('menuitem', { name: 'Manage presets', exact: true })
     .click();
   await page.getByLabel('Import preset file').setInputFiles({
     name: 'stack.json',

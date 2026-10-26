@@ -42,6 +42,7 @@ import {
   Info,
   Layers,
   LockKeyhole,
+  LoaderCircle,
   Move,
   Palette,
   Pencil,
@@ -264,7 +265,11 @@ const groups: { title: string; icons: IconEntry[] }[] = [
     icons: [
       { name: 'UserRound', Icon: UserRound, usage: 'Author' },
       { name: 'Focus', Icon: Focus, usage: 'Lens' },
-      { name: 'Timer', Icon: Timer, usage: 'Shutter speed' },
+      {
+        name: 'Timer',
+        Icon: Timer,
+        usage: 'Shutter speed and readable shutter duration',
+      },
       { name: 'Sun', Icon: Sun, usage: 'ISO' },
       { name: 'CalendarDays', Icon: CalendarDays, usage: 'Capture date' },
       { name: 'Copyright', Icon: Copyright, usage: 'Copyright' },
@@ -276,6 +281,12 @@ const groups: { title: string; icons: IconEntry[] }[] = [
       { name: 'Bookmark', Icon: Bookmark, usage: 'Preset picker' },
       { name: 'Upload', Icon: Upload, usage: 'Import presets' },
       { name: 'Save', Icon: Save, usage: 'Save preset changes' },
+      {
+        name: 'LoaderCircle',
+        Icon: LoaderCircle,
+        usage:
+          'Split button, photo import and export preparation loading states',
+      },
       { name: 'Settings2', Icon: Settings2, usage: 'Manage presets' },
       { name: 'Pencil', Icon: Pencil, usage: 'Rename preset' },
       { name: 'Ellipsis', Icon: Ellipsis, usage: 'Layer actions menu' },
@@ -288,7 +299,8 @@ const groups: { title: string; icons: IconEntry[] }[] = [
       {
         name: 'ChevronDown',
         Icon: ChevronDown,
-        usage: 'Expand section; open select; decrease number',
+        usage:
+          'Expand section; open select or split button menu; decrease number',
       },
       { name: 'ChevronUp', Icon: ChevronUp, usage: 'Increase number' },
       { name: 'ChevronRight', Icon: ChevronRight, usage: 'Open font picker' },

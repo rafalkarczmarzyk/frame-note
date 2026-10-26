@@ -6,7 +6,7 @@ const meta = {
   component: ToolSidebar,
   args: {
     children: (
-      <SidebarSection id="storybook-tools" title="Tools" persist={false}>
+      <SidebarSection id="storybook-tools" title="Tools">
         <p className="text-xs">Feature controls live here.</p>
       </SidebarSection>
     ),

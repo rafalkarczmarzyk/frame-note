@@ -51,7 +51,7 @@ export function MarginHandle({
     >
       <span
         aria-hidden="true"
-        className={`${showLabel ? 'visible' : 'invisible'} flex size-4 items-center justify-center rounded-sm text-[9px] font-semibold leading-none text-button-primary-text ${active ? 'bg-accent-color' : 'bg-content-primary'}`}
+        className={`${showLabel ? 'visible' : 'invisible'} pointer-events-none absolute ${horizontal ? 'top-full left-1/2 mt-1 -translate-x-1/2' : 'top-1/2 left-full ml-1 -translate-y-1/2'} flex size-4 items-center justify-center rounded-sm text-[9px] font-semibold leading-none text-button-primary-text ${active ? 'bg-accent-color' : 'bg-content-primary'}`}
       >
         {side[0]!.toUpperCase()}
       </span>

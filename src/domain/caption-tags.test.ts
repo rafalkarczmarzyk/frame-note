@@ -348,3 +348,87 @@ describe('FrameNote caption helpers', () => {
     ).toEqual(['FrameNote', 'xmp']);
   });
 });
+
+describe('readable shutter duration', () => {
+  it.each([
+    [1 / 250, '1/250 s'],
+    [0.3, '0.3 s'],
+    [30, '30 s'],
+    [59.5, '59.5 s'],
+    [60, '1 min'],
+    [90, '1 min 30 s'],
+    [125, '2 min 5 s'],
+    [600, '10 min'],
+    [3600, '1 h'],
+    [3660, '1 h 1 min'],
+    [3661.5, '1 h 1 min 1.5 s'],
+    [86400, '24 h'],
+  ])('formats %s seconds as %s', (seconds, expected) => {
+    const fields = [field('exif:ExposureTime', String(seconds), seconds)];
+    expect(get(fields, 'shutterDuration')).toMatchObject({
+      displayValue: expected,
+      sources: ['exif:ExposureTime'],
+    });
+  });
+  it('uses rational XMP values and namespace evidence, while keeping shutter and exposure unchanged', () => {
+    const fields = [
+      field('exif:ExposureTime', 'invalid', [0, 0]),
+      xmpField('ExposureTime', [
+        {
+          group: 'xmp',
+          name: 'ExposureTime',
+          namespaceUri: 'http://ns.adobe.com/exif/1.0/',
+          source: 'xmp:ExposureTime',
+          rawValue: '600/1',
+          displayValue: '600',
+        },
+      ]),
+    ];
+    expect(get(fields, 'shutterDuration')).toMatchObject({
+      displayValue: '10 min',
+      sources: ['xmp:ExposureTime'],
+    });
+    expect(get(fields, 'shutter').displayValue).toBe('600 s');
+    expect(get(fields, 'exposure').displayValue).toBe('600 s');
+    expect(resolveTemplate('{shutterDuration}', fields)).toMatchObject({
+      text: '10 min',
+      missing: [],
+      invalidSyntax: false,
+    });
+  });
+  it('converts APEX seconds before formatting and rejects invalid sources', () => {
+    expect(
+      get(
+        [field('exif:ShutterSpeedValue', '-9.2288', -Math.log2(600))],
+        'shutterDuration',
+      ).displayValue,
+    ).toBe('10 min');
+    for (const raw of [0, -1, NaN, Infinity, [1, 0], 'unknown']) {
+      expect(
+        get([field('exif:ExposureTime', String(raw), raw)], 'shutterDuration')
+          .displayValue,
+      ).toBe('');
+    }
+    expect(get([], 'shutterDuration')).toMatchObject({
+      displayValue: '',
+      sources: [],
+    });
+    expect(
+      get(
+        [
+          xmpField('ExposureTime', [
+            {
+              group: 'xmp',
+              name: 'ExposureTime',
+              namespaceUri: 'urn:unrelated',
+              source: 'unrelated:ExposureTime',
+              rawValue: 600,
+              displayValue: '600',
+            },
+          ]),
+        ],
+        'shutterDuration',
+      ).displayValue,
+    ).toBe('');
+  });
+});

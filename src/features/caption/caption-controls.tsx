@@ -44,21 +44,19 @@ export function CaptionControls({
   disabled,
   onBrowseFonts,
   onBrowseColors,
-  preferenceScope = '',
-  persistSections = true,
   scope = 'all',
   hideTypography = false,
+  canConvertUnits = true,
 }: {
   scope?: 'all' | 'local' | 'global';
   hideTypography?: boolean;
+  canConvertUnits?: boolean;
   caption: Caption;
   dimensions: ImageDimensions;
   onChange: (caption: Caption) => void;
   disabled: boolean;
   onBrowseFonts: () => void;
   onBrowseColors: () => void;
-  preferenceScope?: string;
-  persistSections?: boolean;
 }) {
   const style = (patch: Partial<Caption['style']>) =>
     onChange({ ...caption, style: { ...caption.style, ...patch } });
@@ -105,19 +103,26 @@ export function CaptionControls({
     <>
       {scope !== 'local' && (
         <SidebarSection
-          id={`${preferenceScope}sizing`}
-          persist={persistSections}
+          id="sizing"
           title="Sizing & Margins"
+          defaultOpen={false}
           iconTone="sizing"
           icon={<Ruler />}
         >
-          <Field label="Sizing unit">
+          <Field
+            label="Sizing unit"
+            hint={
+              !canConvertUnits
+                ? 'Open a photo to change document units.'
+                : undefined
+            }
+          >
             {(id, descriptionId) => (
               <Select
                 id={id}
                 aria-describedby={descriptionId}
                 value={caption.sizingUnit}
-                disabled={disabled}
+                disabled={disabled || !canConvertUnits}
                 onValueChange={(value) =>
                   onChange(
                     convertSizing(caption, value as SizingUnit, dimensions),

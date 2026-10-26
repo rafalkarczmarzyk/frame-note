@@ -14,7 +14,6 @@ const meta = {
     title: 'Typography',
     icon: <Type />,
     iconTone: 'typography',
-    persist: false,
     children: (
       <NumberField
         label="Size"
@@ -30,7 +29,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Native details/summary. Independent sections keep their content mounted. Set persist=false for documentation or transient layouts; production uses localStorage.',
+          'Native details/summary. Independent sections keep their content mounted. Open state belongs to the current workspace and resets on reload.',
       },
     },
   },
@@ -50,7 +49,6 @@ function AccordionGroup() {
         icon={<PhotoIcon />}
 
         defaultOpen={false}
-        persist={false}
       >
         <p className="text-xs leading-5">
           20260520-IMG_3843.jpg
@@ -63,7 +61,6 @@ function AccordionGroup() {
         title="Caption"
         iconTone="caption"
         icon={<TextQuote />}
-        persist={false}
       >
         <Textarea
           aria-label="Caption template"
@@ -77,8 +74,6 @@ function AccordionGroup() {
         title="Typography"
         iconTone="typography"
         icon={<Type />}
-
-        persist={false}
       >
         <NumberField
           label="Size (% short edge)"
@@ -96,7 +91,6 @@ function AccordionGroup() {
         icon={<Move />}
 
         defaultOpen={false}
-        persist={false}
       >
         <AnchorPicker value={anchor} onValueChange={setAnchor} />
       </SidebarSection>

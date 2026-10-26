@@ -1,3 +1,6 @@
+import { builtinPresets } from '@/domain/builtin-presets';
+import { createMetadataField } from '@/domain/metadata';
+import { Button } from '@/components/ui/button';
 import { brandIcons } from '@/features/caption/brand-icons';
 import { Aperture, Camera } from 'lucide-react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -28,12 +31,16 @@ function TestPhotoEditor({
   initialLayout,
   initialIcons,
   toolbar,
+  presetId,
+  exposureSeconds,
 }: {
   src: string;
   name: string;
   initialLayout?: CaptionLayout;
   initialIcons?: SvgIcon[];
   toolbar?: ReactNode;
+  presetId?: string;
+  exposureSeconds?: number;
 }) {
   const [photo, setPhoto] = useState<LoadedPhoto | null>(null);
   const [error, setError] = useState('');
@@ -51,6 +58,19 @@ function TestPhotoEditor({
         result.dispose();
         return;
       }
+      if (exposureSeconds !== undefined) {
+        result.document.photo.metadata = [
+          ...result.document.photo.metadata.filter(
+            (field) => field.key !== 'exif:ExposureTime',
+          ),
+          createMetadataField({
+            group: 'exif',
+            name: 'ExposureTime',
+            rawValue: exposureSeconds,
+            displayValue: String(exposureSeconds),
+          }),
+        ];
+      }
       loaded = result;
       setPhoto(result);
     })().catch((cause: unknown) => {
@@ -64,7 +84,8 @@ function TestPhotoEditor({
       abort.abort();
       loaded?.dispose();
     };
-  }, [src, name]);
+  }, [src, name, exposureSeconds]);
+  const preset = builtinPresets.find((preset) => preset.id === presetId);
   return (
     <div className="flex h-svh min-h-0 flex-col overflow-hidden bg-app-base text-content-primary">
       <AppHeader>
@@ -78,8 +99,9 @@ function TestPhotoEditor({
       ) : photo ? (
         <PhotoWorkspace
           photo={photo}
-          initialLayout={initialLayout}
-          initialIcons={initialIcons}
+          initialLayout={preset?.layout ?? initialLayout}
+          initialIcons={preset?.icons ?? initialIcons}
+          initialPresetId={preset?.id}
         />
       ) : (
         <p role="status" className="p-6">
@@ -93,7 +115,12 @@ const meta = {
   title: 'Screens/TestPhotos',
   component: TestPhotoEditor,
   args: { src: brightUrl, name: '20260405-K89A0565.jpg' },
-  render: (args) => <TestPhotoEditor key={args.src} {...args} />,
+  render: (args) => (
+    <TestPhotoEditor
+      key={`${args.src}-${args.presetId ?? ''}-${args.exposureSeconds ?? ''}`}
+      {...args}
+    />
+  ),
   parameters: {
     layout: 'fullscreen',
     docs: {
@@ -326,3 +353,117 @@ function MixedImageExample() {
   );
 }
 export const MixedImages: Story = { render: () => <MixedImageExample /> };
+
+function BuiltinPresetReview({
+  src,
+  name,
+  exposureSeconds,
+}: {
+  src: string;
+  name: string;
+  exposureSeconds?: number;
+}) {
+  const [id, setId] = useState('builtin-default');
+  const preset = builtinPresets.find((preset) => preset.id === id)!;
+  return (
+    <TestPhotoEditor
+      key={`${src}-${id}-${exposureSeconds}`}
+      src={src}
+      name={name}
+      presetId={id}
+      exposureSeconds={exposureSeconds}
+      toolbar={
+        <div className="flex shrink-0 flex-wrap gap-2 border-b border-border-subtle bg-header-base p-3">
+          {builtinPresets.map((preset) => (
+            <Button
+              key={preset.id}
+              size="sm"
+              variant={id === preset.id ? 'default' : 'outline'}
+              onClick={() => setId(preset.id)}
+            >
+              {preset.name}
+            </Button>
+          ))}
+          <span className="self-center text-xs text-content-secondary">
+            {preset.name} · {preset.layout.containers.length} layer(s)
+          </span>
+        </div>
+      }
+    />
+  );
+}
+export const BuiltinPresetLibrary: Story = {
+  args: { src: wildlifeUrl, name: '20260520-IMG_3843.jpg' },
+  render: (args) => <BuiltinPresetReview {...args} />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Compare all nine production presets on the same photo. Buttons switch isolated layouts; changing the photo source lets you review portrait, bright and night fixtures. Does not write application preset storage.',
+      },
+    },
+  },
+};
+export const PresetDefault: Story = {
+  args: { src: wildlifeUrl, name: 'Wildlife.jpg', presetId: 'builtin-default' },
+};
+export const PresetDefaultDark: Story = {
+  args: { presetId: 'builtin-default-dark' },
+};
+export const PresetSignature: Story = {
+  args: {
+    src: portraitUrl,
+    name: 'Portrait.jpg',
+    presetId: 'builtin-signature',
+  },
+};
+export const PresetCompactEXIF: Story = {
+  args: {
+    src: wildlifeUrl,
+    name: 'Wildlife.jpg',
+    presetId: 'builtin-compact-exif',
+  },
+};
+export const PresetCameraAndLens: Story = {
+  args: {
+    src: wildlifeUrl,
+    name: 'Wildlife.jpg',
+    presetId: 'builtin-camera-lens',
+  },
+};
+export const PresetFocusStack: Story = {
+  args: { src: heliconUrl, name: 'Helicon.jpg', presetId: 'builtin-macro' },
+};
+export const PresetEXIFIcons: Story = {
+  args: {
+    src: wildlifeUrl,
+    name: 'Wildlife.jpg',
+    presetId: 'builtin-exif-icons',
+  },
+};
+export const PresetAstrophotography: Story = {
+  args: {
+    src: nightUrl,
+    name: 'Night.jpg',
+    presetId: 'builtin-astrophotography',
+  },
+};
+export const PresetLongExposure: Story = {
+  args: { src: nightUrl, name: 'Night.jpg', presetId: 'builtin-long-exposure' },
+};
+export const LongExposureTenMinutes: Story = {
+  args: {
+    src: nightUrl,
+    name: 'Duration demo.jpg',
+    presetId: 'builtin-long-exposure',
+    exposureSeconds: 600,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Demonstration override: ExposureTime is set to 600 seconds in memory to preview 10 min. This is not the actual exposure recorded in the fixture. The source file is unchanged.',
+      },
+    },
+  },
+};

@@ -1,6 +1,5 @@
 import { ChevronDown } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
-import { readSectionOpen, saveSectionOpen } from '@/lib/section-preferences';
 
 interface SidebarSectionProps {
   id: string;
@@ -9,7 +8,6 @@ interface SidebarSectionProps {
   iconTone?:
     'photo' | 'caption' | 'typography' | 'sizing' | 'position' | 'export';
   defaultOpen?: boolean;
-  persist?: boolean;
   children: ReactNode;
   surface?: 'default' | 'container';
   contentPadding?: 'default' | 'none';
@@ -22,30 +20,18 @@ export function SidebarSection({
   icon,
   iconTone,
   defaultOpen = true,
-  persist = true,
   children,
   surface = 'default',
   contentPadding = 'default',
 }: SidebarSectionProps) {
-  const [open, setOpen] = useState(() => {
-    if (!persist) return defaultOpen;
-    try {
-      return readSectionOpen(window.localStorage, id, defaultOpen);
-    } catch {
-      return defaultOpen;
-    }
-  });
+  const [open, setOpen] = useState(defaultOpen);
   return (
     <details
+      data-section={id}
       open={open}
       onToggle={(event) => {
         const next = event.currentTarget.open;
         setOpen(next);
-        try {
-          if (persist) saveSectionOpen(window.localStorage, id, next);
-        } catch {
-          /* Private browsing can block localStorage. */
-        }
       }}
       className={`group/section mx-3 my-3 overflow-hidden rounded-xl ${surface === 'container' ? 'border border-container-settings-border bg-container-settings-base' : 'bg-accordion-base'}`}
     >
