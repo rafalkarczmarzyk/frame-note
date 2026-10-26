@@ -1,332 +1,246 @@
-# FrameNote
+<p align="center">
+  <img src="docs/assets/framenote-logo.svg" alt="FrameNote" width="360" />
+</p>
 
-Lokalny edytor podpisów fotograficznych: React, TypeScript, Vite, Tailwind CSS,
-Konva i ExifReader. Zdjęcia są przetwarzane w przeglądarce, bez wysyłania na serwer.
+<h1 align="center">Your photos. Their story.</h1>
 
-## Status
+<p align="center">
+  Turn photo metadata into beautifully styled captions, logos, and reusable layouts.<br />
+  Process your photos locally in your browser.
+</p>
 
-Pre-MVP ukończone i zaakceptowane; ostatni etap zapisany w commicie `9a627af`.
-Cały przepływ działa: import JPG/PNG → szablon podpisu → stylowanie i podgląd → eksport JPG.
-Po zamknięciu pre-MVP dodano uzgodnione usprawnienia UI, helpery metadanych i nowe
-zdjęcia testowe. Nie oznacza to zatwierdzenia całej roadmapy MVP.
+<p align="center">
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/status-toward%201.0-14CC60?style=for-the-badge" alt="Status: working toward release 1.0" /></a>
+  <img src="https://img.shields.io/badge/photo%20processing-local-00BFB3?style=for-the-badge" alt="Photo processing: local in your browser" />
+</p>
 
-Kontekst produktu, założenia pre-MVP i propozycja MVP:
-[docs/PRODUCT_PLAN.md](docs/PRODUCT_PLAN.md).
+<p align="center">
+  <img src="https://img.shields.io/github/package-json/v/rafalkarczmarzyk/frame-note?style=for-the-badge&label=FrameNote&color=14CC60" alt="FrameNote package version" />
+  <img src="https://img.shields.io/github/package-json/dependency-version/rafalkarczmarzyk/frame-note/react?style=for-the-badge&logo=react&logoColor=white&color=149ECA" alt="React version range" />
+  <img src="https://img.shields.io/github/package-json/dependency-version/rafalkarczmarzyk/frame-note/dev/typescript?style=for-the-badge&logo=typescript&logoColor=white&color=3178C6" alt="TypeScript version range" />
+  <img src="https://img.shields.io/github/package-json/dependency-version/rafalkarczmarzyk/frame-note/dev/vite?style=for-the-badge&logo=vite&logoColor=white&color=646CFF" alt="Vite version range" />
+  <img src="https://img.shields.io/github/package-json/dependency-version/rafalkarczmarzyk/frame-note/tailwindcss?style=for-the-badge&logo=tailwindcss&logoColor=white&color=06B6D4" alt="Tailwind CSS version range" />
+  <img src="https://img.shields.io/github/package-json/dependency-version/rafalkarczmarzyk/frame-note/dev/storybook?style=for-the-badge&logo=storybook&logoColor=white&color=FF4785" alt="Storybook version range" />
+</p>
 
-## Uruchomienie
+<p align="center">
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#features">Features</a> ·
+  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="#development">Development</a> ·
+  <a href="#documentation">Documentation</a>
+</p>
 
-Node.js: wersja z `.nvmrc` lub zgodna z wymaganiami zależności. Używamy pnpm
-(wersja przypięta w `packageManager`).
+---
+
+FrameNote is a browser-based photo caption editor built for photographers who
+want more control over how metadata appears on their images. Import a photo,
+compose a layout with text and graphics, preview your changes, and download a JPG
+with the finished design rendered into its pixels. No account or backend is
+required for this workflow; photo processing happens in your browser.
+
+The project is under active development. The pre-MVP has been completed and
+accepted; implemented MVP features and subsequent improvements are documented
+below. Product milestones and review status live in the
+[product plan](docs/PRODUCT_PLAN.md).
+
+## Features
+
+- **Metadata that becomes part of the image.** Search available EXIF, IPTC, XMP,
+  and ICC fields recognized by ExifReader. Combine original tags with readable
+  FrameNote helpers such as `{author}`, `{lens}`, and `{exposure}`.
+- **A visual caption editor.** Mix text, metadata badges, built-in icons, and
+  uploaded SVG or PNG artwork. Insert at the cursor, rearrange inline elements,
+  and use undo/redo.
+- **Independent layers.** Add, duplicate, delete, reorder, and hide layers.
+  Select them from the list or directly on the photo. Hidden layers remain
+  editable and are excluded from the preview and export.
+- **Flexible positioning.** Use nine anchors within shared margins, or drag a
+  layer into Manual positioning with X/Y coordinates relative to the photo.
+- **Consistent styling.** Choose Montserrat or Advercase, Regular or Bold,
+  alignment, line spacing, opacity, quick colors, or a custom HEX color. Size
+  content in pixels or as a percentage of the short or long image edge.
+- **Precise margins.** Adjust four margins independently, in pairs, or together
+  through the visual margin editor or interactive photo rulers.
+- **Inline logos and artwork.** Set each image height relative to the font or in
+  document units. Keep SVG colors or use the layer color; PNG preserves its
+  original colors and transparency.
+- **Reusable layout presets.** Save layouts locally, update or duplicate them,
+  and import/export `.framenote.json` files with their image assets. Built-in
+  presets include Default, Default dark, and Macro.
+- **Controlled JPG export.** Choose quality from 1–100%, inspect the actual
+  encoded file size, and download the prepared result. Preview and export share
+  layout calculations.
+
+## Quick start
+
+Use the Node.js version in [`.nvmrc`](.nvmrc) and the pnpm version pinned in
+[`package.json`](package.json). With nvm installed:
 
 ```sh
+nvm install
+nvm use
 pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Aplikacja: http://localhost:3000. Zajęty port powoduje błąd, bez zmiany portu.
-Vite i Storybook nasłuchują na `0.0.0.0`: z innego urządzenia w tej samej sieci
-użyj `http://<IP-komputera>:3000` lub `http://<IP-komputera>:6006`.
-Adresy sieciowe są wyświetlane podczas uruchamiania.
+Open [localhost:3000](http://localhost:3000). The development server fails if the
+port is occupied instead of silently choosing another one.
 
-## Kontrole
+Vite and Storybook listen on `0.0.0.0`. To open either from another device on your
+local network, use `http://<your-computer-ip>:3000` or
+`http://<your-computer-ip>:6006`. The server prints its network addresses at startup.
+
+## Create your first caption
+
+1. Choose a JPG or PNG, or drop it onto the workspace.
+2. Edit the default caption, insert metadata from the tag browser, and add images
+   through **Content → Add image**.
+3. Add layers as needed, then adjust typography, margins, stacking, and position.
+4. Save the layout as a preset if you want to reuse it with other photos.
+5. Choose JPG quality and select **Export JPG**.
+
+A caption can combine plain text and metadata tokens:
+
+```text
+{author}
+{lens}
+{exposure}
+```
+
+Original metadata is also available through namespaced tokens such as
+`{exif:Artist}` and `{exif:UserComment}`. The Macro preset uses `{heliconStack}`
+for the documented Helicon Focus UserComment format. Missing values are reported
+and require confirmation before export for visible layers. Intentional blank
+lines are preserved; lines containing only missing values are omitted.
+
+See the [caption tag reference](docs/CAPTION_TAGS.md) for available helpers,
+source precedence, formatting, and missing-data behavior.
+
+## Presets and local storage
+
+Presets include layers, content templates, styles, positions, visibility,
+stacking order, document units, margins, and used graphics. They exclude the
+source photo, resolved metadata values, and JPG quality.
+
+Saved presets persist in the same browser at the same origin. Clearing site data
+removes them; export a `.framenote.json` file to back them up or transfer them.
+Preset imports are validated and added as new presets without overwriting
+existing entries. The format is still evolving during development; compatibility
+with older presets is not a stable contract.
+
+Replacing a photo preserves the current layout and export quality in the session.
+Refreshing the page resets unsaved editor state; saved presets can be reapplied
+after importing a photo.
+
+## Limits and export behavior
+
+| Input        | Limits                                                      |
+| ------------ | ----------------------------------------------------------- |
+| Source photo | One JPG or PNG; up to 100 MB, 50 MP, and 16,384 px per side |
+| Inline SVG   | Up to 256 KB and 2,000 elements                             |
+| Inline PNG   | Up to 2 MB, 32 MP, and 16,384 px per side                   |
+| Preset file  | Up to 5 MB                                                  |
+
+SVG uploads must be self-contained vector artwork. Scripts, external resources,
+embedded images, stylesheets, and text elements are rejected; convert text to
+paths before importing. The editor limits active image content to 100 images.
+
+- Export produces `*-framenote.jpg` at the decoded source dimensions, with
+  orientation applied to the pixels. JPG is re-encoded, so export is not lossless.
+- Source EXIF/IPTC/XMP/GPS metadata and ICC profiles are not copied. Canvas uses
+  its default sRGB behavior. Color checks cover the supplied sRGB fixtures;
+  Adobe RGB, Display P3, and unusual profiles need separate verification.
+- Text does not automatically wrap or shrink to fit. Large layers can extend
+  beyond the image, including in Manual mode.
+- Metadata availability depends on the file and ExifReader. Not every custom tag
+  or MakerNote is supported.
+- Large photos may briefly block the main thread. Import limits do not guarantee
+  sufficient memory on every device.
+- Batch processing, zoom/pan, and a desktop application remain outside the
+  current scope.
+
+## Development
+
+The stack combines React, TypeScript, Vite, Tailwind CSS, Konva, Tiptap,
+ExifReader, and Radix UI. Unit tests use Vitest; browser tests use Playwright.
+Shared components and design tokens are documented in Storybook.
+
+| Command                         | Purpose                                                                       |
+| ------------------------------- | ----------------------------------------------------------------------------- |
+| `pnpm dev`                      | Start the app on port 3000                                                    |
+| `pnpm check`                    | Check formatting, color tokens, lint, types, unit tests, and production build |
+| `pnpm test:watch`               | Run unit tests in watch mode                                                  |
+| `pnpm test:e2e`                 | Run browser tests in Chromium and WebKit                                      |
+| `pnpm test:e2e:ui`              | Open the Playwright test interface                                            |
+| `pnpm test:photo-export`        | Run the focused photo export checks                                           |
+| `pnpm test:photo-export:review` | Review export checks in Playwright UI                                         |
+| `pnpm test:photo-export:report` | Open the saved Playwright report                                              |
+| `pnpm storybook`                | Start Storybook on port 6006                                                  |
+| `pnpm build-storybook`          | Build the static component documentation                                      |
+| `pnpm build`                    | Build the production app                                                      |
+| `pnpm preview`                  | Preview the production build                                                  |
+
+Install browser engines before running E2E tests:
 
 ```sh
-pnpm check
 pnpm exec playwright install chromium webkit
+pnpm check
 pnpm test:e2e
-pnpm build-storybook
 ```
 
-- `check`: Prettier, kontrola tokenów kolorów, ESLint, TypeScript, 181 testów jednostkowych i build aplikacji.
-- E2E na produkcyjnym buildzie, port 4173: dziewięć scenariuszy w Chromium i WebKit (18 testów).
-- Przepływ eksportu sprawdza oba oryginalne JPG, wymiary, jakość, rozmiar w bajtach,
-  brak źródłowych metadanych, różnice kolorów sRGB i obrót EXIF 6.
-- Regresja wizualna porównuje piksele eksportu w Chromium, bez zależności od UI.
-- Drugi scenariusz sprawdza szybką wymianę zdjęć, błędne i puste pliki, powrót do
-  pracy po błędzie oraz zwalnianie adresów Blob przy wymianie i nieudanym imporcie.
-- Pozostałe scenariusze sprawdzają zachowanie stylu przy zmianie zdjęcia, wybór
-  własnego HEX i jego piksele w JPG oraz helpery, namespace i przenośny szablon.
-- WebKit to automatyczny test silnika przeglądarki; nie zastępuje ręcznej oceny
-  aplikacji Safari ani testów na innych systemach.
+Playwright serves the production build on port 4173. Coverage includes photo
+import and replacement, metadata, layers, inline graphics, presets, positioning,
+and JPG export. Export checks inspect dimensions, encoded size, metadata removal,
+sRGB colors, orientation, and rendered pixels.
 
-Pozostałe polecenia: `format`, `lint:fix`, `test:watch`, `test:e2e:ui`, `preview`.
+Visual export baselines are platform-specific. Review actual/expected/diff images
+before deliberately updating them with
+`pnpm test:e2e:update --project=chromium`. UI-only changes should not require new
+export baselines. Automated WebKit tests do not replace manual Safari testing.
 
-### Wzorce eksportu
+### Storybook and design system
 
-`e2e/photo-flow.spec.ts-snapshots` zawiera zaakceptowane wzorce macOS/Chromium:
-miniaturę całego eksportu i fragment podpisu w oryginalnej rozdzielczości dla obu
-zdjęć. Porównanie dopuszcza próg koloru 0,1 i maksymalnie 0,1% różniących się
-pikseli. Błąd zapisuje actual/expected/diff w `test-results`.
+Open [localhost:6006](http://localhost:6006) after running `pnpm storybook`.
+Stories are grouped into **Design**, **Components** (UI, Layout, Brand), and
+**Screens**. `Screens/TestPhotos` exercises the real editor with original photo
+fixtures. Application and stories share components and CSS.
 
-Świadoma aktualizacja: `pnpm test:e2e:update --project=chromium`, następnie obejrzenie
-obrazów i diffu. Nie aktualizujemy wzorców eksportu przy samych zmianach UI.
-Inne platformy wymagają własnych, przejrzanych wzorców. WebKit wykonuje asercje
-funkcjonalne i pomiar kolorów bez porównywania do wzorców Chromium.
+UI colors are defined in `src/index.css` and consumed through semantic tokens.
+`pnpm check:tokens` checks this convention. The accessibility addon supports
+component review; it is not a complete accessibility audit.
 
-## Aktualne możliwości
+Montserrat is bundled through `@fontsource-variable/montserrat`. Advercase files
+are stored in `public/fonts/advercase`; the supplied archive did not include a
+license file, so its licensing needs review before distribution.
 
-- Jeden JPG lub PNG: wybór pliku lub drag & drop. Błąd wymiany pozostawia poprzednie zdjęcie.
-- Odczyt metadanych rozpoznawanych przez ExifReader: EXIF, IPTC, XMP i ICC.
-  Dostępne pola można przeszukiwać i wstawiać z listy. Nie gwarantujemy obsługi
-  każdego niestandardowego pola lub MakerNote.
-- Wiele kontenerów tekstowych z wieloliniowymi szablonami i helperami FrameNote (`{author}`, `{lens}`, `{exposure}`)
-  i oryginalnymi tagami `{group:name}`, np. `{exif:Artist}`.
-  Wstawianie w pozycji kursora, zastępowanie zaznaczenia, oznaczenie użytych tagów.
-  Helpery są na górze w grupie FrameNote, a oryginały w grupach namespace.
-  Domyślny podpis: `{author}`, `{lens}`, `{exposure}` w osobnych wierszach.
-  Brakujące pola są raportowane; eksport wymaga wtedy potwierdzenia.
-- Zmiana zdjęcia zachowuje ustawienia podpisu i jakość eksportu w bieżącej sesji.
-- Montserrat i Advercase, Regular/Bold, kolor (lista neutralnych i pastelowych odcieni oraz własny HEX), opacity (slider i pole liczbowe),
-  interlinia jako mnożnik fontu oraz wyrównanie tekstu.
-- Globalna jednostka wymiarowania: px, % krótszego lub % dłuższego boku zdjęcia.
-  Dotyczy rozmiaru fontu i czterech marginesów; zmiana jednostki przelicza wartości
-  bez zmiany wyglądu na bieżącym zdjęciu. Domyślnie font 2% krótszego boku,
-  marginesy po 3%, interlinia 1,4× i biały podpis (Porcelain).
-- Wizualny edytor marginesów z trybami niezależnym, parami i wszystkimi krawędziami i dziewięć anchorów względem
-  obszaru wewnątrz marginesów. Limity zostawiają co najmniej 1 px tego obszaru;
-  nie zapewniają dopasowania zbyt dużego bloku tekstu.
-- Wspólna geometria podglądu i eksportu. Font jest ładowany przed renderowaniem.
-- Jakość JPG 1–100%, domyślnie Best 95%; presety Small 60 i Balanced 75.
-- Dokładny rozmiar wyniku po kodowaniu w tle, rozmiar wejścia i ostrzeżenie,
-  gdy wynik jest większy. Pobierany jest gotowy Blob, bez ponownego kodowania.
-- Stały sidebar ze zwijanymi sekcjami i pamięcią otwarcia w localStorage.
-  Pływający panel tagów/fontów/kolorów ma osobny scroll i nie zmienia rozmiaru zdjęcia.
+### Repository structure
 
-## Ograniczenia
-
-- Import: maksymalnie 100 MB, 50 megapikseli i 16 384 px na bok.
-  Rozmiar pliku sprawdzamy przed odczytem, wymiary z nagłówka przed dekodowaniem,
-  a następnie rzeczywiste wymiary obrazu. Limity ograniczają zużycie zasobów;
-  dostępna pamięć nadal zależy od urządzenia i przeglądarki.
-- Eksport `*-framenote.jpg` zachowuje wymiary zdekodowanego zdjęcia i utrwala obrót
-  w pikselach. Ponownie koduje JPG; nie jest bezstratną kopią.
-- Źródłowe EXIF/IPTC/XMP/GPS i profil ICC nie są kopiowane. Canvas używa domyślnego
-  sRGB. Testy kolorów obejmują dostarczone zdjęcia sRGB; Adobe RGB, Display P3
-  i nietypowe profile wymagają osobnej weryfikacji.
-- Bardzo długi podpis może wyjść poza kadr. Brak automatycznego zawijania
-  i zmniejszania tekstu.
-- Kodowanie jest kolejkowane z opóźnieniem 450 ms i ignorowaniem spóźnionych wyników,
-  ale rysowanie dużych obrazów może chwilowo obciążyć główny wątek.
-- Wszystkie kontenery, ich style i pozycje oraz jakość eksportu pozostają przy wymianie zdjęcia,
-  ale bieżąca niezapisana sesja nie wraca po odświeżeniu. Zapisane presety
-  są trwałe w tej przeglądarce; można je odtworzyć po ponownym imporcie zdjęcia.
-- Poza MVP pozostają batch, zoom/pan i wersja desktopowa. Parser Helicon
-  obsługuje udokumentowany format UserComment, bez deklaracji obsługi innych programów.
-
-## Podpisy i zdjęcia testowe
-
-[Helpery i składnia podpisów](docs/CAPTION_TAGS.md) opisują dostępne nazwy,
-kolejność źródeł, formatowanie i brakujące dane. Oryginalne tagi pozostają dostępne.
-
-Siedem oryginalnych JPG obejmuje jasne i ciemne tła, dwie orientacje, komentarz
-Helicon oraz metadane XMP bez parametrów ekspozycji. Lista, wymiary i sumy plików:
-[tests/fixtures/README.md](tests/fixtures/README.md). Nie zmieniamy oryginałów
-i nie dołączamy ich do produkcyjnego builda aplikacji.
-
-## Design system
-
-```sh
-pnpm storybook
-pnpm build-storybook
+```text
+src/
+  components/       Shared UI, layout, and brand components
+  domain/           Photo, document, metadata, and preset models
+  features/
+    caption/        Content editor, geometry, rendering, and export
+    photo/          Import, metadata, and workspace composition
+    presets/        Preset controls and local persistence
+  lib/              Shared utilities and preferences
+docs/               Product, design, and verification documentation
+e2e/                Playwright flows and export baselines
+tests/fixtures/     Original test photos and graphics
 ```
 
-Storybook: http://localhost:6006. Podział: Design (tokeny), Components (UI, Layout,
-Brand) i Screens. `Screens/EditorWorkspace` pokazuje kompozycję UI ze zdjęciem
-poziomym/pionowym; `Screens/TestPhotos` uruchamia rzeczywisty edytor z odczytem
-metadanych, podglądem podpisu i eksportem na pięciu dodatkowych zdjęciach.
-Aplikacja oraz stories importują te same komponenty i CSS.
-Addon dostępności pomaga w przeglądzie; nie stanowi pełnego audytu dostępności.
+## Documentation
 
-Dokumentacja komponentów i rozbudowy: [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md).
+Some internal product and planning documents are maintained in Polish.
 
-### Paleta
-
-HEX-y są zdefiniowane tylko w `@theme` w `src/index.css`.
-
-| Paleta         | HEX     | Główne zastosowanie      |
-| -------------- | ------- | ------------------------ |
-| charcoal       | #383F51 | tło i ciemny tekst       |
-| slate          | #9CAFB7 | tło przeciągania zdjęcia |
-| porcelain      | #FDFFFC | tekst                    |
-| charcoal-dark  | #292E3B | obszar wokół zdjęcia     |
-| charcoal-light | #454E64 | accordiony               |
-
-Kolory akcentów ikon sekcji: turquoise — Photo, rose-brown — Caption, violet — Typography,
-yellow — Sizing i Margins, crimson — Position, primary — Export.
-
-| Paleta     | HEX     |
-| ---------- | ------- |
-| violet     | #731DD8 |
-| turquoise  | #00BFB3 |
-| yellow     | #FFD400 |
-| crimson    | #EF233C |
-| rose-brown | #8B635C |
-
-Primary: emerald (`#14CC60`). Tło przeciągania zdjęcia pozostaje slate (`#9CAFB7`).
-
-Komponenty używają tokenów zastosowań, np. `bg-input-base`, `bg-accordion-base`
-i `text-content-primary`. `pnpm check:tokens` sprawdza zasady kolorów; jest też
-częścią `pnpm check`. Paleta podpisu na zdjęciu pozostaje oddzielona od tokenów UI.
-Glass korzysta z przezroczystości i blur. Logo SVG i Lucide dziedziczą `currentColor`;
-rozmiar i kolor ustawiamy klasami Tailwind.
-
-### Fonty
-
-Montserrat Variable pochodzi z `@fontsource-variable/montserrat` i jest lokalnie
-pakowany. Advercase Regular/Bold z archiwum użytkownika znajduje się w
-`public/fonts/advercase`; w dostarczonym archiwum nie było pliku licencji.
-
-## Struktura
-
-- `src/domain`: modele zdjęcia, podpisu i metadanych, bez zależności od UI.
-- `src/features/photo`: import, normalizacja metadanych i kompozycja edytora.
-- `src/features/caption`: szablon, geometria, renderowanie i eksport.
-- `src/components/ui`: współdzielone kontrolki; Radix dla selecta, slidera i grup.
-- `src/components/layout`: sidebar, sekcje i pływający panel.
-- `src/lib`: kolejka zadań, formatowanie rozmiaru i preferencje sekcji.
-- `tests/fixtures`: oryginalne zdjęcia poziome i pionowe; unity sprawdzają ich sumy.
-- `e2e`: testy Playwright i wzorce eksportu.
-
-## Próba edytora MVP — etap 1
-
-Storybook → **Screens/CaptionEditorPrototype → Playground**:
-[otwórz próbę](http://localhost:6006/?path=/story/screens-captioneditorprototype--playground).
-Tekst, atomowe badge’e tagów i ikon SVG, przeciąganie, undo/redo oraz schowek
-z zapisem `{author}` / `{icon:aperture}`. Pole Clipboard playground służy do
-sprawdzenia kopiowania i ponownego wklejania. Próba korzysta z przykładowych
-wartości i dwóch ikon; nie zmienia obecnego edytora zdjęć ani eksportu.
-
-## Wiele kontenerów — MVP etap 2
-
-Sekcja **Containers** pozwala dodawać, duplikować i usuwać kontenery tekstowe.
-Wybór z listy lub kliknięciem podpisu na zdjęciu zmienia aktywny kontener;
-sidebar edytuje wyłącznie jego treść, styl i anchor. Jednostka wymiarowania
-pozostaje wspólna: zmiana przelicza wszystkie kontenery, zachowując ich wygląd.
-Nowy kontener ma pustą treść i zaślepkę tylko w podglądzie i kopiuje ustawienia aktywnego. Można usunąć wszystkie
-kontenery i wyeksportować samo zdjęcie. Ramka zaznaczenia nie trafia do JPG.
-
-Przykład: Storybook → **Screens/TestPhotos → MultipleCaptions**.
-Przeciąganie i pozycja Custom są dostępne; integracja Tiptap jest dostępna w etapie 4.
-
-Sidebar rozdziela **Selected container** (treść, typografia, pozycja) oraz
-**Document** (wspólna jednostka i marginesy, informacje o zdjęciu).
-Marginesy są globalne i ustawiają wspólny obszar dla wszystkich anchorów.
-
-## Swobodne pozycjonowanie — MVP etap 3
-
-Przeciągnięcie kontenera na zdjęciu przełącza go do trybu Custom. X/Y wyrażają
-procent szerokości/wysokości całego zdjęcia i określają pozycję ostatnio wybranego
-anchora wewnątrz bloku. Zachowuje to wybraną krawędź przy zmianie długości tekstu.
-Custom pomija globalne marginesy; jednostka dokumentu nadal steruje fontem.
-Punkt odniesienia można ustawić w zakresie 0–100%; duży blok może wychodzić poza
-zdjęcie. Wybór anchora przywraca pozycjonowanie względem wspólnych marginesów.
-Duplikat zachowuje Custom, nowy kontener dostaje wolny anchor.
-Storybook: Screens/TestPhotos/CustomPosition.
-
-## Wizualny edytor i SVG inline — MVP etap 4
-
-Caption używa Tiptap: tekst i nowe wiersze, atomowe badge’e metadanych oraz ikony
-SVG bez ramki i widocznej nazwy (token w tooltipie). Tagi korzystają z rzeczywistych
-metadanych zdjęcia; brakujące elementy są oznaczone, bez usuwania zapisu z szablonu.
-Browse available tags wstawia element w miejscu kursora lub zamiast zaznaczenia.
-Zaznaczanie, usuwanie, przeciąganie i undo/redo działają wewnątrz edytora.
-Kopiowanie/wycinanie daje `{klucz}`, a wklejenie odtwarza elementy wizualne.
-
-Browse icons pozwala nadać nazwę i wgrać SVG (do 256 KB, 2000 elementów). Następnie
-wybierz ikonę, aby wstawić `{icon:nazwa}`. SVG musi być samodzielną grafiką wektorową,
-bez skryptów, osadzonych obrazów, zewnętrznych zasobów i arkuszy stylów; tekst należy
-zamienić na krzywe. Ikony zachowują proporcje i dziedziczą kolor, rozmiar i opacity
-kontenera. Podgląd i eksport korzystają z tych samych pomiarów i układu tekstu/SVG.
-Wgrane ikony pozostają przy wymianie zdjęcia w sesji; trwały zapis zasobów dojdzie
-w etapie presetów. Samodzielny blok logo SVG jest dostępny w etapie 5.
-
-Storybook: **Screens/TestPhotos/InlineIcons** pokazuje edytor i eksport z ikonami
-aperture i camera. Test E2E sprawdza upload, odrzucenie skryptu, schowek, brakującą
-ikonę i piksel koloru SVG w JPG. Obecny eksport tekstowy zachowuje wcześniejsze wzorce.
-
-Puste kontenery pokazują przyciemnione logo FrameNote i ramkę wyłącznie na canvasie.
-Zaślepka nie trafia do schowka ani JPG i znika przy pierwszej treści. W edytorze
-widoczna jest podpowiedź. Built-in zawiera też `{icon:framenote-logo}` (pełne logo)
-i `{icon:framenote-icon}` (znak marki); ich świadome wstawienie trafia do eksportu.
-
-## Logo SVG — MVP etap 5
-
-**Add logo** dodaje samodzielny blok SVG. Na liście jest miniatura i nazwa pliku;
-wybór na liście lub canvasie otwiera kontrolki Logo SVG i Position. Width/Height
-zachowują proporcje i używają wspólnej jednostki dokumentu. Original colors zachowuje
-kolory SVG; Single color korzysta z tego samego pickera co podpis. Opacity działa
-w obu trybach. Anchor i globalne marginesy oraz przeciąganie/Custom działają tak
-jak dla tekstu. Replace SVG zachowuje szerokość, styl i pozycję; wysokość wynika
-z proporcji nowej grafiki. Nieudany upload pozostawia poprzednie logo.
-
-Logo można duplikować i usuwać w swoim wierszu. Zmiana jednostki zachowuje wygląd,
-a wymiana zdjęcia zachowuje cały układ. Zasób SVG jest częścią modelu kontenera;
-trwały zapis dojdzie w etapie presetów. Obowiązują te same limity i wymagania SVG
-co dla ikon inline. Storybook: **Screens/TestPhotos/StandaloneLogo**.
-
-Ustawienia wybranego kontenera są zgrupowane jako **Content**, **Appearance**
-i **Layout**. Wygląd obejmuje rozmiar/font, kolor i opacity, a Layout wyrównanie,
-Line spacing i pozycję. Kolor ma szybkie próbki oraz tęczowy picker inline;
-More colors otwiera pełną paletę i graficzny picker z HEX w panelu.
-
-## Presety układu — MVP etap 6
-
-Sekcja Presets zapisuje nazwany układ w przeglądarce: wszystkie kontenery,
-szablony tagów, style, anchory i pozycje Custom, jednostkę i globalne marginesy.
-Użyte ikony oraz logo SVG są dołączane. Zdjęcie, wartości metadanych
-i jakość eksportu nie należą do presetu.
-
-Save preset tworzy zapis; Update preset nadpisuje wybrany, Save as new tworzy
-kopię. Lista przywraca układ na bieżącym zdjęciu. Zmiany wymagają jawnego zapisu;
-usunięcie presetu pozostawia bieżący układ. Export preset zapisuje bieżący układ
-w pliku `.framenote.json`, Import preset waliduje go, dodaje jako nowy preset
-i stosuje. Import nie nadpisuje istniejących zapisów.
-
-Presety pozostają po odświeżeniu w tej samej przeglądarce i pod tym samym adresem.
-Wyczyszczenie danych witryny je usuwa; plik JSON służy do kopii i przenoszenia.
-Import: wersja 1, do 5 MB, 100 kontenerów i 100 ikon; SVG przechodzą ponowną
-walidację. Storybook z przykładowym układem nie zapisuje presetów w localStorage.
-
-Wbudowane presety: **Default** odtwarza początkowy podpis author/lens/exposure;
-**Macro** dodaje w prawym dolnym rogu osobny blok `{heliconStack}` z liczbą zdjęć,
-metodą i parametrami z rozpoznanego komentarza Helicon UserComment. Wbudowane
-presety są stałe; Save as new zapisuje własną kopię. Bez rozpoznanego komentarza
-blok nie jest renderowany i zachowuje standardowe ostrzeżenie brakującego tagu.
-
-**Default dark** zachowuje układ Default i używa ciemnego koloru tekstu Charcoal.
-
-## Weryfikacja MVP — etap 7
-
-Końcowe sprawdzenie obejmuje testy domeny, Chromium/WebKit, wzorce pikseli JPG
-oraz siedem oryginalnych zdjęć w Storybooku. Zapisane SVG, pozycje Custom
-i odstępy między wierszami przechodzą także kontrolę pikseli eksportu na zdjęciu
-poziomym i pionowym po odświeżeniu. Błędny import SVG pozostawia bieżący układ.
-
-Puste wiersze wprowadzone Enterem tworzą odstęp. Wiersze opróżnione przez
-brakujące tagi/ikony są pomijane, a brakujące pola pozostają raportowane.
-Identyfikatory presetów nie wymagają API dostępnego wyłącznie przez HTTPS,
-więc zapis może działać również przy otwarciu aplikacji przez HTTP w LAN.
-
-Zakres, dowody i ograniczenia: [raport weryfikacji](docs/MVP_VERIFICATION.md).
-
-## Grafiki w treści — refaktor, etap 2 do oceny
-
-Content → Add image pozwala mieszać SVG i PNG z tekstem, tagami i ikonami.
-Każde wystąpienie ma własną wysokość względem fontu lub w jednostce dokumentu.
-Zaznaczona grafika ma kontrolki wymiany, usuwania i rozmiaru. SVG zachowuje
-oryginalne kolory albo używa koloru kontenera; PNG zachowuje kolory i alfa.
-PNG: do 2 MB, 32 MP i 16384 px na bok; SVG: dotychczasowe limity 256 KB
-i walidacja. Preset pozostaje ograniczony do 5 MB; zapis wersji 2 dołącza grafiki,
-a import starszej wersji migruje osobne logo. Grafiki dodaje się wyłącznie przez Content → Add image; Containers zawiera
-tylko Add container. Przykład: Screens/TestPhotos/MixedImages.
-
-Plan i aktualny stan: [refaktor logo](docs/INLINE_LOGO_PLAN.md).
-
-## Kolejność i widoczność warstw
-
-Lista Layers pokazuje warstwy od przodu do tyłu. Przeciągnij uchwyt obok oka,
-aby zmienić kolejność; na uchwycie działają też strzałki góra/dół, Home i End.
-Escape anuluje przeciąganie. Oko po lewej ukrywa warstwę w podglądzie i JPG;
-pozostaje ona edytowalna i nie blokuje eksportu brakującymi danymi. Add layer
-pozostaje pod listą i dodaje widoczną warstwę na wierzchu. Preset zachowuje
-kolejność i widoczność.
+- [Changelog: Pre-MVP, MVP, and work toward 1.0](CHANGELOG.md)
+- [Product context and milestone plan](docs/PRODUCT_PLAN.md)
+- [Design system](docs/DESIGN_SYSTEM.md)
+- [Caption helpers and token syntax](docs/CAPTION_TAGS.md)
+- [MVP verification and known limits](docs/MVP_VERIFICATION.md)
+- [Photo export visual test plan](docs/EXPORT_VISUAL_TEST_PLAN.md)
+- [Inline image refactor](docs/INLINE_LOGO_PLAN.md)
+- [Technical remediation and open recommendations](docs/TECHNICAL_REMEDIATION_PLAN.md)
+- [Deferred ideas and decisions](docs/NICE_TO_HAVE.md)
+- [Original photo fixtures](tests/fixtures/README.md)
