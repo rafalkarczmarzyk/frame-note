@@ -77,7 +77,7 @@ test('Photo export / Helicon stack / Macro', async ({ page }, testInfo) => {
   await page
     .getByLabel('Choose JPG or PNG photo')
     .setInputFiles(heliconFixture.path);
-  await choosePreset(page, 'Macro');
+  await choosePreset(page, 'Focus Stack');
   await expect(page.getByLabel('Caption', { exact: true })).toHaveAttribute(
     'data-template',
     '{heliconStack}',

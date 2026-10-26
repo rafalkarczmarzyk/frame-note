@@ -15,8 +15,6 @@ const meta = {
     onChange: () => {},
     onBrowseFonts: () => {},
     onBrowseColors: () => {},
-    persistSections: false,
-    preferenceScope: 'controls-demo-',
   },
   render: function Render(args) {
     const [caption, setCaption] = useState(args.caption);

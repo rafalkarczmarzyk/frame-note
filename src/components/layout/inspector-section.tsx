@@ -4,14 +4,17 @@ import type { ReactNode } from 'react';
 export function InspectorSection({
   title,
   children,
+  imageDrop = false,
 }: {
   title: string;
   children: ReactNode;
+  imageDrop?: boolean;
 }) {
   return (
     <section
       aria-label={title}
-      className="border-t border-border-subtle px-3 py-3"
+      data-content-image-drop={imageDrop || undefined}
+      className="relative border-t border-border-subtle px-3 py-3"
     >
       <h3 className="mb-2 text-xs font-semibold text-content-secondary">
         {title}

@@ -9,7 +9,17 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Added
 
-- Shared category filters for fonts, metadata tags and colors, combined with search
+- Nine built-in layouts, including Signature, Compact EXIF, Camera & Lens,
+  Focus Stack (formerly Macro), EXIF Icons, Astrophotography and Long Exposure.
+  The new `{shutterDuration}` helper formats long exposures as hours, minutes
+  and seconds while preserving the existing shutter and exposure helpers.
+- Reusable split button with primary/outline variants, shared sizes and colors,
+  independent action states, loading feedback and Storybook examples.
+- SVG/PNG drops anywhere in Content insert images at the retained text selection,
+  using the same validation and limits as the file picker, with a local drop overlay.
+- Canvas-centered photo loading indicator and separate export preparation feedback.
+
+- Shared category filters for fonts, metadata tags, colors and presets, combined with search
   in fixed panel headers without changing existing selections.
 - A curated library of 25 Google Fonts families alongside Advercase, with local
   on-demand loading, compact live previews, supported Bold/Italic variants,
@@ -31,6 +41,17 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Changed
 
+- Compact 48 px header with photo import beside the brand and preset selection,
+  split save actions and JPG export on the right. User presets are separated
+  from built-ins in the selector; management stays in the searchable docked panel.
+- Layout editing and preset management are available before importing a photo.
+  First import and replacement preserve the prepared layout, editor and open panels;
+  JPG output and document-unit conversion require actual photo dimensions.
+- Slimmed photo rulers to 18 px and reduced preview gutters to 28 px, preserving
+  larger handle hit targets and moving interaction labels outside the ruler band.
+- Sidebar resizing is limited to 384–560 px. Accordion state and width reset on
+  reload; Photo, Sizing & Margins and Export start collapsed.
+
 - Reorganized Typography into sizing, alignment and style, color, and opacity
   rows, with font icons, grouped Bold/Italic toggles, neutral color swatches and
   direct access to the color panel.
@@ -46,15 +67,20 @@ when explicitly requested; a commit does not automatically create a release.
 - Open directly in an empty editor with photo selection, JPG/PNG drop guidance,
   a local-processing privacy note, and version, GitHub and changelog links at the
   bottom of the canvas. The header and tools remain visible before import.
-- The application logo is now passive, preventing accidental navigation and
-  loss of the current editing session.
-- Restyled the photo drop overlay with dark glass, a thin dashed outline and
-  a gentle fade-in, including reduced-motion and reduced-transparency fallbacks.
+- Clicking the logo opens the informational photographic splash with version,
+  privacy information and project links, preserving the current editing session.
+- Photo imports require a drop on the canvas, with the dark glass overlay confined
+  to that area. Header and sidebar reject photo drops; Content separately accepts
+  layer images. Reduced-motion and reduced-transparency fallbacks remain available.
 - Simplified the layer list with single-line content summaries, persistent
   visibility, position and menu controls, and whole-row dragging. The list uses
   the sidebar's scrolling area and leaves Add layer below the rows.
 
 ### Fixed
+
+- Photo import no longer replaces the interface with a text-only loading screen.
+  Large photos use a bounded preview bitmap while export retains the original;
+  old preview resources are released after their replacement is committed.
 
 - Warning notices, including overlapping layers, now use yellow instead of
   the green primary-action accent.

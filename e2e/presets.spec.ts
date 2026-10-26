@@ -22,13 +22,14 @@ test('saves and restores a layout after reload and imports an exported preset', 
   await page.getByLabel('Preset name', { exact: true }).fill('Wildlife');
   await page.getByRole('button', { name: 'Save', exact: true }).click();
   await page.getByLabel('Caption', { exact: true }).fill('Changed');
-  await expect(
-    page.getByText('Unsaved changes', { exact: true }),
-  ).toBeVisible();
+  await expect(page.getByText('Modified', { exact: true })).toBeVisible();
   await page.reload();
   await page.getByLabel('Choose JPG or PNG photo').setInputFiles(photo);
   await page
-    .getByRole('button', { name: 'Manage presets', exact: true })
+    .getByRole('button', { name: 'Preset actions', exact: true })
+    .click();
+  await page
+    .getByRole('menuitem', { name: 'Manage presets', exact: true })
     .click();
   await page.getByRole('button', { name: 'Wildlife', exact: true }).click();
   await expect(page.getByLabel('Caption', { exact: true })).toHaveAttribute(
@@ -36,7 +37,10 @@ test('saves and restores a layout after reload and imports an exported preset', 
     'Saved {author}',
   );
   await page
-    .getByRole('button', { name: 'Manage presets', exact: true })
+    .getByRole('button', { name: 'Preset actions', exact: true })
+    .click();
+  await page
+    .getByRole('menuitem', { name: 'Manage presets', exact: true })
     .click();
   await page
     .getByRole('button', { name: 'Duplicate Wildlife', exact: true })
@@ -57,7 +61,10 @@ test('saves and restores a layout after reload and imports an exported preset', 
     .click();
   const path = await (await pending).path();
   await page
-    .getByRole('button', { name: 'Manage presets', exact: true })
+    .getByRole('button', { name: 'Preset actions', exact: true })
+    .click();
+  await page
+    .getByRole('menuitem', { name: 'Manage presets', exact: true })
     .click();
   await page
     .getByRole('button', { name: 'Delete Wildlife', exact: true })
@@ -85,9 +92,12 @@ test('offers built-in Default and Macro and resolves the Helicon fixture', async
     page.getByRole('dialog', { name: 'Manage presets' }),
   ).toHaveCount(0);
   await page
-    .getByRole('button', { name: 'Manage presets', exact: true })
+    .getByRole('button', { name: 'Preset actions', exact: true })
     .click();
-  await page.getByRole('button', { name: 'Macro', exact: true }).click();
+  await page
+    .getByRole('menuitem', { name: 'Manage presets', exact: true })
+    .click();
+  await page.getByRole('button', { name: 'Focus Stack', exact: true }).click();
   await expect(
     page.getByRole('dialog', { name: 'Manage presets' }),
   ).toBeVisible();
@@ -95,7 +105,7 @@ test('offers built-in Default and Macro and resolves the Helicon fixture', async
   await expect(
     page.getByRole('dialog', { name: 'Manage presets' }),
   ).toBeVisible();
-  await page.getByRole('button', { name: 'Macro', exact: true }).click();
+  await page.getByRole('button', { name: 'Focus Stack', exact: true }).click();
   await expect(page.getByLabel('Caption', { exact: true })).toHaveAttribute(
     'data-template',
     '{heliconStack}',
@@ -114,7 +124,10 @@ test('offers built-in Default and Macro and resolves the Helicon fixture', async
   ).toContainText('Focus stack · 15 images · Method A · R=8 · S=4');
   await page.getByRole('button', { name: 'Close available tags' }).click();
   await page
-    .getByRole('button', { name: 'Manage presets', exact: true })
+    .getByRole('button', { name: 'Preset actions', exact: true })
+    .click();
+  await page
+    .getByRole('menuitem', { name: 'Manage presets', exact: true })
     .click();
   await page.getByRole('button', { name: 'Default', exact: true }).click();
   await expect(page.getByLabel('Caption', { exact: true })).toHaveAttribute(
@@ -202,7 +215,10 @@ test('restores SVG assets, blank lines and custom positions across photo orienta
   };
   await uploadPhoto(1200, 800);
   await page
-    .getByRole('button', { name: 'Manage presets', exact: true })
+    .getByRole('button', { name: 'Preset actions', exact: true })
+    .click();
+  await page
+    .getByRole('menuitem', { name: 'Manage presets', exact: true })
     .click();
   const unsafe = structuredClone(preset);
   unsafe.icons[0]!.svg =
@@ -324,6 +340,9 @@ test('keeps long-name duplicates and valid presets alongside damaged entries', a
   });
   await page.reload();
   await page.getByLabel('Choose JPG or PNG photo').setInputFiles(photo);
+  await page
+    .getByRole('button', { name: 'Preset warning — manage presets' })
+    .click();
   await expect(page.getByRole('alert')).toContainText(
     'original data is preserved',
   );
@@ -331,7 +350,10 @@ test('keeps long-name duplicates and valid presets alongside damaged entries', a
     page.getByRole('button', { name: 'Download recovery copy' }),
   ).toBeVisible();
   await page
-    .getByRole('button', { name: 'Manage presets', exact: true })
+    .getByRole('button', { name: 'Preset actions', exact: true })
+    .click();
+  await page
+    .getByRole('menuitem', { name: 'Manage presets', exact: true })
     .click();
   await expect(page.getByRole('button', { name, exact: true })).toBeVisible();
   const copy = `${'x'.repeat(75)} copy`;

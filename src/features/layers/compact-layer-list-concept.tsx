@@ -27,7 +27,6 @@ export function CompactLayerListConcept({
         title="Layers"
         icon={<Layers />}
         iconTone="caption"
-        persist={false}
         contentPadding="none"
       >
         <LayerList

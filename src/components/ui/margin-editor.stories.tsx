@@ -112,7 +112,6 @@ export const CompactSidebar: Story = {
           title="Margins"
           icon={<Ruler />}
           iconTone="sizing"
-          persist={false}
         >
           <Story />
         </SidebarSection>

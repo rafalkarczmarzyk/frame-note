@@ -17,7 +17,10 @@ export interface ExportRequest {
   metadataOptions: ExportMetadataOptions;
 }
 
-export function usePreparedExport(request: ExportRequest, enabled: boolean) {
+export function usePreparedExport(
+  request: ExportRequest | null,
+  enabled: boolean,
+) {
   const queue = useMemo(
     () =>
       new LatestJob<ExportRequest, Blob>(
@@ -45,7 +48,7 @@ export function usePreparedExport(request: ExportRequest, enabled: boolean) {
     message: string;
   } | null>(null);
   useEffect(() => {
-    if (enabled)
+    if (enabled && request)
       queue.schedule(
         request,
         (blob) => setResult({ request, blob }),

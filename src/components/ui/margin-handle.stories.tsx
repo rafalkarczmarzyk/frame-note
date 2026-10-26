@@ -36,8 +36,8 @@ function HandleExample(args: MarginHandleProps) {
           className="absolute"
           style={
             horizontal
-              ? { left: 20, top: 28, width: 400, height: 28 }
-              : { left: 28, top: 20, width: 28, height: 400 }
+              ? { left: 20, top: 28, width: 400, height: 18 }
+              : { left: 28, top: 20, width: 18, height: 400 }
           }
         >
           <MarginHandle

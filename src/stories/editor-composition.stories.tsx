@@ -156,7 +156,6 @@ function EditorDemo({
               iconTone="photo"
               icon={<PhotoIcon />}
               defaultOpen={false}
-              persist={false}
             >
               <p className="text-xs">
                 {photo.name} · {photo.width} × {photo.height} px
@@ -167,7 +166,6 @@ function EditorDemo({
               title="Caption"
               iconTone="caption"
               icon={<TextQuote />}
-              persist={false}
             >
               <Textarea
                 aria-label="Caption"
@@ -193,8 +191,6 @@ function EditorDemo({
             <CaptionControls
               dimensions={{ width: photo.width, height: photo.height }}
               caption={caption}
-              preferenceScope="storybook-"
-              persistSections={false}
               onChange={setCaption}
               disabled={false}
               onBrowseFonts={() => setPanel('fonts')}
@@ -205,7 +201,6 @@ function EditorDemo({
               title="Export"
               iconTone="export"
               icon={<Download />}
-              persist={false}
             >
               <div className="space-y-3">
                 <SegmentedControl

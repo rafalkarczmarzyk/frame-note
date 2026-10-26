@@ -1,4 +1,5 @@
 import type { ComponentProps } from 'react';
+import { rulerThickness } from './ruler-metrics';
 import { cn } from '@/lib/utils';
 export interface RulerProps extends ComponentProps<'div'> {
   orientation: 'horizontal' | 'vertical';
@@ -42,27 +43,37 @@ export function Ruler({
         className,
       )}
       style={{
-        width: horizontal ? length : 28,
-        height: horizontal ? 28 : length,
+        width: horizontal ? length : rulerThickness,
+        height: horizontal ? rulerThickness : length,
         ...style,
       }}
       {...props}
     >
       <svg
-        width={horizontal ? length : 28}
-        height={horizontal ? 28 : length}
+        width={horizontal ? length : rulerThickness}
+        height={horizontal ? rulerThickness : length}
         aria-hidden="true"
         className="pointer-events-none absolute text-content-muted"
       >
         {marks.map(({ position, label }) => (
           <g key={label}>
             <path
-              d={horizontal ? `M ${position} 22 v 6` : `M 22 ${position} h 6`}
+              d={
+                horizontal
+                  ? `M ${position} ${rulerThickness - 4} v 4`
+                  : `M ${rulerThickness - 4} ${position} h 4`
+              }
               stroke="currentColor"
             />
             <text
-              x={horizontal ? position + 3 : 3}
-              y={horizontal ? 12 : position + 12}
+              x={horizontal ? position + 3 : 0}
+              y={horizontal ? 10 : 0}
+              transform={
+                horizontal
+                  ? undefined
+                  : `translate(10 ${position + 3}) rotate(-90)`
+              }
+              textAnchor={horizontal ? undefined : 'end'}
               fontSize="9"
               fill="currentColor"
             >
@@ -75,7 +86,11 @@ export function Ruler({
                 offset < length && (
                   <path
                     key={minor}
-                    d={horizontal ? `M ${offset} 25 v 3` : `M 25 ${offset} h 3`}
+                    d={
+                      horizontal
+                        ? `M ${offset} ${rulerThickness - 2} v 2`
+                        : `M ${rulerThickness - 2} ${offset} h 2`
+                    }
                     stroke="currentColor"
                   />
                 )

@@ -1,3 +1,7 @@
+import { EmptyPhotoCanvas } from './empty-workspace';
+import type { MetadataField } from '@/domain/metadata';
+import { PhotoDropOverlay } from './photo-drop-overlay';
+import { PhotoLoadingIndicator } from './photo-loading-indicator';
 import type { FontSelection } from '@/domain/font-style';
 import { CategoryFilter } from '@/components/ui/category-filter';
 import { fontCategories } from '@/domain/fonts';
@@ -14,7 +18,7 @@ import { MarginRulers } from './margin-rulers';
 import { MarginPreviewProvider } from '@/components/ui/margin-preview-provider';
 import { InspectorSection } from '@/components/layout/inspector-section';
 import { createId } from '@/lib/create-id';
-import { defaultTemplate } from '@/domain/builtin-presets';
+import { builtinPresets } from '@/domain/builtin-presets';
 import { PresetControls } from '../presets/preset-controls';
 import { logoLayout } from '../caption/logo-layout';
 import { tintedIcon } from '../caption/inline-layout';
@@ -33,7 +37,6 @@ import { LayerList } from '../layers/layer-list';
 import {
   addCaption,
   containerCaption,
-  createCaptionLayout,
   removeCaption,
   updateCaption,
   type CaptionLayout,
@@ -43,7 +46,15 @@ import { MetadataPicker } from '../caption/metadata-picker';
 import { metadataGroups } from '@/domain/caption-tags';
 import { ColorPickerPanel } from '../caption/color-picker-panel';
 import { resolveCaptionColor } from '@/domain/caption-colors';
-import { Download, Layers, Plus, Tags, Shapes, Type } from 'lucide-react';
+import {
+  Download,
+  LoaderCircle,
+  Layers,
+  Plus,
+  Tags,
+  Shapes,
+  Type,
+} from 'lucide-react';
 import { PhotoIcon } from '@/components/icons/photo-icon';
 import {
   EditorWorkspace,
@@ -75,6 +86,10 @@ import {
 } from 'react-konva';
 import type { LoadedPhoto } from './load-photo';
 
+// Only control geometry uses this reference before import; export requires a photo.
+const emptyDimensions = { width: 1000, height: 1000 };
+const emptyMetadata: readonly MetadataField[] = [];
+
 export function PhotoWorkspace(
   props: Parameters<typeof PhotoWorkspaceContent>[0],
 ) {
@@ -87,13 +102,27 @@ export function PhotoWorkspace(
 
 function PhotoWorkspaceContent({
   photo,
+  loading = false,
+  onChoosePhoto,
   initialLayout,
+  initialPresetId,
   initialIcons = [],
+  onPreviewReady,
+  loadingLabel,
+  draggingPhoto = false,
 }: {
-  photo: LoadedPhoto;
+  photo: LoadedPhoto | null;
+  loading?: boolean;
+  onChoosePhoto?: () => void;
   initialLayout?: CaptionLayout;
+  initialPresetId?: string;
   initialIcons?: SvgIcon[];
+  onPreviewReady?: (photo: LoadedPhoto) => void;
+  loadingLabel?: string;
+  draggingPhoto?: boolean;
 }) {
+  const dimensions = photo?.document.photo.dimensions ?? emptyDimensions;
+  const fields = photo?.document.photo.metadata ?? emptyMetadata;
   const alphaMatte = useMemo(
     () =>
       getComputedStyle(document.documentElement)
@@ -134,10 +163,7 @@ function PhotoWorkspaceContent({
           ...initialLayout,
           containers: initialLayout.containers.map(migrateLogo),
         }
-      : createCaptionLayout({
-          ...photo.document.caption,
-          template: defaultTemplate,
-        }),
+      : structuredClone(builtinPresets[0]!.layout),
   );
   const assets = useMemo(() => {
     const visible = layout.containers.filter(
@@ -233,7 +259,7 @@ function PhotoWorkspaceContent({
         value,
         layout.activeId!,
         typeof next === 'function' ? next(settings) : next,
-        photo.document.photo.dimensions,
+        dimensions,
       ),
     );
   };
@@ -248,9 +274,7 @@ function PhotoWorkspaceContent({
     setLayout((value) => ({ ...value, activeId: id }));
   };
   const addContainer = (duplicate = false) => {
-    setLayout((value) =>
-      addCaption(value, createId(), duplicate, photo.document.photo.dimensions),
-    );
+    setLayout((value) => addCaption(value, createId(), duplicate, dimensions));
   };
   const [exporting, setExporting] = useState(false);
   const [quality, setQuality] = useState(95);
@@ -271,7 +295,7 @@ function PhotoWorkspaceContent({
   };
   const resolved = resolveCaptionContent(
     template,
-    photo.document.photo.metadata,
+    fields,
     icons,
     settings.images,
   );
@@ -288,7 +312,7 @@ function PhotoWorkspaceContent({
           const caption = containerCaption(composition, container);
           const resolved = resolveCaptionContent(
             caption.template,
-            photo.document.photo.metadata,
+            fields,
             icons,
             caption.images,
           );
@@ -299,7 +323,7 @@ function PhotoWorkspaceContent({
           );
           return { id: container.id, caption, ...resolved, color };
         }),
-    [composition, photo, icons],
+    [composition, fields, icons],
   );
   const exportCaptions = useMemo(
     () =>
@@ -312,14 +336,17 @@ function PhotoWorkspaceContent({
     [renderedCaptions],
   );
   const exportRequest = useMemo(
-    () => ({
-      image: photo.image,
-      dimensions: photo.document.photo.dimensions,
-      captions: exportCaptions,
-      quality,
-      metadata: photo.document.photo.metadata,
-      metadataOptions,
-    }),
+    () =>
+      photo
+        ? {
+            image: photo.image,
+            dimensions: photo.document.photo.dimensions,
+            captions: exportCaptions,
+            quality,
+            metadata: photo.document.photo.metadata,
+            metadataOptions,
+          }
+        : null,
     [photo, exportCaptions, quality, metadataOptions],
   );
   const fontKey = JSON.stringify(
@@ -334,7 +361,10 @@ function PhotoWorkspaceContent({
   );
   const fontReady = loadedFont === fontKey;
   const fontError = fontFailure?.key === fontKey ? fontFailure.message : '';
-  const prepared = usePreparedExport(exportRequest, fontReady && iconsReady);
+  const prepared = usePreparedExport(
+    exportRequest,
+    !!photo && fontReady && iconsReady,
+  );
   useEffect(() => {
     let active = true;
     void Promise.all(
@@ -360,7 +390,7 @@ function PhotoWorkspaceContent({
     };
   }, [fontKey]);
   const download = () => {
-    if (!prepared.blob) return;
+    if (!photo || !prepared.blob) return;
     if (
       renderedCaptions.some(
         (item) => item.invalidSyntax || item.missing.length,
@@ -392,292 +422,354 @@ function PhotoWorkspaceContent({
     observer.observe(element);
     return () => observer.disconnect();
   }, []);
-  const { width, height } = photo.document.photo.dimensions;
+  const previewReady =
+    size.width > 1 &&
+    size.height > 1 &&
+    (fontReady || !!fontError) &&
+    (iconsReady || !!assetError);
+  useEffect(() => {
+    if (!photo || !previewReady || !onPreviewReady) return;
+    let secondFrame = 0;
+    const frame = requestAnimationFrame(() => {
+      secondFrame = requestAnimationFrame(() => onPreviewReady(photo));
+    });
+    return () => {
+      cancelAnimationFrame(frame);
+      cancelAnimationFrame(secondFrame);
+    };
+  }, [photo, previewReady, onPreviewReady]);
+  const { width, height } = dimensions;
   const scale = Math.min(
-    Math.max(1, size.width - 80) / width,
-    Math.max(1, size.height - 80) / height,
+    Math.max(1, size.width - 56) / width,
+    Math.max(1, size.height - 56) / height,
     1,
   );
-  const fields = photo.document.photo.metadata;
   const matchingFieldCount = metadataGroups(fields, query)
     .filter((group) => tagCategory === 'all' || group.name === tagCategory)
     .reduce((count, group) => count + group.fields.length, 0);
+  const preparingExport =
+    !!photo && !prepared.blob && !prepared.error && !fontError && !assetError;
+  const exportLabel = exporting
+    ? 'Exporting…'
+    : preparingExport
+      ? 'Preparing JPG…'
+      : 'Export JPG';
   return (
     <EditorWorkspace>
       {exportTarget &&
         createPortal(
-          <Button disabled={!prepared.blob || exporting} onClick={download}>
-            {exporting ? 'Exporting…' : 'Export JPG'}
+          <Button
+            size="sm"
+            aria-label={exportLabel}
+            aria-busy={preparingExport || exporting || undefined}
+            className="px-2 sm:px-3"
+            disabled={!photo || !prepared.blob || exporting}
+            onClick={download}
+          >
+            {preparingExport || exporting ? (
+              <LoaderCircle
+                className="animate-spin motion-reduce:animate-none"
+                aria-hidden="true"
+              />
+            ) : (
+              <Download className="md:hidden" aria-hidden="true" />
+            )}
+            <span className="hidden md:inline">{exportLabel}</span>
           </Button>,
           exportTarget,
         )}
       <div
         ref={host}
-        className="relative min-h-[40vh] min-w-0 flex-1 bg-workspace-base md:min-h-0"
+        data-photo-canvas
+        className="relative flex min-h-[40vh] min-w-0 flex-1 flex-col bg-workspace-base md:min-h-0"
       >
-        <div
-          role="img"
-          aria-label={`Photo preview: ${photo.document.photo.name}`}
-        >
-          <Stage width={size.width} height={size.height}>
-            <Layer>
-              <Group
-                x={(size.width - width * scale) / 2}
-                y={(size.height - height * scale) / 2}
-                scaleX={scale}
-                scaleY={scale}
-                clipWidth={width}
-                clipHeight={height}
-              >
-                <Rect
-                  x={0}
-                  y={0}
-                  width={width}
-                  height={height}
-                  fill={alphaMatte}
-                  listening={false}
-                />
-                <CanvasImage
-                  image={photo.image}
-                  width={width}
-                  height={height}
-                />
-                {fontReady &&
-                  renderedCaptions.map(
-                    ({ id, caption, text, color, icons: inlineIcons }) => {
-                      if (
-                        (caption.logo &&
-                          !iconImages.has(caption.logo.asset.svg)) ||
-                        inlineIcons.some((icon) => !iconImages.has(icon.svg))
-                      )
-                        return null;
-                      const config = captionConfig(
-                        { width, height },
-                        caption,
-                        text,
-                        color,
-                      );
-                      const placeholder =
-                        !caption.logo && !caption.template.trim();
-                      const visualColor = placeholder
-                        ? getComputedStyle(document.documentElement)
-                            .getPropertyValue('--color-porcelain')
-                            .trim()
-                        : color;
-                      const scene = placeholder
-                        ? inlineLayout(
+        {loadingLabel && <PhotoLoadingIndicator label={loadingLabel} />}
+        {draggingPhoto && <PhotoDropOverlay />}
+        {photo ? (
+          <>
+            <div
+              role="img"
+              className="transition-opacity duration-200 motion-reduce:transition-none"
+              style={{ opacity: previewReady ? 1 : 0 }}
+              aria-label={`Photo preview: ${photo.document.photo.name}`}
+            >
+              <Stage width={size.width} height={size.height}>
+                <Layer>
+                  <Group
+                    x={(size.width - width * scale) / 2}
+                    y={(size.height - height * scale) / 2}
+                    scaleX={scale}
+                    scaleY={scale}
+                    clipWidth={width}
+                    clipHeight={height}
+                  >
+                    <Rect
+                      x={0}
+                      y={0}
+                      width={width}
+                      height={height}
+                      fill={alphaMatte}
+                      listening={false}
+                    />
+                    <CanvasImage
+                      image={photo.previewImage ?? photo.image}
+                      width={width}
+                      height={height}
+                    />
+                    {fontReady &&
+                      renderedCaptions.map(
+                        ({ id, caption, text, color, icons: inlineIcons }) => {
+                          if (
+                            (caption.logo &&
+                              !iconImages.has(caption.logo.asset.svg)) ||
+                            inlineIcons.some(
+                              (icon) => !iconImages.has(icon.svg),
+                            )
+                          )
+                            return null;
+                          const config = captionConfig(
                             { width, height },
                             caption,
-                            iconMarker(0),
-                            [brandIcons[0]!],
-                          )
-                        : inlineIcons.length
-                          ? inlineLayout(
-                              { width, height },
-                              caption,
-                              text,
-                              inlineIcons,
-                            )
-                          : null;
-                      const logoGeometry = caption.logo
-                        ? logoLayout({ width, height }, caption)
-                        : null;
-                      const geometry = logoGeometry ??
-                        scene ?? {
-                          ...config,
-                          height:
-                            text.split('\n').length *
-                            config.fontSize *
-                            config.lineHeight,
-                        };
-                      return (
-                        <Group key={id}>
-                          <Group
-                            x={geometry.x}
-                            y={geometry.y}
-                            width={geometry.width}
-                            height={geometry.height}
-                            opacity={placeholder ? 0.4 : caption.style.opacity}
-                            listening
-                            draggable={!exporting}
-                            onDragStart={() => {
-                              selectContainer(id);
-                              setDraggingId(id);
-                            }}
-                            onDragMove={(event) => {
-                              const node = event.currentTarget;
-                              const block = {
-                                width: node.width(),
-                                height: node.height(),
-                              };
-                              const point = customPoint(
+                            text,
+                            color,
+                          );
+                          const placeholder =
+                            !caption.logo && !caption.template.trim();
+                          const visualColor = placeholder
+                            ? getComputedStyle(document.documentElement)
+                                .getPropertyValue('--color-porcelain')
+                                .trim()
+                            : color;
+                          const scene = placeholder
+                            ? inlineLayout(
                                 { width, height },
-                                block,
-                                caption.position.anchor,
-                                node.position(),
-                              );
-                              const custom = {
-                                x: Math.min(100, Math.max(0, point.x)),
-                                y: Math.min(100, Math.max(0, point.y)),
-                              };
-                              node.position(
-                                customPosition(
+                                caption,
+                                iconMarker(0),
+                                [brandIcons[0]!],
+                              )
+                            : inlineIcons.length
+                              ? inlineLayout(
                                   { width, height },
-                                  block,
-                                  caption.position.anchor,
-                                  custom,
-                                ),
-                              );
-                              setLayout((value) => ({
-                                ...value,
-                                containers: value.containers.map((container) =>
-                                  container.id === id
-                                    ? {
-                                        ...container,
-                                        position: {
-                                          ...container.position,
-                                          custom,
-                                        },
-                                      }
-                                    : container,
-                                ),
-                              }));
-                            }}
-                            onDragEnd={() => setDraggingId(null)}
-                            onMouseEnter={() => setHoveredId(id)}
-                            onMouseLeave={() => setHoveredId(null)}
-                            onClick={() => selectContainer(id)}
-                            onTap={() => selectContainer(id)}
-                          >
-                            <Rect
-                              width={geometry.width}
-                              height={geometry.height}
-                              fill={color}
-                              opacity={0}
-                            />
-                            {caption.logo && logoGeometry ? (
-                              <CanvasImage
-                                listening={false}
-                                width={logoGeometry.width}
-                                height={logoGeometry.height}
-                                image={
-                                  caption.logo.colorMode === 'single'
-                                    ? tintedIcon(
-                                        caption.logo.asset,
-                                        iconImages.get(caption.logo.asset.svg)!,
-                                        logoGeometry.height,
-                                        color,
-                                      )
-                                    : iconImages.get(caption.logo.asset.svg)
-                                }
-                              />
-                            ) : scene ? (
-                              <InlinePreview
-                                scene={scene}
-                                caption={caption}
-                                color={visualColor}
-                                images={iconImages}
-                              />
-                            ) : (
-                              <Text
-                                {...config}
-                                x={0}
-                                y={0}
-                                opacity={1}
-                                listening={false}
-                              />
-                            )}
-                          </Group>
-                          {(hoveredId === id ||
-                            editingId === id ||
-                            draggingId === id) &&
-                            (text || placeholder || caption.logo) && (
-                              <Rect
-                                x={geometry.x - 4 / scale}
-                                y={geometry.y - 4 / scale}
-                                width={geometry.width + 8 / scale}
-                                height={geometry.height + 8 / scale}
-                                stroke={getComputedStyle(
-                                  document.documentElement,
+                                  caption,
+                                  text,
+                                  inlineIcons,
                                 )
-                                  .getPropertyValue('--color-porcelain')
-                                  .trim()}
-                                strokeWidth={1 / scale}
-                                dash={[4 / scale, 3 / scale]}
-                                listening={false}
-                              />
-                            )}
-                          {hoveredId === id &&
-                            !draggingId &&
-                            (text || placeholder || caption.logo) && (
+                              : null;
+                          const logoGeometry = caption.logo
+                            ? logoLayout({ width, height }, caption)
+                            : null;
+                          const geometry = logoGeometry ??
+                            scene ?? {
+                              ...config,
+                              height:
+                                text.split('\n').length *
+                                config.fontSize *
+                                config.lineHeight,
+                            };
+                          return (
+                            <Group key={id}>
                               <Group
-                                listening={false}
-                                x={Math.max(
-                                  0,
-                                  Math.min(
-                                    geometry.x,
-                                    width - Math.min(280 / scale, width),
-                                  ),
-                                )}
-                                y={
-                                  geometry.y >= 52 / scale
-                                    ? geometry.y - 52 / scale
-                                    : Math.max(
-                                        0,
-                                        Math.min(
-                                          height - 46 / scale,
-                                          geometry.y +
-                                            geometry.height +
-                                            10 / scale,
-                                        ),
-                                      )
+                                x={geometry.x}
+                                y={geometry.y}
+                                width={geometry.width}
+                                height={geometry.height}
+                                opacity={
+                                  placeholder ? 0.4 : caption.style.opacity
                                 }
+                                listening
+                                draggable={!exporting}
+                                onDragStart={() => {
+                                  selectContainer(id);
+                                  setDraggingId(id);
+                                }}
+                                onDragMove={(event) => {
+                                  const node = event.currentTarget;
+                                  const block = {
+                                    width: node.width(),
+                                    height: node.height(),
+                                  };
+                                  const point = customPoint(
+                                    { width, height },
+                                    block,
+                                    caption.position.anchor,
+                                    node.position(),
+                                  );
+                                  const custom = {
+                                    x: Math.min(100, Math.max(0, point.x)),
+                                    y: Math.min(100, Math.max(0, point.y)),
+                                  };
+                                  node.position(
+                                    customPosition(
+                                      { width, height },
+                                      block,
+                                      caption.position.anchor,
+                                      custom,
+                                    ),
+                                  );
+                                  setLayout((value) => ({
+                                    ...value,
+                                    containers: value.containers.map(
+                                      (container) =>
+                                        container.id === id
+                                          ? {
+                                              ...container,
+                                              position: {
+                                                ...container.position,
+                                                custom,
+                                              },
+                                            }
+                                          : container,
+                                    ),
+                                  }));
+                                }}
+                                onDragEnd={() => setDraggingId(null)}
+                                onMouseEnter={() => setHoveredId(id)}
+                                onMouseLeave={() => setHoveredId(null)}
+                                onClick={() => selectContainer(id)}
+                                onTap={() => selectContainer(id)}
                               >
                                 <Rect
-                                  width={Math.min(280 / scale, width)}
-                                  height={42 / scale}
-                                  cornerRadius={6 / scale}
-                                  fill={getComputedStyle(
-                                    document.documentElement,
-                                  )
-                                    .getPropertyValue('--color-panel-base')
-                                    .trim()}
+                                  width={geometry.width}
+                                  height={geometry.height}
+                                  fill={color}
+                                  opacity={0}
                                 />
-                                <Text
-                                  listening={false}
-                                  width={Math.min(280 / scale, width)}
-                                  padding={8 / scale}
-                                  fontSize={11 / scale}
-                                  lineHeight={1.3}
-                                  fontFamily="Montserrat Variable"
-                                  fill={getComputedStyle(
-                                    document.documentElement,
-                                  )
-                                    .getPropertyValue('--color-content-primary')
-                                    .trim()}
-                                  text={`${caption.position.custom ? `Manual: X ${Number(caption.position.custom.x.toFixed(1))}% · Y ${Number(caption.position.custom.y.toFixed(1))}%` : `Anchor: ${caption.position.anchor.replaceAll('-', ' ')}`}\nDrag to move`}
-                                />
+                                {caption.logo && logoGeometry ? (
+                                  <CanvasImage
+                                    listening={false}
+                                    width={logoGeometry.width}
+                                    height={logoGeometry.height}
+                                    image={
+                                      caption.logo.colorMode === 'single'
+                                        ? tintedIcon(
+                                            caption.logo.asset,
+                                            iconImages.get(
+                                              caption.logo.asset.svg,
+                                            )!,
+                                            logoGeometry.height,
+                                            color,
+                                          )
+                                        : iconImages.get(caption.logo.asset.svg)
+                                    }
+                                  />
+                                ) : scene ? (
+                                  <InlinePreview
+                                    scene={scene}
+                                    caption={caption}
+                                    color={visualColor}
+                                    images={iconImages}
+                                  />
+                                ) : (
+                                  <Text
+                                    {...config}
+                                    x={0}
+                                    y={0}
+                                    opacity={1}
+                                    listening={false}
+                                  />
+                                )}
                               </Group>
-                            )}
-                        </Group>
-                      );
-                    },
-                  )}
-              </Group>
-            </Layer>
-          </Stage>
-        </div>
-        <MarginRulers
-          disabled={exporting}
-          onChange={(margins) => setLayout((value) => ({ ...value, margins }))}
-          dimensions={{ width, height }}
-          unit={layout.sizingUnit}
-          margins={layout.margins}
-          linkMode={layout.marginLinkMode}
-          scale={scale}
-          x={(size.width - width * scale) / 2}
-          y={(size.height - height * scale) / 2}
-        />
+                              {(hoveredId === id ||
+                                editingId === id ||
+                                draggingId === id) &&
+                                (text || placeholder || caption.logo) && (
+                                  <Rect
+                                    x={geometry.x - 4 / scale}
+                                    y={geometry.y - 4 / scale}
+                                    width={geometry.width + 8 / scale}
+                                    height={geometry.height + 8 / scale}
+                                    stroke={getComputedStyle(
+                                      document.documentElement,
+                                    )
+                                      .getPropertyValue('--color-porcelain')
+                                      .trim()}
+                                    strokeWidth={1 / scale}
+                                    dash={[4 / scale, 3 / scale]}
+                                    listening={false}
+                                  />
+                                )}
+                              {hoveredId === id &&
+                                !draggingId &&
+                                (text || placeholder || caption.logo) && (
+                                  <Group
+                                    listening={false}
+                                    x={Math.max(
+                                      0,
+                                      Math.min(
+                                        geometry.x,
+                                        width - Math.min(280 / scale, width),
+                                      ),
+                                    )}
+                                    y={
+                                      geometry.y >= 52 / scale
+                                        ? geometry.y - 52 / scale
+                                        : Math.max(
+                                            0,
+                                            Math.min(
+                                              height - 46 / scale,
+                                              geometry.y +
+                                                geometry.height +
+                                                10 / scale,
+                                            ),
+                                          )
+                                    }
+                                  >
+                                    <Rect
+                                      width={Math.min(280 / scale, width)}
+                                      height={42 / scale}
+                                      cornerRadius={6 / scale}
+                                      fill={getComputedStyle(
+                                        document.documentElement,
+                                      )
+                                        .getPropertyValue('--color-panel-base')
+                                        .trim()}
+                                    />
+                                    <Text
+                                      listening={false}
+                                      width={Math.min(280 / scale, width)}
+                                      padding={8 / scale}
+                                      fontSize={11 / scale}
+                                      lineHeight={1.3}
+                                      fontFamily="Montserrat Variable"
+                                      fill={getComputedStyle(
+                                        document.documentElement,
+                                      )
+                                        .getPropertyValue(
+                                          '--color-content-primary',
+                                        )
+                                        .trim()}
+                                      text={`${caption.position.custom ? `Manual: X ${Number(caption.position.custom.x.toFixed(1))}% · Y ${Number(caption.position.custom.y.toFixed(1))}%` : `Anchor: ${caption.position.anchor.replaceAll('-', ' ')}`}\nDrag to move`}
+                                    />
+                                  </Group>
+                                )}
+                            </Group>
+                          );
+                        },
+                      )}
+                  </Group>
+                </Layer>
+              </Stage>
+            </div>
+            <MarginRulers
+              disabled={exporting}
+              onChange={(margins) =>
+                setLayout((value) => ({ ...value, margins }))
+              }
+              dimensions={{ width, height }}
+              unit={layout.sizingUnit}
+              margins={layout.margins}
+              linkMode={layout.marginLinkMode}
+              scale={scale}
+              x={(size.width - width * scale) / 2}
+              y={(size.height - height * scale) / 2}
+            />
+          </>
+        ) : (
+          <EmptyPhotoCanvas
+            loading={loading}
+            onChoosePhoto={onChoosePhoto ?? (() => {})}
+          />
+        )}
       </div>
       {activePanel === 'presets' && (
         <div
@@ -816,21 +908,34 @@ function PhotoWorkspaceContent({
             icon={<PhotoIcon />}
             defaultOpen={false}
           >
-            <h1 className="break-all text-sm font-medium">
-              {photo.document.photo.name}
-            </h1>
-            <p className="mt-2 text-xs text-content-secondary">
-              {width} × {height} px
-            </p>
-            <p
-              className="mt-1 text-xs text-content-secondary"
-              title={`${photo.document.photo.byteLength.toLocaleString('en-US')} bytes`}
-            >
-              Input: {formatBytes(photo.document.photo.byteLength)}
-            </p>
+            {photo ? (
+              <>
+                <h1 className="break-all text-sm font-medium">
+                  {photo.document.photo.name}
+                </h1>
+                <p className="mt-2 text-xs text-content-secondary">
+                  {width} × {height} px
+                </p>
+                <p
+                  className="mt-1 text-xs text-content-secondary"
+                  title={`${photo.document.photo.byteLength.toLocaleString('en-US')} bytes`}
+                >
+                  Input: {formatBytes(photo.document.photo.byteLength)}
+                </p>
+              </>
+            ) : (
+              <p className="text-xs text-content-secondary">
+                No photo open. Choose a preset or prepare your layout before
+                importing.
+              </p>
+            )}
           </SidebarSection>
           <PresetControls
             panelHost={presetHost}
+            toolbarHost={document.getElementById('preset-actions')}
+            initialPresetId={
+              initialPresetId ?? (initialLayout ? '' : 'builtin-default')
+            }
             onBrowse={() => setActivePanel('presets')}
             onClose={() => setActivePanel(null)}
             layout={layout}
@@ -853,16 +958,12 @@ function PhotoWorkspaceContent({
           <section aria-label="Document settings">
             <CaptionControls
               scope="global"
-              dimensions={photo.document.photo.dimensions}
+              canConvertUnits={!!photo}
+              dimensions={dimensions}
               caption={settings}
               onChange={(caption) =>
                 setLayout((value) =>
-                  updateCaption(
-                    value,
-                    '',
-                    caption,
-                    photo.document.photo.dimensions,
-                  ),
+                  updateCaption(value, '', caption, dimensions),
                 )
               }
               disabled={exporting}
@@ -902,7 +1003,7 @@ function PhotoWorkspaceContent({
                     { ...value, activeId: id },
                     createId(),
                     true,
-                    photo.document.photo.dimensions,
+                    dimensions,
                   ),
                 );
               }}
@@ -949,14 +1050,14 @@ function PhotoWorkspaceContent({
               surface="container"
             >
               <>
-                <InspectorSection title="Content">
+                <InspectorSection title="Content" imageDrop>
                   <CaptionEditor
                     value={template}
                     images={settings.images}
                     sizingUnit={settings.sizingUnit}
                     fontSize={settings.style.fontSize}
-                    dimensions={photo.document.photo.dimensions}
-                    fields={photo.document.photo.metadata}
+                    dimensions={dimensions}
+                    fields={fields}
                     icons={icons}
                     onChange={setTemplate}
                     onFocus={() => setEditingId(activeContainer.id)}
@@ -1000,7 +1101,8 @@ function PhotoWorkspaceContent({
                       </>
                     }
                   />
-                  {settings.visible !== false &&
+                  {photo &&
+                    settings.visible !== false &&
                     (resolved.missing.length > 0 || resolved.invalidSyntax) && (
                       <p className="mt-2 text-xs" role="status">
                         {resolved.invalidSyntax ? 'Check token syntax. ' : ''}
@@ -1013,7 +1115,7 @@ function PhotoWorkspaceContent({
               </>
               <CaptionControls
                 scope="local"
-                dimensions={photo.document.photo.dimensions}
+                dimensions={dimensions}
                 caption={settings}
                 onChange={setSettings}
                 disabled={exporting}
@@ -1032,18 +1134,20 @@ function PhotoWorkspaceContent({
           )}
           <SidebarSection
             id="export"
+            defaultOpen={false}
             title="Export"
             iconTone="export"
             icon={<Download />}
           >
-            {renderedCaptions.some(
-              (item) => item.invalidSyntax || item.missing.length,
-            ) && (
-              <InlineNotice tone="warning" className="mb-3">
-                Some layers have missing fields or invalid tokens. Select them
-                to review their captions.
-              </InlineNotice>
-            )}
+            {photo &&
+              renderedCaptions.some(
+                (item) => item.invalidSyntax || item.missing.length,
+              ) && (
+                <InlineNotice tone="warning" className="mb-3">
+                  Some layers have missing fields or invalid tokens. Select them
+                  to review their captions.
+                </InlineNotice>
+              )}
             <fieldset disabled={exporting}>
               <h3 className="mb-3 text-xs font-semibold">Image quality</h3>
               <label
@@ -1137,11 +1241,14 @@ function PhotoWorkspaceContent({
                   Output:{' '}
                   {prepared.blob
                     ? formatBytes(prepared.blob.size)
-                    : prepared.error
-                      ? 'Unavailable'
-                      : 'Calculating…'}
+                    : !photo
+                      ? 'Open a photo to prepare export.'
+                      : prepared.error
+                        ? 'Unavailable'
+                        : 'Calculating…'}
                 </p>
-                {prepared.blob &&
+                {photo &&
+                  prepared.blob &&
                   prepared.blob.size > photo.document.photo.byteLength && (
                     <InlineNotice tone="warning" className="mt-2">
                       Output is larger than the original. Try a lower JPEG

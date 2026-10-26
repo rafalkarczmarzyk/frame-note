@@ -3,6 +3,8 @@ import {
   checkImageRetention,
 } from '@/domain/image-retention';
 import type { ReactNode } from 'react';
+import { createPortal } from 'react-dom';
+import { ContentImageDropOverlay } from './content-image-drop-overlay';
 import { ImagePlus } from 'lucide-react';
 import { createId } from '@/lib/create-id';
 import type { JSONContent } from '@tiptap/core';
@@ -23,7 +25,7 @@ import {
   type SizingUnit,
 } from '@/domain/sizing';
 import type { ImageDimensions } from '@/domain/document';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { EditorContent, useEditor, type Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Fragment, Slice } from '@tiptap/pm/model';
@@ -81,6 +83,15 @@ export function CaptionEditor({
   const upload = useRef<HTMLInputElement>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const importingImage = useRef(false);
+  const [dropSurface, setDropSurface] = useState<HTMLElement | null>(null);
+  const [draggingImage, setDraggingImage] = useState(false);
+  const attachDropSurface = useCallback((node: HTMLDivElement | null) => {
+    setDropSurface(
+      node?.parentElement?.closest<HTMLElement>('[data-content-image-drop]') ??
+        node,
+    );
+  }, []);
   const [composing, setComposing] = useState(false);
   const editor = useEditor({
     extensions: [
@@ -319,6 +330,149 @@ export function CaptionEditor({
       },
     },
   });
+  const addImage = useCallback(
+    async (file: File, replaceAt: number | null = null) => {
+      if (!editor || editor.isDestroyed || importingImage.current) return;
+      importingImage.current = true;
+      setLoading(true);
+      setError('');
+      const startRevision = revision.current;
+      const insertion = {
+        from: editor.state.selection.from,
+        to: editor.state.selection.to,
+      };
+      const previousToken =
+        replaceAt === null
+          ? null
+          : String(editor.state.doc.nodeAt(replaceAt)?.attrs.token);
+      const previous = previousToken ? parseImageToken(previousToken) : null;
+      try {
+        const asset = await importImage(file, createId());
+        if (editor.isDestroyed) return;
+        if (
+          revision.current !== startRevision ||
+          (replaceAt !== null &&
+            String(editor.state.doc.nodeAt(replaceAt)?.attrs.token) !==
+              previousToken)
+        )
+          throw Error(
+            'Content changed while the image was loading. Add the image again at the desired position.',
+          );
+        const existing = imageAssets.current.find(
+          (item) => item.source === asset.source,
+        );
+        const added = existing
+          ? imageAssets.current
+          : [...imageAssets.current, asset];
+        const tokenValue = imageToken({
+          height: 2,
+          unit: 'font',
+          colorMode: 'original',
+          ...previous,
+          assetId: existing?.id ?? asset.id,
+        });
+        const target =
+          replaceAt === null
+            ? insertion
+            : { from: replaceAt, to: replaceAt + 1 };
+        const next = editor.state.tr.replaceWith(
+          target.from,
+          target.to,
+          editor.schema.nodes.captionToken!.create({
+            token: tokenValue,
+          }),
+        );
+        checkImageRetention(documentTemplate(next.doc.toJSON()), added);
+        if (!existing) imageAssets.current = [...imageAssets.current, asset];
+        editor
+          .chain()
+          .focus()
+          .insertContentAt(
+            replaceAt === null
+              ? insertion
+              : { from: replaceAt, to: replaceAt + 1 },
+            {
+              type: 'captionToken',
+              attrs: {
+                token: imageToken({
+                  height: 2,
+                  unit: 'font',
+                  colorMode: 'original',
+                  ...previous,
+                  assetId: existing?.id ?? asset.id,
+                }),
+              },
+            },
+          )
+          .run();
+      } catch (cause) {
+        if (editor.isDestroyed) return;
+        setError(
+          cause instanceof Error ? cause.message : 'Could not load image.',
+        );
+      } finally {
+        importingImage.current = false;
+        if (!editor.isDestroyed) setLoading(false);
+      }
+    },
+    [editor],
+  );
+  useEffect(() => {
+    if (!dropSurface) return;
+    const isFileDrag = (event: DragEvent) =>
+      Array.from(event.dataTransfer?.types ?? []).includes('Files');
+    const reset = () => setDraggingImage(false);
+    const over = (event: DragEvent) => {
+      if (!isFileDrag(event)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (event.dataTransfer)
+        event.dataTransfer.dropEffect = importingImage.current
+          ? 'none'
+          : 'copy';
+      setDraggingImage(!importingImage.current);
+    };
+    const leave = (event: DragEvent) => {
+      const next =
+        event.relatedTarget ??
+        document.elementFromPoint(event.clientX, event.clientY);
+      if (!(next instanceof Node) || !dropSurface.contains(next)) reset();
+    };
+    const drop = (event: DragEvent) => {
+      if (!isFileDrag(event)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      reset();
+      if (importingImage.current) return;
+      const files = event.dataTransfer?.files;
+      if (!files?.length) return;
+      if (files.length !== 1) {
+        setError('Please add one SVG or PNG image at a time.');
+        return;
+      }
+      replacePosition.current = null;
+      void addImage(files[0]!);
+    };
+    const key = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') reset();
+    };
+    dropSurface.addEventListener('dragenter', over, true);
+    dropSurface.addEventListener('dragover', over, true);
+    dropSurface.addEventListener('dragleave', leave);
+    dropSurface.addEventListener('drop', drop, true);
+    window.addEventListener('dragend', reset);
+    window.addEventListener('blur', reset);
+    window.addEventListener('keydown', key);
+    return () => {
+      dropSurface.removeEventListener('dragenter', over, true);
+      dropSurface.removeEventListener('dragover', over, true);
+      dropSurface.removeEventListener('dragleave', leave);
+      dropSurface.removeEventListener('drop', drop, true);
+      window.removeEventListener('dragend', reset);
+      window.removeEventListener('blur', reset);
+      window.removeEventListener('keydown', key);
+    };
+  }, [dropSurface, addImage]);
   useEffect(() => {
     onReady(editor);
     return () => onReady(null);
@@ -367,9 +521,15 @@ export function CaptionEditor({
       }}
     >
       <div
+        ref={attachDropSurface}
+        data-content-image-drop
+        className="relative"
         onCompositionStart={() => setComposing(true)}
         onCompositionEnd={() => setComposing(false)}
       >
+        {draggingImage &&
+          dropSurface &&
+          createPortal(<ContentImageDropOverlay />, dropSurface)}
         <div className="relative">
           <EditorContent
             editor={editor}
@@ -406,98 +566,18 @@ export function CaptionEditor({
             accept="image/svg+xml,image/png,.svg,.png"
             className="sr-only"
             aria-label="Upload image"
-            onChange={async (event) => {
+            onChange={(event) => {
               const file = event.target.files?.[0];
               event.target.value = '';
-              if (!file || !editor) return;
-              setLoading(true);
-              setError('');
-              const startRevision = revision.current;
-              const insertion = {
-                from: editor.state.selection.from,
-                to: editor.state.selection.to,
-              };
-              const replaceAt = replacePosition.current;
-              const previousToken =
-                replaceAt === null
-                  ? null
-                  : String(editor.state.doc.nodeAt(replaceAt)?.attrs.token);
-              const previous = previousToken
-                ? parseImageToken(previousToken)
-                : null;
-              try {
-                const asset = await importImage(file, createId());
-                if (editor.isDestroyed) return;
-                if (
-                  revision.current !== startRevision ||
-                  (replaceAt !== null &&
-                    String(editor.state.doc.nodeAt(replaceAt)?.attrs.token) !==
-                      previousToken)
-                )
-                  throw Error(
-                    'Content changed while the image was loading. Add the image again at the desired position.',
-                  );
-                const existing = imageAssets.current.find(
-                  (item) => item.source === asset.source,
-                );
-                const added = existing
-                  ? imageAssets.current
-                  : [...imageAssets.current, asset];
-                const tokenValue = imageToken({
-                  height: 2,
-                  unit: 'font',
-                  colorMode: 'original',
-                  ...previous,
-                  assetId: existing?.id ?? asset.id,
-                });
-                const target =
-                  replaceAt === null
-                    ? insertion
-                    : { from: replaceAt, to: replaceAt + 1 };
-                const next = editor.state.tr.replaceWith(
-                  target.from,
-                  target.to,
-                  editor.schema.nodes.captionToken!.create({
-                    token: tokenValue,
-                  }),
-                );
-                checkImageRetention(documentTemplate(next.doc.toJSON()), added);
-                if (!existing)
-                  imageAssets.current = [...imageAssets.current, asset];
-                editor
-                  .chain()
-                  .focus()
-                  .insertContentAt(
-                    replaceAt === null
-                      ? insertion
-                      : { from: replaceAt, to: replaceAt + 1 },
-                    {
-                      type: 'captionToken',
-                      attrs: {
-                        token: imageToken({
-                          height: 2,
-                          unit: 'font',
-                          colorMode: 'original',
-                          ...previous,
-                          assetId: existing?.id ?? asset.id,
-                        }),
-                      },
-                    },
-                  )
-                  .run();
-              } catch (cause) {
-                if (editor.isDestroyed) return;
-                setError(
-                  cause instanceof Error
-                    ? cause.message
-                    : 'Could not load image.',
-                );
-              } finally {
-                if (!editor.isDestroyed) setLoading(false);
-              }
+              if (file) void addImage(file, replacePosition.current);
             }}
           />
         </div>
+        {loading && (
+          <p role="status" className="mt-2 text-xs text-content-secondary">
+            Loading image…
+          </p>
+        )}
         {error && (
           <p role="alert" className="mt-2 text-xs">
             {error}

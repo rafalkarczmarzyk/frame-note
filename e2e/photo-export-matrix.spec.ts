@@ -43,7 +43,12 @@ for (const photo of photos) {
         .getByLabel('Choose JPG or PNG photo')
         .setInputFiles(photo.file.path);
       await page.getByRole('combobox', { name: 'Saved preset' }).click();
-      await page.getByRole('option', { name: preset, exact: true }).click();
+      await page
+        .getByRole('option', {
+          name: preset === 'Macro' ? 'Focus Stack' : preset,
+          exact: true,
+        })
+        .click();
       await expect(page.getByLabel('Caption', { exact: true })).toHaveAttribute(
         'data-template',
         preset === 'Macro' ? '{heliconStack}' : '{author}\n{lens}\n{exposure}',

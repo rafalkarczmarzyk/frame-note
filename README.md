@@ -79,7 +79,8 @@ Each suffix number identifies a deliberately prepared prerelease, not a commit.
   original colors and transparency.
 - **Reusable layout presets.** Save layouts locally, update or duplicate them,
   and import/export `.framenote.json` files with their image assets. Built-in
-  presets include Default, Default dark, and Macro.
+  presets include Default, Default dark, Signature, Compact EXIF, Camera & Lens,
+  Focus Stack, EXIF Icons, Astrophotography, and Long Exposure.
 - **Controlled JPG export.** Choose quality from 1–100%, inspect the actual
   encoded file size, choose which supported metadata groups to keep, and download
   the prepared result. Preview and export share layout calculations.
@@ -125,13 +126,16 @@ A caption can combine plain text and metadata tokens:
 ```
 
 Original metadata is also available through namespaced tokens such as
-`{exif:Artist}` and `{exif:UserComment}`. The Macro preset uses `{heliconStack}`
+`{exif:Artist}` and `{exif:UserComment}`. The Focus Stack preset uses `{heliconStack}`
 for the documented Helicon Focus UserComment format. Missing values are reported
 and require confirmation before export for visible layers. Intentional blank
 lines are preserved; lines containing only missing values are omitted.
 
 See the [caption tag reference](docs/CAPTION_TAGS.md) for available helpers,
 source precedence, formatting, and missing-data behavior.
+
+`{shutterDuration}` formats long exposures as minutes and hours, for example
+`600 s` → `10 min`; `{shutter}` keeps its original seconds format.
 
 ## Presets and local storage
 
@@ -146,6 +150,10 @@ existing entries. The format is still evolving during development; compatibility
 with older presets is not a stable contract.
 
 Replacing a photo preserves the current layout, export quality, and metadata choices in the session.
+The layout editor and preset management are available before opening a photo.
+The first import preserves the prepared layout; document-unit conversions wait
+for real image dimensions, and JPG export requires a photo.
+
 Refreshing the page resets unsaved editor state; saved presets can be reapplied
 after importing a photo.
 

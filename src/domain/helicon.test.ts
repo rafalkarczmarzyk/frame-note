@@ -26,7 +26,7 @@ it('does not interpret unrelated or incomplete comments as Helicon', () => {
     captionTags([]).find((tag) => tag.key === 'heliconStack')?.displayValue,
   ).toBe('');
 });
-it('provides Default and Macro without changing the default caption', () => {
+it('provides Default and Focus Stack without changing the default caption', () => {
   expect(builtinPresets[0]!.layout.containers[0]!.template).toBe(
     defaultTemplate,
   );

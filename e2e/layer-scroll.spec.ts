@@ -42,7 +42,10 @@ test('auto-scrolls a long layer list with a stationary pointer and preserves can
     },
   };
   await page
-    .getByRole('button', { name: 'Manage presets', exact: true })
+    .getByRole('button', { name: 'Preset actions', exact: true })
+    .click();
+  await page
+    .getByRole('menuitem', { name: 'Manage presets', exact: true })
     .click();
   await page.getByLabel('Import preset file').setInputFiles({
     name: 'long.json',
