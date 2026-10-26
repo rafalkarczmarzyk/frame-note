@@ -82,3 +82,30 @@ it('keeps migrated standalone logo dimensions and anchored geometry', () => {
   expect(scene.x).toBe(24);
   expect(scene.y).toBe(736);
 });
+
+it('Auto aligns rows containing artwork using the retained anchor', () => {
+  const caption = createCaption();
+  caption.position.anchor = 'bottom-right';
+  const icons = [
+    { name: 'wide', svg: '<svg/>', aspect: 4 },
+    { name: 'small', svg: '<svg/>', aspect: 1 },
+  ];
+  const dimensions = { width: 1000, height: 800 };
+  const scene = inlineLayout(
+    dimensions,
+    caption,
+    '\uE0000\uE001\n\uE0001\uE001',
+    icons,
+  );
+  expect(scene.runs[1]!.x + scene.runs[1]!.width).toBe(scene.width);
+  caption.position.custom = { x: 80, y: 70 };
+  expect(
+    inlineLayout(dimensions, caption, '\uE0000\uE001\n\uE0001\uE001', icons)
+      .runs,
+  ).toEqual(scene.runs);
+  caption.style.textAlign = 'left';
+  expect(
+    inlineLayout(dimensions, caption, '\uE0000\uE001\n\uE0001\uE001', icons)
+      .runs[1]!.x,
+  ).toBe(0);
+});

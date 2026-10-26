@@ -545,7 +545,6 @@ export function CaptionEditor({
             />
             <NumberField
               label="Image height"
-              showSteppers
               value={token.height}
               min={token.unit === 'font' ? 0.25 : sizingUnit === 'px' ? 1 : 0.1}
               max={1e7}

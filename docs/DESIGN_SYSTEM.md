@@ -726,3 +726,39 @@ supported fields as XMP, so download and displayed size remain synchronized.
 Export separates Image quality, Metadata and Output file with visible semantic
 borders and stronger headings. Retained metadata groups share an inset surface
 with padded rows and separators; each description stays beside its own switch.
+
+### Automatic text alignment
+
+Typography starts its alignment control with a custom AlignAuto icon (text lines
+and an A), followed by left, center and right. New layers default to Auto, which
+follows the horizontal column of their retained anchor, including in Manual
+position mode. Explicit alignment stays independent of position. Presets preserve
+Auto or the explicit choice; preview and export share alignment resolution.
+
+### Icon catalog
+
+Design/Icons/Usage documents Lucide symbols and custom artwork together, grouped by
+purpose with a preview, component name and usage description. Shared symbols
+appear once with their multiple uses. Design/Icons/CustomArtwork lists all custom
+icon and brand components: FrameNoteLogo, FrameNoteIcon, PhotoIcon, AlignAuto
+and AutoAlign (the supplied filled artwork, with its original 10 × 8 viewBox).
+Keep this catalog current when adding an icon or changing its meaning; individual
+component stories remain available under Components.
+
+### Numeric field steppers
+
+Every NumberInput and DimensionInput always shows increase/decrease buttons.
+NumberField supplies the field label for accessible button names. Buttons respect
+the configured step, clamp at the field limits and remain disabled inside disabled
+fieldsets. Compact margin fields retain their arrows even without focus.
+Components/UI/NumberField/StepperLimits covers fractional steps and both limits.
+
+### Typography rows and real italic
+
+Font family has an external Type icon. Font size and line spacing share a row;
+alignment and independent Bold/Italic toggles share the next. White, Black and
+Custom color shortcuts precede a Colors button opening the floating color panel
+directly. Opacity remains below. Montserrat loads real italic and bold italic;
+Advercase has no italic asset and disables Italic. Switching to Advercase clears
+italic. Presets preserve fontStyle; absent style means normal. Preview, inline
+measurement, font readiness and export use the same effective font variant.

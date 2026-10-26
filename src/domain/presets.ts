@@ -103,11 +103,14 @@ export function parsePreset(
       style: {
         fontFamily: oneOf(s.fontFamily, ['Montserrat Variable', 'Advercase']),
         fontWeight: oneOf(s.fontWeight, [400, 700]),
+        ...(s.fontStyle === undefined
+          ? {}
+          : { fontStyle: oneOf(s.fontStyle, ['normal', 'italic']) }),
         fontSize: number(s.fontSize, 0),
         color,
         opacity: number(s.opacity, 0, 1),
         lineHeight: number(s.lineHeight, 0.1, 10),
-        textAlign: oneOf(s.textAlign, ['left', 'center', 'right']),
+        textAlign: oneOf(s.textAlign, ['auto', 'left', 'center', 'right']),
       },
       position: {
         anchor: oneOf(p.anchor, [

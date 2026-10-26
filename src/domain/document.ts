@@ -37,13 +37,14 @@ export interface Caption {
   style: {
     fontFamily: 'Montserrat Variable' | 'Advercase';
     fontWeight: 400 | 700;
+    fontStyle?: 'normal' | 'italic';
     /** Uses the document sizing unit, never the viewport. */
     fontSize: number;
     color: string;
     opacity: number;
     /** Unitless multiplier of the font size. */
     lineHeight: number;
-    textAlign: 'left' | 'center' | 'right';
+    textAlign: 'auto' | 'left' | 'center' | 'right';
   };
   position: {
     anchor: Anchor;
@@ -71,7 +72,7 @@ export function createCaption(): Caption {
       color: 'porcelain',
       opacity: 1,
       lineHeight: 1.4,
-      textAlign: 'left',
+      textAlign: 'auto',
     },
     position: {
       anchor: 'bottom-left',
@@ -99,4 +100,17 @@ export function createPhotoDocument(photo: Photo): PhotoDocument {
     },
     caption: createCaption(),
   };
+}
+
+/** Auto follows the retained anchor, including in Manual position mode. */
+export function resolvedTextAlign(
+  caption: Caption,
+): 'left' | 'center' | 'right' {
+  if (caption.style.textAlign !== 'auto') return caption.style.textAlign;
+  const anchor = caption.position.anchor;
+  return anchor.endsWith('left')
+    ? 'left'
+    : anchor.endsWith('right')
+      ? 'right'
+      : 'center';
 }

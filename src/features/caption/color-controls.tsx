@@ -1,5 +1,3 @@
-import { useId, useRef, useState } from 'react';
-import { ChevronDown } from 'lucide-react';
 import { ColorSwatch } from '@/components/ui/color-swatch';
 import { Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -19,68 +17,72 @@ export function ColorControls({
   onBrowse: () => void;
   disabled?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
-  const disclosureId = useId();
-  const trigger = useRef<HTMLButtonElement>(null);
   if (compact)
     return (
       <div
-        className="relative"
-        onBlur={(event) => {
-          if (!event.currentTarget.contains(event.relatedTarget))
-            setOpen(false);
-        }}
-        onKeyDown={(event) => {
-          if (event.key === 'Escape') {
-            setOpen(false);
-            event.stopPropagation();
-            event.currentTarget.querySelector('button')?.focus();
-          }
-        }}
+        className="flex items-center gap-2"
+        role="group"
+        aria-label="Text color"
       >
-        <button
-          ref={trigger}
-          type="button"
-          title={`Color: ${captionColorLabel(value)}`}
-          aria-label="Color"
-          aria-expanded={open}
-          aria-controls={disclosureId}
-          disabled={disabled}
-          onClick={() => setOpen(!open)}
-          className="control-field flex h-9 w-full items-center gap-2 px-2 text-xs"
-        >
-          <ColorSwatch value={value} className="size-4" />
-          <span className="min-w-0 flex-1 truncate text-left">
-            {captionColorLabel(value)}
-          </span>
-          <ChevronDown className="size-3" aria-hidden="true" />
-        </button>
-        {open && (
-          <div
-            id={disclosureId}
-            className="absolute right-0 z-20 mt-1 w-64 rounded-lg border border-panel-border bg-panel-base p-3 shadow-panel"
+        {[
+          'caption-white',
+          'caption-silver',
+          'caption-dark-gray',
+          'caption-black',
+        ].map((color) => (
+          <button
+            key={color}
+            type="button"
+            className="control-button control-quiet flex size-8 items-center justify-center rounded-full aria-pressed:outline-2 aria-pressed:outline-input-focus-ring"
+            aria-label={captionColorLabel(color)}
+            title={captionColorLabel(color)}
+            aria-pressed={value === color}
+            disabled={disabled}
+            onClick={() => onChange(color)}
           >
-            <QuickColors
-              value={value}
-              onChange={onChange}
-              disabled={disabled}
-            />
-            <Button
-              variant="outline"
-              size="sm"
-              className="mt-2"
-              disabled={disabled}
-              onClick={() => {
-                trigger.current?.focus({ preventScroll: true });
-                setOpen(false);
-                onBrowse();
-              }}
-            >
-              <Palette aria-hidden="true" />
-              More colors…
-            </Button>
-          </div>
-        )}
+            <ColorSwatch value={color} className="size-6" />
+          </button>
+        ))}
+        <button
+          type="button"
+          aria-label="Custom color"
+          aria-pressed={
+            ![
+              'caption-white',
+              'caption-silver',
+              'caption-dark-gray',
+              'caption-black',
+            ].includes(value)
+          }
+          title={captionColorLabel(value)}
+          aria-haspopup="dialog"
+          disabled={disabled}
+          onClick={(event) => {
+            event.currentTarget.focus({ preventScroll: true });
+            onBrowse();
+          }}
+          className="control-button control-quiet flex size-8 items-center justify-center rounded-full aria-pressed:outline-2 aria-pressed:outline-input-focus-ring"
+        >
+          <span
+            aria-hidden="true"
+            className="color-spectrum size-6 rounded-full"
+          />
+        </button>
+        <Button
+          variant="outline"
+          size="sm"
+          aria-label="Color"
+          aria-haspopup="dialog"
+          disabled={disabled}
+          onClick={(event) => {
+            event.currentTarget.focus({ preventScroll: true });
+            onBrowse();
+          }}
+          className="ml-auto h-9"
+        >
+          <Palette aria-hidden="true" />
+          Colors
+        </Button>
       </div>
     );
   return (

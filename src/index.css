@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import '@fontsource-variable/montserrat';
+@import '@fontsource-variable/montserrat/wght-italic.css';
 
 @font-face {
   font-family: 'Advercase';
@@ -699,8 +700,7 @@
     border-color: transparent;
     box-shadow: none;
   }
-  .margin-model-value .numeric-input:not(:focus-within) .numeric-unit,
-  .margin-model-value .numeric-input:not(:focus-within) .numeric-steppers {
+  .margin-model-value .numeric-input:not(:focus-within) .numeric-unit {
     display: none;
   }
   .margin-model-value .numeric-input:focus-within {

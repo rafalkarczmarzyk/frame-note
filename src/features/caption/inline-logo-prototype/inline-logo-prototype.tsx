@@ -327,7 +327,6 @@ export function InlineLogoPrototype({
             />
             <NumberField
               label="Image height"
-              showSteppers
               step={attrs.unit === 'px' ? 1 : 0.25}
               value={Number(attrs.size)}
               min={attrs.unit === 'px' ? 1 : 0.25}

@@ -1,7 +1,6 @@
 import {
   Download,
   ExternalLink,
-  Image,
   Layers,
   LockKeyhole,
   Plus,
@@ -110,7 +109,7 @@ export function EmptyWorkspace({
             className="flex max-w-sm flex-col items-center text-center"
             aria-labelledby="empty-workspace-title"
           >
-            <Image
+            <PhotoIcon
               className="mb-5 size-9 text-content-muted"
               aria-hidden="true"
             />
@@ -120,7 +119,7 @@ export function EmptyWorkspace({
             <p className="mt-2 text-xs text-content-muted">JPG or PNG</p>
             <Button
               className="mt-6"
-              variant="outline"
+              variant="default"
               disabled={loading}
               onClick={onChoosePhoto}
             >

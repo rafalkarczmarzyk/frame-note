@@ -61,7 +61,6 @@ test('panels receive keyboard focus and return it to their opener', async ({
     await expect(item.trigger).toBeFocused();
   }
   await page.getByRole('button', { name: 'Color', exact: true }).click();
-  await page.getByRole('button', { name: 'More colors…', exact: true }).click();
   const colors = page.getByRole('dialog', {
     name: 'Choose a color',
     exact: true,

@@ -1,3 +1,5 @@
+import { canvasFontStyle, effectiveFontStyle } from '../../domain/font-style';
+import { resolvedTextAlign } from '../../domain/document';
 import type { InlineAsset } from '@/domain/inline-image';
 import { logoLayout } from './logo-layout';
 import { inlineLayout, tintedIcon } from './inline-layout';
@@ -42,7 +44,7 @@ export function captionConfig(
     text,
     fontSize,
     fontFamily: caption.style.fontFamily,
-    fontStyle: caption.style.fontWeight === 700 ? 'bold' : 'normal',
+    fontStyle: canvasFontStyle(caption),
     lineHeight: caption.style.lineHeight,
     wrap: 'none',
   });
@@ -62,9 +64,9 @@ export function captionConfig(
     width: block.width,
     fontSize,
     fontFamily: caption.style.fontFamily,
-    fontStyle: caption.style.fontWeight === 700 ? 'bold' : 'normal',
+    fontStyle: canvasFontStyle(caption),
     lineHeight: caption.style.lineHeight,
-    align: caption.style.textAlign,
+    align: resolvedTextAlign(caption),
     fill: color,
     opacity: caption.style.opacity,
     wrap: 'none',
@@ -108,7 +110,7 @@ export async function exportPhotoCaptions(
   await Promise.all(
     captions.map(({ caption }) =>
       document.fonts.load(
-        `${caption.style.fontWeight} 16px "${caption.style.fontFamily}"`,
+        `${effectiveFontStyle(caption)} ${caption.style.fontWeight} 16px "${caption.style.fontFamily}"`,
       ),
     ),
   );
@@ -189,7 +191,7 @@ export async function exportPhotoCaptions(
               text: run.text,
               fontSize: scene.fontSize,
               fontFamily: caption.style.fontFamily,
-              fontStyle: caption.style.fontWeight === 700 ? 'bold' : 'normal',
+              fontStyle: canvasFontStyle(caption),
               lineHeight: caption.style.lineHeight,
               fill: color,
               wrap: 'none',

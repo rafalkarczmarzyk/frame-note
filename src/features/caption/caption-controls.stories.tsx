@@ -52,3 +52,22 @@ export const CustomInspector: Story = {
     },
   },
 };
+
+export const ItalicInspector: Story = {
+  args: {
+    scope: 'local',
+    caption: {
+      ...createCaption(),
+      style: { ...createCaption().style, fontStyle: 'italic', fontWeight: 700 },
+    },
+  },
+};
+export const NoItalicInspector: Story = {
+  args: {
+    scope: 'local',
+    caption: {
+      ...createCaption(),
+      style: { ...createCaption().style, fontFamily: 'Advercase' },
+    },
+  },
+};

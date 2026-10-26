@@ -9,6 +9,13 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Added
 
+- Automatic text alignment following the layer anchor, including Manual position,
+  with explicit left, center and right overrides preserved in presets.
+- True Montserrat Italic and Bold Italic in preview, JPG export and presets;
+  unavailable italic variants are disabled for Advercase.
+- Storybook icon catalog documenting Lucide and custom artwork by application,
+  including brand assets and both automatic-alignment icons.
+
 - Export metadata controls with removal enabled by default and five optional
   retention groups. Supported source fields are written as XMP and included in
   the prepared download size.
@@ -18,6 +25,14 @@ when explicitly requested; a commit does not automatically create a release.
 - Per-layer menu commands to move up, move down, bring to front, and send to back.
 
 ### Changed
+
+- Reorganized Typography into sizing, alignment and style, color, and opacity
+  rows, with font icons, grouped Bold/Italic toggles, neutral color swatches and
+  direct access to the color panel.
+- All numeric fields now show increase/decrease arrows, respecting their steps,
+  limits and disabled states, including compact margin fields.
+- Use the custom photo symbol and primary photo-selection button in the empty
+  workspace.
 
 - Separate image quality, metadata and output file details in Export, with
   clearly divided rows for metadata groups.

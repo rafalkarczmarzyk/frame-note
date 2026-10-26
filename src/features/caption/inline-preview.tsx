@@ -1,3 +1,4 @@
+import { canvasFontStyle } from '../../domain/font-style';
 import { Text, Image as CanvasImage } from 'react-konva';
 import type { Caption } from '@/domain/document';
 import { inlineLayout, tintedIcon } from './inline-layout';
@@ -48,7 +49,7 @@ export function InlinePreview({
             text={run.text}
             fontSize={scene.fontSize}
             fontFamily={caption.style.fontFamily}
-            fontStyle={caption.style.fontWeight === 700 ? 'bold' : 'normal'}
+            fontStyle={canvasFontStyle(caption)}
             lineHeight={caption.style.lineHeight}
             fill={color}
             wrap="none"
