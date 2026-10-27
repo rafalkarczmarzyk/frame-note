@@ -2,7 +2,7 @@
   position: relative;
   min-width: 0;
   max-width: 100%;
-  padding: 8px 8px 16px 16px;
+  padding: 8px 0 16px 16px;
   background-color: var(--sidebar-base);
   background-image:
     linear-gradient(var(--film-tabletop-tint), var(--film-tabletop-tint)),
@@ -259,4 +259,33 @@
 .film-roll-strip[data-pointer-input] .film-roll-frame:focus-visible::after,
 .film-roll-strip[data-pointer-input] .film-roll-handle:focus-visible::after {
   display: none;
+}
+
+.film-roll::after {
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 56px;
+  background: var(--film-overflow-shade);
+  opacity: 0;
+  transition: opacity 240ms ease-in-out;
+  content: '';
+  pointer-events: none;
+}
+
+.film-roll[data-more-photos='true']::after {
+  opacity: 1;
+}
+/* Space travels with the tail, never with the viewport edge. */
+.film-roll-strip::after {
+  flex: none;
+  width: 16px;
+  content: '';
+}
+@media (prefers-reduced-motion: reduce) {
+  .film-roll::after {
+    transition: none;
+  }
 }

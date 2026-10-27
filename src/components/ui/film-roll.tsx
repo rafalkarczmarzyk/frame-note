@@ -37,7 +37,7 @@ export function FilmRoll({
   photos,
   activePhotoId,
   onSelectPhoto,
-  height = 195,
+  height = 180,
   cassetteScale = 0.9,
   className,
   disabled = false,
@@ -127,6 +127,31 @@ export function FilmRoll({
     stripRef.current?.removeAttribute('data-dragging');
     stripRef.current?.style.setProperty('--film-pull', '0px');
   }, [disabled, photos.length]);
+
+  useEffect(() => {
+    const roll = rollRef.current;
+    const strip = stripRef.current;
+    if (!roll || !strip) return;
+    function updateOverflow() {
+      if (!roll || !strip) return;
+      roll.dataset.morePhotos = String(
+        strip.offsetWidth - roll.clientWidth - roll.scrollLeft > 1,
+      );
+      roll.parentElement?.setAttribute(
+        'data-more-photos',
+        roll.dataset.morePhotos,
+      );
+    }
+    updateOverflow();
+    const observer = new ResizeObserver(updateOverflow);
+    observer.observe(roll);
+    observer.observe(strip);
+    roll.addEventListener('scroll', updateOverflow, { passive: true });
+    return () => {
+      observer.disconnect();
+      roll.removeEventListener('scroll', updateOverflow);
+    };
+  }, []);
 
   useEffect(() => {
     const roll = rollRef.current;

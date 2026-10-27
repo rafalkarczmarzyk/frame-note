@@ -86,6 +86,11 @@
     var(--workspace-base) 25%,
     transparent
   );
+  --film-overflow-shade: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in srgb, var(--color-film-photo-base) 55%, transparent)
+  );
   --film-frame-light: linear-gradient(
     color-mix(in srgb, var(--color-film-light-amber) 65%, transparent),
     color-mix(in srgb, var(--color-film-light-core) 70%, transparent),
