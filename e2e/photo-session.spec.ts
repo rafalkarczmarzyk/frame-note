@@ -507,6 +507,15 @@ test('keeps the cassette fixed and springs back only beyond the film range', asy
     })),
   );
   await ready(page);
+  await expect(viewport).toHaveAttribute('data-more-photos', 'true');
+  expect(
+    await viewport.evaluate((el) =>
+      Math.abs(
+        el.getBoundingClientRect().right -
+          el.parentElement!.getBoundingClientRect().right,
+      ),
+    ),
+  ).toBeLessThan(1);
   await viewport.hover();
   await page.mouse.wheel(0, 300);
   await expect
@@ -516,6 +525,7 @@ test('keeps the cassette fixed and springs back only beyond the film range', asy
   await viewport.evaluate((el) => {
     el.scrollLeft = el.scrollWidth;
   });
+  await expect(viewport).toHaveAttribute('data-more-photos', 'false');
   const before = await viewport.evaluate((el) => el.scrollLeft);
   const end = (await handle.boundingBox())!;
   await page.mouse.move(end.x + end.width / 2, end.y + 20);

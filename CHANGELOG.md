@@ -18,7 +18,9 @@ when explicitly requested; a commit does not automatically create a release.
   cassette, translucent dark film, active-frame highlight and cool wood-textured
   tray include interactive Storybook previews and reduced-motion support.
   Keyboard focus uses a small marker above frames and the film tail, stays hidden
-  during pointer interaction, and skips the decorative tabletop.
+  during pointer interaction, and skips the decorative tabletop. The lower
+  180 px roll reaches the tray edge while browsing, with a softly animated edge
+  shade when more film remains and a small gap after the tail.
 - Export all prepares full-resolution JPGs sequentially and downloads one ZIP,
   with shared quality/metadata settings, collision-safe names, combined token
   warnings, progress, cancellation and per-file failure reporting.
