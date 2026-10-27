@@ -1,0 +1,27 @@
+.film-roll-label {
+  --film-label-ink: var(--color-film-ink);
+}
+.film-roll-label-emerald {
+  --film-label-start: var(--color-film-emerald-start);
+  --film-label-light: var(--color-film-emerald-light);
+  --film-label-mid: var(--color-film-emerald-mid);
+  --film-label-end: var(--color-film-emerald-end);
+}
+.film-roll-label-gold {
+  --film-label-start: var(--color-film-label-start);
+  --film-label-light: var(--color-film-label-light);
+  --film-label-mid: var(--color-film-label-mid);
+  --film-label-end: var(--color-film-label-end);
+}
+.film-roll-label-ivory {
+  --film-label-start: var(--color-film-ivory-start);
+  --film-label-light: var(--color-film-ivory-light);
+  --film-label-mid: var(--color-film-ivory-mid);
+  --film-label-end: var(--color-film-ivory-end);
+}
+.film-roll-label-coral {
+  --film-label-start: var(--color-film-coral-start);
+  --film-label-light: var(--color-film-coral-light);
+  --film-label-mid: var(--color-film-coral-mid);
+  --film-label-end: var(--color-film-coral-end);
+}

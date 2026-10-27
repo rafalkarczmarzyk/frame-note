@@ -47,12 +47,29 @@
   --color-caption-lavender: #d2c9df;
   --color-emerald: #14cc60;
   /* Supplied film-roll artwork, independent of interface surfaces. */
-  --color-film-shell: #272216;
-  --color-film-stock: #3d3022;
+  --color-film-shell: #191c20;
+  --color-film-shell-mid: #282c31;
+  --color-film-shell-highlight: #4b5056;
+  --color-film-stock: #211f1d;
   --color-film-label-start: #f0b318;
   --color-film-label-light: #fdd20d;
   --color-film-label-mid: #da8817;
   --color-film-label-end: #c26b2b;
+  --color-film-emerald-start: #359465;
+  --color-film-emerald-light: #8dcca3;
+  --color-film-emerald-mid: #4f9f72;
+  --color-film-emerald-end: #286443;
+  --color-film-ivory-start: #d2c7ad;
+  --color-film-ivory-light: #f3ecda;
+  --color-film-ivory-mid: #d9cdb5;
+  --color-film-ivory-end: #aa987b;
+  --color-film-coral-start: #b87661;
+  --color-film-coral-light: #e7b29a;
+  --color-film-coral-mid: #c88870;
+  --color-film-coral-end: #965e4c;
+  --color-film-ink: #172019;
+  --color-film-light-core: #fff3cf;
+  --color-film-light-amber: #e8b675;
   --color-film-photo-base: #000000;
   /* Section accents; primary remains independent. */
   --color-violet: #731dd8;
@@ -64,6 +81,16 @@
 
 /* Base palette above is also used by photo captions. UI roles below are independent. */
 :root {
+  --film-tabletop-tint: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--sidebar-base) 80%, var(--color-porcelain)) 32%,
+    transparent
+  );
+  --film-frame-light: linear-gradient(
+    color-mix(in srgb, var(--color-film-light-amber) 65%, transparent),
+    color-mix(in srgb, var(--color-film-light-core) 70%, transparent),
+    color-mix(in srgb, var(--color-film-light-amber) 65%, transparent)
+  );
   --switch-thumb-background: linear-gradient(
     160deg,
     var(--color-porcelain),

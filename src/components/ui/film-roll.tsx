@@ -1,6 +1,15 @@
-import { useEffect, useRef, type CSSProperties } from 'react';
-import { FilmRollStart } from '@/components/brand/film-roll-start';
+import {
+  useEffect,
+  useRef,
+  type PointerEvent,
+  type CSSProperties,
+} from 'react';
+import {
+  FilmRollStart,
+  type FilmRollVariant,
+} from '@/components/brand/film-roll-start';
 import { FilmRollFrame } from '@/components/brand/film-roll-frame';
+import { FilmRollLeader } from '@/components/brand/film-roll-leader';
 import { FilmRollEnd } from '@/components/brand/film-roll-end';
 import { cn } from '@/lib/utils';
 import './film-roll.css';
@@ -15,10 +24,13 @@ export interface FilmRollProps {
   photos: readonly FilmRollPhoto[];
   activePhotoId?: string;
   onSelectPhoto?: (id: string) => void;
-  /** Overall height including the cassette; the SVG artwork scales uniformly. */
+  /** Reference height for film artwork; cassetteScale adjusts the shell independently. */
   height?: number;
+  /** Scale the cassette independently while preserving film frame size. */
+  cassetteScale?: number;
   className?: string;
   disabled?: boolean;
+  variant?: FilmRollVariant;
 }
 
 export function FilmRoll({
@@ -26,10 +38,86 @@ export function FilmRoll({
   activePhotoId,
   onSelectPhoto,
   height = 195,
+  cassetteScale = 0.9,
   className,
   disabled = false,
+  variant = 'emerald',
 }: FilmRollProps) {
   const rollRef = useRef<HTMLDivElement>(null);
+  const stripRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<{
+    id: number;
+    x: number;
+    scroll: number;
+    max: number;
+    moved: boolean;
+  } | null>(null);
+
+  const suppressClickRef = useRef(false);
+
+  function startDrag(event: PointerEvent<HTMLDivElement>) {
+    const roll = rollRef.current;
+    const strip = stripRef.current;
+    if (disabled || !event.isPrimary || event.button !== 0 || !roll || !strip)
+      return;
+    event.preventDefault();
+    (event.target as Element).closest('button')?.focus({ preventScroll: true });
+    suppressClickRef.current = false;
+    dragRef.current = {
+      id: event.pointerId,
+      x: event.clientX,
+      scroll: roll.scrollLeft,
+      max: Math.max(0, strip.offsetWidth - roll.clientWidth),
+      moved: false,
+    };
+  }
+
+  function moveDrag(event: PointerEvent<HTMLDivElement>) {
+    const drag = dragRef.current;
+    const roll = rollRef.current;
+    const strip = stripRef.current;
+    if (!drag || !roll || !strip || drag.id !== event.pointerId) return;
+    const distance = event.clientX - drag.x;
+    if (!drag.moved && Math.abs(distance) < 6) return;
+    if (!drag.moved) {
+      drag.moved = true;
+      suppressClickRef.current = true;
+      event.currentTarget.setPointerCapture(event.pointerId);
+      strip.setAttribute('data-dragging', 'true');
+    }
+    const desired = drag.scroll - distance;
+    const clamped = Math.max(0, Math.min(drag.max, desired));
+    // The leader repeats at a fixed pitch, so pulling never stretches the holes.
+    const pull = clamped - desired;
+    strip.style.setProperty(
+      '--film-leader-width',
+      `${Math.max(0, pull) + 1}px`,
+    );
+    strip.style.setProperty('--film-pull', `${pull}px`);
+    roll.scrollLeft = clamped;
+  }
+
+  function finishDrag(event: PointerEvent<HTMLDivElement>) {
+    // Touch starts with implicit capture on the pressed button. Transferring
+    // capture to the strip must not cancel the drag when that button loses it.
+    if (
+      event.type === 'lostpointercapture' &&
+      event.target !== event.currentTarget
+    )
+      return;
+    if (dragRef.current?.id !== event.pointerId) return;
+    dragRef.current = null;
+    stripRef.current?.removeAttribute('data-dragging');
+    stripRef.current?.style.setProperty('--film-pull', '0px');
+    if (event.currentTarget.hasPointerCapture(event.pointerId))
+      event.currentTarget.releasePointerCapture(event.pointerId);
+  }
+
+  useEffect(() => {
+    dragRef.current = null;
+    stripRef.current?.removeAttribute('data-dragging');
+    stripRef.current?.style.setProperty('--film-pull', '0px');
+  }, [disabled, photos.length]);
 
   useEffect(() => {
     const roll = rollRef.current;
@@ -44,7 +132,7 @@ export function FilmRoll({
       )
         return;
 
-      const maxScroll = roll.scrollWidth - roll.clientWidth;
+      const maxScroll = (stripRef.current?.offsetWidth ?? 0) - roll.clientWidth;
       if (maxScroll <= 0) return;
       const step =
         event.deltaMode === WheelEvent.DOM_DELTA_LINE
@@ -82,32 +170,88 @@ export function FilmRoll({
 
   return (
     <div
-      ref={rollRef}
-      className={cn('film-roll overflow-x-auto', className)}
-      style={{ '--film-roll-height': `${height}px` } as CSSProperties}
-      role="region"
-      aria-label="Photo film roll"
-      tabIndex={0}
+      className={cn('film-roll', className)}
+      style={
+        {
+          '--film-roll-height': `${height}px`,
+          '--film-cassette-height': `${height * Math.max(0.8, Math.min(1, cassetteScale))}px`,
+        } as CSSProperties
+      }
     >
-      <div className="film-roll-strip">
-        <FilmRollStart className="film-roll-start" />
-        {photos.map((photo, index) => (
+      <FilmRollStart
+        className="film-roll-start"
+        variant={variant}
+        exposures={photos.length}
+      />
+      <div
+        ref={rollRef}
+        className="film-roll-viewport"
+        role="region"
+        aria-label="Photo film roll"
+        tabIndex={0}
+      >
+        <span className="sr-only" aria-live="polite">
+          {photos.length} photos in roll
+        </span>
+        <div
+          ref={stripRef}
+          className="film-roll-strip"
+          onPointerDown={startDrag}
+          onPointerMove={moveDrag}
+          onPointerUp={finishDrag}
+          onPointerCancel={finishDrag}
+          onLostPointerCapture={finishDrag}
+          onClickCapture={(event) => {
+            if (suppressClickRef.current && event.detail !== 0) {
+              event.preventDefault();
+              event.stopPropagation();
+              suppressClickRef.current = false;
+            }
+          }}
+        >
+          <FilmRollLeader scale={height / 78} className="film-roll-leader" />
+          {photos.map((photo, index) => (
+            <button
+              key={photo.id}
+              type="button"
+              disabled={disabled}
+              className="film-roll-frame"
+              aria-label={`Photo ${index + 1}: ${photo.name}`}
+              aria-pressed={photo.id === activePhotoId}
+              onClick={() => onSelectPhoto?.(photo.id)}
+            >
+              <span className="film-roll-photo">
+                <img
+                  src={photo.src}
+                  alt=""
+                  draggable={false}
+                  decoding="async"
+                />
+              </span>
+              <FilmRollFrame className="film-roll-overlay" />
+            </button>
+          ))}
           <button
-            key={photo.id}
             type="button"
+            className="film-roll-handle"
             disabled={disabled}
-            className="film-roll-frame"
-            aria-label={`Photo ${index + 1}: ${photo.name}`}
-            aria-pressed={photo.id === activePhotoId}
-            onClick={() => onSelectPhoto?.(photo.id)}
+            aria-label="Drag film to browse photos"
+            title="Drag anywhere on the film · Arrow keys to browse"
+            onKeyDown={(event) => {
+              if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight')
+                return;
+              event.preventDefault();
+              rollRef.current?.scrollBy({
+                left:
+                  event.key === 'ArrowRight'
+                    ? (height * 64) / 78
+                    : (-height * 64) / 78,
+              });
+            }}
           >
-            <span className="film-roll-photo">
-              <img src={photo.src} alt="" draggable={false} decoding="async" />
-            </span>
-            <FilmRollFrame className="film-roll-overlay" />
+            <FilmRollEnd className="film-roll-end" />
           </button>
-        ))}
-        <FilmRollEnd className="film-roll-end" />
+        </div>
       </div>
     </div>
   );

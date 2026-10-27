@@ -86,7 +86,9 @@ test('adds photos, restores independent documents and exports the roll with coll
   }, portrait);
   await ready(page);
   const roll = page.getByRole('region', { name: 'Photo film roll' });
-  await expect(roll.getByRole('button')).toHaveCount(2);
+  await expect(roll.getByRole('button', { name: /^Photo \d+:/ })).toHaveCount(
+    2,
+  );
   await expect(
     page.getByRole('combobox', { name: 'Saved preset', exact: true }),
   ).toContainText('Default');
@@ -202,7 +204,9 @@ test('imports a mixed batch, confirms warnings once and releases all photo URLs 
   await ready(page);
   await expect(page.getByRole('alert')).toContainText('bad.jpg');
   const roll = page.getByRole('region', { name: 'Photo film roll' });
-  await expect(roll.getByRole('button')).toHaveCount(2);
+  await expect(roll.getByRole('button', { name: /^Photo \d+:/ })).toHaveCount(
+    2,
+  );
   // One decoded source URL and two thumbnails; inactive originals are released.
   const urls = () =>
     page.evaluate(
@@ -328,7 +332,9 @@ test('cancels pending imports and batch export without adding stale photos or do
   await page.evaluate(() => window.dispatchEvent(new Event('release-export')));
   await ready(page);
   await expect(
-    page.getByRole('region', { name: 'Photo film roll' }).getByRole('button'),
+    page
+      .getByRole('region', { name: 'Photo film roll' })
+      .getByRole('button', { name: /^Photo \d+:/ }),
   ).toHaveCount(2);
   await expect(caption(page)).toHaveAttribute('data-template', 'Second');
   expect(downloads).toEqual([]);
@@ -392,4 +398,113 @@ test('switches photos with a centered glass loader without moving the canvas or 
   ).toHaveAttribute('aria-pressed', 'true');
   expect(await surface.boundingBox()).toEqual(beforeCanvas);
   expect(await roll.boundingBox()).toEqual(beforeRoll);
+});
+
+test('keeps the cassette fixed and springs back only beyond the film range', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const bytes = Buffer.from(await imageBytes(page), 'base64');
+  await input(page).setInputFiles(
+    Array.from({ length: 2 }, (_, index) => ({
+      name: `pull-${index}.png`,
+      mimeType: 'image/png',
+      buffer: bytes,
+    })),
+  );
+  await ready(page);
+  const viewport = page.getByRole('region', { name: 'Photo film roll' });
+  const strip = viewport.locator('.film-roll-strip');
+  const cassette = page.locator('.film-roll-start');
+  const handle = page.getByRole('button', {
+    name: 'Drag film to browse photos',
+  });
+  const initial = await cassette.boundingBox();
+  const tail = (await handle.boundingBox())!;
+  await page.mouse.move(tail.x + tail.width / 2, tail.y + 20);
+  await page.mouse.down();
+  await page.mouse.move(tail.x + tail.width / 2 + 420, tail.y + 20, {
+    steps: 8,
+  });
+  await expect(strip).toHaveAttribute('data-dragging', 'true');
+  expect(
+    await strip.evaluate((el) =>
+      Number.parseFloat(
+        (el as HTMLElement).style.getPropertyValue('--film-pull'),
+      ),
+    ),
+  ).toBeGreaterThan(400);
+  await page.mouse.up();
+  await expect(strip).not.toHaveAttribute('data-dragging');
+  await expect
+    .poll(() => strip.evaluate((el) => getComputedStyle(el).transform))
+    .toBe('matrix(1, 0, 0, 1, 0, 0)');
+  expect(await cassette.boundingBox()).toEqual(initial);
+
+  const first = viewport.getByRole('button', {
+    name: 'Photo 1: pull-0.png',
+    exact: true,
+  });
+  const second = viewport.getByRole('button', {
+    name: 'Photo 2: pull-1.png',
+    exact: true,
+  });
+  const selectedBefore = await viewport
+    .locator('[aria-pressed="true"]')
+    .getAttribute('aria-label');
+  const frame = (await second.boundingBox())!;
+  await page.mouse.move(frame.x + frame.width / 2, frame.y + frame.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(
+    frame.x + frame.width / 2 + 260,
+    frame.y + frame.height / 2,
+    { steps: 8 },
+  );
+  expect(
+    await strip.evaluate((el) =>
+      Number.parseFloat(
+        (el as HTMLElement).style.getPropertyValue('--film-pull'),
+      ),
+    ),
+  ).toBeGreaterThan(250);
+  await page.mouse.up();
+  await expect(viewport.locator('[aria-pressed="true"]')).toHaveAttribute(
+    'aria-label',
+    selectedBefore!,
+  );
+  await expect(strip).toHaveCSS('transform', 'matrix(1, 0, 0, 1, 0, 0)');
+  await first.click();
+  await ready(page);
+  await expect(first).toHaveAttribute('aria-pressed', 'true');
+  await second.click();
+  await ready(page);
+  await expect(second).toHaveAttribute('aria-pressed', 'true');
+
+  await input(page).setInputFiles(
+    Array.from({ length: 12 }, (_, index) => ({
+      name: `long-${index}.png`,
+      mimeType: 'image/png',
+      buffer: bytes,
+    })),
+  );
+  await ready(page);
+  await viewport.hover();
+  await page.mouse.wheel(0, 300);
+  await expect
+    .poll(() => viewport.evaluate((el) => el.scrollLeft))
+    .toBeGreaterThan(0);
+  expect(await cassette.boundingBox()).toEqual(initial);
+  await viewport.evaluate((el) => {
+    el.scrollLeft = el.scrollWidth;
+  });
+  const before = await viewport.evaluate((el) => el.scrollLeft);
+  const end = (await handle.boundingBox())!;
+  await page.mouse.move(end.x + end.width / 2, end.y + 20);
+  await page.mouse.down();
+  await page.mouse.move(end.x + end.width / 2 + 100, end.y + 20, { steps: 8 });
+  await page.mouse.up();
+  expect(await viewport.evaluate((el) => el.scrollLeft)).toBeLessThan(
+    before - 50,
+  );
+  await expect(strip).toHaveCSS('transform', 'matrix(1, 0, 0, 1, 0, 0)');
 });
