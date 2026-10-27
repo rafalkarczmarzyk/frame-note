@@ -1150,7 +1150,7 @@ the left column; three/four-digit counts use smaller type. FilmRoll derives the
 count from its actual photo list, so failed imports never increase it.
 
 The shell is neutral graphite for contrast with the workspace. Material lighting
-stays below all opaque photos. Keyboard focus uses a white inset outline and
+stays below all opaque photos. Keyboard focus uses a small warm marker along the upper perforation and
 forced colors retain a system highlight. Exported JPGs are unaffected.
 
 Components/Brand/FilmRoll provides Emerald, Gold, Ivory, Coral, LabelVariants
@@ -1160,7 +1160,7 @@ PullShortRoll demonstrates elastic pulling and FixedCassette demonstrates scroll
 a long roll beneath the stationary shell. Components/Brand/FilmRoll/Leader shows
 the perforated blank film exposed when pulling past the beginning.
 
-Film stock uses 82% fill opacity and a deeper dark warm base to separate it from the tabletop. The film tray currently experiments with the supplied repeating wood texture (src/assets/film-tabletop.png), sized to 320 px high. A 32% overlay blends the sidebar color with 20% porcelain, cooling and gently brightening the wood without tinting the film or photos. The texture stays fixed while film slides above it; the sidebar surface remains its fallback, with a subtle top separator. Selected photos have an inset accent frame and a faint warm light below the film, kept below every opaque photo. Hover adds a thin inset outline only to unselected photos; keyboard focus retains its stronger outline. The canvas preview sits 12 px above the tray when a roll is present instead of leaving a centered letterbox gap.
+Film stock uses 82% fill opacity and a deeper dark warm base to separate it from the tabletop. The film tray currently experiments with the supplied repeating wood texture (src/assets/film-tabletop.png), sized to 320 px high. A 25% workspace-colored overlay cools and darkens the wood without tinting the film or photos. The texture stays fixed while film slides above it; the sidebar surface remains its fallback, with a subtle top separator. Selected photos have an inset accent frame and a faint warm light below the film, kept below every opaque photo. Hover adds a thin inset outline only to unselected photos; keyboard focus uses a small warm marker on the upper perforation. Pointer input suppresses keyboard markers until the next key press. The tabletop viewport is excluded from Tab navigation; frame and tail buttons remain keyboard-accessible. The canvas preview sits 12 px above the tray when a roll is present instead of leaving a centered letterbox gap.
 
 The cassette SVG contains only its shell and label. It stays fixed above a clipped native scroll viewport; film begins beneath its edge. The entire film supports horizontal pointer dragging, including photos, perforations and tail. A 6 px movement threshold separates clicks from dragging, and drag release never selects a photo. Within the scroll range, release preserves the new position. Beyond either boundary, the film follows the pointer without a distance cap and returns to the nearest valid scroll position on release, cancellation or lost capture. The blank leader repeats vector perforations at their original pitch for any exposed length. The tail retains keyboard arrow browsing. Reduced motion disables return animation; reduced transparency restores opaque stock.
 

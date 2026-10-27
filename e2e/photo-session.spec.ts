@@ -427,6 +427,13 @@ test('keeps the cassette fixed and springs back only beyond the film range', asy
     steps: 8,
   });
   await expect(strip).toHaveAttribute('data-dragging', 'true');
+  await expect(strip).toHaveAttribute('data-pointer-input', 'true');
+  expect(
+    await handle.evaluate((el) => {
+      const marker = getComputedStyle(el, '::after');
+      return marker.display === 'none' || marker.content === 'none';
+    }),
+  ).toBe(true);
   expect(
     await strip.evaluate((el) =>
       Number.parseFloat(
@@ -476,7 +483,19 @@ test('keeps the cassette fixed and springs back only beyond the film range', asy
   await first.click();
   await ready(page);
   await expect(first).toHaveAttribute('aria-pressed', 'true');
-  await second.click();
+  await expect(viewport).toHaveAttribute('tabindex', '-1');
+  await first.focus();
+  // WebKit on macOS uses Option+Tab to include buttons in keyboard traversal.
+  await page.keyboard.press(
+    test.info().project.name === 'webkit' ? 'Alt+Tab' : 'Tab',
+  );
+  await expect(second).toBeFocused();
+  await expect(strip).not.toHaveAttribute('data-pointer-input');
+  expect(
+    await second.evaluate((el) => getComputedStyle(el, '::after').content),
+  ).not.toBe('none');
+  await expect(first).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press('Enter');
   await ready(page);
   await expect(second).toHaveAttribute('aria-pressed', 'true');
 

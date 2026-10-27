@@ -17,6 +17,8 @@ when explicitly requested; a commit does not automatically create a release.
   then release to return; photo clicks remain separate from dragging. The compact
   cassette, translucent dark film, active-frame highlight and cool wood-textured
   tray include interactive Storybook previews and reduced-motion support.
+  Keyboard focus uses a small marker above frames and the film tail, stays hidden
+  during pointer interaction, and skips the decorative tabletop.
 - Export all prepares full-resolution JPGs sequentially and downloads one ZIP,
   with shared quality/metadata settings, collision-safe names, combined token
   warnings, progress, cancellation and per-file failure reporting.
