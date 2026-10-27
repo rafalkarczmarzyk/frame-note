@@ -12,6 +12,9 @@ type Story = StoryObj<typeof meta>;
 
 export const Empty: Story = {};
 export const PhotoLoaded: Story = { args: { hasPhoto: true } };
+export const RollLoaded: Story = {
+  args: { hasPhoto: true, photoCount: 12, onDisposeRoll: () => {} },
+};
 export const Importing: Story = { args: { hasPhoto: true, loading: true } };
 export const Interactive: Story = {
   render: function Interactive() {

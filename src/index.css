@@ -46,6 +46,14 @@
   --color-caption-mist: #c3d4df;
   --color-caption-lavender: #d2c9df;
   --color-emerald: #14cc60;
+  /* Supplied film-roll artwork, independent of interface surfaces. */
+  --color-film-shell: #272216;
+  --color-film-stock: #3d3022;
+  --color-film-label-start: #f0b318;
+  --color-film-label-light: #fdd20d;
+  --color-film-label-mid: #da8817;
+  --color-film-label-end: #c26b2b;
+  --color-film-photo-base: #000000;
   /* Section accents; primary remains independent. */
   --color-violet: #731dd8;
   --color-turquoise: #00bfb3;

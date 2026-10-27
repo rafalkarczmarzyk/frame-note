@@ -110,12 +110,12 @@ FrameNote opens into an empty editor with a photo-selection button, JPG/PNG drop
 guidance and a privacy note in the canvas. The application version, GitHub and
 Changelog links sit at the bottom. The FrameNote logo is not a navigation link.
 
-1. Choose a JPG or PNG, or drop it onto the workspace.
+1. Choose one or more JPG/PNG photos, or drop them onto the canvas.
 2. Edit the default caption, insert metadata from the tag browser, and add images
    through **Content → Add image**.
 3. Add layers as needed, then adjust typography, margins, stacking, and position.
 4. Save the layout as a preset if you want to reuse it with other photos.
-5. Choose JPG quality and select **Export JPG**.
+5. Choose JPG quality and select **Export JPG**, or **Export all** from its menu for a ZIP of the roll.
 
 A caption can combine plain text and metadata tokens:
 
@@ -149,9 +149,17 @@ Preset imports are validated and added as new presets without overwriting
 existing entries. The format is still evolving during development; compatibility
 with older presets is not a stable contract.
 
-Replacing a photo preserves the current layout, export quality, and metadata choices in the session.
-Use the arrow beside **Open photo → Close photo** to return to the empty canvas
-while retaining the layout, preset selection, and session settings.
+**Add photos** and canvas drops append photos to the session. A film roll appears
+below the canvas when two or more photos are open. Selecting a frame restores
+its independent layout, artwork and preset selection. Each added photo starts
+with Default; a single first import preserves the layout prepared in the empty
+editor. Opening several photos together starts all of them with Default.
+
+**Photo actions → Close photo** closes the active photo and selects a neighbor.
+**Dispose roll…** closes all photos after confirmation. Closing the last photo
+keeps its layout in the empty editor. Source files and saved presets are not deleted.
+Export quality, metadata choices and sidebar state are shared session settings.
+Text undo/redo resets when switching photos; edits themselves are retained.
 The layout editor and preset management are available before opening a photo.
 The first import preserves the prepared layout; document-unit conversions wait
 for real image dimensions, and JPG export requires a photo.
@@ -161,12 +169,12 @@ after importing a photo.
 
 ## Limits and export behavior
 
-| Input        | Limits                                                      |
-| ------------ | ----------------------------------------------------------- |
-| Source photo | One JPG or PNG; up to 100 MB, 50 MP, and 16,384 px per side |
-| Inline SVG   | Up to 256 KB and 2,000 elements                             |
-| Inline PNG   | Up to 2 MB, 32 MP, and 16,384 px per side                   |
-| Preset file  | Up to 5 MB                                                  |
+| Input        | Limits                                                       |
+| ------------ | ------------------------------------------------------------ |
+| Source photo | Each JPG or PNG; up to 100 MB, 50 MP, and 16,384 px per side |
+| Inline SVG   | Up to 256 KB and 2,000 elements                              |
+| Inline PNG   | Up to 2 MB, 32 MP, and 16,384 px per side                    |
+| Preset file  | Up to 5 MB                                                   |
 
 SVG uploads must be self-contained vector artwork. Scripts, external resources,
 embedded images, stylesheets, and text elements are rejected; convert text to
@@ -191,8 +199,16 @@ paths before importing. The editor limits active image content to 100 images.
   or MakerNote is supported.
 - Large photos may briefly block the main thread. Import limits do not guarantee
   sufficient memory on every device.
-- Batch processing, zoom/pan, and a desktop application remain outside the
-  current scope.
+- **Export all** processes photos sequentially and downloads `framenote-roll.zip`.
+  Missing metadata/token warnings are confirmed once for the series; failed photos
+  are listed and successful outputs remain downloadable. Duplicate output names
+  receive numerical suffixes. ZIP output is limited to 1 GB of accumulated entries.
+- Import and batch export show progress and can be cancelled. Cancellation waits
+  for current decoding/encoding to return and discards pending output. Batch export
+  locks editing until it finishes or cancellation completes.
+- Only active-preview/import/export photos are fully decoded; inactive photos keep
+  small thumbnails and source files. Large-series memory budgets still need measurement.
+- Zoom/pan and a desktop application remain outside the current scope.
 
 ## Development
 

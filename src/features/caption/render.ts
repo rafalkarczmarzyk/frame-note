@@ -98,7 +98,26 @@ export interface RenderedCaption {
   icons?: readonly InlineAsset[];
 }
 
-export async function exportPhotoCaptions(
+// Share the render queue between prepared JPGs and batch output. A cancelled
+// preparation may still be encoding; never overlap full-resolution canvases.
+let exportChain: Promise<void> = Promise.resolve();
+export function exportPhotoCaptions(
+  image: HTMLImageElement,
+  dimensions: ImageDimensions,
+  captions: readonly RenderedCaption[],
+  qualityPercent = 95,
+): Promise<Blob> {
+  const job = exportChain.then(() =>
+    renderPhotoCaptions(image, dimensions, captions, qualityPercent),
+  );
+  exportChain = job.then(
+    () => {},
+    () => {},
+  );
+  return job;
+}
+
+async function renderPhotoCaptions(
   image: HTMLImageElement,
   dimensions: ImageDimensions,
   captions: readonly RenderedCaption[],

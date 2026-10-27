@@ -352,3 +352,72 @@ pustego edytora: przycisk wyboru zdjęcia, informacja o drop JPG/PNG i prywatno�
 Na dole canvasu wersja aplikacji oraz GitHub i Changelog. Bez fotografii,
 osobnego splasha i timera. Logo w headerze pozostaje nieklikalne. Iteracje
 oceniamy wizualnie bez pełnych testów/buildów. Użytkownik zlecił commit tej wersji.
+
+### Sesja wielu zdjęć i eksport rolki — 2026-10-27
+
+Użytkownik zaakceptował POC rolki z dostarczonych SVG i zlecił implementację
+całego uzgodnionego przepływu. Bieżący zakres jest realizowany do jego oceny:
+
+- Add photos i drop na canvas dodają jeden lub wiele JPG/PNG do sesji.
+  Kolejne operacje importu są kolejkowane; drop do Content nadal wstawia grafikę.
+- Przy jednym zdjęciu rolka jest ukryta, przy co najmniej dwóch pojawia się pod
+  canvasem, bez zajmowania szerokości paneli. Wysokość kasetki wynosi 195 px;
+  klatki zachowują poprawione proporcje 3:2. Pionowe kółko przewija rolkę poziomo.
+- Pojedynczy pierwszy import zachowuje układ przygotowany przed otwarciem zdjęcia.
+  Pierwszy import wielu plików i każde kolejne zdjęcie zaczynają od Default.
+  Pierwsze poprawnie wczytane zdjęcie z dodanej partii staje się aktywne.
+- Układ, grafiki, aktywna warstwa i wybór presetu są niezależne dla zdjęć.
+  Zmiana zapisanego presetu nie nadpisuje układów pozostałych otwartych zdjęć.
+  Edytor treści jest odtwarzany przy zmianie dokumentu: historia tekstowego
+  undo/redo nie przenosi się między zdjęciami i nie jest zachowywana po przełączeniu.
+- Close photo usuwa aktywne zdjęcie i wybiera sąsiednie. Dispose roll… po
+  potwierdzeniu zamyka całą serię. Ostatni aktywny układ pozostaje w pustym
+  edytorze, zgodnie z zachowaniem zamykania pojedynczego zdjęcia. Pliki źródłowe
+  i zapisane presety pozostają na miejscu.
+- Export JPG dotyczy aktywnego zdjęcia. Export all w menu split buttona
+  przygotowuje kolejno wszystkie JPG i pobiera framenote-roll.zip. Jakość
+  i opcje metadanych są wspólne. Nazwy kolidujących plików otrzymują sufiksy.
+- Brakujące pola/niepoprawne tokeny wszystkich widocznych warstw są zbierane
+  w jednym potwierdzeniu. Błąd pojedynczego pliku nie przerywa importu/eksportu
+  pozostałych; eksportuje się poprawne wyniki i pokazuje listę niepowodzeń.
+- Import i eksport mają postęp i anulowanie w szklanym overlayu na środku canvasu.
+  Przełączanie zdjęć nie dodaje belki ani nie przesuwa canvasu i rolki. Podczas eksportu edycja oraz zmiany
+  sesji są zablokowane. Anulowanie czeka na zakończenie bieżącego dekodowania
+  lub kodowania, odrzuca spóźnione wyniki i nie pobiera częściowego ZIP-a.
+
+Sesja przechowuje pliki źródłowe, metadane, dokumenty i małe miniatury (maks.
+320 px na dłuższym boku). Poza importem pełny obraz jest zachowywany dla aktywnego
+zdjęcia; eksport serii wczytuje dodatkowo tylko bieżący plik. Renderowanie JPG
+współdzieli jedną kolejkę z automatycznym przygotowaniem aktywnego eksportu.
+Nie przygotowujemy JPG wszystkich zdjęć po każdej zmianie. ZIP przechowuje
+skompresowane JPG bez ponownego pakowania; zgromadzone wyniki mają limit 1 GB.
+Dotychczasowe limity pojedynczego pliku pozostają w mocy. Nie zadeklarowano
+obsługi nieograniczonych serii ani budżetu pamięci dla każdego urządzenia.
+
+Sesja nie jest trwale zapisywana; odświeżenie strony usuwa otwarte zdjęcia i ich
+niezapisane ustawienia. Synchronizacja układów nie należy do uzgodnionego zakresu.
+Storybook: Screens/PhotoSession/ImportedSeries używa produkcyjnej aplikacji.
+
+Weryfikacja implementacji: `pnpm check` (306 testów jednostkowych), build
+Storybooka oraz kontrola wizualna produkcyjnego edytora z rolką. Regresja
+przeglądarkowa obejmuje 158 scenariuszy w Chromium/WebKit. Po pełnym przebiegu
+zaktualizowano starsze scenariusze do zwijanych paneli, osobnego custom pickera
+oraz dodawania zamiast zastępowania zdjęć; wszystkie nieudane scenariusze
+zweryfikowano ponownie. Końcowy przebieg 10/10 obejmuje eksport poziomy/pionowy,
+niezależność dokumentów, zgodność JPG pojedynczego i w ZIP, kolizje nazw,
+zwalnianie zasobów, anulowanie oraz układ przygotowany przed importem.
+Istniejących wzorców pikseli nie regenerowano. Implementacja pozostaje do oceny
+użytkownika; commit nie oznacza akceptacji etapu ani wydania.
+
+### Cofnięcie optymalizacji przełączania — 2026-10-27
+
+Po ocenie użytkownik nie zauważył odczuwalnej poprawy szybkości i zdecydował
+wrócić do prostszego wczytywania aktywnego zdjęcia. Cofnięto cache LRU, ponowne
+użycie metadanych przy przełączaniu/eksporcie, opóźnianie loadera, osobne
+wczytywanie oryginału dla aktywnego JPG oraz kolejkę szybkich przełączeń.
+Pozostają sesja wielu zdjęć, rolka, niezależne dokumenty, eksport ZIP i szklany
+overlay na środku canvasu, bez belki ani zmiany geometrii widoku.
+
+Po cofnięciu: `pnpm check` (306 testów jednostkowych), build Storybooka oraz
+16/16 testów importu, sesji, eksportu i geometrii overlayu w Chromium/WebKit.
+Wzorce pikseli eksportu pozostały bez zmian.

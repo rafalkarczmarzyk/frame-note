@@ -42,6 +42,8 @@ export function PresetControls({
   panelHost,
   toolbarHost,
   initialPresetId = 'builtin-default',
+  selectedPresetId,
+  onSelectedPresetChange,
   onBrowse,
   onClose,
 }: {
@@ -53,6 +55,8 @@ export function PresetControls({
   panelHost: HTMLElement | null;
   toolbarHost: HTMLElement | null;
   initialPresetId?: string;
+  selectedPresetId?: string;
+  onSelectedPresetChange?: (id: string) => void;
   onBrowse: () => void;
   onClose: () => void;
 }) {
@@ -77,7 +81,12 @@ export function PresetControls({
       ),
   );
   const [presets, setPresets] = useState(collection.presets);
-  const [selected, setSelected] = useState(initialPresetId);
+  const [localSelected, setLocalSelected] = useState(initialPresetId);
+  const selected = selectedPresetId ?? localSelected;
+  const setSelected = (id: string) => {
+    if (onSelectedPresetChange) onSelectedPresetChange(id);
+    else setLocalSelected(id);
+  };
   const [name, setName] = useState('');
   const [naming, setNaming] = useState(false);
   const [renameId, setRenameId] = useState<string | null>(null);

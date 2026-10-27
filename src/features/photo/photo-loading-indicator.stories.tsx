@@ -45,7 +45,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'The production photo loader: a centered card with a rotating 36 px spinner. Positioned absolutely inside its nearest positioned parent, without moving or blocking the underlying UI. Uses shared panel tokens; reduced motion stops rotation. Edit this component to refine the loader used by the application. StartupRedesign/LoadingPreview shows the same component inside the full interface.',
+          'The production photo loader: a centered card with a rotating 36 px spinner. Positioned absolutely inside its nearest positioned parent, without moving the underlying UI. Uses the shared glass material; reduced motion stops rotation. Edit this component to refine the loader used by the application. StartupRedesign/LoadingPreview shows the same component inside the full interface.',
       },
     },
   },
@@ -62,6 +62,14 @@ export const Playground: Story = {};
 export const OpeningPhoto: Story = { args: { label: 'Opening photo…' } };
 export const PreparingPreview: Story = {};
 export const OnPhoto: Story = {
+  render: (args) => (
+    <PreviewSurface photo>
+      <PhotoLoadingIndicator {...args} />
+    </PreviewSurface>
+  ),
+};
+export const Cancellable: Story = {
+  args: { label: 'Adding photos · 3 of 12', onCancel: () => {} },
   render: (args) => (
     <PreviewSurface photo>
       <PhotoLoadingIndicator {...args} />

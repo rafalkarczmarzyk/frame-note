@@ -79,11 +79,13 @@ function EmptyTools() {
 export function EmptyPhotoCanvas({
   loading = false,
   loadingLabel,
+  onCancelLoading,
   draggingPhoto = false,
   onChoosePhoto,
 }: {
   loading?: boolean;
   loadingLabel?: string;
+  onCancelLoading?: () => void;
   draggingPhoto?: boolean;
   onChoosePhoto: () => void;
 }) {
@@ -92,7 +94,12 @@ export function EmptyPhotoCanvas({
       data-photo-canvas
       className="relative flex min-h-[40vh] min-w-0 flex-1 flex-col overflow-auto bg-workspace-base md:min-h-0"
     >
-      {loadingLabel && <PhotoLoadingIndicator label={loadingLabel} />}
+      {loadingLabel && (
+        <PhotoLoadingIndicator
+          label={loadingLabel}
+          onCancel={onCancelLoading}
+        />
+      )}
       {draggingPhoto && <PhotoDropOverlay />}
       <div className="flex flex-1 items-center justify-center p-8">
         <section
@@ -104,7 +111,7 @@ export function EmptyPhotoCanvas({
             aria-hidden="true"
           />
           <h1 id="empty-workspace-title" className="text-sm font-medium">
-            Drop a photo here
+            Drop photos here
           </h1>
           <p className="mt-2 text-xs text-content-muted">JPG or PNG</p>
           <Button
@@ -113,7 +120,7 @@ export function EmptyPhotoCanvas({
             disabled={loading}
             onClick={onChoosePhoto}
           >
-            Choose a photo
+            Choose photos
           </Button>
           <p className="mt-8 flex items-center gap-1.5 text-[11px] text-content-muted">
             <LockKeyhole className="size-3" aria-hidden="true" />

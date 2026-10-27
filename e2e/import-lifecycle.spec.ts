@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { portraitFixture, wildlifeFixture } from '../tests/fixtures.ts';
 
-test('recovers from invalid imports and keeps the latest photo during rapid replacement', async ({
+test('recovers from invalid additions and releases inactive originals and disposed thumbnails', async ({
   page,
 }) => {
   const errors: string[] = [];
@@ -29,6 +29,9 @@ test('recovers from invalid imports and keeps the latest photo during rapid repl
   await page.goto('/');
   const input = page.getByLabel('Choose JPG or PNG photo');
   await input.setInputFiles(wildlifeFixture.path);
+  await expect(
+    page.getByRole('button', { name: 'Add photos', exact: true }),
+  ).toBeEnabled();
   await input.setInputFiles(portraitFixture.path);
   await expect(
     page.getByRole('img', { name: 'Photo preview: 20261021-IMG_0469.jpg' }),
@@ -42,7 +45,7 @@ test('recovers from invalid imports and keeps the latest photo during rapid repl
         (window as unknown as { testLivePhotoUrls: Set<string> })
           .testLivePhotoUrls.size,
     );
-  await expect.poll(liveUrlCount).toBe(1);
+  await expect.poll(liveUrlCount).toBe(3);
   await input.setInputFiles({
     name: 'broken.jpg',
     mimeType: 'image/jpeg',
@@ -64,7 +67,7 @@ test('recovers from invalid imports and keeps the latest photo during rapid repl
     buffer: Buffer.from([0xff, 0xd8, 0xff, 0x00]),
   });
   await expect(page.getByRole('alert')).toContainText('could not be read');
-  await expect.poll(liveUrlCount).toBe(1);
+  await expect.poll(liveUrlCount).toBe(3);
   // A SOF header declaring 10001 × 5000 pixels, with no image data.
   // The size error must come from the header check, before Image.decode().
   await input.setInputFiles({
@@ -76,13 +79,21 @@ test('recovers from invalid imports and keeps the latest photo during rapid repl
     ]),
   });
   await expect(page.getByRole('alert')).toContainText('50 megapixels');
-  await expect.poll(liveUrlCount).toBe(1);
+  await expect.poll(liveUrlCount).toBe(3);
   await input.setInputFiles(wildlifeFixture.path);
   await expect(
     page.getByRole('img', { name: 'Photo preview: 20260520-IMG_3843.jpg' }),
   ).toBeVisible();
   await expect(page.getByRole('alert')).toHaveCount(0);
-  await expect.poll(liveUrlCount).toBe(1);
+  await expect.poll(liveUrlCount).toBe(4);
+  await page
+    .getByRole('button', { name: 'Photo actions', exact: true })
+    .click();
+  page.once('dialog', (dialog) => dialog.accept());
+  await page
+    .getByRole('menuitem', { name: 'Dispose roll…', exact: true })
+    .click();
+  await expect.poll(liveUrlCount).toBe(0);
   expect(errors).toEqual([]);
 });
 
@@ -119,12 +130,15 @@ test('imports PNG photos and rejects a mismatched PNG extension', async ({
   await expect(page.getByRole('alert')).toContainText('does not match');
 });
 
-test('keeps caption settings when replacing landscape and portrait photos', async ({
+test('keeps caption settings when closing and reopening landscape and portrait photos', async ({
   page,
 }) => {
   await page.goto('/');
   const input = page.getByLabel('Choose JPG or PNG photo');
   await input.setInputFiles(wildlifeFixture.path);
+  await expect(
+    page.getByRole('button', { name: 'Add photos', exact: true }),
+  ).toBeEnabled();
   await page
     .getByLabel('Caption', { exact: true })
     .fill('My caption\n{exif:Artist}');
@@ -155,14 +169,25 @@ test('keeps caption settings when replacing landscape and portrait photos', asyn
     .getByRole('radiogroup', { name: 'Text align' })
     .getByRole('radio', { name: 'Align right' })
     .click();
+  await page.getByText('Sizing & Margins', { exact: true }).click();
   await page
     .getByRole('radiogroup', { name: 'Margin linking' })
     .getByRole('radio', { name: 'Paired', exact: true })
     .click();
   await page.getByRole('spinbutton', { name: 'Top', exact: true }).fill('5');
   await page.getByRole('spinbutton', { name: 'Left', exact: true }).fill('7');
+  await page.getByText('Export', { exact: true }).click();
   await page.getByRole('radio', { name: 'Balanced', exact: true }).click();
   for (const fixture of [portraitFixture, wildlifeFixture]) {
+    await expect(
+      page.getByRole('button', { name: 'Add photos', exact: true }),
+    ).toBeEnabled();
+    await page
+      .getByRole('button', { name: 'Photo actions', exact: true })
+      .click();
+    await page
+      .getByRole('menuitem', { name: 'Close photo', exact: true })
+      .click();
     await input.setInputFiles(fixture.path);
     await expect(
       page.getByRole('img', {

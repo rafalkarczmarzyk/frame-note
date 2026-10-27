@@ -9,6 +9,12 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Added
 
+- Multi-photo sessions with independent layouts, artwork and preset selections.
+  An SVG film roll appears below the canvas for two or more photos, supports
+  horizontal browsing with the mouse wheel and restores each photo's edits.
+- Export all prepares full-resolution JPGs sequentially and downloads one ZIP,
+  with shared quality/metadata settings, collision-safe names, combined token
+  warnings, progress, cancellation and per-file failure reporting.
 - Reusable translucent glass tooltips throughout typography, colors, margins,
   positioning, layers, inline content, photo/preset actions and export controls.
   Help appears after 750 ms on hover or immediately on keyboard focus, stays
@@ -25,7 +31,8 @@ when explicitly requested; a commit does not automatically create a release.
   independent action states, loading feedback and Storybook examples.
 - SVG/PNG drops anywhere in Content insert images at the retained text selection,
   using the same validation and limits as the file picker, with a local drop overlay.
-- Canvas-centered photo loading indicator and separate export preparation feedback.
+- Canvas-centered glass loading/progress overlay with cancellation and separate
+  JPG preparation feedback. Loading preserves canvas and film-roll geometry.
 
 - Shared category filters for fonts, metadata tags and presets, combined with search
   in fixed panel headers without changing existing selections.
@@ -49,15 +56,19 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Changed
 
-- Photo import uses an Open photo split button with a Close photo action that
-  returns to the empty canvas while preserving the layout, preset and session
-  settings. Menus with only disabled actions support keyboard focus and Escape.
+- Add photos and canvas drops append one or more JPG/PNG files to the session.
+  Added photos start with Default; a single first import preserves the prepared
+  layout. Close photo selects a neighbor, while Dispose roll closes the series
+  after confirmation. Closing the last photo retains its layout in the empty editor.
+  Inactive photos keep thumbnails and source files; full decoded photo resources
+  are released when switching or closing. Menus with only disabled actions
+  support keyboard focus and Escape.
 - Compact 48 px header with photo import beside the brand and preset selection,
   split save actions and JPG export on the right. User presets are separated
   from built-ins in the selector; management stays in the searchable docked panel.
 - Layout editing and preset management are available before importing a photo.
-  First import and replacement preserve the prepared layout, editor and open panels;
-  JPG output and document-unit conversion require actual photo dimensions.
+  A single first import preserves the prepared layout, mounted editor and open
+  panels; JPG output and document-unit conversion require actual photo dimensions.
 - Slimmed photo rulers to 18 px and reduced preview gutters to 28 px, preserving
   larger handle hit targets and moving interaction labels outside the ruler band.
 - Sidebar resizing is limited to 384–560 px. Accordion state and width reset on

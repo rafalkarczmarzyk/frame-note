@@ -10,7 +10,10 @@ export interface LoadedPhoto {
   dispose: () => void;
 }
 
-export async function loadPhoto(file: File): Promise<LoadedPhoto> {
+export async function loadPhoto(
+  file: File,
+  { preview = true }: { preview?: boolean } = {},
+): Promise<LoadedPhoto> {
   validateFileSize(file.size);
   const bytes = await file.arrayBuffer();
   const bytesView = new Uint8Array(bytes);
@@ -46,14 +49,17 @@ export async function loadPhoto(file: File): Promise<LoadedPhoto> {
     image.src = url;
     await image.decode();
     validateImageSize(image.naturalWidth, image.naturalHeight);
-    // The viewport does not need the full camera resolution. Keep the original
-    // for export and let the browser prepare a smaller decoded preview.
+    // Retain the active original for export and a smaller viewport image.
     let previewImage: ImageBitmap | undefined;
     const previewScale = Math.min(
       1,
       2048 / Math.max(image.naturalWidth, image.naturalHeight),
     );
-    if (previewScale < 1 && typeof createImageBitmap === 'function') {
+    if (
+      preview &&
+      previewScale < 1 &&
+      typeof createImageBitmap === 'function'
+    ) {
       try {
         previewImage = await createImageBitmap(image, {
           resizeWidth: Math.max(
@@ -70,6 +76,7 @@ export async function loadPhoto(file: File): Promise<LoadedPhoto> {
         // Browser resize support varies; the decoded original remains usable.
       }
     }
+    let disposed = false;
     return {
       image,
       previewImage,
@@ -81,6 +88,9 @@ export async function loadPhoto(file: File): Promise<LoadedPhoto> {
         metadata,
       }),
       dispose: () => {
+        if (disposed) return;
+        disposed = true;
+        image.removeAttribute('src');
         previewImage?.close();
         URL.revokeObjectURL(url);
       },

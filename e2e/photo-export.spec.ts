@@ -1,3 +1,4 @@
+import { openSidebarSection } from './sidebar-helpers.js';
 import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
 import {
@@ -123,6 +124,7 @@ test('Photo export / typography / Advercase Bold', async ({
   await page.getByRole('button', { name: 'Font', exact: true }).click();
   await page.getByRole('button', { name: /Advercase/ }).click();
   await page.getByRole('button', { name: 'Bold', exact: true }).click();
+  await openSidebarSection(page, 'Sizing & Margins');
   await page
     .getByRole('combobox', { name: 'Sizing unit', exact: true })
     .click();
