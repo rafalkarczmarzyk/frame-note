@@ -1,3 +1,4 @@
+import { Button } from './button';
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { FilmRoll, type FilmRollPhoto, type FilmRollProps } from './film-roll';
@@ -38,6 +39,10 @@ const meta = {
   args: { photos, activePhotoId: 'wildlife', height: 195 },
   argTypes: {
     height: { control: { type: 'range', min: 78, max: 312, step: 1 } },
+    variant: {
+      control: 'select',
+      options: ['emerald', 'gold', 'ivory', 'coral'],
+    },
     photos: { control: false },
     onSelectPhoto: { control: false },
   },
@@ -100,3 +105,102 @@ export const BelowCanvas: Story = {
     );
   },
 };
+
+export const Emerald: Story = { args: { variant: 'emerald' } };
+export const Gold: Story = { args: { variant: 'gold' } };
+export const Ivory: Story = { args: { variant: 'ivory' } };
+export const Coral: Story = { args: { variant: 'coral' } };
+export const ColorVariants: Story = {
+  render: (args) => (
+    <div className="space-y-7">
+      {(['emerald', 'gold', 'ivory', 'coral'] as const).map((variant) => (
+        <InteractiveRoll key={variant} {...args} variant={variant} />
+      ))}
+    </div>
+  ),
+};
+export const ChangingCount: Story = {
+  render: function ChangingCount(args) {
+    const [count, setCount] = useState(2);
+    return (
+      <div className="space-y-4">
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setCount(count + 1)}
+            disabled={count === photos.length}
+          >
+            Add photo
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setCount(count - 1)}
+            disabled={count === 0}
+          >
+            Remove photo
+          </Button>
+        </div>
+        <InteractiveRoll {...args} photos={photos.slice(0, count)} />
+      </div>
+    );
+  },
+};
+
+export const PullShortRoll: Story = {
+  args: { photos: photos.slice(0, 2) },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Drag the film tail to the right and release: a short roll can be pulled freely across the available space and returns to its starting position. Drag any frame or the tail; click to select a photo.',
+      },
+    },
+  },
+};
+export const FixedCassette: Story = {
+  ...LongRoll,
+  decorators: [
+    (Story) => (
+      <div className="w-[720px] max-w-full">
+        <Story />
+      </div>
+    ),
+  ],
+};
+
+export const DragAnywhere: Story = {
+  args: { photos: photos.slice(0, 3) },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Drag any photo or the perforations. A short click selects; dragging preserves selection. The dark film sits on a dedicated sidebar-colored tray.',
+      },
+    },
+  },
+};
+
+export const CassetteProportions: Story = {
+  render: (args) => (
+    <div className="space-y-6">
+      {[
+        { scale: 1, label: 'Original · 100%' },
+        { scale: 0.9, label: 'Compact · 90% — recommended' },
+        { scale: 0.85, label: 'Small · 85%' },
+      ].map(({ scale, label }) => (
+        <section key={scale} className="space-y-2">
+          <h2 className="text-sm font-medium text-content-primary">{label}</h2>
+          <InteractiveRoll
+            {...args}
+            photos={photos.slice(0, 3)}
+            cassetteScale={scale}
+          />
+        </section>
+      ))}
+    </div>
+  ),
+};
+export const CompactCassette: Story = { args: { cassetteScale: 0.9 } };
+export const SmallCassette: Story = { args: { cassetteScale: 0.85 } };

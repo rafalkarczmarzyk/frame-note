@@ -1097,13 +1097,15 @@ aria-valuetext; tooltip help is dismissed during the gesture.
 ### Film roll artwork and composition preview
 
 FilmRollStart, FilmRollFrame and FilmRollEnd are standalone brand SVG components
-converted from the supplied vectors. Original cassette/leader paths, transparent sprocket holes,
+converted from the supplied vectors. Cassette and leader paths, transparent sprocket holes,
 label gradient and FrameNote branding are preserved. Colors live in the film
 palette in index.css; each cassette has its own gradient ID.
 Components/Brand/FilmRoll shows each asset and their joined geometry.
 
-FilmRoll composes the cassette, repeated frames and leader end at a uniform scale.
-The 56-unit film begins 13 units below the top of the 78-unit cassette. Each frame
+FilmRoll composes the cassette, repeated frames and leader end. Film artwork scales
+from a 78-unit reference height, with a 56-unit film body; the cassette defaults
+to 90% of that reference height. At 100% the film starts at y=13; smaller cassette
+variants recenter the film without changing frame dimensions. Each frame
 positions a black-backed photo beneath the SVG's transparent aperture
 (x=3.5, y=9, width=57, height=38 in a 64 × 56 viewBox). The aperture is
 corrected to the 3:2 ratio of a 36 × 24 mm frame; outer dimensions and perforations
@@ -1122,3 +1124,44 @@ Export JPG uses SplitButton with Export all in its menu. Session progress and ca
 overlay inside the canvas. No loading/progress row is inserted below the header,
 so switching photos preserves canvas and film-roll geometry. The cancel control
 remains interactive while batch rendering locks the underlying preview and tools.
+
+The film cassette artwork now uses the supplied linear/radial shell and label
+gradients plus two inner-shadow filters. Filter regions and the 49 × 78 artboard
+are preserved; the separate moving film aligns at y=13. All five definition IDs
+are scoped with useId per component instance; filter-local intermediate results
+stay local to their filter. The multicolor palette remains in index.css.
+Components/Brand/FilmRoll/MultipleInstances checks the artwork at three sizes,
+including the 195 px reference height. These trusted brand effects do not
+change the validation policy for user-uploaded SVG content.
+
+Cassette reflections and inner-shadow opacity are softened for the dark workspace.
+The cassette no longer contains a static film connector. Moving film and its
+perforated leader slide beneath the shell, with a small overlap that prevents
+subpixel gaps without altering the perforation pitch.
+
+### Film label variants and light-table selection
+
+FilmRollStart and FilmRoll accept emerald (default), gold, ivory and coral label
+variants. Shared palette tokens and scoped label roles preserve the supplied
+cassette geometry, soft gradients, inner shadows and unique SVG definition IDs.
+The existing vertical FrameNote mark is joined by the variant name, PHOTO FILM,
+a live EXP count, format 135 and a decorative barcode. Label text stays inside
+the left column; three/four-digit counts use smaller type. FilmRoll derives the
+count from its actual photo list, so failed imports never increase it.
+
+The shell is neutral graphite for contrast with the workspace. Material lighting
+stays below all opaque photos. Keyboard focus uses a white inset outline and
+forced colors retain a system highlight. Exported JPGs are unaffected.
+
+Components/Brand/FilmRoll provides Emerald, Gold, Ivory, Coral, LabelVariants
+and ExposureCounts (2/12/128/1024). Components/UI/FilmRoll includes matching
+interactive color stories, ColorVariants and ChangingCount with add/remove actions.
+PullShortRoll demonstrates elastic pulling and FixedCassette demonstrates scrolling
+a long roll beneath the stationary shell. Components/Brand/FilmRoll/Leader shows
+the perforated blank film exposed when pulling past the beginning.
+
+Film stock uses 82% fill opacity and a deeper dark warm base to separate it from the tabletop. The film tray currently experiments with the supplied repeating wood texture (src/assets/film-tabletop.png), sized to 320 px high. A 32% overlay blends the sidebar color with 20% porcelain, cooling and gently brightening the wood without tinting the film or photos. The texture stays fixed while film slides above it; the sidebar surface remains its fallback, with a subtle top separator. Selected photos have an inset accent frame and a faint warm light below the film, kept below every opaque photo. Hover adds a thin inset outline only to unselected photos; keyboard focus retains its stronger outline. The canvas preview sits 12 px above the tray when a roll is present instead of leaving a centered letterbox gap.
+
+The cassette SVG contains only its shell and label. It stays fixed above a clipped native scroll viewport; film begins beneath its edge. The entire film supports horizontal pointer dragging, including photos, perforations and tail. A 6 px movement threshold separates clicks from dragging, and drag release never selects a photo. Within the scroll range, release preserves the new position. Beyond either boundary, the film follows the pointer without a distance cap and returns to the nearest valid scroll position on release, cancellation or lost capture. The blank leader repeats vector perforations at their original pitch for any exposed length. The tail retains keyboard arrow browsing. Reduced motion disables return animation; reduced transparency restores opaque stock.
+
+CassetteProportions compares the original cassette with 90% and 85% scales while keeping film frames and tray padding unchanged. CompactCassette and SmallCassette provide interactive standalone previews. The optional cassetteScale affects shell dimensions and panel height, preserving uniform SVG scaling and film alignment; the accepted application default is 90%.

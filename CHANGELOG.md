@@ -12,6 +12,11 @@ when explicitly requested; a commit does not automatically create a release.
 - Multi-photo sessions with independent layouts, artwork and preset selections.
   An SVG film roll appears below the canvas for two or more photos, supports
   horizontal browsing with the mouse wheel and restores each photo's edits.
+  The stationary cassette has Emerald, Gold, Ivory and Coral labels with a live
+  exposure count. Drag any part of the film to browse or pull beyond its range,
+  then release to return; photo clicks remain separate from dragging. The compact
+  cassette, translucent dark film, active-frame highlight and cool wood-textured
+  tray include interactive Storybook previews and reduced-motion support.
 - Export all prepares full-resolution JPGs sequentially and downloads one ZIP,
   with shared quality/metadata settings, collision-safe names, combined token
   warnings, progress, cancellation and per-file failure reporting.
