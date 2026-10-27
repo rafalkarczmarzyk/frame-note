@@ -61,7 +61,7 @@ export function FilmRoll({
     if (disabled || !event.isPrimary || event.button !== 0 || !roll || !strip)
       return;
     event.preventDefault();
-    (event.target as Element).closest('button')?.focus({ preventScroll: true });
+    strip.setAttribute('data-pointer-input', 'true');
     suppressClickRef.current = false;
     dragRef.current = {
       id: event.pointerId,
@@ -112,6 +112,15 @@ export function FilmRoll({
     if (event.currentTarget.hasPointerCapture(event.pointerId))
       event.currentTarget.releasePointerCapture(event.pointerId);
   }
+
+  useEffect(() => {
+    function showKeyboardFocus() {
+      stripRef.current?.removeAttribute('data-pointer-input');
+    }
+    document.addEventListener('keydown', showKeyboardFocus, true);
+    return () =>
+      document.removeEventListener('keydown', showKeyboardFocus, true);
+  }, []);
 
   useEffect(() => {
     dragRef.current = null;
@@ -188,7 +197,7 @@ export function FilmRoll({
         className="film-roll-viewport"
         role="region"
         aria-label="Photo film roll"
-        tabIndex={0}
+        tabIndex={-1}
       >
         <span className="sr-only" aria-live="polite">
           {photos.length} photos in roll

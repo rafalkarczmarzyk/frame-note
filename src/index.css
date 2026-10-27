@@ -83,7 +83,7 @@
 :root {
   --film-tabletop-tint: color-mix(
     in srgb,
-    color-mix(in srgb, var(--sidebar-base) 80%, var(--color-porcelain)) 32%,
+    var(--workspace-base) 25%,
     transparent
   );
   --film-frame-light: linear-gradient(

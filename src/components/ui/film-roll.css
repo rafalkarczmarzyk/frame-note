@@ -2,7 +2,7 @@
   position: relative;
   min-width: 0;
   max-width: 100%;
-  padding: 8px 8px 16px 24px;
+  padding: 8px 8px 16px 16px;
   background-color: var(--sidebar-base);
   background-image:
     linear-gradient(var(--film-tabletop-tint), var(--film-tabletop-tint)),
@@ -12,11 +12,6 @@
     auto,
     auto 320px;
   border-top: 1px solid var(--border-subtle);
-}
-
-.film-roll-viewport:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
 }
 
 .film-roll-viewport {
@@ -45,7 +40,7 @@
 
 .film-roll-start {
   position: absolute;
-  left: 24px;
+  left: 16px;
   top: 8px;
   z-index: 3;
   display: block;
@@ -147,9 +142,18 @@
 .film-roll-frame:focus-visible {
   outline: none;
 }
-.film-roll-frame:focus-visible .film-roll-photo {
-  outline: 2px solid var(--content-primary);
-  outline-offset: -2px;
+.film-roll-frame:focus-visible::after,
+.film-roll-handle:focus-visible::after {
+  position: absolute;
+  z-index: 2;
+  left: 38%;
+  right: 38%;
+  top: 3%;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-film-light-core);
+  content: '';
+  pointer-events: none;
 }
 .film-roll-overlay {
   fill-opacity: var(--film-stock-opacity, 0.82);
@@ -201,8 +205,7 @@
   cursor: default;
 }
 .film-roll-handle:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: -2px;
+  outline: none;
 }
 .film-roll-strip[data-dragging='true'] {
   transition: none;
@@ -242,4 +245,18 @@
 }
 .film-roll-photo img {
   user-select: none;
+}
+
+@media (forced-colors: active) {
+  .film-roll-frame:focus-visible .film-roll-photo,
+  .film-roll-handle:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}
+
+/* Pointer dragging must not expose a retained keyboard-focus marker. */
+.film-roll-strip[data-pointer-input] .film-roll-frame:focus-visible::after,
+.film-roll-strip[data-pointer-input] .film-roll-handle:focus-visible::after {
+  display: none;
 }
