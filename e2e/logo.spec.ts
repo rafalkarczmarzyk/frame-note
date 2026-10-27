@@ -76,7 +76,7 @@ test('adds SVG through container content and exports original and single colors'
   expect(original[1]![2]).toBeGreaterThan(240);
   await page.getByRole('img', { name: 'two-colors.svg', exact: true }).click();
   await page.getByRole('radio', { name: 'Layer color', exact: true }).click();
-  await page.getByRole('button', { name: 'Color', exact: true }).click();
+  await page.getByRole('button', { name: 'Custom color', exact: true }).click();
   const hex = page.getByRole('textbox', {
     name: 'Custom color (HEX)',
     exact: true,

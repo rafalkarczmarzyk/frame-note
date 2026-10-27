@@ -1,3 +1,4 @@
+import { openSidebarSection } from './sidebar-helpers.js';
 import { readFile } from 'node:fs/promises';
 import { test, expect } from '@playwright/test';
 import ExifReader from 'exifreader';
@@ -23,6 +24,7 @@ test('metadata choices affect the prepared download and retain the original pixe
     );
     return bytes;
   };
+  await openSidebarSection(page, 'Export');
   const remove = page.getByRole('switch', {
     name: 'Remove all metadata',
     exact: true,

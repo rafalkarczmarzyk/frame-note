@@ -57,7 +57,10 @@ test('drops SVG and PNG at the retained cursor in Content without replacing the 
     /^Before\{image:[^}]+\}After$/,
   );
   await expect(page.getByText('Drop an image', { exact: true })).toHaveCount(0);
-  for (let i = 0; i < 5; i++) await caption.press('ArrowRight');
+  // Collapse a whole-document selection at the end, independent of how the
+  // browser moves through the newly inserted atomic image.
+  await caption.press('ControlOrMeta+a');
+  await caption.press('ArrowRight');
   await sendFile(page, content, 'drop', {
     name: 'mark.png',
     type: 'image/png',

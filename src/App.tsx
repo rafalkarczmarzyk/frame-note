@@ -1,4 +1,10 @@
-import { loadPhoto, type LoadedPhoto } from '@/features/photo/load-photo';
+import { usePhotoSession } from '@/features/photo/use-photo-session';
+import {
+  exportRoll,
+  rollWarnings,
+  type RollExportOptions,
+} from '@/features/photo/export-roll';
+import { FilmRoll } from '@/components/ui/film-roll';
 import {
   lazy,
   Suspense,
@@ -6,7 +12,6 @@ import {
   useEffect,
   useRef,
   useState,
-  startTransition,
 } from 'react';
 import { AppHeader } from '@/components/layout/app-header';
 import { EmptyWorkspace } from '@/features/photo/empty-workspace';
@@ -22,82 +27,126 @@ const PhotoWorkspace = lazy(() =>
 export default function App() {
   const [isDragging, setIsDragging] = useState(false);
 
-  const [photo, setPhoto] = useState<LoadedPhoto | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const [error, setError] = useState('');
+  const {
+    session,
+    photo,
+    progress,
+    previewLoading,
+    error,
+    setError,
+    openFiles,
+    selectPhoto,
+    closePhoto,
+    disposeRoll,
+    cancelImport,
+    previewReady,
+    updateDocument,
+    document: editorDocument,
+    documentKey,
+  } = usePhotoSession();
+  const loading = !!progress;
   const input = useRef<HTMLInputElement>(null);
-  const currentPhoto = useRef<LoadedPhoto | null>(null);
-  const loadedPhotos = useRef(new Set<LoadedPhoto>());
-  const requestId = useRef(0);
-  const importing = useRef(false);
-  const previewReady = useCallback((readyPhoto: LoadedPhoto) => {
-    if (!importing.current && currentPhoto.current === readyPhoto)
-      setPreviewLoading(false);
-  }, []);
-  const openFile = useCallback(async (file: File) => {
-    const id = ++requestId.current;
-    importing.current = true;
-    setLoading(true);
-    setPreviewLoading(true);
-    void loadWorkspace().catch(() => {});
-    setError('');
-    try {
-      // Let the loading indicator paint before metadata parsing and decoding.
-      await new Promise<void>((resolve) =>
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
-      );
-      if (id !== requestId.current) return;
-      const loaded = await loadPhoto(file);
-      if (id !== requestId.current) {
-        loaded.dispose();
-        return;
-      }
-      loadedPhotos.current.add(loaded);
-      currentPhoto.current = loaded;
-      importing.current = false;
-      startTransition(() => setPhoto(loaded));
-    } catch (cause) {
-      if (id === requestId.current) {
-        setPreviewLoading(false);
-        setError(
-          cause instanceof Error ? cause.message : 'Could not open photo.',
-        );
-      }
-    } finally {
-      if (id === requestId.current) {
-        importing.current = false;
-        setLoading(false);
-      }
-    }
-  }, []);
-  const closePhoto = useCallback(() => {
-    requestId.current += 1;
-    importing.current = false;
-    currentPhoto.current = null;
-    setPhoto(null);
-    setLoading(false);
-    setPreviewLoading(false);
-    setIsDragging(false);
-    setError('');
-  }, []);
-  useEffect(() => {
-    // Retire old bitmaps only after the replacement has committed to the UI.
-    for (const loaded of loadedPhotos.current) {
-      if (loaded !== photo && loaded !== currentPhoto.current) {
-        loaded.dispose();
-        loadedPhotos.current.delete(loaded);
-      }
-    }
-  }, [photo]);
+  const batchAbort = useRef<AbortController | null>(null);
+  const importQueue = useRef<File[][]>([]);
+  const drainingImports = useRef(false);
+  const [batch, setBatch] = useState<{
+    completed: number;
+    total: number;
+    name: string;
+  } | null>(null);
+  const addFiles = useCallback(
+    (files: readonly File[]) => {
+      if (batchAbort.current) return;
+      void loadWorkspace().catch(() => {});
+      importQueue.current.push([...files]);
+      if (drainingImports.current) return;
+      drainingImports.current = true;
+      void (async () => {
+        try {
+          while (importQueue.current.length) {
+            const next = importQueue.current.shift();
+            if (next) await openFiles(next);
+          }
+        } finally {
+          drainingImports.current = false;
+        }
+      })();
+    },
+    [openFiles],
+  );
   useEffect(
     () => () => {
-      requestId.current += 1;
-      for (const loaded of loadedPhotos.current) loaded.dispose();
-      loadedPhotos.current.clear();
+      importQueue.current = [];
+      batchAbort.current?.abort();
     },
     [],
   );
+  const stopImport = () => {
+    importQueue.current = [];
+    cancelImport();
+  };
+
+  const exportAll = async (options: RollExportOptions) => {
+    if (batchAbort.current || loading || session.items.length < 2) return;
+    const items = session.items.map((item) => ({
+      ...item,
+      editor: structuredClone(item.editor),
+    }));
+    const warnings = rollWarnings(items);
+    if (
+      warnings.length &&
+      !window.confirm(
+        `${warnings.length} photos have missing fields or invalid tokens:\n\n${warnings.join('\n')}\n\nExport all anyway?`,
+      )
+    )
+      return;
+    const controller = new AbortController();
+    batchAbort.current = controller;
+    setError('');
+    setBatch({ completed: 0, total: items.length, name: '' });
+    try {
+      const result = await exportRoll(
+        items,
+        options,
+        controller.signal,
+        (completed, name) => setBatch({ completed, total: items.length, name }),
+      );
+      controller.signal.throwIfAborted();
+      if (result.blob) {
+        const url = URL.createObjectURL(result.blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'framenote-roll.zip';
+        link.click();
+        window.setTimeout(() => URL.revokeObjectURL(url), 30_000);
+      }
+      if (result.failures.length)
+        setError(
+          `${result.completed} of ${items.length} photos exported.\n${result.failures.join('\n')}`,
+        );
+    } catch (cause) {
+      if (!controller.signal.aborted)
+        setError(
+          cause instanceof Error ? cause.message : 'Could not export the roll.',
+        );
+    } finally {
+      if (batchAbort.current === controller) {
+        batchAbort.current = null;
+        setBatch(null);
+      }
+    }
+  };
+  const discardRoll = () => {
+    if (batchAbort.current || !session.items.length) return;
+    if (
+      window.confirm(
+        `Close all ${session.items.length} photos and discard their individual edits? Source files and saved presets will not be deleted.`,
+      )
+    ) {
+      disposeRoll();
+      setIsDragging(false);
+    }
+  };
 
   useEffect(() => {
     const isFileDrag = (event: DragEvent) =>
@@ -140,9 +189,7 @@ export default function App() {
         return;
       }
       const files = event.dataTransfer?.files;
-      if (files?.length === 1 && files[0]) void openFile(files[0]);
-      else if (files && files.length > 1)
-        setError('Please add one photo at a time.');
+      if (files?.length) addFiles(Array.from(files));
     };
     const keydown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') reset();
@@ -163,22 +210,32 @@ export default function App() {
       window.removeEventListener('blur', reset);
       window.removeEventListener('keydown', keydown);
     };
-  }, [openFile]);
+  }, [addFiles]);
 
-  const loadingLabel = previewLoading
-    ? loading
-      ? 'Opening photo…'
-      : 'Preparing preview…'
-    : undefined;
+  const loadingLabel = batch
+    ? `Exporting ${Math.min(batch.completed + 1, batch.total)} of ${batch.total}`
+    : progress && progress.total > 1
+      ? `Adding photos · ${progress.done} of ${progress.total}`
+      : previewLoading || progress
+        ? 'Preparing preview…'
+        : undefined;
+  const cancelLoading = batch
+    ? () => batchAbort.current?.abort()
+    : progress
+      ? stopImport
+      : undefined;
+
   return (
     <div className="flex h-svh flex-col overflow-hidden bg-app-base text-content-primary">
       <AppHeader
         photoAction={
           <PhotoActions
-            hasPhoto={!!photo}
-            loading={loading}
+            hasPhoto={session.items.length > 0}
+            loading={loading || !!batch}
             onOpen={() => input.current?.click()}
             onClose={closePhoto}
+            photoCount={session.items.length}
+            onDisposeRoll={discardRoll}
           />
         }
       >
@@ -202,17 +259,21 @@ export default function App() {
       <input
         ref={input}
         type="file"
+        multiple
         accept="image/jpeg,image/png,.jpg,.jpeg,.png"
         aria-label="Choose JPG or PNG photo"
         className="hidden"
         onChange={(event) => {
-          const file = event.target.files?.[0];
-          if (file) void openFile(file);
+          const files = Array.from(event.target.files ?? []);
+          if (files.length) addFiles(files);
           event.target.value = '';
         }}
       />
       {error && (
-        <div role="alert" className="border-b px-6 py-3 text-sm">
+        <div
+          role="alert"
+          className="max-h-32 shrink-0 overflow-y-auto border-b px-6 py-3 text-sm whitespace-pre-line"
+        >
           {error}
         </div>
       )}
@@ -225,6 +286,7 @@ export default function App() {
             <EmptyWorkspace
               loading
               loadingLabel={loadingLabel}
+              onCancelLoading={cancelLoading}
               draggingPhoto={isDragging}
               onChoosePhoto={() => input.current?.click()}
             />
@@ -232,10 +294,31 @@ export default function App() {
         >
           <PhotoWorkspace
             photo={photo}
+            sessionDocument={editorDocument}
+            onDocumentChange={updateDocument}
+            documentKey={documentKey}
+            batchBusy={!!batch}
+            onExportAll={session.items.length > 1 ? exportAll : undefined}
+            filmRoll={
+              session.items.length > 1 ? (
+                <FilmRoll
+                  className="shrink-0"
+                  photos={session.items.map((item) => ({
+                    id: item.id,
+                    src: item.thumbnailUrl,
+                    name: item.photo.name,
+                  }))}
+                  activePhotoId={session.activeId ?? undefined}
+                  onSelectPhoto={(id) => void selectPhoto(id)}
+                  disabled={loading || !!batch}
+                />
+              ) : undefined
+            }
             loading={loading}
             onChoosePhoto={() => input.current?.click()}
             onPreviewReady={previewReady}
             loadingLabel={loadingLabel}
+            onCancelLoading={cancelLoading}
             draggingPhoto={isDragging}
           />
         </Suspense>

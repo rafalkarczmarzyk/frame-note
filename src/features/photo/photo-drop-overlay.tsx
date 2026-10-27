@@ -8,10 +8,10 @@ export function PhotoDropOverlay() {
     >
       <div className="flex h-full flex-col items-center justify-center rounded-3xl border-2 border-dashed border-drop-border p-6 text-center">
         <p className="text-center font-display text-3xl font-normal tracking-tight sm:text-5xl">
-          Drop your photo.
+          Add your photos.
         </p>
         <p className="mt-5 text-sm text-drop-secondary">
-          Release to open · JPG or PNG
+          Release to add · JPG or PNG
         </p>
         <p className="mt-3 flex items-center justify-center gap-1.5 text-[11px] text-drop-secondary">
           <LockKeyhole className="size-3" aria-hidden="true" />

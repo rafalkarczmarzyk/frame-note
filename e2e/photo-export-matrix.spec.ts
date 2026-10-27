@@ -1,3 +1,4 @@
+import { openSidebarSection } from './sidebar-helpers.js';
 import { readFile } from 'node:fs/promises';
 import { expect, test, type Page } from '@playwright/test';
 import {
@@ -330,6 +331,7 @@ for (const font of fonts) {
     else await page.getByRole('button', { name: /Montserrat/ }).click();
     if (font.bold)
       await page.getByRole('button', { name: 'Bold', exact: true }).click();
+    await openSidebarSection(page, 'Sizing & Margins');
     await page
       .getByRole('combobox', { name: 'Sizing unit', exact: true })
       .click();

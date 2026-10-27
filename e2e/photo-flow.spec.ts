@@ -1,3 +1,4 @@
+import { openSidebarSection } from './sidebar-helpers.js';
 import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
 import ExifReader from 'exifreader';
@@ -25,6 +26,7 @@ test('exports landscape and portrait JPGs with stable caption pixels and colors'
         page.getByRole('button', { name: 'Export JPG', exact: true }),
       ).toBeEnabled();
       // Changing the shared unit must preserve the exported geometry.
+      await openSidebarSection(page, 'Sizing & Margins');
       for (const unit of ['% of long edge', 'Pixels (px)', '% of short edge']) {
         await page
           .getByRole('combobox', { name: 'Sizing unit', exact: true })
@@ -181,6 +183,7 @@ test('exports landscape and portrait JPGs with stable caption pixels and colors'
         );
       }
       if (name === 'landscape') {
+        await openSidebarSection(page, 'Export');
         await page
           .getByRole('slider', { name: 'JPEG quality', exact: true })
           .press('Home');

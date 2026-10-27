@@ -1,0 +1,93 @@
+.film-roll {
+  max-width: 100%;
+  padding: 4px;
+}
+
+.film-roll:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.film-roll-strip {
+  display: flex;
+  align-items: flex-start;
+  width: max-content;
+  height: var(--film-roll-height);
+}
+
+.film-roll-start {
+  display: block;
+  flex: none;
+  width: calc(var(--film-roll-height) * 49 / 78);
+  height: var(--film-roll-height);
+}
+
+.film-roll-frame,
+.film-roll-end {
+  flex: none;
+  margin-top: calc(var(--film-roll-height) * 13 / 78);
+  height: calc(var(--film-roll-height) * 56 / 78);
+}
+
+.film-roll-frame {
+  position: relative;
+  display: block;
+  width: calc(var(--film-roll-height) * 64 / 78);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.film-roll-end {
+  display: block;
+  width: calc(var(--film-roll-height) * 65 / 78);
+}
+
+/* The corrected 3:2 aperture is x=3.5, y=9, width=57, height=38
+   within the original 64 × 56 viewBox.
+   Only this aperture has a black backing; sprocket holes remain transparent. */
+.film-roll-photo {
+  position: absolute;
+  left: 5.46875%;
+  top: 16.07142857%;
+  width: 89.0625%;
+  height: 67.85714286%;
+  overflow: hidden;
+  background: var(--color-film-photo-base);
+}
+
+.film-roll-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.film-roll-overlay {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.film-roll-frame[aria-pressed='true'] .film-roll-photo::after,
+.film-roll-frame:focus-visible .film-roll-photo::after,
+.film-roll-frame:hover .film-roll-photo::after {
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--content-secondary);
+  content: '';
+  pointer-events: none;
+}
+
+.film-roll-frame[aria-pressed='true'] .film-roll-photo::after,
+.film-roll-frame:focus-visible .film-roll-photo::after {
+  border-color: var(--accent-color);
+}
+
+.film-roll-frame:focus-visible {
+  outline: none;
+}

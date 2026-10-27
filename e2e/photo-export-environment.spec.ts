@@ -1,3 +1,4 @@
+import { openSidebarSection } from './sidebar-helpers.js';
 import { readFile } from 'node:fs/promises';
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import { wildlifeFixture } from '../tests/fixtures.ts';
@@ -79,6 +80,7 @@ test('Photo export / waits for RetiredDisplay Bold before enabling download', as
   await page.getByRole('button', { name: 'Font', exact: true }).click();
   await page.getByRole('button', { name: /RetiredDisplay/ }).click();
   await page.getByRole('button', { name: 'Bold', exact: true }).click();
+  await openSidebarSection(page, 'Sizing & Margins');
   await page
     .getByRole('combobox', { name: 'Sizing unit', exact: true })
     .click();

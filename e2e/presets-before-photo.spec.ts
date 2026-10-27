@@ -57,7 +57,7 @@ test('edits and saves a layout before import and retains the mounted editor acro
       page.getByRole('button', { name: 'Export JPG', exact: true }),
     ).toBeEnabled();
     await expect(
-      page.getByRole('button', { name: 'Open photo', exact: true }),
+      page.getByRole('button', { name: 'Add photos', exact: true }),
     ).toBeEnabled();
     const photoActions = page.getByRole('button', {
       name: 'Photo actions',

@@ -1,3 +1,4 @@
+import { openSidebarSection } from './sidebar-helpers.js';
 import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
 import { wildlifeFixture } from '../tests/fixtures.ts';
@@ -23,6 +24,7 @@ test('edits independent containers, selects on canvas and exports the whole layo
   await expect(
     page.getByRole('spinbutton', { name: 'Font size', exact: true }),
   ).toHaveValue('2');
+  await openSidebarSection(page, 'Sizing & Margins');
   await page
     .getByRole('combobox', { name: 'Sizing unit', exact: true })
     .click();

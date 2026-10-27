@@ -257,6 +257,17 @@ test('restores SVG assets, blank lines and custom positions across photo orienta
     [800, 1200],
   ] as const) {
     await uploadPhoto(width, height);
+    await expect(
+      page.getByRole('button', { name: 'Add photos', exact: true }),
+    ).toBeEnabled();
+    // Additional photos intentionally start from Default; apply the saved layout
+    // to each orientation before checking its exported artwork.
+    await page
+      .getByRole('combobox', { name: 'Saved preset', exact: true })
+      .click();
+    await page
+      .getByRole('option', { name: 'Portable SVG', exact: true })
+      .click();
     const ready = page.getByRole('button', { name: 'Export JPG', exact: true });
     await expect(ready).toBeEnabled();
     const pending = page.waitForEvent('download');

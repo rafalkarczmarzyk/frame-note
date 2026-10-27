@@ -47,6 +47,9 @@ export function usePreparedExport(
     request: ExportRequest;
     message: string;
   } | null>(null);
+  // Closing a session also releases its retained encoded result.
+  if (!request && result) setResult(null);
+  if (!request && failure) setFailure(null);
   useEffect(() => {
     if (enabled && request)
       queue.schedule(

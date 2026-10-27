@@ -1093,3 +1093,32 @@ pointer activation dismisses help and drag gestures do not open it. Token help
 never takes editor focus or adds a Tab stop; values are bounded to 500 characters.
 Ruler handle badges remain visible while dragging and numeric values stay in
 aria-valuetext; tooltip help is dismissed during the gesture.
+
+### Film roll artwork and composition preview
+
+FilmRollStart, FilmRollFrame and FilmRollEnd are standalone brand SVG components
+converted from the supplied vectors. Original cassette/leader paths, transparent sprocket holes,
+label gradient and FrameNote branding are preserved. Colors live in the film
+palette in index.css; each cassette has its own gradient ID.
+Components/Brand/FilmRoll shows each asset and their joined geometry.
+
+FilmRoll composes the cassette, repeated frames and leader end at a uniform scale.
+The 56-unit film begins 13 units below the top of the 78-unit cassette. Each frame
+positions a black-backed photo beneath the SVG's transparent aperture
+(x=3.5, y=9, width=57, height=38 in a 64 × 56 viewBox). The aperture is
+corrected to the 3:2 ratio of a 36 × 24 mm frame; outer dimensions and perforations
+remain unchanged. Photos use
+object-fit: contain so portrait and landscape images retain their complete crop;
+the black backing never covers the transparent sprocket holes.
+
+Components/UI/FilmRoll provides selection, compact/two-photo/24-photo/narrow
+examples, mixed photo proportions and an interactive BelowCanvas composition.
+Height is adjustable in Storybook. The same component is now mounted under the production canvas for sessions
+with at least two photos. Frames are disabled during import/export, the active
+frame scrolls into view and vertical wheel movement scrolls overflowing film
+horizontally. Screens/PhotoSession/ImportedSeries exercises the complete production
+workspace. PhotoActions exposes Add photos, Close photo and Dispose roll…;
+Export JPG uses SplitButton with Export all in its menu. Session progress and cancellation use the centered PhotoLoadingIndicator glass
+overlay inside the canvas. No loading/progress row is inserted below the header,
+so switching photos preserves canvas and film-roll geometry. The cancel control
+remains interactive while batch rendering locks the underlying preview and tools.
