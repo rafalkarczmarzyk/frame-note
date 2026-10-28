@@ -170,3 +170,24 @@ Kolor, opacity, wspólny MarginEditor dla paddingu, radius i cień z kolorem,
 opacity, blur, spread i przesunięciami działają w podglądzie i JPG.
 Obrys wyboru obejmuje padding, punkt pozycjonowania pozostaje przy treści.
 Edycja paddingu nie podświetla linijek marginesów dokumentu.
+
+### Etap 4 — integracja Glass
+
+Glass działa w głównym inspektorze, podglądzie, presetach i eksporcie (w tym
+wspólnej ścieżce batch). Próbki rozmycia zawierają tylko zdjęcie i widoczne
+niższe warstwy. Tekst, grafiki, ramki wyboru i uchwyty edytora pozostają ostre;
+ramki i uchwyty nie są próbkowane do szkła. Zmiany kompozycji i zdjęcia
+unieważniają podgląd; wybór aktywnej warstwy i hover go nie przebudowują.
+Podgląd składa obraz do 1600 px dłuższego boku i łączy zmiany w klatki;
+JPG używa pełnych wymiarów. Bufory próbek i nieaktualnych wyników są zwalniane.
+Duże promienie blur korzystają z pomniejszonej próbki, aby ominąć limit filtra
+Konva i zachować wizualną skalę. Obecnie rozmycie działa także podczas
+przeciągania; wyłączenie go nie jest potrzebne do podstawowego przepływu,
+a pomiary na słabszych urządzeniach pozostają osobnym ograniczeniem.
+
+Storybook produkcyjny: Screens/TestPhotos/ColorLayerBackground,
+GlassLayerBackground i GlassPortraitBackground. Dotychczasowy CanvasTrial
+pozostaje izolowaną próbą porównawczą. Test integracyjny w Chromium/WebKit
+potwierdza zmianę wyniku po zmianie blur i ukryciu niższej warstwy oraz zgodność
+podglądu z JPG z tolerancją strat kodowania. Wszystkie cztery scenariusze
+Color/Glass w obu silnikach przeszły.
