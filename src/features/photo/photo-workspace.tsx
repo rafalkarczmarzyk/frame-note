@@ -57,11 +57,11 @@ import {
   LoaderCircle,
   Layers,
   Plus,
+  Trash2,
   Tags,
   Shapes,
-  Type,
+  Image,
 } from 'lucide-react';
-import { PhotoIcon } from '@/components/icons/photo-icon';
 import {
   EditorWorkspace,
   ToolSidebar,
@@ -979,9 +979,9 @@ function PhotoWorkspaceContent({
         >
           <SidebarSection
             id="photo"
-            title="Photo"
+            title="Photo info"
             iconTone="photo"
-            icon={<PhotoIcon />}
+            icon={<Image />}
             defaultOpen={false}
           >
             {photo ? (
@@ -1065,188 +1065,210 @@ function PhotoWorkspaceContent({
               onBrowseFonts={() => {}}
             />
           </section>
-          <SidebarSection
-            id="containers"
-            title="Layers"
-            contentPadding="none"
-            iconTone="caption"
-            icon={<Layers />}
-          >
-            {(assetError || fontError) && (
-              <p role="alert" className="px-4 pt-2 pb-3 text-xs">
-                {assetError || fontError}
-              </p>
-            )}
-            <LayerList
-              appearance="compact"
-              layout={layout}
-              fields={fields}
-              icons={icons}
-              onMove={(id, index) =>
-                setLayout((value) => moveLayer(value, id, index))
-              }
-              onToggleVisibility={(id) =>
-                setLayout((value) => toggleLayerVisibility(value, id))
-              }
-              onChoose={selectContainer}
-              onHover={setHoveredId}
-              onDuplicate={(id) => {
-                setEditingId(null);
-                setLayout((value) =>
-                  addCaption(
-                    { ...value, activeId: id },
-                    createId(),
-                    true,
-                    dimensions,
-                  ),
-                );
-              }}
-              onDelete={(id) => {
-                if (layout.activeId === id) setEditingId(null);
-                setHoveredId(null);
-                setLayout((value) => removeCaption(value, id));
-              }}
-            />
-            {activeContainer &&
-              activeContainer.visible !== false &&
-              layout.containers.some(
-                (container) =>
-                  container.id !== activeContainer.id &&
-                  container.visible !== false &&
-                  !container.position.custom &&
-                  !activeContainer.position.custom &&
-                  container.position.anchor === activeContainer.position.anchor,
-              ) && (
-                <InlineNotice tone="warning" className="mx-4 mt-3">
-                  Multiple layers use this anchor and may overlap. Select each
-                  from the list to change its anchor.
-                </InlineNotice>
-              )}
-            <div className="flex flex-wrap gap-2 px-4 pt-3 pb-4">
-              <Button
-                variant="outline"
-                size="sm"
-                data-add-layer=""
-                onClick={() => addContainer()}
-              >
-                <Plus aria-hidden="true" />
-                Add layer
-              </Button>
-            </div>
-          </SidebarSection>
-          {activeContainer && (
+          <div className="mx-3 my-3 overflow-hidden rounded-xl bg-accordion-base [&>[data-section]]:m-0 [&>[data-section]]:rounded-none [&>[data-section=selected-container]]:border-x-0 [&>[data-section=selected-container]]:border-b-0">
             <SidebarSection
-              key={activeContainer.id}
-              id="selected-container"
-              title="Layer"
-              icon={<Type />}
-              iconTone="typography"
-              surface="container"
+              id="containers"
+              title="Layers"
+              contentPadding="none"
+              iconTone="caption"
+              icon={<Layers />}
             >
-              <>
-                <InspectorSection title="Content" imageDrop>
-                  <CaptionEditor
-                    key={documentKey}
-                    value={template}
-                    images={settings.images}
-                    sizingUnit={settings.sizingUnit}
-                    fontSize={settings.style.fontSize}
-                    dimensions={dimensions}
-                    fields={fields}
-                    icons={icons}
-                    onChange={setTemplate}
-                    onFocus={() => setEditingId(activeContainer.id)}
-                    onBlur={() => setEditingId(null)}
-                    onReady={editorReady}
-                    actions={
-                      <>
-                        <Tooltip content="Insert photo metadata at the text cursor">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            aria-label={
-                              tagsOpen
-                                ? 'Hide available tags'
-                                : 'Browse available tags'
-                            }
-                            aria-expanded={tagsOpen}
-                            aria-controls="auxiliary-panel"
-                            onClick={() =>
-                              setActivePanel((value) =>
-                                value === 'tags' ? null : 'tags',
-                              )
-                            }
-                          >
-                            <Tags aria-hidden="true" />
-                            Tags
-                          </Button>
-                        </Tooltip>
-                        <Tooltip content="Insert a built-in or uploaded SVG icon">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            aria-label="Browse icons"
-                            aria-expanded={activePanel === 'icons'}
-                            onClick={() =>
-                              setActivePanel((value) =>
-                                value === 'icons' ? null : 'icons',
-                              )
-                            }
-                          >
-                            <Shapes aria-hidden="true" />
-                            Icons
-                          </Button>
-                        </Tooltip>
-                      </>
-                    }
-                  />
-                  {photo &&
-                    settings.visible !== false &&
-                    (resolved.missing.length > 0 || resolved.invalidSyntax) && (
-                      <p className="mt-2 text-xs" role="status">
-                        {resolved.invalidSyntax ? 'Check token syntax. ' : ''}
-                        {resolved.missing.length
-                          ? `Missing fields: ${resolved.missing.join(', ')}`
-                          : ''}
-                      </p>
-                    )}
-                </InspectorSection>
-              </>
-              <CaptionControls
-                colorSelectionSource={
-                  colorSelections[activeContainer.id]?.value ===
-                  settings.style.color
-                    ? colorSelections[activeContainer.id]?.source
-                    : undefined
+              {(assetError || fontError) && (
+                <p role="alert" className="px-4 pt-2 pb-3 text-xs">
+                  {assetError || fontError}
+                </p>
+              )}
+              <LayerList
+                appearance="compact"
+                layout={layout}
+                fields={fields}
+                icons={icons}
+                onMove={(id, index) =>
+                  setLayout((value) => moveLayer(value, id, index))
                 }
-                onColorSelectionSourceChange={(source, color) =>
-                  setColorSelections((entries) => ({
-                    ...entries,
-                    [activeContainer.id]: { value: color, source },
-                  }))
+                onToggleVisibility={(id) =>
+                  setLayout((value) => toggleLayerVisibility(value, id))
                 }
-                scope="local"
-                dimensions={dimensions}
-                caption={settings}
-                onChange={setSettings}
-                disabled={exporting}
-                onBrowseColors={() =>
-                  setActivePanel((value) =>
-                    value === 'colors' ? null : 'colors',
-                  )
-                }
-                onBrowseFonts={() =>
-                  setActivePanel((value) =>
-                    value === 'fonts' ? null : 'fonts',
-                  )
-                }
+                onChoose={selectContainer}
+                onHover={setHoveredId}
+                onDuplicate={(id) => {
+                  setEditingId(null);
+                  setLayout((value) =>
+                    addCaption(
+                      { ...value, activeId: id },
+                      createId(),
+                      true,
+                      dimensions,
+                    ),
+                  );
+                }}
+                onDelete={(id) => {
+                  if (layout.activeId === id) setEditingId(null);
+                  setHoveredId(null);
+                  setLayout((value) => removeCaption(value, id));
+                }}
               />
+              {activeContainer &&
+                activeContainer.visible !== false &&
+                layout.containers.some(
+                  (container) =>
+                    container.id !== activeContainer.id &&
+                    container.visible !== false &&
+                    !container.position.custom &&
+                    !activeContainer.position.custom &&
+                    container.position.anchor ===
+                      activeContainer.position.anchor,
+                ) && (
+                  <InlineNotice tone="warning" className="mx-4 mt-3">
+                    Multiple layers use this anchor and may overlap. Select each
+                    from the list to change its anchor.
+                  </InlineNotice>
+                )}
+              <div className="flex flex-wrap gap-2 px-4 pt-3 pb-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  data-add-layer=""
+                  onClick={() => addContainer()}
+                >
+                  <Plus aria-hidden="true" />
+                  Add layer
+                </Button>
+                <Tooltip content="Remove selected layer">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!activeContainer}
+                    onClick={() => {
+                      if (!activeContainer) return;
+                      setEditingId(null);
+                      setHoveredId(null);
+                      setLayout((value) =>
+                        removeCaption(value, activeContainer.id),
+                      );
+                    }}
+                  >
+                    <Trash2 aria-hidden="true" />
+                    Remove layer
+                  </Button>
+                </Tooltip>
+              </div>
             </SidebarSection>
-          )}
+            {activeContainer && (
+              <SidebarSection
+                key={activeContainer.id}
+                id="selected-container"
+                title="Selected layer"
+                collapsible={false}
+                hideHeading
+                surface="container"
+              >
+                <>
+                  <InspectorSection title="Content" imageDrop>
+                    <CaptionEditor
+                      key={documentKey}
+                      value={template}
+                      images={settings.images}
+                      sizingUnit={settings.sizingUnit}
+                      fontSize={settings.style.fontSize}
+                      dimensions={dimensions}
+                      fields={fields}
+                      icons={icons}
+                      onChange={setTemplate}
+                      onFocus={() => setEditingId(activeContainer.id)}
+                      onBlur={() => setEditingId(null)}
+                      onReady={editorReady}
+                      actions={
+                        <>
+                          <Tooltip content="Insert photo metadata at the text cursor">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              aria-label={
+                                tagsOpen
+                                  ? 'Hide available tags'
+                                  : 'Browse available tags'
+                              }
+                              aria-expanded={tagsOpen}
+                              aria-controls="auxiliary-panel"
+                              onClick={() =>
+                                setActivePanel((value) =>
+                                  value === 'tags' ? null : 'tags',
+                                )
+                              }
+                            >
+                              <Tags aria-hidden="true" />
+                              Metadata
+                            </Button>
+                          </Tooltip>
+                          <Tooltip content="Insert a built-in or uploaded SVG icon">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              aria-label="Browse icons"
+                              aria-expanded={activePanel === 'icons'}
+                              onClick={() =>
+                                setActivePanel((value) =>
+                                  value === 'icons' ? null : 'icons',
+                                )
+                              }
+                            >
+                              <Shapes aria-hidden="true" />
+                              Icons
+                            </Button>
+                          </Tooltip>
+                        </>
+                      }
+                    />
+                    {photo &&
+                      settings.visible !== false &&
+                      (resolved.missing.length > 0 ||
+                        resolved.invalidSyntax) && (
+                        <p className="mt-2 text-xs" role="status">
+                          {resolved.invalidSyntax ? 'Check token syntax. ' : ''}
+                          {resolved.missing.length
+                            ? `Missing fields: ${resolved.missing.join(', ')}`
+                            : ''}
+                        </p>
+                      )}
+                  </InspectorSection>
+                </>
+                <CaptionControls
+                  colorSelectionSource={
+                    colorSelections[activeContainer.id]?.value ===
+                    settings.style.color
+                      ? colorSelections[activeContainer.id]?.source
+                      : undefined
+                  }
+                  onColorSelectionSourceChange={(source, color) =>
+                    setColorSelections((entries) => ({
+                      ...entries,
+                      [activeContainer.id]: { value: color, source },
+                    }))
+                  }
+                  scope="local"
+                  dimensions={dimensions}
+                  caption={settings}
+                  onChange={setSettings}
+                  disabled={exporting}
+                  onBrowseColors={() =>
+                    setActivePanel((value) =>
+                      value === 'colors' ? null : 'colors',
+                    )
+                  }
+                  onBrowseFonts={() =>
+                    setActivePanel((value) =>
+                      value === 'fonts' ? null : 'fonts',
+                    )
+                  }
+                />
+              </SidebarSection>
+            )}
+          </div>
           <SidebarSection
             id="export"
             defaultOpen={false}
-            title="Export"
+            title="Export settings"
             iconTone="export"
             icon={<Download />}
           >

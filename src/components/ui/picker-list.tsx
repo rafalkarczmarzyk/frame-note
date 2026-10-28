@@ -243,7 +243,7 @@ export function PickerList({
             key={item.id}
             data-picker-row={index}
             data-picker-id={item.id}
-            className={`relative flex items-center gap-1 rounded-lg ${appearance === 'compact' ? 'px-1' : ''} ${item.selected && selectionTone === 'container' ? '' : 'hover:bg-menu-item-hover'} ${item.selected ? (selectionTone === 'container' ? 'bg-container-settings-base' : 'bg-menu-item-selected') : ''}`}
+            className={`relative flex items-center gap-1 rounded-lg ${appearance === 'compact' ? 'px-1 py-1' : ''} ${item.selected && selectionTone === 'container' ? '' : 'hover:bg-menu-item-hover'} ${item.selected ? (selectionTone === 'container' ? 'bg-container-settings-base' : 'bg-menu-item-selected') : ''}`}
             onMouseEnter={() => onHover?.(item.id)}
             onMouseLeave={() => onHover?.(null)}
           >
@@ -304,7 +304,9 @@ export function PickerList({
                 <span
                   className={`flex justify-between gap-2 ${item.trailing && controlsLayout === 'inline' ? 'items-center' : 'items-start'}`}
                 >
-                  <span className="flex min-w-0 flex-1 items-center gap-2 text-xs">
+                  <span
+                    className={`flex min-w-0 flex-1 items-center ${appearance === 'compact' ? 'gap-1' : 'gap-2'} text-xs`}
+                  >
                     {item.leading}
                     <span
                       data-tooltip-truncate=""

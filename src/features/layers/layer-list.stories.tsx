@@ -326,3 +326,38 @@ export const CleanListDeleteLast: Story = {
     );
   },
 };
+
+/** Accepted material, rendered by the same component as the application. */
+export const LiquidGlass: Story = {
+  args: {
+    concept: true,
+    width: 384,
+    initialLayout: {
+      ...examples,
+      containers: [
+        examples.containers[4]!,
+        examples.containers[7]!,
+        examples.containers[1]!,
+      ],
+    },
+  },
+};
+
+export const LiquidGlassPrimary: Story = {
+  render: () => (
+    <div className="layer-selector-primary-preview">
+      <Example
+        concept
+        width={384}
+        initialLayout={{
+          ...examples,
+          containers: [
+            examples.containers[4]!,
+            examples.containers[7]!,
+            examples.containers[1]!,
+          ],
+        }}
+      />
+    </div>
+  ),
+};
