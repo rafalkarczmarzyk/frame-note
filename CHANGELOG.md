@@ -145,6 +145,9 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Fixed
 
+- Photo switching and roll export retain access to imported image data even if
+  the original file becomes unreadable, using session-owned copies of its bytes.
+
 - Photo import no longer replaces the interface with a text-only loading screen.
   Large photos use a bounded preview bitmap while export retains the original;
   old preview resources are released after their replacement is committed.

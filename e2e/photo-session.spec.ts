@@ -18,8 +18,99 @@ async function imageBytes(page: Page, width = 300, height = 200) {
 }
 const input = (page: Page) => page.getByLabel('Choose JPG or PNG photo');
 const caption = (page: Page) => page.getByLabel('Caption', { exact: true });
+async function fillCaption(page: Page, text: string) {
+  await caption(page).click();
+  await caption(page).press('ControlOrMeta+a');
+  await caption(page).press('Backspace');
+  await page.keyboard.insertText(text);
+  await expect(caption(page)).toHaveAttribute('data-template', text);
+}
 const exported = (page: Page) =>
   page.getByRole('button', { name: 'Export JPG', exact: true });
+
+test('switches and exports from session bytes when original file handles become unreadable', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.evaluate(() => {
+    const originals = new WeakSet<File>();
+    document.addEventListener(
+      'change',
+      (event) => {
+        if (event.target instanceof HTMLInputElement)
+          for (const file of event.target.files ?? []) originals.add(file);
+      },
+      true,
+    );
+    const read = File.prototype.arrayBuffer;
+    File.prototype.arrayBuffer = function () {
+      if (originals.has(this) && document.body.dataset.expiredFiles)
+        return Promise.reject(
+          new DOMException(
+            'Source file is no longer readable.',
+            'NotReadableError',
+          ),
+        );
+      return read.call(this);
+    };
+  });
+  await input(page).setInputFiles([
+    {
+      name: 'first.png',
+      mimeType: 'image/png',
+      buffer: Buffer.from(await imageBytes(page), 'base64'),
+    },
+    {
+      name: 'second.png',
+      mimeType: 'image/png',
+      buffer: Buffer.from(await imageBytes(page, 200, 300), 'base64'),
+    },
+  ]);
+  await ready(page);
+  await fillCaption(page, 'First signature');
+  await page.evaluate(() => {
+    document.body.dataset.expiredFiles = 'yes';
+  });
+  const roll = page.getByRole('region', { name: 'Photo film roll' });
+  for (const index of [2, 1, 2]) {
+    const name = index === 1 ? 'first.png' : 'second.png';
+    const frame = roll.getByRole('button', {
+      name: `Photo ${index}: ${name}`,
+      exact: true,
+    });
+    await frame.click();
+    await ready(page);
+    await expect(frame).toHaveAttribute('aria-pressed', 'true');
+    await expect(
+      page.getByRole('img', { name: `Photo preview: ${name}` }),
+    ).toBeVisible();
+    await expect(page.getByRole('alert')).toHaveCount(0);
+    if (index === 1)
+      await expect(caption(page)).toHaveAttribute(
+        'data-template',
+        'First signature',
+      );
+    else {
+      await fillCaption(page, 'Second signature');
+    }
+  }
+  await expect(exported(page)).toBeEnabled();
+  await page
+    .getByRole('button', { name: 'Export actions', exact: true })
+    .click();
+  const downloaded = page.waitForEvent('download');
+  await page.getByRole('menuitem', { name: 'Export all', exact: true }).click();
+  const entries = zipEntries(
+    await readFile((await (await downloaded).path())!),
+  );
+  expect(entries.map((entry) => entry.name)).toEqual([
+    'first-framenote.jpg',
+    'second-framenote.jpg',
+  ]);
+  expect(ExifReader.load(entries[0]!.data)['Image Width']?.value).toBe(300);
+  expect(ExifReader.load(entries[1]!.data)['Image Width']?.value).toBe(200);
+});
+
 async function ready(page: Page) {
   await expect(
     page.getByRole('button', { name: 'Add photos', exact: true }),
@@ -48,7 +139,7 @@ test('adds photos, restores independent documents and exports the roll with coll
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
   const bytes = await imageBytes(page);
-  await caption(page).fill('First signature');
+  await fillCaption(page, 'First signature');
   await input(page).setInputFiles({
     name: 'same.png',
     mimeType: 'image/png',
@@ -99,7 +190,7 @@ test('adds photos, restores independent documents and exports the roll with coll
     'data-template',
     'First signature',
   );
-  await caption(page).fill('Second signature');
+  await fillCaption(page, 'Second signature');
   await roll
     .getByRole('button', { name: 'Photo 1: same.png', exact: true })
     .click();
@@ -294,14 +385,14 @@ test('cancels pending imports and batch export without adding stale photos or do
   await expect(
     page.getByRole('img', { name: 'Photo preview: fast.png' }),
   ).toBeVisible();
-  await caption(page).fill('First');
+  await fillCaption(page, 'First');
   await input(page).setInputFiles({
     name: 'other.png',
     mimeType: 'image/png',
     buffer: bytes,
   });
   await ready(page);
-  await caption(page).fill('Second');
+  await fillCaption(page, 'Second');
   await page.evaluate(() => {
     const read = File.prototype.arrayBuffer;
     File.prototype.arrayBuffer = async function () {

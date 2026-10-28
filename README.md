@@ -207,7 +207,10 @@ paths before importing. The editor limits active image content to 100 images.
   for current decoding/encoding to return and discards pending output. Batch export
   locks editing until it finishes or cancellation completes.
 - Only active-preview/import/export photos are fully decoded; inactive photos keep
-  small thumbnails and source files. Large-series memory budgets still need measurement.
+  small thumbnails and session-owned copies of the encoded source bytes. Switching
+  and batch export do not reread the original disk files. These copies last until
+  the photos are closed or the page is refreshed and can increase memory/storage
+  use for large rolls. Large-series memory budgets still need measurement.
 - Zoom/pan and a desktop application remain outside the current scope.
 
 ## Development

@@ -82,7 +82,7 @@ export function usePhotoSession() {
           let loaded: LoadedPhoto | undefined;
           let thumbnailUrl: string | undefined;
           try {
-            loaded = await loadPhoto(file);
+            loaded = await loadPhoto(file, { snapshotSource: true });
             if (generation.current !== token) break;
             thumbnailUrl = await photoThumbnail(loaded);
             if (generation.current !== token) break;
@@ -91,7 +91,7 @@ export function usePhotoSession() {
               first && retainLayout ? state.current.empty.id : createId();
             const item = {
               id,
-              file,
+              file: loaded.sourceFile,
               photo: loaded.document.photo,
               thumbnailUrl,
               editor: retainLayout
