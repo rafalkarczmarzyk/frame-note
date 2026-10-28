@@ -1,3 +1,4 @@
+import { Badge } from '@/components/ui/badge';
 import { useGlassPreview } from '../caption/use-glass-preview';
 import { BackgroundControls } from '../caption/background-controls';
 import { BackgroundPreview } from '../caption/background-preview';
@@ -538,7 +539,6 @@ function PhotoWorkspaceContent({
                 !photo ? 'Open a photo to export a JPG' : exportLabel
               }
               primaryDisabled={!photo || !prepared.blob || exporting || loading}
-              menuDisabled={!onExportAll || exporting || loading}
               aria-busy={preparingExport || exporting || undefined}
               onClick={download}
               items={[
@@ -1298,13 +1298,15 @@ function PhotoWorkspaceContent({
                               <div className="flex flex-wrap items-center gap-1.5 text-notice-warning">
                                 <span>Empty:</span>
                                 {emptyFields.map((field) => (
-                                  <span
+                                  <Badge
                                     key={field}
+                                    tone="warning"
+                                    size="md"
                                     data-value-status="empty"
-                                    className="metadata-issue-badge min-w-0 rounded border px-1.5 py-0.5 break-all"
+                                    className="break-all"
                                   >
                                     {field}
-                                  </span>
+                                  </Badge>
                                 ))}
                               </div>
                             )}
@@ -1312,13 +1314,15 @@ function PhotoWorkspaceContent({
                               <div className="flex flex-wrap items-center gap-1.5 text-notice-error">
                                 <span>Unknown:</span>
                                 {unknownFields.map((field) => (
-                                  <span
+                                  <Badge
                                     key={field}
+                                    tone="error"
+                                    size="md"
                                     data-value-status="absent"
-                                    className="metadata-issue-badge min-w-0 rounded border px-1.5 py-0.5 break-all"
+                                    className="break-all"
                                   >
                                     {field}
-                                  </span>
+                                  </Badge>
                                 ))}
                               </div>
                             )}
@@ -1326,12 +1330,14 @@ function PhotoWorkspaceContent({
                               <div className="flex flex-wrap items-center gap-1.5">
                                 <span>Missing images or icons:</span>
                                 {missingGraphics.map((field) => (
-                                  <span
+                                  <Badge
                                     key={field}
-                                    className="control-neutral min-w-0 rounded px-1.5 py-0.5 break-all"
+                                    tone="neutral"
+                                    size="md"
+                                    className="break-all"
                                   >
                                     {field}
-                                  </span>
+                                  </Badge>
                                 ))}
                               </div>
                             )}

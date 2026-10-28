@@ -1,3 +1,4 @@
+import { Badge } from '@/components/ui/badge';
 import { parseIconToken } from '@/domain/inline-icon';
 import { NodeSelection } from '@tiptap/pm/state';
 import { metadataTokenStatus } from './token-status';
@@ -57,94 +58,108 @@ export function TokenView({
                 : values[token]
       }
     >
-      <NodeViewWrapper
-        as="span"
-        contentEditable={false}
-        data-drag-handle=""
-        onClick={(event: MouseEvent<HTMLSpanElement>) => {
-          if (event.shiftKey) return;
-          const position = getPos();
-          if (typeof position === 'number') {
-            editor.chain().focus().setNodeSelection(position).run();
-            requestAnimationFrame(() => {
-              const selection = editor.state.selection;
-              if (
-                selection instanceof NodeSelection &&
-                selection.from === position
-              )
-                editor.view.dom.ownerDocument.getSelection()?.removeAllRanges();
-            });
-          }
-        }}
-        data-token={token}
-        data-missing={missing || undefined}
-        data-value-status={status}
-        className={`caption-token relative inline-flex h-8 cursor-grab items-center gap-1.5 rounded px-2 py-1 align-middle text-xs leading-none text-content-primary control-neutral ${selected ? 'z-10 outline-2 outline-input-focus-ring' : ''}`}
+      <Badge
+        asChild
+        size="token"
+        tone={
+          status === 'empty'
+            ? 'warning'
+            : status === 'absent'
+              ? 'error'
+              : 'neutral'
+        }
       >
-        {missing ? (
-          <TriangleAlert
-            aria-hidden="true"
-            className={icon ? 'size-5' : 'size-3'}
-          />
-        ) : graphic &&
-          imageRef?.colorMode === 'single' &&
-          graphic.format === 'svg' ? (
-          <span
-            aria-label={graphic.name}
-            role="img"
-            className="inline-block bg-current"
-            style={{
-              height: '1.25rem',
-              width: `${Math.min((1.25 * graphic.width) / graphic.height, 8)}rem`,
-              maskImage: `url("${imageSource(graphic)}")`,
-              maskSize: 'contain',
-              maskRepeat: 'no-repeat',
-            }}
-          />
-        ) : graphic && imageRef ? (
-          <img
-            src={imageSource(graphic)}
-            alt={graphic.name}
-            draggable={false}
-            style={{
-              height: '1.25rem',
-              width: 'auto',
-              maxWidth: '8rem',
-              objectFit: 'contain',
-            }}
-          />
-        ) : asset ? (
-          <span
-            aria-hidden="true"
-            className="inline-block h-5 bg-current"
-            style={{
-              width: `${20 * asset.aspect}px`,
-              maskImage: `url("${svgUrl(asset.svg)}")`,
-              maskSize: '100% 100%',
-              maskRepeat: 'no-repeat',
-            }}
-          />
-        ) : icon ? (
-          <Icon aria-hidden="true" className="size-5" />
-        ) : (
-          <Tag aria-hidden="true" className="size-3" />
-        )}
-        {icon ? (
-          <span className="sr-only">
-            {missing
-              ? imageRef
-                ? 'Missing image: '
-                : 'Missing icon: '
-              : imageRef
-                ? 'Image: '
-                : 'Icon: '}
-            {graphic?.name ?? (imageRef ? token : token.slice(5))}
-          </span>
-        ) : (
-          <span>{token}</span>
-        )}
-        {missing && <span className="sr-only"> (missing)</span>}
-      </NodeViewWrapper>
+        <NodeViewWrapper
+          as="span"
+          contentEditable={false}
+          data-drag-handle=""
+          onClick={(event: MouseEvent<HTMLSpanElement>) => {
+            if (event.shiftKey) return;
+            const position = getPos();
+            if (typeof position === 'number') {
+              editor.chain().focus().setNodeSelection(position).run();
+              requestAnimationFrame(() => {
+                const selection = editor.state.selection;
+                if (
+                  selection instanceof NodeSelection &&
+                  selection.from === position
+                )
+                  editor.view.dom.ownerDocument
+                    .getSelection()
+                    ?.removeAllRanges();
+              });
+            }
+          }}
+          data-token={token}
+          data-missing={missing || undefined}
+          data-value-status={status}
+          className={`caption-token relative cursor-grab ${selected ? 'z-10 outline-2 outline-input-focus-ring' : ''}`}
+        >
+          {missing ? (
+            <TriangleAlert
+              aria-hidden="true"
+              className={icon ? 'size-5' : 'size-3'}
+            />
+          ) : graphic &&
+            imageRef?.colorMode === 'single' &&
+            graphic.format === 'svg' ? (
+            <span
+              aria-label={graphic.name}
+              role="img"
+              className="inline-block bg-current"
+              style={{
+                height: '1.25rem',
+                width: `${Math.min((1.25 * graphic.width) / graphic.height, 8)}rem`,
+                maskImage: `url("${imageSource(graphic)}")`,
+                maskSize: 'contain',
+                maskRepeat: 'no-repeat',
+              }}
+            />
+          ) : graphic && imageRef ? (
+            <img
+              src={imageSource(graphic)}
+              alt={graphic.name}
+              draggable={false}
+              style={{
+                height: '1.25rem',
+                width: 'auto',
+                maxWidth: '8rem',
+                objectFit: 'contain',
+              }}
+            />
+          ) : asset ? (
+            <span
+              aria-hidden="true"
+              className="inline-block h-5 bg-current"
+              style={{
+                width: `${20 * asset.aspect}px`,
+                maskImage: `url("${svgUrl(asset.svg)}")`,
+                maskSize: '100% 100%',
+                maskRepeat: 'no-repeat',
+              }}
+            />
+          ) : icon ? (
+            <Icon aria-hidden="true" className="size-5" />
+          ) : (
+            <Tag aria-hidden="true" className="size-3" />
+          )}
+          {icon ? (
+            <span className="sr-only">
+              {missing
+                ? imageRef
+                  ? 'Missing image: '
+                  : 'Missing icon: '
+                : imageRef
+                  ? 'Image: '
+                  : 'Icon: '}
+              {graphic?.name ?? (imageRef ? token : token.slice(5))}
+            </span>
+          ) : (
+            <span>{token}</span>
+          )}
+          {missing && <span className="sr-only"> (missing)</span>}
+        </NodeViewWrapper>
+      </Badge>
     </Tooltip>
   );
 }

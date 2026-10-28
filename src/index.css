@@ -1188,19 +1188,36 @@ fieldset:disabled .glass-switch {
   color: inherit;
 }
 
-/* Metadata badges distinguish absent fields from recognized, empty values. */
-.caption-token[data-value-status='empty'],
-.metadata-issue-badge[data-value-status='empty'] {
+/* Shared badge colors, including metadata status. */
+.badge[data-tone='muted'] {
+  color: var(--content-secondary);
+  border-color: var(--border-subtle);
+}
+.badge[data-tone='neutral'] {
+  color: var(--button-secondary-text);
+  border-color: var(--button-border);
+  background: var(--button-secondary-base);
+  box-shadow: var(--button-shadow);
+}
+.badge[data-tone='warning'] {
   color: var(--notice-warning);
   border-color: var(--token-warning-border);
   background: var(--token-warning-base);
 }
-
-.caption-token[data-value-status='absent'],
-.metadata-issue-badge[data-value-status='absent'] {
+.badge[data-tone='error'] {
   color: var(--notice-error);
   border-color: var(--token-error-border);
   background: var(--token-error-base);
+}
+.badge[data-tone='accent'] {
+  color: var(--button-primary-text);
+  border-color: var(--accent-color);
+  background: var(--accent-color);
+}
+.badge[data-tone='inverse'] {
+  color: var(--button-primary-text);
+  border-color: var(--content-primary);
+  background: var(--content-primary);
 }
 
 /* Editor-only decorations preserve source spaces and line-break geometry. */

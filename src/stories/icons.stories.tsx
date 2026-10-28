@@ -1,3 +1,4 @@
+import { MacroIcon } from '../components/icons/macro-icon';
 import { AutoAlign } from '../components/icons/auto-align';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ComponentType, SVGProps } from 'react';
@@ -90,6 +91,11 @@ type IconEntry = {
 };
 
 const customIcons: IconEntry[] = [
+  {
+    name: 'MacroIcon',
+    Icon: MacroIcon,
+    usage: 'Supplied macro photography artwork; inline macro icon.',
+  },
   {
     name: 'AutoAlign',
     Icon: AutoAlign,
@@ -263,6 +269,7 @@ const groups: { title: string; icons: IconEntry[] }[] = [
   {
     title: 'Metadata helpers',
     icons: [
+      ...customIcons.filter(({ name }) => name === 'MacroIcon'),
       { name: 'UserRound', Icon: UserRound, usage: 'Author' },
       { name: 'Focus', Icon: Focus, usage: 'Lens' },
       {

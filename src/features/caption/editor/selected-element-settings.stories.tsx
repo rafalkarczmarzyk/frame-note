@@ -1,3 +1,4 @@
+import { Badge } from '@/components/ui/badge';
 import { ElementSizeSettings } from './element-size-settings';
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -59,15 +60,21 @@ function Proposal({
       >
         <span>©</span>
         {!removed && (
-          <button
-            type="button"
-            aria-label={`Select ${name}`}
-            aria-pressed="true"
-            className="control-neutral flex min-h-9 items-center gap-2 rounded px-2 outline-2 outline-input-focus-ring"
+          <Badge
+            asChild
+            tone="neutral"
+            size="token"
+            className="min-h-9 gap-2 outline-2 outline-input-focus-ring"
           >
-            <Icon aria-hidden="true" className="size-5" />
-            <span className="text-xs">{name}</span>
-          </button>
+            <button
+              type="button"
+              aria-label={`Select ${name}`}
+              aria-pressed="true"
+            >
+              <Icon aria-hidden="true" className="size-5" />
+              <span className="text-xs">{name}</span>
+            </button>
+          </Badge>
         )}
         <span>Photo</span>
       </div>
