@@ -69,7 +69,6 @@
   --color-film-coral-end: #965e4c;
   --color-film-ink: #172019;
   --color-film-light-core: #fff3cf;
-  --color-film-light-amber: #e8b675;
   --color-film-photo-base: #000000;
   /* Section accents; primary remains independent. */
   --color-violet: #731dd8;
@@ -81,20 +80,41 @@
 
 /* Base palette above is also used by photo captions. UI roles below are independent. */
 :root {
-  --film-tabletop-tint: color-mix(
+  --film-tabletop-base: color-mix(
     in srgb,
-    var(--workspace-base) 25%,
+    var(--sidebar-base) 85%,
+    var(--color-porcelain)
+  );
+  --film-tabletop-soft: color-mix(
+    in srgb,
+    var(--sidebar-base) 94%,
+    var(--color-porcelain)
+  );
+  --film-tabletop-deep: color-mix(
+    in srgb,
+    var(--sidebar-base) 65%,
+    var(--workspace-base)
+  );
+  --film-tabletop-grain: color-mix(
+    in srgb,
+    var(--color-porcelain) 3%,
     transparent
   );
+  --film-tabletop-texture:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px 1px,
+      var(--film-tabletop-grain) 1px 2px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px 2px,
+      var(--film-tabletop-grain) 2px 3px
+    );
   --film-overflow-shade: linear-gradient(
     to right,
     transparent,
     color-mix(in srgb, var(--color-film-photo-base) 55%, transparent)
-  );
-  --film-frame-light: linear-gradient(
-    color-mix(in srgb, var(--color-film-light-amber) 65%, transparent),
-    color-mix(in srgb, var(--color-film-light-core) 70%, transparent),
-    color-mix(in srgb, var(--color-film-light-amber) 65%, transparent)
   );
   --switch-thumb-background: linear-gradient(
     160deg,

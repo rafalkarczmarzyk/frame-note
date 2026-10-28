@@ -3,21 +3,14 @@
   min-width: 0;
   max-width: 100%;
   padding: 8px 0 16px 16px;
-  background-color: var(--sidebar-base);
-  background-image:
-    linear-gradient(var(--film-tabletop-tint), var(--film-tabletop-tint)),
-    url('../../assets/film-tabletop.png');
+  background-color: var(--film-tabletop-deep);
+  background-image: var(--film-tabletop-texture);
   background-repeat: repeat;
-  background-size:
-    auto,
-    auto 320px;
   border-top: 1px solid var(--border-subtle);
 }
 
 .film-roll-viewport {
-  margin-left: calc(
-    var(--film-cassette-height, var(--film-roll-height)) * 46 / 78
-  );
+  margin-left: calc(var(--film-cassette-width) - 1px);
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
@@ -45,27 +38,21 @@
   z-index: 3;
   display: block;
   flex: none;
-  width: calc(var(--film-cassette-height, var(--film-roll-height)) * 49 / 78);
+  width: var(--film-cassette-width);
   height: var(--film-cassette-height, var(--film-roll-height));
 }
 
 .film-roll-frame,
 .film-roll-handle {
   flex: none;
-  margin-top: calc(
-    (
-        var(--film-cassette-height, var(--film-roll-height)) -
-          var(--film-roll-height) * 56 / 78
-      ) /
-      2 + var(--film-roll-height) * 2 / 78
-  );
-  height: calc(var(--film-roll-height) * 56 / 78);
+  margin-top: var(--film-tape-top);
+  height: var(--film-frame-height);
 }
 
 .film-roll-frame {
   position: relative;
   display: block;
-  width: calc(var(--film-roll-height) * 64 / 78);
+  width: var(--film-frame-width);
   padding: 0;
   border: 0;
   background: transparent;
@@ -80,19 +67,17 @@
   background: transparent;
   cursor: grab;
   touch-action: pan-y;
-  width: calc(var(--film-roll-height) * 65 / 78);
+  width: var(--film-tail-width);
 }
 
-/* The corrected 3:2 aperture is x=3.5, y=9, width=57, height=38
-   within the original 64 × 56 viewBox.
-   Only this aperture has a black backing; sprocket holes remain transparent. */
+/* Native 148 × 129 px frame: aperture x=8, y=21, 132 × 88 (3:2). */
 .film-roll-photo {
   z-index: 2;
   position: absolute;
-  left: 5.46875%;
-  top: 16.07142857%;
-  width: 89.0625%;
-  height: 67.85714286%;
+  left: calc(100% * 8 / 148);
+  top: calc(100% * 21 / 129);
+  width: calc(100% * 132 / 148);
+  height: calc(100% * 88 / 129);
   overflow: hidden;
   background: var(--color-film-photo-base);
 }
@@ -114,20 +99,6 @@
   pointer-events: none;
 }
 
-/* All light remains below every film overlay and opaque photograph. */
-.film-roll-frame::before {
-  position: absolute;
-  z-index: 0;
-  inset: 8% 3%;
-  background: var(--film-frame-light);
-  filter: blur(9px);
-  opacity: 0;
-  content: '';
-  pointer-events: none;
-}
-.film-roll-frame[aria-pressed='true']::before {
-  opacity: 0.45;
-}
 .film-roll-frame[aria-pressed='true'] .film-roll-photo {
   outline: 2px solid var(--accent-color);
   outline-offset: -2px;
@@ -214,18 +185,9 @@
 .film-roll-leader {
   position: absolute;
   right: 100%;
-  top: calc(
-    (
-        var(--film-cassette-height, var(--film-roll-height)) -
-          var(--film-roll-height) * 56 / 78
-      ) /
-      2 + var(--film-roll-height) * 2 / 78
-  );
-  width: max(
-    calc(var(--film-roll-height) * 64 / 78),
-    var(--film-leader-width, 0px)
-  );
-  height: calc(var(--film-roll-height) * 56 / 78);
+  top: var(--film-tape-top);
+  width: max(var(--film-frame-width), var(--film-leader-width, 0px));
+  height: var(--film-frame-height);
   fill-opacity: var(--film-stock-opacity, 0.82);
 }
 @media (prefers-reduced-motion: reduce) {
@@ -288,4 +250,18 @@
   .film-roll::after {
     transition: none;
   }
+}
+
+.film-roll-tone-soft {
+  background-color: var(--film-tabletop-soft);
+}
+.film-roll-tone-sidebar {
+  background-color: var(--sidebar-base);
+}
+.film-roll-tone-deep {
+  background-color: var(--film-tabletop-deep);
+}
+
+.film-roll-tone-light {
+  background-color: var(--film-tabletop-base);
 }

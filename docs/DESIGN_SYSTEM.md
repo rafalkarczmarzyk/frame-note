@@ -1102,16 +1102,13 @@ label gradient and FrameNote branding are preserved. Colors live in the film
 palette in index.css; each cassette has its own gradient ID.
 Components/Brand/FilmRoll shows each asset and their joined geometry.
 
-FilmRoll composes the cassette, repeated frames and leader end. Film artwork scales
-from a 78-unit reference height, with a 56-unit film body; the cassette defaults
-to 90% of that reference height. At 100% the film starts at y=13; smaller cassette
-variants recenter the film without changing frame dimensions. Each frame
-positions a black-backed photo beneath the SVG's transparent aperture
-(x=3.5, y=9, width=57, height=38 in a 64 × 56 viewBox). The aperture is
-corrected to the 3:2 ratio of a 36 × 24 mm frame; outer dimensions and perforations
-remain unchanged. Photos use
-object-fit: contain so portrait and landscape images retain their complete crop;
-the black backing never covers the transparent sprocket holes.
+FilmRoll composes the cassette, repeated frames and leader end using native pixels
+at the accepted 180 px reference height: frame 148 × 129, tail 150 × 129 and
+cassette 96 × 162. The 132 × 88 aperture starts at (8,21), preserving 3:2.
+Other heights round layout dimensions to whole CSS pixels; cassetteScale adjusts
+the shell independently. Photos use object-fit: contain so portrait and landscape
+images retain their complete crop. Only apertures have opaque black backings;
+sprocket holes remain transparent.
 
 Components/UI/FilmRoll provides selection, compact/two-photo/24-photo/narrow
 examples, mixed photo proportions and an interactive BelowCanvas composition.
@@ -1126,8 +1123,8 @@ so switching photos preserves canvas and film-roll geometry. The cancel control
 remains interactive while batch rendering locks the underlying preview and tools.
 
 The film cassette artwork now uses the supplied linear/radial shell and label
-gradients plus two inner-shadow filters. Filter regions and the 49 × 78 artboard
-are preserved; the separate moving film aligns at y=13. All five definition IDs
+gradients plus two inner-shadow filters. Filter regions, gradients and artwork coordinates are converted to the native
+96 × 162 artboard; the empty right-side connector area is removed. All five definition IDs
 are scoped with useId per component instance; filter-local intermediate results
 stay local to their filter. The multicolor palette remains in index.css.
 Components/Brand/FilmRoll/MultipleInstances checks the artwork at three sizes,
@@ -1160,10 +1157,14 @@ PullShortRoll demonstrates elastic pulling and FixedCassette demonstrates scroll
 a long roll beneath the stationary shell. Components/Brand/FilmRoll/Leader shows
 the perforated blank film exposed when pulling past the beginning.
 
-Film stock uses 82% fill opacity and a deeper dark warm base to separate it from the tabletop. The film tray currently experiments with the supplied repeating wood texture (src/assets/film-tabletop.png), sized to 320 px high. A 25% workspace-colored overlay cools and darkens the wood without tinting the film or photos. The texture stays fixed while film slides above it; the sidebar surface remains its fallback, with a subtle top separator. Selected photos have an inset accent frame and a faint warm light below the film, kept below every opaque photo. Hover adds a thin inset outline only to unselected photos; keyboard focus uses a small warm marker on the upper perforation. Pointer input suppresses keyboard markers until the next key press. The tabletop viewport is excluded from Tab navigation; frame and tail buttons remain keyboard-accessible. The canvas preview sits 12 px above the tray when a roll is present instead of leaving a centered letterbox gap.
+Film stock uses 82% fill opacity and a deeper dark warm base to separate it from the tabletop. The film tray uses the original matte graphite proposal: a fine 2 × 3 px procedural grid with 3% porcelain grain on a sidebar-colored base lightened by 15% porcelain. At normal scale the grid reads as a subtle dither-like texture. It stays fixed while the film moves, with a subtle top separator. Selected photos have an inset accent frame without a glow below the film. Hover adds a thin inset outline only to unselected photos; keyboard focus uses a small warm marker on the upper perforation. Pointer input suppresses keyboard markers until the next key press. The tabletop viewport is excluded from Tab navigation; frame and tail buttons remain keyboard-accessible. The canvas preview sits 12 px above the tray when a roll is present instead of leaving a centered letterbox gap.
 
 The cassette SVG contains only its shell and label. It stays fixed above a clipped native scroll viewport; film begins beneath its edge. The entire film supports horizontal pointer dragging, including photos, perforations and tail. A 6 px movement threshold separates clicks from dragging, and drag release never selects a photo. Within the scroll range, release preserves the new position. Beyond either boundary, the film follows the pointer without a distance cap and returns to the nearest valid scroll position on release, cancellation or lost capture. The blank leader repeats vector perforations at their original pitch for any exposed length. The tail retains keyboard arrow browsing. Reduced motion disables return animation; reduced transparency restores opaque stock.
 
-CassetteProportions compares the original cassette with 90% and 85% scales while keeping film frames and tray padding unchanged. CompactCassette and SmallCassette provide interactive standalone previews. The optional cassetteScale affects shell dimensions and panel height, preserving uniform SVG scaling and film alignment; the accepted application default is 90%. The default film reference height is 180 px, with tray padding unchanged.
+CassetteProportions compares the original cassette with 90% and 85% scales while keeping film frames and tray padding unchanged. CompactCassette and SmallCassette provide interactive standalone previews. The optional cassetteScale affects shell dimensions and panel height while preserving film alignment; the accepted application default is 90%. The default film reference height is 180 px, with tray padding unchanged.
 
-The film viewport reaches the right edge of the wood tray without a padding gap. A 56 px shade ending at 55% black covers the full height of the tabletop at its right edge and hints at more film only while content remains to the right; scrolling and resizing update it with a 240 ms opacity fade (disabled for reduced motion). A 16 px spacer travels after the tail, leaving breathing room at the end without clipping the film early during scrolling.
+The film viewport reaches the right edge of the graphite tray without a padding gap. A 56 px shade ending at 55% black covers the full height of the tabletop at its right edge and hints at more film only while content remains to the right; scrolling and resizing update it with a 240 ms opacity fade (disabled for reduced motion). A 16 px spacer travels after the tail, leaving breathing room at the end without clipping the film early during scrolling.
+
+GraphiteTones compares the current light graphite base with SoftGraphite (6% porcelain), SidebarGraphite (sidebar surface), and DeepGraphite (35% workspace blend). The fine 2 × 3 px texture, grain opacity, film scale and cassette remain identical. These darker tones are Storybook proposals; production uses DeepGraphite for in-application evaluation.
+
+Film SVG artwork now uses native dimensions for the accepted 180 px roll: frames 148 × 129, tail 150 × 129, and cassette 96 × 162 with its obsolete right-side film area trimmed. The aperture is 132 × 88 at (8,21), preserving 3:2. SVG geometry, gradients, labels and filter lengths are converted to those coordinates; the default viewBoxes and rendered dimensions match. Layout dimensions and the exposed leader movement round to CSS pixels. Alternate Storybook sizes remain supported, but the default no longer scales the legacy 64 × 56 artwork. No overlapping seam patches are used.

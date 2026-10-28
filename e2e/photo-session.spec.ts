@@ -420,6 +420,13 @@ test('keeps the cassette fixed and springs back only beyond the film range', asy
     name: 'Drag film to browse photos',
   });
   const initial = await cassette.boundingBox();
+  expect(initial!.width).toBe(96);
+  expect(initial!.height).toBe(162);
+  const nativeFrame = await viewport
+    .getByRole('button', { name: 'Photo 1: pull-0.png', exact: true })
+    .boundingBox();
+  expect(nativeFrame!.width).toBe(148);
+  expect(nativeFrame!.height).toBe(129);
   const tail = (await handle.boundingBox())!;
   await page.mouse.move(tail.x + tail.width / 2, tail.y + 20);
   await page.mouse.down();
