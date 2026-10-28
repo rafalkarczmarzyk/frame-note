@@ -32,7 +32,10 @@ when explicitly requested; a commit does not automatically create a release.
   relative/fixed heights and top/center/bottom alignment against the text line;
   settings survive clipboard operations, document-unit changes and presets and
   match between preview and JPG export. Editor badges have consistent heights
-  and more space between lines.
+  and more space between lines. The Content toolbar groups icon selection and
+  SVG/PNG graphics in a shared panel, with Icons and Graphics tabs, an upload
+  action, and a built-in Canon logo. Inline graphic badges keep the same height
+  regardless of their output size.
 - Formatting marks are visible by default in Content: centered space dots and
   clear line-break arrows distinguish real breaks from visual wrapping. A Pilcrow
   toggle beside the insertion actions hides them without changing caption text,

@@ -40,8 +40,10 @@ test('uploads SVG, edits atomic tokens, round-trips the clipboard and exports a 
   await editor.press('Meta+a');
   await editor.press('Backspace');
   await expect(editor).toHaveAttribute('data-template', '');
-  await page.getByRole('button', { name: 'Browse icons', exact: true }).click();
-  const panel = page.getByRole('dialog', { name: 'Inline icons', exact: true });
+  await page
+    .getByRole('button', { name: 'Browse graphics', exact: true })
+    .click();
+  const panel = page.getByRole('dialog', { name: 'Graphics', exact: true });
   await expect(panel.getByLabel('Upload SVG icon')).toHaveCount(0);
   await expect(
     panel.getByRole('button', { name: 'Back to caption' }),

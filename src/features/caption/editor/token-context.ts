@@ -4,8 +4,6 @@ import type { SvgIcon } from '../svg-icons';
 export const TokenContext = createContext<{
   images?: readonly ImageAsset[];
   selectedImagePosition?: number | null;
-  imageFontPixels?: number;
-  imageUnitPixels?: number;
   values: Record<string, string>;
   hasPhoto?: boolean;
   icons?: readonly SvgIcon[];

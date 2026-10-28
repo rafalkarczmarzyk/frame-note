@@ -40,7 +40,9 @@ import { iconMarker } from '../caption/inline-content';
 import { builtinIcons } from '../caption/builtin-icons';
 import type { Editor } from '@tiptap/react';
 import { CaptionEditor } from '../caption/editor/caption-editor';
-import { IconPickerPanel } from '../caption/icon-picker-panel';
+import { GraphicsPickerPanel } from '../caption/graphics-picker-panel';
+import type { GraphicsEditorActions } from '../caption/editor/caption-editor';
+import type { ImageAsset } from '@/domain/inline-image';
 import { loadIcon, type SvgIcon } from '../caption/svg-icons';
 import { resolveCaptionContent } from '../caption/inline-content';
 import { inlineLayout } from '../caption/inline-layout';
@@ -188,8 +190,15 @@ function PhotoWorkspaceContent({
     ReadonlyMap<string, HTMLImageElement>
   >(new Map());
   const [activePanel, setActivePanel] = useState<
-    'tags' | 'fonts' | 'colors' | 'icons' | 'presets' | null
+    'tags' | 'fonts' | 'colors' | 'graphics' | 'presets' | null
   >(null);
+  const [graphicsActions, setGraphicsActions] =
+    useState<GraphicsEditorActions | null>(null);
+  const registerGraphicsActions = useCallback(
+    (actions: GraphicsEditorActions | null) =>
+      setGraphicsActions(() => actions),
+    [],
+  );
   const [colorSelections, setColorSelections] = useState<
     Record<string, { value: string; source: ColorSelectionSource }>
   >({});
@@ -896,10 +905,16 @@ function PhotoWorkspaceContent({
           className="max-h-[40vh] w-full shrink-0 md:max-h-none md:w-80"
         />
       )}
-      {activePanel === 'icons' && (
-        <IconPickerPanel
+      {activePanel === 'graphics' && (
+        <GraphicsPickerPanel
           icons={icons}
-          onChoose={(name) => addToken(`icon:${name}`)}
+          images={settings.images ?? []}
+          onChooseIcon={(name) => addToken(`icon:${name}`)}
+          onChooseGraphic={(asset: ImageAsset) => {
+            graphicsActions?.insert(asset);
+            setActivePanel(null);
+          }}
+          onUploadGraphic={() => graphicsActions?.upload()}
           onClose={() => setActivePanel(null)}
           className="max-h-[40vh] w-full shrink-0 rounded-none shadow-none md:max-h-none md:w-80"
         />
@@ -925,7 +940,7 @@ function PhotoWorkspaceContent({
       )}
       {activePanel &&
         activePanel !== 'colors' &&
-        activePanel !== 'icons' &&
+        activePanel !== 'graphics' &&
         activePanel !== 'presets' && (
           <FloatingPanel
             id="auxiliary-panel"
@@ -1228,12 +1243,13 @@ function PhotoWorkspaceContent({
                         onFocus={() => setEditingId(activeContainer.id)}
                         onBlur={() => setEditingId(null)}
                         onReady={editorReady}
+                        onGraphicsActionsReady={registerGraphicsActions}
                         actions={
                           <>
                             <Tooltip content="Insert photo metadata at the text cursor">
                               <button
                                 type="button"
-                                className="control-segment flex h-7 min-w-0 items-center justify-center gap-1 px-2 text-xs whitespace-nowrap [&_svg]:size-4"
+                                className="control-segment flex h-7 min-w-0 items-center justify-center gap-1 px-2 text-xs whitespace-nowrap [&_svg]:size-4 [&_svg]:shrink-0"
                                 aria-label={
                                   tagsOpen
                                     ? 'Hide available tags'
@@ -1252,23 +1268,23 @@ function PhotoWorkspaceContent({
                                 Metadata
                               </button>
                             </Tooltip>
-                            <Tooltip content="Insert a built-in or uploaded SVG icon">
+                            <Tooltip content="Insert a built-in icon or SVG / PNG graphic">
                               <button
                                 type="button"
-                                className="control-segment flex h-7 min-w-0 items-center justify-center gap-1 px-2 text-xs whitespace-nowrap [&_svg]:size-4"
-                                aria-label="Browse icons"
+                                className="control-segment flex h-7 min-w-0 items-center justify-center gap-1 px-2 text-xs whitespace-nowrap [&_svg]:size-4 [&_svg]:shrink-0"
+                                aria-label="Browse graphics"
                                 data-state={
-                                  activePanel === 'icons' ? 'on' : 'off'
+                                  activePanel === 'graphics' ? 'on' : 'off'
                                 }
-                                aria-expanded={activePanel === 'icons'}
+                                aria-expanded={activePanel === 'graphics'}
                                 onClick={() =>
                                   setActivePanel((value) =>
-                                    value === 'icons' ? null : 'icons',
+                                    value === 'graphics' ? null : 'graphics',
                                   )
                                 }
                               >
                                 <Shapes aria-hidden="true" />
-                                Icons
+                                Graphics
                               </button>
                             </Tooltip>
                           </>

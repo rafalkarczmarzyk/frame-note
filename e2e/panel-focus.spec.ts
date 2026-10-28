@@ -29,8 +29,11 @@ test('panels receive keyboard focus and return it to their opener', async ({
       input: 'Search fonts',
     },
     {
-      trigger: page.getByRole('button', { name: 'Browse icons', exact: true }),
-      dialog: 'Inline icons',
+      trigger: page.getByRole('button', {
+        name: 'Browse graphics',
+        exact: true,
+      }),
+      dialog: 'Graphics',
     },
     {
       trigger: page.getByRole('button', {
