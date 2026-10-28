@@ -864,7 +864,6 @@ function PhotoWorkspaceContent({
       {activePanel === 'icons' && (
         <IconPickerPanel
           icons={icons}
-          onUpload={(icon) => setIcons((value) => [...value, icon])}
           onChoose={(name) => addToken(`icon:${name}`)}
           onClose={() => setActivePanel(null)}
           className="max-h-[40vh] w-full shrink-0 rounded-none shadow-none md:max-h-none md:w-80"
@@ -1189,6 +1188,7 @@ function PhotoWorkspaceContent({
                       fontSize={settings.style.fontSize}
                       dimensions={dimensions}
                       fields={fields}
+                      hasPhoto={!!photo}
                       icons={icons}
                       onChange={setTemplate}
                       onFocus={() => setEditingId(activeContainer.id)}
@@ -1199,7 +1199,7 @@ function PhotoWorkspaceContent({
                           <Tooltip content="Insert photo metadata at the text cursor">
                             <button
                               type="button"
-                              className="control-segment flex h-7 min-w-0 items-center justify-center gap-1 px-2 text-xs [&_svg]:size-4"
+                              className="control-segment flex h-7 min-w-0 items-center justify-center gap-1 px-2 text-xs whitespace-nowrap [&_svg]:size-4"
                               aria-label={
                                 tagsOpen
                                   ? 'Hide available tags'
@@ -1221,7 +1221,7 @@ function PhotoWorkspaceContent({
                           <Tooltip content="Insert a built-in or uploaded SVG icon">
                             <button
                               type="button"
-                              className="control-segment flex h-7 min-w-0 items-center justify-center gap-1 px-2 text-xs [&_svg]:size-4"
+                              className="control-segment flex h-7 min-w-0 items-center justify-center gap-1 px-2 text-xs whitespace-nowrap [&_svg]:size-4"
                               aria-label="Browse icons"
                               data-state={
                                 activePanel === 'icons' ? 'on' : 'off'
@@ -1240,53 +1240,54 @@ function PhotoWorkspaceContent({
                         </>
                       }
                     />
-                    {(resolved.missing.length > 0 ||
-                      resolved.invalidSyntax) && (
-                      <div className="mt-2 space-y-2 text-xs" role="status">
-                        {emptyFields.length > 0 && (
-                          <div className="flex flex-wrap items-center gap-1.5 text-notice-warning">
-                            <span>Empty:</span>
-                            {emptyFields.map((field) => (
-                              <span
-                                key={field}
-                                data-value-status="empty"
-                                className="metadata-issue-badge min-w-0 rounded border px-1.5 py-0.5 break-all"
-                              >
-                                {field}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                        {unknownFields.length > 0 && (
-                          <div className="flex flex-wrap items-center gap-1.5 text-notice-error">
-                            <span>Unknown:</span>
-                            {unknownFields.map((field) => (
-                              <span
-                                key={field}
-                                data-value-status="absent"
-                                className="metadata-issue-badge min-w-0 rounded border px-1.5 py-0.5 break-all"
-                              >
-                                {field}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                        {missingGraphics.length > 0 && (
-                          <div className="flex flex-wrap items-center gap-1.5">
-                            <span>Missing images or icons:</span>
-                            {missingGraphics.map((field) => (
-                              <span
-                                key={field}
-                                className="control-neutral min-w-0 rounded px-1.5 py-0.5 break-all"
-                              >
-                                {field}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                        {resolved.invalidSyntax && <p>Check token syntax.</p>}
-                      </div>
-                    )}
+                    {photo &&
+                      (resolved.missing.length > 0 ||
+                        resolved.invalidSyntax) && (
+                        <div className="mt-2 space-y-2 text-xs" role="status">
+                          {emptyFields.length > 0 && (
+                            <div className="flex flex-wrap items-center gap-1.5 text-notice-warning">
+                              <span>Empty:</span>
+                              {emptyFields.map((field) => (
+                                <span
+                                  key={field}
+                                  data-value-status="empty"
+                                  className="metadata-issue-badge min-w-0 rounded border px-1.5 py-0.5 break-all"
+                                >
+                                  {field}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          {unknownFields.length > 0 && (
+                            <div className="flex flex-wrap items-center gap-1.5 text-notice-error">
+                              <span>Unknown:</span>
+                              {unknownFields.map((field) => (
+                                <span
+                                  key={field}
+                                  data-value-status="absent"
+                                  className="metadata-issue-badge min-w-0 rounded border px-1.5 py-0.5 break-all"
+                                >
+                                  {field}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          {missingGraphics.length > 0 && (
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <span>Missing images or icons:</span>
+                              {missingGraphics.map((field) => (
+                                <span
+                                  key={field}
+                                  className="control-neutral min-w-0 rounded px-1.5 py-0.5 break-all"
+                                >
+                                  {field}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          {resolved.invalidSyntax && <p>Check token syntax.</p>}
+                        </div>
+                      )}
                   </InspectorSection>
                 </>
                 <CaptionControls

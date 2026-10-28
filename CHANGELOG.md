@@ -12,8 +12,11 @@ when explicitly requested; a commit does not automatically create a release.
 - Metadata badges distinguish absent tags in red from recognized fields or helpers
   returning no value in yellow. Compact Empty/Unknown summaries show individual
   field badges below the editor; value tooltips display only the resolved text.
-  Content insertion uses a full-width Add row with grouped Metadata, Icons and
-  Image actions.
+  Missing-value indicators stay hidden until a photo is open.
+  Content insertion uses a full-width group of Metadata, Icons and SVG / PNG
+  actions beside a plus icon, with nonbreaking labels and consistent spacing
+  before typography controls. Custom graphics use SVG / PNG; the icon panel
+  no longer includes upload controls, empty custom-icon groups or Back to caption.
 
 - Multi-photo sessions with independent layouts, artwork and preset selections.
   An SVG film roll appears below the canvas for two or more photos, supports
