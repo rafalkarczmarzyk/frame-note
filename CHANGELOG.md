@@ -122,8 +122,8 @@ when explicitly requested; a commit does not automatically create a release.
 - Graphics include the FrameNote wordmark alongside Canon, with larger previews,
   names in tooltips and format badges at the end of each row. The standalone
   FrameNote symbol remains in Icons.
-- Removed the separator before Export JPG. The export menu arrow stays enabled
-  while unavailable actions are disabled inside its menu.
+- Removed the separator before Export JPG. Split-button menu arrows are disabled
+  when every menu action is unavailable or the menu is empty.
 
 - Icon and color pickers use three-column button grids with larger previews.
   Icon names sit below the artwork, truncate to one line and remain available

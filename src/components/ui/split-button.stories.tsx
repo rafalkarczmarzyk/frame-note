@@ -52,7 +52,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'An attached pair of buttons: the left segment runs the primary action; the arrow opens secondary actions without changing the primary action. Shares Button variants, palette and sizes. Each segment has its own focus target. Enter/Space opens the menu, Arrow Up/Down opens and navigates it, Home/End jumps, Escape returns focus, and Tab or an outside click dismisses it. Menu items can omit icons, be disabled, or start a new group. Native disabled fieldsets disable both segments. loading disables both; primaryDisabled and menuDisabled control each segment independently. className styles the outer group; native button props (including ref, type and form) belong to the primary action. Give icon-only content an aria-label and always provide menuLabel.',
+          'An attached pair of buttons: the left segment runs the primary action; the arrow opens secondary actions without changing the primary action. Shares Button variants, palette and sizes. Each segment has its own focus target. Enter/Space opens the menu, Arrow Up/Down opens and navigates it, Home/End jumps, Escape returns focus, and Tab or an outside click dismisses it. Menu items can omit icons, be disabled, or start a new group. Native disabled fieldsets disable both segments. loading disables both; primaryDisabled and menuDisabled control each segment independently. The menu arrow is also disabled when all menu items are disabled or the list is empty. className styles the outer group; native button props (including ref, type and form) belong to the primary action. Give icon-only content an aria-label and always provide menuLabel.',
       },
     },
   },
@@ -125,6 +125,11 @@ export const PrimaryDisabled: Story = {
   args: { primaryDisabled: true, variant: 'outline' },
 };
 export const MenuDisabled: Story = { args: { menuDisabled: true } };
+export const AllItemsDisabled: Story = {
+  args: {
+    items: [{ label: 'Export all', disabled: true, onSelect: () => {} }],
+  },
+};
 export const DisabledFieldset: Story = {
   render: (args) => (
     <fieldset disabled>
