@@ -17,7 +17,7 @@ const meta = {
     children: (
       <NumberField
         label="Size"
-        step={0.25}
+        step={0.1}
         value={2}
         onValueChange={() => {}}
         min={0.01}
@@ -77,7 +77,7 @@ function AccordionGroup() {
       >
         <NumberField
           label="Size (% short edge)"
-          step={0.25}
+          step={0.1}
           value={size}
           onValueChange={setSize}
           min={0.01}

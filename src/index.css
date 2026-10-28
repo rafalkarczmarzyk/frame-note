@@ -910,7 +910,7 @@
     align-items: center;
     justify-content: center;
     border-radius: 2px;
-    cursor: pointer;
+    cursor: ns-resize;
   }
   .numeric-steppers button:hover {
     background: var(--tone-hover);
@@ -946,6 +946,13 @@
     white-space: nowrap;
     font-size: 10px;
     color: var(--input-unit);
+  }
+  .numeric-unit-multiplier {
+    min-width: 1rem;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--input-text);
   }
   .numeric-input:has(input:focus-visible) {
     border-color: var(--input-focus-ring);

@@ -327,7 +327,7 @@ export function InlineLogoPrototype({
             />
             <NumberField
               label="Image height"
-              step={attrs.unit === 'px' ? 1 : 0.25}
+              step={attrs.unit === 'px' ? 1 : 0.1}
               value={Number(attrs.size)}
               min={attrs.unit === 'px' ? 1 : 0.25}
               max={attrs.unit === 'px' ? 500 : 20}
@@ -376,7 +376,7 @@ export function InlineLogoPrototype({
       <InspectorSection title="Typography">
         <NumberField
           label="Font size"
-          step={0.25}
+          step={0.1}
           value={fontSize}
           min={10}
           max={48}

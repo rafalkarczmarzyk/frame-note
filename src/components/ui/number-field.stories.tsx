@@ -8,7 +8,7 @@ const meta = {
   args: {
     label: 'Size (% short edge)',
     value: 1.35,
-    step: 0.25,
+    step: 0.1,
     min: 0.01,
     max: 20,
     onValueChange: () => {},
@@ -30,6 +30,43 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 export const Fractional: Story = {};
 export const Disabled: Story = { args: { disabled: true } };
+
+function DragToAdjustPrototype() {
+  const [value, setValue] = useState(3);
+  const step = 0.1;
+  const min = 0.1;
+  const max = 20;
+
+  return (
+    <div className="max-w-72">
+      <NumberField
+        label="Font size"
+        value={value}
+        onValueChange={setValue}
+        min={min}
+        max={max}
+        step={step}
+        unit="% S"
+      />
+      <p className="mt-2 text-xs text-content-secondary">
+        Drag vertically on either arrow to adjust · click an arrow for one step
+        · click the value to type
+      </p>
+    </div>
+  );
+}
+
+export const DragToAdjust: Story = {
+  render: () => <DragToAdjustPrototype />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Drag vertically on either stepper arrow to adjust by 0.1 per 4 px. Clicking an arrow still changes one step, and the value remains directly editable.',
+      },
+    },
+  },
+};
 
 export const StepperLimits: Story = {
   args: {
@@ -66,7 +103,7 @@ export const FontSizeStep: Story = {
     value: 2,
     min: 0.0001,
     max: 20,
-    step: 0.25,
+    step: 0.1,
     unit: '% S',
   },
   play: async ({ canvasElement }) => {
@@ -75,18 +112,18 @@ export const FontSizeStep: Story = {
     await userEvent.click(
       c.getByRole('button', { name: 'Increase Font size' }),
     );
-    await expect(input).toHaveValue(2.25);
+    await expect(input).toHaveValue(2.1);
     input.focus();
     await userEvent.keyboard('{ArrowUp}');
-    await expect(input).toHaveValue(2.5);
+    await expect(input).toHaveValue(2.2);
     await userEvent.keyboard('{ArrowDown}');
-    await expect(input).toHaveValue(2.25);
+    await expect(input).toHaveValue(2.1);
     // Values entered by hand retain precision; steppers add rather than snap.
     await userEvent.clear(input);
     await userEvent.type(input, '2.13');
     await expect(input).toBeValid();
     await userEvent.keyboard('{ArrowUp}');
-    await expect(input).toHaveValue(2.38);
+    await expect(input).toHaveValue(2.23);
   },
 };
 export const LineSpacingStep: Story = {
