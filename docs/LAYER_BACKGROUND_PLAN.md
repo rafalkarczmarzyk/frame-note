@@ -178,7 +178,7 @@ wspólnej ścieżce batch). Próbki rozmycia zawierają tylko zdjęcie i widoczn
 niższe warstwy. Tekst, grafiki, ramki wyboru i uchwyty edytora pozostają ostre;
 ramki i uchwyty nie są próbkowane do szkła. Zmiany kompozycji i zdjęcia
 unieważniają podgląd; wybór aktywnej warstwy i hover go nie przebudowują.
-Podgląd składa obraz do 1600 px dłuższego boku i łączy zmiany w klatki;
+Podgląd przelicza dekoracje na kompozycji do 1600 px dłuższego boku i łączy zmiany w klatki;
 JPG używa pełnych wymiarów. Bufory próbek i nieaktualnych wyników są zwalniane.
 Duże promienie blur korzystają z pomniejszonej próbki, aby ominąć limit filtra
 Konva i zachować wizualną skalę. Obecnie rozmycie działa także podczas
@@ -191,3 +191,24 @@ pozostaje izolowaną próbą porównawczą. Test integracyjny w Chromium/WebKit
 potwierdza zmianę wyniku po zmianie blur i ukryciu niższej warstwy oraz zgodność
 podglądu z JPG z tolerancją strat kodowania. Wszystkie cztery scenariusze
 Color/Glass w obu silnikach przeszły.
+
+### Etap 5 — weryfikacja końcowa
+
+Zweryfikowano 40 przypadków E2E (20 w każdym silniku): tła, zgodność podglądu
+z JPG, próbkowanie niższej warstwy, przeciąganie za padding, zmiana jednostek,
+niezależne układy sesji i zgodność pojedynczych JPG z zawartością ZIP, presety,
+grafiki inline oraz istniejące wzorce eksportu. Dwa starsze kroki testów
+zaktualizowano: nazwę Units & Margins i zastępowanie treści Tiptap wraz z atomami.
+Nie zmieniono wzorców JPG. Dodatkowe 6 testów Storybooka sprawdza Color/Glass
+na prawdziwych zdjęciach poziomym i pionowym oraz eksport pełnych wymiarów.
+
+Podczas oceny prawdziwych zdjęć zmieniono podgląd na buforowanie wyłącznie teł:
+zdjęcie i treść pozostają ostrymi osobnymi elementami, a rozmyte próbki i materiał
+są nakładane jako lokalne dekoracje. Hover i wybór nie generują na nowo kafelków
+Color. Ponowna weryfikacja objęła podgląd, JPG i stories produkcyjne.
+
+pnpm check: 324 testy jednostkowe i build. Build Storybooka przechodzi.
+Nie oznacza to pomiarów pamięci ani gwarancji płynności na każdym urządzeniu;
+wiele dużych nakładających się szkieł wymaga dalszych pomiarów. Bieżący zakres
+teł jest wdrożony; nie wykonano wydania ani zmiany wersji. Separatory pozostają
+odłożone. Ocena wizualna użytkownika nie jest zastępowana commitem.

@@ -93,6 +93,7 @@ export async function exportPhoto(
 }
 
 export interface RenderedCaption {
+  id?: string;
   caption: Caption;
   text: string;
   color: string;
@@ -136,15 +137,39 @@ async function renderPhotoCaptions(
   });
 }
 
-/** Preview rendering uses the same ordered composition as full-resolution JPG. */
-export function renderPhotoCanvas(
+type BackgroundTile = NonNullable<ReturnType<typeof renderBackgroundTile>>;
+
+/** Keep preview rasterization local to the decorations. The photo and caption
+ * remain native sharp nodes in the editor. Returned tiles belong to the caller. */
+export async function renderPhotoBackgrounds(
   image: CanvasImageSource,
   dimensions: ImageDimensions,
   captions: readonly RenderedCaption[],
-): Promise<HTMLCanvasElement> {
-  return withPhotoStage(image, dimensions, captions, (stage) =>
-    stage.toCanvas({ pixelRatio: 1 }),
-  );
+): Promise<Map<number, BackgroundTile>> {
+  const tiles = new Map<number, BackgroundTile>();
+  try {
+    await withPhotoStage(
+      image,
+      dimensions,
+      captions,
+      () => undefined,
+      (index, tile) => {
+        const copy = document.createElement('canvas');
+        copy.width = tile.width;
+        copy.height = tile.height;
+        const context = copy.getContext('2d');
+        if (!context) throw Error('Canvas is unavailable.');
+        context.drawImage(tile.image, 0, 0);
+        tiles.set(index, { ...tile, image: copy });
+      },
+    );
+    return tiles;
+  } catch (error) {
+    tiles.forEach((tile) => {
+      tile.image.width = tile.image.height = 0;
+    });
+    throw error;
+  }
 }
 
 async function withPhotoStage<T>(
@@ -152,6 +177,7 @@ async function withPhotoStage<T>(
   dimensions: ImageDimensions,
   captions: readonly RenderedCaption[],
   consume: (stage: Konva.Stage) => T | Promise<T>,
+  onDecoration?: (index: number, tile: BackgroundTile) => void,
 ): Promise<T> {
   const alphaMatte = getComputedStyle(document.documentElement)
     .getPropertyValue('--color-caption-white')
@@ -186,7 +212,10 @@ async function withPhotoStage<T>(
         height: dimensions.height,
       }),
     );
-    for (const { caption, text, color, icons = [] } of captions) {
+    for (const [
+      index,
+      { caption, text, color, icons = [] },
+    ] of captions.entries()) {
       if (caption.visible === false) continue;
       const geometry = caption.logo
         ? logoLayout(dimensions, caption)
@@ -199,6 +228,7 @@ async function withPhotoStage<T>(
           : null;
       if (background) {
         decorations.push(background.image);
+        onDecoration?.(index, background);
         layer.add(new Konva.Image({ ...background, listening: false }));
       }
       if (caption.logo) {

@@ -72,6 +72,12 @@ Each suffix number identifies a deliberately prepared prerelease, not a commit.
 - **Consistent styling.** Choose from 25 Google Fonts families plus Advercase, supported Bold/Italic variants,
   alignment, line spacing, opacity, quick colors, or a custom HEX color. Size
   content in pixels or as a percentage of the short or long image edge.
+- **Layer backgrounds.** Choose None, Color or Glass in the selected layer inspector.
+  Control base color and opacity, four-sided padding and corner radius. Color
+  backgrounds support a drop shadow with color, opacity, blur, spread and X/Y
+  offsets. Glass blurs the photo and visible lower layers beneath raised shading;
+  its base color, opacity and blur are independent of content opacity. Background
+  settings are included in presets and JPG exports.
 - **Precise margins.** Adjust four margins independently, in pairs, or together
   through the visual margin editor or interactive photo rulers.
 - **Inline logos and artwork.** Set each image height relative to the font or in
@@ -166,6 +172,19 @@ for real image dimensions, and JPG export requires a photo.
 
 Refreshing the page resets unsaved editor state; saved presets can be reapplied
 after importing a photo.
+
+Background padding grows around the existing content position: document margins
+and Manual coordinates continue to position the text/inline artwork. Enabling a
+background does not move content. Backgrounds and shadows can extend into margins
+and are clipped at the photo edge. Empty resolved content has no background;
+None retains its settings without applying padding. Shadows do not enlarge the
+selection area. The layer's padded background does enlarge it.
+
+Glass previews render at screen resolution (up to 1600 pixels on the long edge);
+JPGs use full photo resolution. They share composition and material calculations,
+with normal rasterization and JPG differences. Full glass remains active while
+dragging. Performance with many overlapping glass layers on slower devices still
+needs broader measurement.
 
 ## Limits and export behavior
 

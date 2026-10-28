@@ -18,7 +18,8 @@ when explicitly requested; a commit does not automatically create a release.
   shared padding controls; preview and JPG use the same decoration renderer.
   Glass backgrounds blur the photo and visible lower layers, with independent
   base color/opacity, blur and raised material shading. The editor uses a bounded
-  screen-resolution composition; export uses the same renderer at full resolution.
+  screen-resolution composition for background tiles while retaining the sharp
+  photo and content nodes; export uses the same renderer at full resolution.
   Large blur radii retain their scale instead of hitting the pixel-filter limit.
 
 - Shared selection settings for metadata, icons and SVG/PNG, with a labeled Remove

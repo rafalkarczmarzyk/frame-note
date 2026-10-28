@@ -1201,3 +1201,20 @@ wrapping adds no marker. ProseMirror decorations preserve document text, clipboa
 serialization, selection and export. Toggling is excluded from undo history and
 separates adjacent edit groups. Components/UI/CaptionWhitespace shows spaces,
 empty lines, metadata, icons and a long wrapped line.
+
+### Layer background inspector
+
+BackgroundControls is a plain InspectorSection in the selected layer's lighter
+surface, between Content and Typography. None shows only None/Color/Glass;
+Color and Glass reveal base color/opacity, padding and radius. Glass adds a blur
+field and slider; Color adds an optional Drop shadow group with its own color,
+opacity, blur, spread and offsets. ColorControls and ColorPickerPanel are reused
+for both base and shadow colors. The single Layers disclosure owns list and
+inspector together. No extra disclosure is introduced for Background.
+
+MarginEditor accepts purpose="padding" to reuse its compact four-sided diagram
+and linking controls with padding labels and a zero reset. Padding does not use
+the document-margin hover provider. Production examples live in
+Screens/TestPhotos/ColorLayerBackground, GlassLayerBackground and
+GlassPortraitBackground. Screens/LayerBackground retains earlier proposals;
+CanvasTrial documents the isolated pixel-rendering experiment.

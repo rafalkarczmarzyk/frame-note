@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import type { LoadedPhoto } from '../photo/load-photo';
 import { convertSizing } from '../../domain/sizing';
-import { renderPhotoCanvas, type RenderedCaption } from './render';
+import { renderPhotoBackgrounds, type RenderedCaption } from './render';
+import type { renderBackgroundTile } from './background-render';
+type Tile = NonNullable<ReturnType<typeof renderBackgroundTile>>;
 
 /** A bounded, screen-resolution composition. Requests are coalesced to a frame;
  * outdated results are released and never replace a newer photo's preview. */
@@ -13,7 +15,7 @@ export function useGlassPreview(
 ) {
   const [result, setResult] = useState<{
     photo: LoadedPhoto;
-    canvas: HTMLCanvasElement;
+    tiles: Map<string, Tile>;
   } | null>(null);
   const [failure, setFailure] = useState<{
     photo: LoadedPhoto;
@@ -41,17 +43,29 @@ export function useGlassPreview(
         ...item,
         caption: convertSizing(item.caption, 'short-edge', original),
       }));
-      void renderPhotoCanvas(
+      void renderPhotoBackgrounds(
         photo.previewImage ?? photo.image,
         dimensions,
         scaled,
       ).then(
-        (canvas) => {
+        (backgrounds) => {
           if (cancelled) {
-            canvas.width = canvas.height = 0;
+            backgrounds.forEach((tile) => {
+              tile.image.width = tile.image.height = 0;
+            });
             return;
           }
-          setResult({ photo, canvas });
+          const tiles = new Map<string, Tile>();
+          backgrounds.forEach((tile, index) =>
+            tiles.set(captions[index]!.id ?? String(index), {
+              ...tile,
+              x: (tile.x * original.width) / dimensions.width,
+              y: (tile.y * original.height) / dimensions.height,
+              width: (tile.width * original.width) / dimensions.width,
+              height: (tile.height * original.height) / dimensions.height,
+            }),
+          );
+          setResult({ photo, tiles });
           setFailure(null);
         },
         (error) => {
@@ -76,13 +90,15 @@ export function useGlassPreview(
   // Release results when replaced or unmounted; effects don't clear a canvas
   // while it is still displayed by react-konva.
   useEffect(() => {
-    const canvas = result?.canvas;
+    const tiles = result?.tiles;
     return () => {
-      if (canvas) canvas.width = canvas.height = 0;
+      tiles?.forEach((tile) => {
+        tile.image.width = tile.image.height = 0;
+      });
     };
   }, [result]);
   return {
-    canvas: enabled && result?.photo === photo ? result.canvas : null,
+    tiles: enabled && result?.photo === photo ? result.tiles : null,
     error: enabled && failure?.photo === photo ? failure.message : '',
   };
 }
