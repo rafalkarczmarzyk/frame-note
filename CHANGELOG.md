@@ -9,6 +9,12 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Added
 
+- Layer background data supports None, Color and Glass, independent tint opacity,
+  four-sided padding, corner radius, blur and configurable drop shadows. Settings
+  survive preset roundtrips, duplication and document-unit conversions while
+  retaining the content position. Includes interactive background proposals and
+  a canvas/JPG glass trial with overlapping panels and image-edge checks.
+
 - Shared selection settings for metadata, icons and SVG/PNG, with a labeled Remove
   action instead of overlapping close badges. Icons and images support individual
   relative/fixed heights and top/center/bottom alignment against the text line;
@@ -144,6 +150,8 @@ when explicitly requested; a commit does not automatically create a release.
   the sidebar's scrolling area and leaves Add layer below the rows.
 
 ### Fixed
+
+- Collapsing Layers also collapses the selected layer inspector.
 
 - Photo previews and rulers stay centered in the available workspace above the
   film roll, including when the roll appears or disappears and the window resizes.

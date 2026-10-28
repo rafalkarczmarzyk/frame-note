@@ -1,3 +1,4 @@
+import type { LayerBackground } from './layer-background';
 import { parseIconToken } from './inline-icon';
 import { fontIds } from './fonts';
 import { migrateLogo, parseImageToken } from './inline-image';
@@ -52,6 +53,45 @@ function oneOf<T extends string | number>(
   return value as T;
 }
 
+function parseBackground(value: unknown): LayerBackground {
+  const b = record(value),
+    padding = record(b.padding),
+    shadow = record(b.shadow);
+  const color = (value: unknown) => {
+    const result = text(value, 64);
+    if (
+      !normalizeHex(result) &&
+      !captionColors.some((item) => item.value === result) &&
+      !legacyCaptionColors.some((item) => item === result)
+    )
+      return invalid();
+    return result;
+  };
+  return {
+    type: oneOf(b.type, ['none', 'color', 'glass']),
+    color: color(b.color),
+    opacity: number(b.opacity, 0, 1),
+    padding: {
+      top: number(padding.top, 0),
+      right: number(padding.right, 0),
+      bottom: number(padding.bottom, 0),
+      left: number(padding.left, 0),
+    },
+    paddingLinkMode: oneOf(b.paddingLinkMode, ['none', 'pairs', 'all']),
+    radius: number(b.radius, 0),
+    blur: number(b.blur, 0),
+    shadow: {
+      enabled: typeof shadow.enabled === 'boolean' ? shadow.enabled : invalid(),
+      color: color(shadow.color),
+      opacity: number(shadow.opacity, 0, 1),
+      blur: number(shadow.blur, 0),
+      spread: number(shadow.spread, -1e7),
+      x: number(shadow.x, -1e7),
+      y: number(shadow.y, -1e7),
+    },
+  };
+}
+
 /** Rebuild trusted domain data, discarding unknown fields and validating every SVG. */
 export function parsePreset(
   source: string,
@@ -100,6 +140,9 @@ export function parsePreset(
     const logo = c.logo === undefined ? undefined : record(c.logo);
     return {
       id,
+      ...(c.background === undefined
+        ? {}
+        : { background: parseBackground(c.background) }),
       ...(c.visible === undefined
         ? {}
         : { visible: typeof c.visible === 'boolean' ? c.visible : invalid() }),

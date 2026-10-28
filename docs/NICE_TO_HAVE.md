@@ -57,3 +57,14 @@ polecenia. Nowe decyzje dopisujemy lub aktualizujemy w istniejącym wpisie.
   warstwy podczas redesignu listy: Move up, Move down, Bring to front i Send to back.
   Akcje korzystają z tej samej kolejności co przeciąganie; na krańcach listy
   niedostępne kierunki są wyłączone. Nie dokładamy przycisków do samego wiersza.
+
+## NTH-004 — Separatory poziome w treści warstwy
+
+- **Status:** odłożone do czasu po obsłudze teł.
+- **Data decyzji:** 2026-10-28.
+- **Źródło:** rozmowa o tłach; użytkownik zaakceptował wydzielenie separatorów
+  poza bieżącą implementację.
+- **Pomysł:** linia w osobnym wierszu na pełną szerokość treści warstwy,
+  z ustawieniami wyglądu i odstępów; padding tła pozostaje poza szerokością linii.
+- **Przy powrocie:** ustalić wymiarowanie warstwy zawierającej sam separator.
+  Rozdzielić obrys treści i tła w geometrii. Wpis nie upoważnia do implementacji.

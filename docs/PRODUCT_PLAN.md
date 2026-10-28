@@ -421,3 +421,11 @@ overlay na środku canvasu, bez belki ani zmiany geometrii widoku.
 Po cofnięciu: `pnpm check` (306 testów jednostkowych), build Storybooka oraz
 16/16 testów importu, sesji, eksportu i geometrii overlayu w Chromium/WebKit.
 Wzorce pikseli eksportu pozostały bez zmian.
+
+### Tła warstw — propozycja rozszerzenia
+
+Ustalenia z 2026-10-28, zakres kontrolek, geometria zachowująca pozycję treści,
+próba renderowania Glass i proponowane etapy znajdują się w
+[planie obsługi teł warstw](LAYER_BACKGROUND_PLAN.md). Storybook zawiera
+prototyp interfejsu Screens/LayerBackground. Plan nie oznacza zgody na
+automatyczną implementację kolejnych etapów.

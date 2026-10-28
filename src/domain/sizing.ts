@@ -1,3 +1,4 @@
+import { mapBackgroundLengths } from './layer-background';
 import { iconToken, parseIconToken } from './inline-icon';
 import { imageToken, parseImageToken } from './inline-image';
 import type { Caption, ImageDimensions } from './document';
@@ -58,6 +59,9 @@ export function convertSizing(
   return {
     ...caption,
     sizingUnit: unit,
+    ...(caption.background
+      ? { background: mapBackgroundLengths(caption.background, convert) }
+      : {}),
     template: caption.template.replace(
       /\{((?:image|icon):[^{}]*)\}/gu,
       (original, token: string) => {

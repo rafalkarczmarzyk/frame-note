@@ -22,6 +22,7 @@ import {
 import { createCaption, type ImageDimensions } from '@/domain/document';
 
 export interface MarginEditorProps {
+  purpose?: 'margins' | 'padding';
   value: Margins;
   linkMode: MarginLinkMode;
   unit: SizingUnit;
@@ -35,6 +36,7 @@ export interface MarginEditorProps {
 }
 
 export function MarginEditor({
+  purpose = 'margins',
   value,
   linkMode,
   unit,
@@ -59,10 +61,19 @@ export function MarginEditor({
     },
     [clearHover, clearFocus],
   );
+  const isPadding = purpose === 'padding';
+  const name = isPadding ? 'Padding' : 'Margins';
+  const edgeName = isPadding ? 'padding' : 'margin';
   const compact = appearance === 'compact';
   const limits = marginLimits(value, unit, dimensions, linkMode);
   const resetButton = (
-    <Tooltip content="Reset all margins to 3% of the short edge">
+    <Tooltip
+      content={
+        isPadding
+          ? 'Reset padding to zero'
+          : 'Reset all margins to 3% of the short edge'
+      }
+    >
       <Button
         variant="outline"
         size="sm"
@@ -71,10 +82,14 @@ export function MarginEditor({
             ? 'absolute right-2 bottom-2 z-10 h-6 gap-1 px-1.5 text-xs'
             : 'h-6 gap-1 px-1.5 text-xs'
         }
-        aria-label="Reset margins"
+        aria-label={`Reset ${purpose}`}
         title=""
         disabled={disabled}
         onClick={() => {
+          if (isPadding) {
+            onChange({ top: 0, right: 0, bottom: 0, left: 0 }, linkMode);
+            return;
+          }
           const defaults = convertSizing(createCaption(), unit, dimensions)
             .position.margins;
           onChange(
@@ -90,9 +105,9 @@ export function MarginEditor({
   );
   const linking = (
     <div className="space-y-2">
-      {!compact && <p className="text-xs text-label">Link margins</p>}
+      {!compact && <p className="text-xs text-label">Link {purpose}</p>}
       <SegmentedControl
-        label="Margin linking"
+        label={`${name} linking`}
         value={linkMode}
         disabled={disabled}
         className="w-full"
@@ -103,7 +118,7 @@ export function MarginEditor({
           {
             value: 'none',
             label: compact ? 'Individual' : 'None',
-            tooltip: 'Edit each margin independently',
+            tooltip: `Edit each ${edgeName} independently`,
           },
           {
             value: 'pairs',
@@ -113,7 +128,7 @@ export function MarginEditor({
           {
             value: 'all',
             label: compact ? 'Linked' : 'All',
-            tooltip: 'Link all four margins',
+            tooltip: `Link all four ${edgeName} values`,
           },
         ]}
       />
@@ -123,13 +138,13 @@ export function MarginEditor({
     <fieldset
       disabled={disabled}
       className={cn('min-w-0', compact ? 'space-y-2' : 'space-y-3')}
-      aria-label="Margins"
+      aria-label={name}
     >
       {compact && linking}
       {!compact && (
         <div className="flex items-center justify-between gap-2">
           <div className="margin-model-label text-xs text-label">
-            {hideLabel ? 'Photo margins' : 'Margins'}{' '}
+            {isPadding ? 'Padding' : hideLabel ? 'Photo margins' : 'Margins'}{' '}
             <span className="text-content-muted">({unitLabel})</span>
           </div>
           {resetButton}
@@ -143,7 +158,7 @@ export function MarginEditor({
             {!hideUnitLabel && (
               <span
                 className="absolute top-2 left-2 text-[10px] text-content-muted"
-                aria-label={`Margin unit: ${unitLabel}`}
+                aria-label={`${name} unit: ${unitLabel}`}
               >
                 {unitLabel}
               </span>
@@ -177,7 +192,7 @@ export function MarginEditor({
             }}
           >
             <NumberField
-              tooltip={`${side.charAt(0).toUpperCase() + side.slice(1)} margin`}
+              tooltip={`${side.charAt(0).toUpperCase() + side.slice(1)} ${edgeName}`}
               label={side.charAt(0).toUpperCase() + side.slice(1)}
               hideLabel
               unit={unitLabel}
@@ -194,7 +209,7 @@ export function MarginEditor({
         ))}
         <div
           className="margin-diagram"
-          aria-label="Margin edges"
+          aria-label={`${name} edges`}
           style={{ gridArea: 'center' }}
         >
           <div className="margin-photo" aria-hidden="true">
@@ -208,7 +223,7 @@ export function MarginEditor({
                   focusable="false"
                 />
                 <span className="text-[10px] text-content-secondary">
-                  Caption area
+                  {isPadding ? 'Content area' : 'Caption area'}
                 </span>
               </>
             )}

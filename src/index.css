@@ -313,6 +313,37 @@
   --panel-glass: color-mix(in srgb, var(--panel-base) 98%, transparent);
   --menu-glass: var(--panel-glass);
   --glass-popover: color-mix(in srgb, var(--panel-base) 42%, transparent);
+  /* Storybook layer-background proposal: raised glass material. */
+  --background-concept-glass-highlight: color-mix(
+    in srgb,
+    var(--color-porcelain) 55%,
+    transparent
+  );
+  --background-concept-glass-soft-light: color-mix(
+    in srgb,
+    var(--color-porcelain) 18%,
+    transparent
+  );
+  --background-concept-glass-shade: color-mix(
+    in srgb,
+    var(--color-caption-black) 40%,
+    transparent
+  );
+  --background-concept-glass-reflection: linear-gradient(
+    135deg,
+    var(--background-concept-glass-soft-light),
+    transparent 45%,
+    var(--tone-shadow)
+  );
+  --background-concept-glass-bevel:
+    inset 0 1px 0 var(--background-concept-glass-highlight),
+    inset 1px 0 0 var(--background-concept-glass-soft-light),
+    inset 0 -1px 0 var(--background-concept-glass-shade),
+    inset 0 0 0 1px var(--tone-edge),
+    inset 0 2px 8px var(--background-concept-glass-soft-light);
+  --background-concept-glass-shadow:
+    0 8px 24px var(--background-concept-glass-shade),
+    0 2px 5px var(--tone-shadow);
   --tooltip-glass: color-mix(in srgb, var(--panel-base) 22%, transparent);
   --surface-reflection: linear-gradient(
     to bottom,
