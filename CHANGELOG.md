@@ -14,6 +14,8 @@ when explicitly requested; a commit does not automatically create a release.
   survive preset roundtrips, duplication and document-unit conversions while
   retaining the content position. Includes interactive background proposals and
   a canvas/JPG glass trial with overlapping panels and image-edge checks.
+  The selected layer inspector exposes Color backgrounds and drop shadows with
+  shared padding controls; preview and JPG use the same decoration renderer.
 
 - Shared selection settings for metadata, icons and SVG/PNG, with a labeled Remove
   action instead of overlapping close badges. Icons and images support individual

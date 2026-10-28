@@ -162,3 +162,11 @@ Wdrożone: opcjonalne ustawienia tła, walidacja presetów, przeliczanie wszystk
 wymiarów i niezależne duplikowanie. None zachowuje ustawienia. Padding
 rozszerza wyłącznie obrys dekoracji; pusta treść nie zostawia panelu.
 Użytkownik zlecił kontynuowanie kolejnych etapów po szybkiej weryfikacji i commicie.
+
+### Etap 3 — Color i Drop shadow
+
+Kontrolki w jaśniejszej sekcji warstwy; None ograniczone do wyboru typu.
+Kolor, opacity, wspólny MarginEditor dla paddingu, radius i cień z kolorem,
+opacity, blur, spread i przesunięciami działają w podglądzie i JPG.
+Obrys wyboru obejmuje padding, punkt pozycjonowania pozostaje przy treści.
+Edycja paddingu nie podświetla linijek marginesów dokumentu.
