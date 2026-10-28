@@ -23,8 +23,10 @@ export function AppHeader({
           className="control-button control-height inline-flex min-w-10 shrink-0 items-center justify-center px-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring"
           onClick={() => setAboutOpen(true)}
         >
-          <FrameNoteLogo className="hidden h-[22px] w-auto sm:block" />
-          <FrameNoteIcon className="size-[22px] sm:hidden" />
+          <span className="inline-flex shrink-0 items-center">
+            <FrameNoteLogo className="hidden h-[22px] w-auto sm:block" />
+            <FrameNoteIcon className="size-[22px] sm:hidden" />
+          </span>
         </button>
       </Tooltip>
       {aboutOpen && <AboutSplash onClose={() => setAboutOpen(false)} />}
@@ -48,11 +50,7 @@ export function AppHeader({
           />
         </div>
       </div>
-      {children && (
-        <div className="flex shrink-0 items-center border-l border-border-subtle pl-2 sm:pl-3">
-          {children}
-        </div>
-      )}
+      {children && <div className="flex shrink-0 items-center">{children}</div>}
     </header>
   );
 }

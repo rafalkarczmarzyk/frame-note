@@ -1233,3 +1233,18 @@ Button, IconButton and segmented buttons share icon sizing: 14 px standalone,
 12 px inside shared groups for labeled buttons. IconButton uses 18 px standalone
 and 16 px in groups. Icons never shrink with available flex space.
 AnchorPicker retains its separate 3 × 3 geometry and 16 px icons.
+
+### Shared badges
+
+`Badge` owns compact, non-interactive labels throughout the application. Its
+`tone` options are muted (asset formats and selection labels), neutral (editor
+values and missing graphics), warning (recognized metadata without a value),
+error (unknown metadata), accent and inverse. All colors use
+shared semantic tokens in index.css; features do not define local badge palettes.
+Sizes are sm, md and token (32 px editor elements).
+`asChild` applies the same appearance to Tiptap's NodeViewWrapper without adding
+an editor DOM wrapper. Token selection, dragging, clipboard and export remain
+owned by the editor. Margin handle labels are dedicated positioning controls,
+not badges; they keep their original geometry and styling. Filters and tooltips
+retain their existing components.
+Storybook: Components/UI/Badge — Default, Colors, ApplicationExamples and AsChild.

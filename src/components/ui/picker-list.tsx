@@ -1,3 +1,4 @@
+import { Badge } from './badge';
 import { Tooltip } from './tooltip';
 import { edgeScrollSpeed, scrollAncestor } from '@/lib/drag-scroll';
 import {
@@ -278,8 +279,8 @@ export function PickerList({
             )}
             <Tooltip
               disabled={!item.tooltip || !!drag}
-              content="Drag to reorder layers"
-              overflowContent={item.tooltip?.slice(0, 500)}
+              content={onMove ? 'Drag to reorder layers' : item.tooltip}
+              overflowContent={onMove ? item.tooltip?.slice(0, 500) : undefined}
             >
               <button
                 type="button"
@@ -326,10 +327,10 @@ export function PickerList({
                     <span className="shrink-0">{item.trailing}</span>
                   )}
                   {item.selected && selectedLabel && (
-                    <span className="flex shrink-0 items-center gap-1 text-[10px]">
+                    <Badge className="shrink-0">
                       <Check aria-hidden="true" className="size-3.5" />
                       {selectedLabel}
-                    </span>
+                    </Badge>
                   )}
                 </span>
                 {item.description && (

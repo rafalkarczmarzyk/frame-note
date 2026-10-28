@@ -1,3 +1,4 @@
+import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FloatingPanel } from '@/components/layout/floating-panel';
@@ -64,8 +65,9 @@ export function GraphicsPickerPanel({
         ['Built-in', 'Your SVGs'].map((group) => {
           const items = icons.filter(
             (icon) =>
+              icon.name !== 'framenote-logo' &&
               builtinIcons.some((builtin) => builtin.name === icon.name) ===
-              (group === 'Built-in'),
+                (group === 'Built-in'),
           );
           if (!items.length) return null;
           return (
@@ -121,12 +123,13 @@ export function GraphicsPickerPanel({
               items={assets.map((asset) => ({
                 id: asset.id,
                 label: asset.name,
-                description: `${asset.format.toUpperCase()} · Insert at text cursor`,
-                leading: (
+                tooltip: asset.name,
+                trailing: <Badge>{asset.format.toUpperCase()}</Badge>,
+                content: (
                   <img
                     src={imageSource(asset)}
                     alt=""
-                    className="h-10 w-24 shrink-0 object-contain"
+                    className="h-16 w-full object-contain object-left"
                   />
                 ),
               }))}

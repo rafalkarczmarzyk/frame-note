@@ -1,3 +1,4 @@
+import { Badge } from '@/components/ui/badge';
 import { parseIconToken } from '@/domain/inline-icon';
 import { Tag, TriangleAlert } from 'lucide-react';
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
@@ -63,10 +64,14 @@ export function LayerContentPreview({
           (token.startsWith('image:')
             ? 'Missing image'
             : token.replace(/^icon:/u, ''));
+        const Token = isGraphic ? 'span' : Badge;
         return (
-          <span
+          <Token
             key={index}
-            className={`inline-flex h-6 max-w-full items-center gap-1 ${isGraphic ? '' : `control-neutral rounded px-1.5 ${missing ? 'border border-dashed' : ''}`}`}
+            {...(!isGraphic
+              ? { tone: 'neutral' as const, size: 'md' as const }
+              : {})}
+            className={`inline-flex h-6 max-w-full items-center gap-1 ${isGraphic ? '' : `py-0 font-normal ${missing ? 'border-dashed' : ''}`}`}
             data-layer-token={token}
             data-missing={missing || undefined}
           >
@@ -113,7 +118,7 @@ export function LayerContentPreview({
             {(!isGraphic || missing || nodes.length === 1) && (
               <span className="truncate">{name}</span>
             )}
-          </span>
+          </Token>
         );
       })}
     </PreviewFlow>

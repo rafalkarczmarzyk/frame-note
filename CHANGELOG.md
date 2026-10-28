@@ -9,6 +9,10 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Added
 
+- Supplied macro photography icon in the built-in icon picker and Storybook.
+- Shared Badge component with semantic colors and sizes for asset formats,
+  metadata statuses, editor tokens, layer summaries and selection labels.
+
 - Layer background data supports None, Color and Glass, independent tint opacity,
   four-sided padding, corner radius, blur and configurable drop shadows. Settings
   survive preset roundtrips, duplication and document-unit conversions while
@@ -115,6 +119,12 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Changed
 
+- Graphics include the FrameNote wordmark alongside Canon, with larger previews,
+  names in tooltips and format badges at the end of each row. The standalone
+  FrameNote symbol remains in Icons.
+- Removed the separator before Export JPG. The export menu arrow stays enabled
+  while unavailable actions are disabled inside its menu.
+
 - Icon and color pickers use three-column button grids with larger previews.
   Icon names sit below the artwork, truncate to one line and remain available
   in tooltips; token syntax is hidden. Palette rows fit their swatches and labels
@@ -183,6 +193,10 @@ when explicitly requested; a commit does not automatically create a release.
   the sidebar's scrolling area and leaves Add layer below the rows.
 
 ### Fixed
+
+- Header branding retains its intended proportions instead of inheriting small
+  button-icon dimensions. Margin letters sit against their triangle bases,
+  forming connected handles on the rulers rather than separate photo overlays.
 
 - Selected inline elements and multi-selected tokens render their editor outlines
   above adjacent badges and graphics.
