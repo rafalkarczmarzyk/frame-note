@@ -1,3 +1,4 @@
+import { metadataTokenStatus } from '../caption/editor/token-status';
 import type { SessionDocument } from './session-document';
 import type { RollExportOptions } from './export-roll';
 import { SplitButton } from '@/components/ui/split-button';
@@ -342,6 +343,21 @@ function PhotoWorkspaceContent({
     fields,
     icons,
     settings.images,
+  );
+  const metadataValues = Object.fromEntries(
+    fields.map((field) => [field.key, field.displayValue]),
+  );
+  const missingGraphics = resolved.missing.filter(
+    (key) => key.startsWith('icon:') || key.startsWith('image:'),
+  );
+  const missingMetadata = resolved.missing.filter(
+    (key) => !missingGraphics.includes(key),
+  );
+  const emptyFields = missingMetadata.filter(
+    (key) => metadataTokenStatus(key, metadataValues) === 'empty',
+  );
+  const unknownFields = missingMetadata.filter(
+    (key) => metadataTokenStatus(key, metadataValues) === 'absent',
   );
   const { containers, sizingUnit, margins, marginLinkMode } = layout;
   const composition = useMemo(
@@ -1181,14 +1197,15 @@ function PhotoWorkspaceContent({
                       actions={
                         <>
                           <Tooltip content="Insert photo metadata at the text cursor">
-                            <Button
-                              variant="outline"
-                              size="sm"
+                            <button
+                              type="button"
+                              className="control-segment flex h-7 min-w-0 items-center justify-center gap-1 px-2 text-xs [&_svg]:size-4"
                               aria-label={
                                 tagsOpen
                                   ? 'Hide available tags'
                                   : 'Browse available tags'
                               }
+                              data-state={tagsOpen ? 'on' : 'off'}
                               aria-expanded={tagsOpen}
                               aria-controls="auxiliary-panel"
                               onClick={() =>
@@ -1199,13 +1216,16 @@ function PhotoWorkspaceContent({
                             >
                               <Tags aria-hidden="true" />
                               Metadata
-                            </Button>
+                            </button>
                           </Tooltip>
                           <Tooltip content="Insert a built-in or uploaded SVG icon">
-                            <Button
-                              variant="outline"
-                              size="sm"
+                            <button
+                              type="button"
+                              className="control-segment flex h-7 min-w-0 items-center justify-center gap-1 px-2 text-xs [&_svg]:size-4"
                               aria-label="Browse icons"
+                              data-state={
+                                activePanel === 'icons' ? 'on' : 'off'
+                              }
                               aria-expanded={activePanel === 'icons'}
                               onClick={() =>
                                 setActivePanel((value) =>
@@ -1215,22 +1235,58 @@ function PhotoWorkspaceContent({
                             >
                               <Shapes aria-hidden="true" />
                               Icons
-                            </Button>
+                            </button>
                           </Tooltip>
                         </>
                       }
                     />
-                    {photo &&
-                      settings.visible !== false &&
-                      (resolved.missing.length > 0 ||
-                        resolved.invalidSyntax) && (
-                        <p className="mt-2 text-xs" role="status">
-                          {resolved.invalidSyntax ? 'Check token syntax. ' : ''}
-                          {resolved.missing.length
-                            ? `Missing fields: ${resolved.missing.join(', ')}`
-                            : ''}
-                        </p>
-                      )}
+                    {(resolved.missing.length > 0 ||
+                      resolved.invalidSyntax) && (
+                      <div className="mt-2 space-y-2 text-xs" role="status">
+                        {emptyFields.length > 0 && (
+                          <div className="flex flex-wrap items-center gap-1.5 text-notice-warning">
+                            <span>Empty:</span>
+                            {emptyFields.map((field) => (
+                              <span
+                                key={field}
+                                data-value-status="empty"
+                                className="metadata-issue-badge min-w-0 rounded border px-1.5 py-0.5 break-all"
+                              >
+                                {field}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {unknownFields.length > 0 && (
+                          <div className="flex flex-wrap items-center gap-1.5 text-notice-error">
+                            <span>Unknown:</span>
+                            {unknownFields.map((field) => (
+                              <span
+                                key={field}
+                                data-value-status="absent"
+                                className="metadata-issue-badge min-w-0 rounded border px-1.5 py-0.5 break-all"
+                              >
+                                {field}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {missingGraphics.length > 0 && (
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span>Missing images or icons:</span>
+                            {missingGraphics.map((field) => (
+                              <span
+                                key={field}
+                                className="control-neutral min-w-0 rounded px-1.5 py-0.5 break-all"
+                              >
+                                {field}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {resolved.invalidSyntax && <p>Check token syntax.</p>}
+                      </div>
+                    )}
                   </InspectorSection>
                 </>
                 <CaptionControls

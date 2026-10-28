@@ -9,6 +9,12 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Added
 
+- Metadata badges distinguish absent tags in red from recognized fields or helpers
+  returning no value in yellow. Compact Empty/Unknown summaries show individual
+  field badges below the editor; value tooltips display only the resolved text.
+  Content insertion uses a full-width Add row with grouped Metadata, Icons and
+  Image actions.
+
 - Multi-photo sessions with independent layouts, artwork and preset selections.
   An SVG film roll appears below the canvas for two or more photos, supports
   horizontal browsing with the mouse wheel and restores each photo's edits.

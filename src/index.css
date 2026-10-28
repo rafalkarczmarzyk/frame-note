@@ -74,6 +74,7 @@
   --color-violet: #731dd8;
   --color-turquoise: #00bfb3;
   --color-yellow: #ffd400;
+  --color-red: #ff8585;
   --color-crimson: #ef233c;
   --color-rose-brown: #8b635c;
 }
@@ -279,6 +280,27 @@
   --menu-text: var(--content-primary);
   --accent-color: var(--color-emerald);
   --notice-warning: var(--color-yellow);
+  --notice-error: var(--color-red);
+  --token-warning-border: color-mix(
+    in srgb,
+    var(--notice-warning) 65%,
+    transparent
+  );
+  --token-warning-base: color-mix(
+    in srgb,
+    var(--notice-warning) 12%,
+    var(--panel-base)
+  );
+  --token-error-border: color-mix(
+    in srgb,
+    var(--notice-error) 65%,
+    transparent
+  );
+  --token-error-base: color-mix(
+    in srgb,
+    var(--notice-error) 12%,
+    var(--panel-base)
+  );
   --drop-base: var(--color-charcoal-dark);
   --drop-glass: color-mix(in srgb, var(--color-caption-black) 40%, transparent);
   --drop-text: var(--color-porcelain);
@@ -386,6 +408,7 @@
   --color-menu-text: var(--menu-text);
   --color-accent-color: var(--accent-color);
   --color-notice-warning: var(--notice-warning);
+  --color-notice-error: var(--notice-error);
   --color-drop-base: var(--drop-base);
   --color-drop-text: var(--drop-text);
   --color-drop-secondary: var(--drop-secondary);
@@ -1084,4 +1107,19 @@ fieldset:disabled .glass-switch {
   [data-picker-row]:has([data-picker-choice][aria-pressed='true'])
   [role='img'] {
   color: inherit;
+}
+
+/* Metadata badges distinguish absent fields from recognized, empty values. */
+.caption-token[data-value-status='empty'],
+.metadata-issue-badge[data-value-status='empty'] {
+  color: var(--notice-warning);
+  border-color: var(--token-warning-border);
+  background: var(--token-warning-base);
+}
+
+.caption-token[data-value-status='absent'],
+.metadata-issue-badge[data-value-status='absent'] {
+  color: var(--notice-error);
+  border-color: var(--token-error-border);
+  background: var(--token-error-base);
 }

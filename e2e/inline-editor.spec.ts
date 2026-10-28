@@ -94,6 +94,6 @@ test('uploads SVG, edits atomic tokens, round-trips the clipboard and exports a 
     'true',
   );
   await expect(
-    page.getByRole('status').filter({ hasText: 'Missing fields:' }),
+    page.getByRole('status').filter({ hasText: 'Missing images or icons:' }),
   ).toContainText('icon:absent');
 });
