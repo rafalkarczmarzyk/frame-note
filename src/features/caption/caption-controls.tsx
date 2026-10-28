@@ -195,7 +195,7 @@ export function CaptionControls({
                       max={
                         Math.max(dimensions.width, dimensions.height) / factor
                       }
-                      step={0.25}
+                      step={0.1}
                       disabled={disabled}
                       onValueChange={(fontSize) => style({ fontSize })}
                     />

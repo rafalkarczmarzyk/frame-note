@@ -8,7 +8,7 @@ import {
   Ruler,
 } from 'lucide-react';
 import { Tooltip } from '@/components/ui/tooltip';
-import { RangeField } from '@/components/ui/range-field';
+import { NumberField } from '@/components/ui/number-field';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import type { VerticalAlignment as Alignment } from '@/domain/inline-icon';
 export function ElementSizeSettings({
@@ -31,54 +31,64 @@ export function ElementSizeSettings({
   return (
     <div className="space-y-3">
       <div className="space-y-2">
-        <SegmentedControl
-          className="[&_button]:px-1"
-          label="Sizing"
-          value={unit}
-          onValueChange={onUnit}
-          options={[
-            {
-              value: 'font',
-              label: 'Relative to font',
-              content: (
-                <>
+        <div className="grid grid-cols-[1rem_minmax(0,1fr)] items-center gap-2">
+          <Tooltip content="Element height">
+            <MoveVertical
+              aria-label="Height"
+              className="size-4 text-content-secondary"
+            />
+          </Tooltip>
+          <div className="control-field flex min-w-0 items-center gap-1 p-1">
+            <div
+              role="group"
+              aria-label="Sizing"
+              className="flex min-w-0 flex-[1.1] items-center gap-1"
+            >
+              <Tooltip content="Scale the element with the layer’s font size">
+                <button
+                  type="button"
+                  aria-label="Relative to font"
+                  aria-pressed={unit === 'font'}
+                  onClick={() => onUnit('font')}
+                  className={`control-segment flex h-9 min-w-0 flex-1 items-center justify-center gap-1 px-1 text-xs [&_svg]:size-4 ${unit === 'font' ? 'control-selected' : ''}`}
+                >
                   <Type aria-hidden="true" />
                   Relative
-                </>
-              ),
-              tooltip: 'Scale the element with the layer’s font size',
-            },
-            {
-              value: 'document',
-              label: 'Fixed height',
-              content: (
-                <>
+                </button>
+              </Tooltip>
+              <Tooltip content="Keep a fixed height in document units">
+                <button
+                  type="button"
+                  aria-label="Fixed height"
+                  aria-pressed={unit === 'document'}
+                  onClick={() => onUnit('document')}
+                  className={`control-segment flex h-9 min-w-0 flex-1 items-center justify-center gap-1 px-1 text-xs [&_svg]:size-4 ${unit === 'document' ? 'control-selected' : ''}`}
+                >
                   <Ruler aria-hidden="true" />
                   Fixed
-                </>
-              ),
-              tooltip: 'Keep a fixed height in document units',
-            },
-          ]}
-        />
+                </button>
+              </Tooltip>
+            </div>
+            <div className="min-w-0 flex-1">
+              <NumberField
+                label="Image height"
+                hideLabel
+                tooltip={
+                  unit === 'font'
+                    ? 'Element height as a multiple of the layer’s font size'
+                    : `Element height in ${documentUnit}`
+                }
+                value={height}
+                onValueChange={onHeight}
+                min={unit === 'font' ? 0.25 : documentUnit === 'px' ? 1 : 0.1}
+                max={1e7}
+                step={unit === 'font' ? 0.1 : documentUnit === 'px' ? 1 : 0.1}
+                unit={unit === 'font' ? '×' : documentUnit}
+              />
+            </div>
+          </div>
+        </div>
       </div>
-      <RangeField
-        label="Image height"
-        inputLabel="Image height"
-        icon={<MoveVertical className="size-4" aria-hidden="true" />}
-        tooltip={
-          unit === 'font'
-            ? 'Element height as a multiple of the layer’s font size'
-            : `Element height in ${documentUnit}`
-        }
-        value={height}
-        onValueChange={onHeight}
-        min={unit === 'font' ? 0.25 : documentUnit === 'px' ? 1 : 0.1}
-        max={1e7}
-        sliderMax={unit === 'font' ? 4 : documentUnit === 'px' ? 256 : 10}
-        step={unit === 'font' ? 0.25 : documentUnit === 'px' ? 1 : 0.1}
-        unit={unit === 'font' ? '×' : documentUnit}
-      />
       <div
         style={{
           display: 'grid',
