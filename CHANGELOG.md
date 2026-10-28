@@ -35,7 +35,10 @@ when explicitly requested; a commit does not automatically create a release.
   and more space between lines. The Content toolbar groups icon selection and
   SVG/PNG graphics in a shared panel, with Icons and Graphics tabs, an upload
   action, and a built-in Canon logo. Inline graphic badges keep the same height
-  regardless of their output size.
+  regardless of their output size. Graphic sizing uses a full-width slider and
+  numeric field; clicking a graphic keeps its green editor outline without the
+  browser’s blue selection highlight, while drag selection across text and
+  graphics remains available. The replace action is labeled “Replace graphic.”
 - Formatting marks are visible by default in Content: centered space dots and
   clear line-break arrows distinguish real breaks from visual wrapping. A Pilcrow
   toggle beside the insertion actions hides them without changing caption text,

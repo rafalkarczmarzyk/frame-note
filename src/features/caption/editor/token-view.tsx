@@ -1,4 +1,5 @@
 import { parseIconToken } from '@/domain/inline-icon';
+import { NodeSelection } from '@tiptap/pm/state';
 import { metadataTokenStatus } from './token-status';
 import { Tooltip } from '@/components/ui/tooltip';
 import { parseImageToken } from '@/domain/inline-image';
@@ -63,8 +64,17 @@ export function TokenView({
         onClick={(event: MouseEvent<HTMLSpanElement>) => {
           if (event.shiftKey) return;
           const position = getPos();
-          if (typeof position === 'number')
+          if (typeof position === 'number') {
             editor.chain().focus().setNodeSelection(position).run();
+            requestAnimationFrame(() => {
+              const selection = editor.state.selection;
+              if (
+                selection instanceof NodeSelection &&
+                selection.from === position
+              )
+                editor.view.dom.ownerDocument.getSelection()?.removeAllRanges();
+            });
+          }
         }}
         data-token={token}
         data-missing={missing || undefined}

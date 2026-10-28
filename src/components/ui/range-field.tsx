@@ -11,6 +11,7 @@ export function RangeField({
   min = 0,
   max = 100,
   step = 1,
+  sliderMax,
   unit,
   disabled = false,
   inputLabel = `${label} value`,
@@ -23,6 +24,7 @@ export function RangeField({
   min?: number;
   max?: number;
   step?: number;
+  sliderMax?: number;
   unit?: string;
   disabled?: boolean;
   inputLabel?: string;
@@ -39,10 +41,10 @@ export function RangeField({
       <Tooltip content={tooltip}>
         <Slider
           label={label}
-          value={value}
+          value={Math.max(min, Math.min(value, sliderMax ?? max))}
           onValueChange={onValueChange}
           min={min}
-          max={max}
+          max={sliderMax ?? max}
           step={step}
           disabled={disabled}
         />

@@ -1,7 +1,7 @@
 import { ElementSizeSettings } from './element-size-settings';
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Camera, Image, Tag, Trash2 } from 'lucide-react';
+import { Camera, Image, Replace, Tag, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 
@@ -187,7 +187,8 @@ function Proposal({
               )}
               {(kind === 'svg' || kind === 'png') && (
                 <Button variant="outline" size="sm" className="w-full" disabled>
-                  Replace image…
+                  <Replace aria-hidden="true" />
+                  Replace graphic
                 </Button>
               )}
             </>
