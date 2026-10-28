@@ -35,7 +35,7 @@ export function PresetToolbar({
       aria-label="Layout presets"
       data-preset-live={live || undefined}
     >
-      <div className="w-28 min-w-0 sm:w-44 lg:w-56 [&_button]:h-8 [&_button>span:first-child]:truncate">
+      <div className="w-28 min-w-0 sm:w-44 lg:w-56 [&_button>span:first-child]:truncate">
         <Tooltip
           overflowOnly
           content={

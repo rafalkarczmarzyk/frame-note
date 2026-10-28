@@ -35,7 +35,7 @@ export function Select({
     >
       <SelectPrimitive.Trigger
         {...props}
-        className="control-field flex h-9 w-full min-w-0 items-center justify-between gap-2 px-3 text-left text-xs"
+        className="control-field control-height flex w-full min-w-0 items-center justify-between gap-2 px-3 text-left text-xs"
       >
         <SelectPrimitive.Value
           data-tooltip-truncate

@@ -12,10 +12,11 @@ export function IconButton({
   const button = (
     <button
       type="button"
+      data-button-content="icon"
       aria-label={label}
       title=""
       className={cn(
-        'control-button control-quiet inline-flex size-8 shrink-0 items-center justify-center text-current [&_svg]:size-4',
+        'control-button control-quiet inline-flex control-height min-w-10 shrink-0 items-center justify-center px-2 text-current',
         className,
       )}
       {...props}

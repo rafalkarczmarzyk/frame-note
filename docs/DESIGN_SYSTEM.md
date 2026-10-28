@@ -1218,3 +1218,18 @@ the document-margin hover provider. Production examples live in
 Screens/TestPhotos/ColorLayerBackground, GlassLayerBackground and
 GlassPortraitBackground. Screens/LayerBackground retains earlier proposals;
 CanvasTrial documents the isolated pixel-rendering experiment.
+
+### Control sizing
+
+Standalone buttons, fields, selects and inline layout rows are 36 px high.
+`InlineInputGroup` aligns controls without resizing its descendants. A shared
+`control-segments` surface is also 36 px high, with 4 px padding and 28 px
+immediate child controls. Adjacent groups keep their own outer height. Nested
+segments in the element-sizing surface occupy its 28 px inner area without
+adding another surface or padding. Numeric steppers remain subdivisions of their
+input rather than full-height group buttons.
+
+Button, IconButton and segmented buttons share icon sizing: 14 px standalone,
+12 px inside shared groups for labeled buttons. IconButton uses 18 px standalone
+and 16 px in groups. Icons never shrink with available flex space.
+AnchorPicker retains its separate 3 × 3 geometry and 16 px icons.

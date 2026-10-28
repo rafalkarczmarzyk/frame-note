@@ -63,7 +63,7 @@ function PrototypeLogoView({
         <IconButton
           label={`Remove ${label}`}
           draggable={false}
-          className="absolute -top-2 -right-2 size-4 rounded-full border border-panel-border bg-panel-base text-content-primary [&_svg]:size-2.5"
+          className="absolute -top-2 -right-2 control-height min-w-10 rounded border border-panel-border bg-panel-base px-2 text-content-primary"
           onMouseDown={(event) => {
             event.preventDefault();
             event.stopPropagation();

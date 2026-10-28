@@ -102,89 +102,91 @@ export function ColorControls({
     };
   }, [open]);
   return (
-    <div
-      role="group"
-      aria-label="Color"
-      className="control-segments flex w-full min-w-0 items-center gap-1 p-1"
-    >
-      {quickColors.map((color) => (
-        <Tooltip key={color} content={captionColorLabel(color)}>
+    <>
+      <div
+        role="group"
+        aria-label="Color"
+        className="control-segments flex control-height w-full min-w-0 items-center gap-1 px-1"
+      >
+        {quickColors.map((color) => (
+          <Tooltip key={color} content={captionColorLabel(color)}>
+            <button
+              type="button"
+              aria-label={captionColorLabel(color)}
+              aria-pressed={source === 'quick' && value === color}
+              disabled={disabled}
+              onClick={() => {
+                popup.current?.hidePopover();
+                markSource('quick', color);
+                onChange(color);
+              }}
+              className={`control-segment flex h-full min-w-0 flex-1 items-center justify-center ${source === 'quick' && value === color ? 'control-selected' : ''}`}
+            >
+              <ColorSwatch value={color} className="size-6" />
+            </button>
+          </Tooltip>
+        ))}
+        <Tooltip
+          content={`Custom color · ${normalizeHex(resolvedColor(value)) ?? resolvedColor(value)}`}
+        >
           <button
+            ref={trigger}
             type="button"
-            aria-label={captionColorLabel(color)}
-            aria-pressed={source === 'quick' && value === color}
+            className={`control-segment flex h-full min-w-0 flex-1 items-center justify-center ${source === 'custom' ? 'control-selected' : ''}`}
+            aria-pressed={source === 'custom'}
+            aria-label="Custom color"
+            data-color-value={value}
+            aria-haspopup="dialog"
+            aria-expanded={open}
+            aria-controls={id}
             disabled={disabled}
             onClick={() => {
-              popup.current?.hidePopover();
-              markSource('quick', color);
-              onChange(color);
+              if (open) {
+                close();
+                return;
+              }
+              setDraft({ value, text: resolvedColor(value) });
+              setError('');
+              const box = trigger.current!.getBoundingClientRect();
+              setPosition({
+                left: Math.max(
+                  8,
+                  Math.min(box.right - 288, window.innerWidth - 296),
+                ),
+                top: Math.max(
+                  8,
+                  Math.min(box.bottom + 8, window.innerHeight - 370),
+                ),
+              });
+              popup.current?.showPopover();
             }}
-            className={`control-segment flex h-8 min-w-0 flex-1 items-center justify-center ${source === 'quick' && value === color ? 'control-selected' : ''}`}
           >
-            <ColorSwatch value={color} className="size-6" />
+            <span
+              aria-hidden="true"
+              className="color-spectrum size-6 rounded-full"
+            />
           </button>
         </Tooltip>
-      ))}
-      <Tooltip
-        content={`Custom color · ${normalizeHex(resolvedColor(value)) ?? resolvedColor(value)}`}
-      >
-        <button
-          ref={trigger}
-          type="button"
-          className={`control-segment flex h-8 min-w-0 flex-1 items-center justify-center ${source === 'custom' ? 'control-selected' : ''}`}
-          aria-pressed={source === 'custom'}
-          aria-label="Custom color"
-          data-color-value={value}
-          aria-haspopup="dialog"
-          aria-expanded={open}
-          aria-controls={id}
-          disabled={disabled}
-          onClick={() => {
-            if (open) {
-              close();
-              return;
-            }
-            setDraft({ value, text: resolvedColor(value) });
-            setError('');
-            const box = trigger.current!.getBoundingClientRect();
-            setPosition({
-              left: Math.max(
-                8,
-                Math.min(box.right - 288, window.innerWidth - 296),
-              ),
-              top: Math.max(
-                8,
-                Math.min(box.bottom + 8, window.innerHeight - 370),
-              ),
-            });
-            popup.current?.showPopover();
-          }}
-        >
-          <span
-            aria-hidden="true"
-            className="color-spectrum size-6 rounded-full"
-          />
-        </button>
-      </Tooltip>
-      <Tooltip content="Color palette">
-        <button
-          type="button"
-          className={`control-segment flex h-8 min-w-0 flex-1 items-center justify-center ${source === 'palette' ? 'control-selected' : ''}`}
-          aria-pressed={source === 'palette'}
-          aria-label="Color"
-          aria-haspopup="dialog"
-          disabled={disabled}
-          onClick={(event) => {
-            popup.current?.hidePopover();
-            event.currentTarget.focus({ preventScroll: true });
-            onBrowse();
-          }}
-        >
-          <span className="flex size-7 items-center justify-center rounded-full border border-panel-border bg-button-secondary-base">
-            <Palette aria-hidden="true" className="size-5" />
-          </span>
-        </button>
-      </Tooltip>
+        <Tooltip content="Color palette">
+          <button
+            type="button"
+            className={`control-segment flex h-full min-w-0 flex-1 items-center justify-center ${source === 'palette' ? 'control-selected' : ''}`}
+            aria-pressed={source === 'palette'}
+            aria-label="Color"
+            aria-haspopup="dialog"
+            disabled={disabled}
+            onClick={(event) => {
+              popup.current?.hidePopover();
+              event.currentTarget.focus({ preventScroll: true });
+              onBrowse();
+            }}
+          >
+            <span className="flex size-7 items-center justify-center rounded-full border border-panel-border bg-button-secondary-base">
+              <Palette aria-hidden="true" className="size-5" />
+            </span>
+          </button>
+        </Tooltip>
+      </div>
       <div
         ref={popup}
         id={id}
@@ -256,6 +258,6 @@ export function ColorControls({
           </Field>
         </div>
       </div>
-    </div>
+    </>
   );
 }

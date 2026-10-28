@@ -79,7 +79,7 @@ export function TokenView({
         data-token={token}
         data-missing={missing || undefined}
         data-value-status={status}
-        className={`caption-token relative inline-flex h-8 cursor-grab items-center gap-1.5 rounded px-2 py-1 align-middle text-xs leading-none text-content-primary control-neutral ${selected ? 'outline-2 outline-input-focus-ring' : ''}`}
+        className={`caption-token relative inline-flex h-8 cursor-grab items-center gap-1.5 rounded px-2 py-1 align-middle text-xs leading-none text-content-primary control-neutral ${selected ? 'z-10 outline-2 outline-input-focus-ring' : ''}`}
       >
         {missing ? (
           <TriangleAlert

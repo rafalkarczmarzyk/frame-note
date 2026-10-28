@@ -232,7 +232,7 @@ export function PickerList({
             data-reorder-handle=""
             aria-label={`Reorder layer ${index + 1}`}
             aria-describedby={helpId}
-            className="control-button inline-flex shrink-0 cursor-grab touch-none items-center justify-center rounded p-1 text-content-secondary active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-input-focus-ring"
+            className="control-button control-height inline-flex min-w-10 shrink-0 cursor-grab touch-none items-center justify-center rounded px-2 text-content-secondary active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-input-focus-ring"
             {...reorderProps}
           >
             <GripVertical aria-hidden="true" className="size-3.5" />
@@ -260,10 +260,10 @@ export function PickerList({
               />
             )}
             {controlsLayout === 'grid' ? (
-              <div className="grid shrink-0 grid-cols-2 gap-0 p-1 [&_button]:size-7">
+              <div className="picker-controls-grid grid shrink-0 grid-cols-2 gap-0 p-1">
                 {grip}
                 {item.controlsLeft}
-                <span className="flex size-7 items-center justify-center">
+                <span className="flex control-height min-w-10 items-center justify-center">
                   {item.trailing}
                 </span>
                 {item.actions}
@@ -299,7 +299,7 @@ export function PickerList({
                   }
                   onChoose(item.id);
                 }}
-                className={`control-button ${item.muted ? 'text-content-muted' : ''} block min-w-0 flex-1 rounded-lg ${appearance === 'compact' ? 'h-10 px-1' : item.content ? 'px-1 py-2' : density === 'dense' ? 'px-3 py-2' : 'p-3'} ${reorderHandle === 'row' ? 'cursor-grab touch-none active:cursor-grabbing' : ''} text-left ${selectionTone === 'default' ? 'aria-pressed:text-accent-color' : ''}`}
+                className={`control-button ${item.muted ? 'text-content-muted' : ''} block min-w-0 flex-1 rounded-lg ${appearance === 'compact' ? 'control-height px-1' : item.content ? 'control-min-height px-1 py-2' : density === 'dense' ? 'control-min-height px-3 py-2' : 'control-min-height p-3'} ${reorderHandle === 'row' ? 'cursor-grab touch-none active:cursor-grabbing' : ''} text-left ${selectionTone === 'default' ? 'aria-pressed:text-accent-color' : ''}`}
               >
                 <span
                   className={`flex justify-between gap-2 ${item.trailing && controlsLayout === 'inline' ? 'items-center' : 'items-start'}`}

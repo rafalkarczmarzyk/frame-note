@@ -49,7 +49,7 @@ export function AnchorPicker({
     <div
       role="group"
       aria-label="Caption anchor"
-      className="control-segments grid w-32 grid-cols-3 gap-1 p-1"
+      className="control-segments anchor-picker grid w-32 grid-cols-3 gap-1 p-1"
     >
       {anchorOptions.map((anchor) => {
         const Icon = anchorIcons[anchor];

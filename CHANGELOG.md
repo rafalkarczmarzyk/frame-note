@@ -115,6 +115,13 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Changed
 
+- Buttons, inputs and inline control groups share a 36 px outer height, with
+  28 px controls and 4 px padding inside shared groups. Numeric fields avoid
+  redundant wrappers; the anchor picker retains its separate 3 × 3 layout.
+  Shared buttons distinguish icon-only actions from icons with labels, with
+  consistent non-shrinking icon sizes and smaller grouped variants. Storybook
+  documents the shared button variants.
+
 - Unified layer selection and editing in one sidebar panel, with a recessed glass
   list, raised active rows, grouped visibility/menu controls and direct removal
   of the selected layer. Visibility buttons reflect their on/off state. Clearer
@@ -171,6 +178,9 @@ when explicitly requested; a commit does not automatically create a release.
   the sidebar's scrolling area and leaves Add layer below the rows.
 
 ### Fixed
+
+- Selected inline elements and multi-selected tokens render their editor outlines
+  above adjacent badges and graphics.
 
 - Collapsing Layers also collapses the selected layer inspector.
 

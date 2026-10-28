@@ -27,6 +27,7 @@ import {
 import { Select } from '@/components/ui/select';
 import { Field } from '@/components/ui/field';
 import { NumberField } from '@/components/ui/number-field';
+import { InlineInputGroup } from '@/components/ui/inline-input-group';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { AnchorPicker } from '@/components/ui/anchor-picker';
 import { MarginEditor } from '@/components/ui/margin-editor';
@@ -162,7 +163,7 @@ export function CaptionControls({
                           id={id}
                           aria-haspopup="dialog"
                           onClick={onBrowseFonts}
-                          className="control-field flex h-9 w-full items-center justify-between px-3 text-xs"
+                          className="control-field control-height flex w-full items-center justify-between px-3 text-xs"
                         >
                           <span className="flex min-w-0 items-center gap-2">
                             {caption.style.fontFamily.replace(' Variable', '')}
@@ -177,7 +178,10 @@ export function CaptionControls({
                   </Field>
                 </div>
                 <div className="grid grid-cols-2 items-center gap-2">
-                  <div className="grid min-w-0 grid-cols-[1rem_minmax(0,1fr)] items-center gap-2">
+                  <InlineInputGroup
+                    label="Font size"
+                    className="grid min-w-0 grid-cols-[1rem_minmax(0,1fr)]"
+                  >
                     <Tooltip content="Font size">
                       <ALargeSmall
                         className="size-4 shrink-0 text-content-secondary"
@@ -199,8 +203,11 @@ export function CaptionControls({
                       disabled={disabled}
                       onValueChange={(fontSize) => style({ fontSize })}
                     />
-                  </div>
-                  <div className="grid min-w-0 grid-cols-[1rem_minmax(0,1fr)] items-center gap-2">
+                  </InlineInputGroup>
+                  <InlineInputGroup
+                    label="Line spacing"
+                    className="grid min-w-0 grid-cols-[1rem_minmax(0,1fr)]"
+                  >
                     <Tooltip content="Line spacing · multiple of font size">
                       <ArrowDownUp
                         className="size-4 shrink-0 text-content-secondary"
@@ -219,9 +226,12 @@ export function CaptionControls({
                       disabled={disabled}
                       onValueChange={(lineHeight) => style({ lineHeight })}
                     />
-                  </div>
+                  </InlineInputGroup>
                 </div>
-                <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)] items-center gap-2">
+                <InlineInputGroup
+                  label="Text formatting controls"
+                  className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-2"
+                >
                   <SegmentedControl
                     disabled={disabled}
                     label="Text align"
@@ -257,7 +267,7 @@ export function CaptionControls({
                   <div
                     role="group"
                     aria-label="Font style"
-                    className="control-segments grid grid-cols-2 gap-1 p-1"
+                    className="control-segments grid control-height grid-cols-2 gap-1 px-1"
                   >
                     <Tooltip
                       content={
@@ -275,7 +285,7 @@ export function CaptionControls({
                         disabled={disabled}
                         aria-disabled={!supportsBold(caption.style.fontFamily)}
                         title=""
-                        className={`control-segment h-7 w-full aria-disabled:opacity-40 aria-disabled:cursor-default ${supportsBold(caption.style.fontFamily) && caption.style.fontWeight === 700 ? 'control-selected' : ''}`}
+                        className={`control-segment h-full w-full aria-disabled:opacity-40 aria-disabled:cursor-default ${supportsBold(caption.style.fontFamily) && caption.style.fontWeight === 700 ? 'control-selected' : ''}`}
                         onClick={() => {
                           if (!supportsBold(caption.style.fontFamily)) return;
                           style({
@@ -302,7 +312,7 @@ export function CaptionControls({
                         }
                         title=""
                         aria-pressed={effectiveFontStyle(caption) === 'italic'}
-                        className={`control-segment h-7 w-full aria-disabled:opacity-40 aria-disabled:cursor-default ${effectiveFontStyle(caption) === 'italic' ? 'control-selected' : ''}`}
+                        className={`control-segment h-full w-full aria-disabled:opacity-40 aria-disabled:cursor-default ${effectiveFontStyle(caption) === 'italic' ? 'control-selected' : ''}`}
                         onClick={() => {
                           if (!supportsItalic(caption.style.fontFamily)) return;
                           style({
@@ -317,7 +327,7 @@ export function CaptionControls({
                       </IconButton>
                     </Tooltip>
                   </div>
-                </div>
+                </InlineInputGroup>
                 <ColorControls
                   value={caption.style.color}
                   onChange={(color) => style({ color })}
