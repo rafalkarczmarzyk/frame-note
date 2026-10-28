@@ -9,6 +9,18 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Added
 
+- Shared selection settings for metadata, icons and SVG/PNG, with a labeled Remove
+  action instead of overlapping close badges. Icons and images support individual
+  relative/fixed heights and top/center/bottom alignment against the text line;
+  settings survive clipboard operations, document-unit changes and presets and
+  match between preview and JPG export. Editor badges have consistent heights
+  and more space between lines.
+- Formatting marks are visible by default in Content: centered space dots and
+  clear line-break arrows distinguish real breaks from visual wrapping. A Pilcrow
+  toggle beside the insertion actions hides them without changing caption text,
+  clipboard content, undo history or exports. Includes interactive Storybook
+  examples for every element type and formatting marks.
+
 - Metadata badges distinguish absent tags in red from recognized fields or helpers
   returning no value in yellow. Compact Empty/Unknown summaries show individual
   field badges below the editor; value tooltips display only the resolved text.

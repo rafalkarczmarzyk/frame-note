@@ -1,21 +1,20 @@
+import { parseIconToken } from '@/domain/inline-icon';
 import { metadataTokenStatus } from './token-status';
 import { Tooltip } from '@/components/ui/tooltip';
 import { parseImageToken } from '@/domain/inline-image';
 import { imageSource } from '../image-assets';
-import { IconButton } from '@/components/ui/icon-button';
 import { useContext } from 'react';
 import { TokenContext } from './token-context';
 import { svgUrl } from '../svg-icons';
 import type { MouseEvent } from 'react';
 import { NodeViewWrapper, type NodeViewProps } from '@tiptap/react';
-import { Aperture, Camera, Tag, TriangleAlert, X } from 'lucide-react';
+import { Aperture, Camera, Tag, TriangleAlert } from 'lucide-react';
 
 export function TokenView({
   node,
   selected: nodeSelected,
   editor,
   getPos,
-  deleteNode,
 }: NodeViewProps) {
   const {
     values,
@@ -27,25 +26,25 @@ export function TokenView({
     imageUnitPixels = 1,
   } = useContext(TokenContext);
   const token = String(node.attrs.token);
+  const iconRef = parseIconToken(token);
   const imageRef = parseImageToken(token);
   const graphic =
     imageRef && images?.find((item) => item.id === imageRef.assetId);
-  const selected =
-    nodeSelected || (imageRef && selectedImagePosition === getPos());
+  const selected = nodeSelected || selectedImagePosition === getPos();
   const imageHeight = imageRef
     ? imageRef.unit === 'font'
       ? imageRef.height
       : (imageRef.height * imageUnitPixels) / imageFontPixels
     : 1;
-  const asset = icons?.find((item) => `icon:${item.name}` === token);
+  const asset = icons?.find((item) => item.name === iconRef?.name);
   const icon = token.startsWith('icon:') || token.startsWith('image:');
-  const Icon = token === 'icon:aperture' ? Aperture : Camera;
+  const Icon = iconRef?.name === 'aperture' ? Aperture : Camera;
   const missing = token.startsWith('image:')
     ? !graphic
     : icon
       ? icons
         ? !asset
-        : !['icon:aperture', 'icon:camera'].includes(token)
+        : !['aperture', 'camera'].includes(iconRef?.name ?? '')
       : hasPhoto && !values[token]?.trim();
   const status =
     icon || !hasPhoto ? undefined : metadataTokenStatus(token, values);
@@ -77,12 +76,12 @@ export function TokenView({
         data-token={token}
         data-missing={missing || undefined}
         data-value-status={status}
-        className={`caption-token relative inline-flex cursor-grab items-center rounded text-content-primary ${icon ? 'align-middle text-inherit' : 'control-neutral gap-1 px-1.5 py-0.5 align-baseline text-xs'} ${selected ? 'outline-2 outline-input-focus-ring' : ''}`}
+        className={`caption-token relative inline-flex cursor-grab items-center gap-1.5 rounded px-2 py-1 align-middle text-content-primary control-neutral ${imageRef ? 'text-xl' : 'h-8 text-xs leading-none'} ${selected ? 'outline-2 outline-input-focus-ring' : ''}`}
       >
         {missing ? (
           <TriangleAlert
             aria-hidden="true"
-            className={icon ? 'size-[1em]' : 'size-3'}
+            className={icon ? 'size-5' : 'size-3'}
           />
         ) : graphic &&
           imageRef?.colorMode === 'single' &&
@@ -92,8 +91,8 @@ export function TokenView({
             role="img"
             className="inline-block bg-current"
             style={{
-              height: `${imageHeight}em`,
-              width: `${(imageHeight * graphic.width) / graphic.height}em`,
+              height: `${Math.max(1, Math.min(3, imageHeight))}em`,
+              width: `${(Math.max(1, Math.min(3, imageHeight)) * graphic.width) / graphic.height}em`,
               maskImage: `url("${imageSource(graphic)}")`,
               maskSize: '100% 100%',
               maskRepeat: 'no-repeat',
@@ -105,7 +104,7 @@ export function TokenView({
             alt={graphic.name}
             draggable={false}
             style={{
-              height: `${imageHeight}em`,
+              height: `${Math.max(1, Math.min(3, imageHeight))}em`,
               width: 'auto',
               maxWidth: 'none',
             }}
@@ -113,16 +112,16 @@ export function TokenView({
         ) : asset ? (
           <span
             aria-hidden="true"
-            className="inline-block h-[1em] bg-current"
+            className="inline-block h-5 bg-current"
             style={{
-              width: `${asset.aspect}em`,
+              width: `${20 * asset.aspect}px`,
               maskImage: `url("${svgUrl(asset.svg)}")`,
               maskSize: '100% 100%',
               maskRepeat: 'no-repeat',
             }}
           />
         ) : icon ? (
-          <Icon aria-hidden="true" className="size-[1em]" />
+          <Icon aria-hidden="true" className="size-5" />
         ) : (
           <Tag aria-hidden="true" className="size-3" />
         )}
@@ -141,29 +140,6 @@ export function TokenView({
           <span>{token}</span>
         )}
         {missing && <span className="sr-only"> (missing)</span>}
-        {selected && (
-          <IconButton
-            label={
-              graphic ? `Remove image ${graphic.name}` : `Remove {${token}}`
-            }
-            tooltip={
-              graphic ? `Remove image · ${graphic.name}` : `Remove {${token}}`
-            }
-            draggable={false}
-            className="absolute -top-2 -right-2 size-4 rounded-full border border-panel-border bg-panel-base text-content-primary [&_svg]:size-2.5"
-            onMouseDown={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-            }}
-            onClick={(event) => {
-              event.stopPropagation();
-              deleteNode();
-              editor.commands.focus();
-            }}
-          >
-            <X aria-hidden="true" />
-          </IconButton>
-        )}
       </NodeViewWrapper>
     </Tooltip>
   );

@@ -1123,3 +1123,51 @@ fieldset:disabled .glass-switch {
   border-color: var(--token-error-border);
   background: var(--token-error-base);
 }
+
+/* Editor-only decorations preserve source spaces and line-break geometry. */
+.caption-whitespace-space {
+  position: relative;
+}
+.caption-whitespace-space::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--content-primary);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+}
+.caption-whitespace-newline {
+  position: relative;
+  display: inline-block;
+  width: 20px;
+  height: 32px;
+  vertical-align: middle;
+  overflow: visible;
+  color: var(--content-primary);
+  pointer-events: none;
+  user-select: none;
+}
+.caption-whitespace-newline svg {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+}
+
+/* Leave room around 32 px inline badges on explicit and wrapped lines. */
+.caption-content-editor {
+  line-height: 2.5rem;
+  letter-spacing: 0.04em;
+  word-spacing: 0.2em;
+}
+.caption-content-editor .caption-token {
+  letter-spacing: normal;
+  word-spacing: normal;
+}

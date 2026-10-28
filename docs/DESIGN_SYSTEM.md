@@ -1179,3 +1179,25 @@ are quiet; selection uses raised glass with shared segment tokens. Visibility an
 buttons share a dark action surface. The eye uses raised glass while the layer
 is visible, independently of selection; the menu uses glass on hover/focus. Photo info, Units & Margins and Export settings describe
 their current scope explicitly; the content insertion action uses Metadata.
+
+### Selected inline element settings
+
+Selecting metadata, an icon or an SVG/PNG opens settings below Content. All
+objects use the same selection treatment and a labeled Remove action instead of
+an overlapping close badge. Metadata shows its resolved value or missing-data
+explanation; before photo import it shows an invitation to open a photo.
+ElementSizeSettings is shared by icons, SVG and PNG and by the Storybook proposal.
+Its first row places the height icon, Relative/Fixed segments and height input
+on one line. A second row starts with UnfoldVertical and Top/Center/Bottom
+segments. Shared tooltips explain sizing, units and line alignment. SVG retains
+its color-mode control; SVG/PNG retain replacement and PNG resolution guidance.
+Editor graphics have a bounded, readable representation independent of output
+pixels. Individual size and alignment belong to each token occurrence, survive
+clipboard and presets, and use the same layout for preview and export.
+
+Content exposes a Pilcrow (¶) toggle for editor-only formatting marks. Literal
+spaces show a centered dot and real paragraph/hard breaks show an arrow; visual
+wrapping adds no marker. ProseMirror decorations preserve document text, clipboard
+serialization, selection and export. Toggling is excluded from undo history and
+separates adjacent edit groups. Components/UI/CaptionWhitespace shows spaces,
+empty lines, metadata, icons and a long wrapped line.
