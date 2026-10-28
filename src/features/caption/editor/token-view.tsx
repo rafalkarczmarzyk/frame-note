@@ -22,8 +22,6 @@ export function TokenView({
     icons,
     images,
     selectedImagePosition,
-    imageFontPixels = 20,
-    imageUnitPixels = 1,
   } = useContext(TokenContext);
   const token = String(node.attrs.token);
   const iconRef = parseIconToken(token);
@@ -31,11 +29,6 @@ export function TokenView({
   const graphic =
     imageRef && images?.find((item) => item.id === imageRef.assetId);
   const selected = nodeSelected || selectedImagePosition === getPos();
-  const imageHeight = imageRef
-    ? imageRef.unit === 'font'
-      ? imageRef.height
-      : (imageRef.height * imageUnitPixels) / imageFontPixels
-    : 1;
   const asset = icons?.find((item) => item.name === iconRef?.name);
   const icon = token.startsWith('icon:') || token.startsWith('image:');
   const Icon = iconRef?.name === 'aperture' ? Aperture : Camera;
@@ -76,7 +69,7 @@ export function TokenView({
         data-token={token}
         data-missing={missing || undefined}
         data-value-status={status}
-        className={`caption-token relative inline-flex cursor-grab items-center gap-1.5 rounded px-2 py-1 align-middle text-content-primary control-neutral ${imageRef ? 'text-xl' : 'h-8 text-xs leading-none'} ${selected ? 'outline-2 outline-input-focus-ring' : ''}`}
+        className={`caption-token relative inline-flex h-8 cursor-grab items-center gap-1.5 rounded px-2 py-1 align-middle text-xs leading-none text-content-primary control-neutral ${selected ? 'outline-2 outline-input-focus-ring' : ''}`}
       >
         {missing ? (
           <TriangleAlert
@@ -91,10 +84,10 @@ export function TokenView({
             role="img"
             className="inline-block bg-current"
             style={{
-              height: `${Math.max(1, Math.min(3, imageHeight))}em`,
-              width: `${(Math.max(1, Math.min(3, imageHeight)) * graphic.width) / graphic.height}em`,
+              height: '1.25rem',
+              width: `${Math.min((1.25 * graphic.width) / graphic.height, 8)}rem`,
               maskImage: `url("${imageSource(graphic)}")`,
-              maskSize: '100% 100%',
+              maskSize: 'contain',
               maskRepeat: 'no-repeat',
             }}
           />
@@ -104,9 +97,10 @@ export function TokenView({
             alt={graphic.name}
             draggable={false}
             style={{
-              height: `${Math.max(1, Math.min(3, imageHeight))}em`,
+              height: '1.25rem',
               width: 'auto',
-              maxWidth: 'none',
+              maxWidth: '8rem',
+              objectFit: 'contain',
             }}
           />
         ) : asset ? (

@@ -45,6 +45,11 @@ import { templateDocument, documentTemplate } from './template-document';
 import { TokenContext } from './token-context';
 import type { SvgIcon } from '../svg-icons';
 
+export interface GraphicsEditorActions {
+  upload: () => void;
+  insert: (asset: ImageAsset) => void;
+}
+
 export function CaptionEditor({
   value,
   actions,
@@ -59,6 +64,7 @@ export function CaptionEditor({
   onFocus,
   onBlur,
   onReady,
+  onGraphicsActionsReady,
 }: {
   value: string;
   actions?: ReactNode;
@@ -73,6 +79,7 @@ export function CaptionEditor({
   onFocus: () => void;
   onBlur: () => void;
   onReady: (editor: Editor | null) => void;
+  onGraphicsActionsReady?: (actions: GraphicsEditorActions | null) => void;
 }) {
   const callbacks = useRef({ onChange, onFocus, onBlur, onReady });
   useEffect(() => {
@@ -429,6 +436,55 @@ export function CaptionEditor({
     },
     [editor],
   );
+  const insertGraphic = useCallback(
+    (asset: ImageAsset) => {
+      if (!editor || editor.isDestroyed) return;
+      const existing = imageAssets.current.find(
+        (item) => item.source === asset.source,
+      );
+      const retained = existing
+        ? imageAssets.current
+        : [...imageAssets.current, asset];
+      const token = imageToken({
+        assetId: existing?.id ?? asset.id,
+        height: 2,
+        unit: 'font',
+        colorMode: 'original',
+      });
+      const transaction = editor.state.tr.replaceSelectionWith(
+        editor.schema.nodes.captionToken!.create({ token }),
+      );
+      try {
+        checkImageRetention(
+          documentTemplate(transaction.doc.toJSON()),
+          retained,
+        );
+      } catch (cause) {
+        setError(
+          cause instanceof Error ? cause.message : 'Could not insert graphic.',
+        );
+        return;
+      }
+      if (!existing) imageAssets.current = retained;
+      editor
+        .chain()
+        .focus()
+        .insertContent({ type: 'captionToken', attrs: { token } })
+        .run();
+    },
+    [editor],
+  );
+  const openImageUpload = useCallback(() => {
+    replacePosition.current = null;
+    upload.current?.click();
+  }, []);
+  useEffect(() => {
+    onGraphicsActionsReady?.({
+      upload: openImageUpload,
+      insert: insertGraphic,
+    });
+    return () => onGraphicsActionsReady?.(null);
+  }, [insertGraphic, onGraphicsActionsReady, openImageUpload]);
   useEffect(() => {
     if (!dropSurface) return;
     const isFileDrag = (event: DragEvent) =>
@@ -547,11 +603,6 @@ export function CaptionEditor({
         icons,
         images,
         selectedImagePosition: selectedPosition,
-        imageFontPixels: Math.max(
-          0.01,
-          toPixels(fontSize, sizingUnit, dimensions),
-        ),
-        imageUnitPixels: pixelsPerUnit(sizingUnit, dimensions),
       }}
     >
       <div
@@ -591,20 +642,6 @@ export function CaptionEditor({
             className="control-segments grid min-w-0 flex-1 auto-cols-auto grid-flow-col items-center gap-1 p-1"
           >
             {actions}
-            <Tooltip content="Insert an SVG or PNG at the text cursor">
-              <button
-                type="button"
-                className="control-segment flex h-7 min-w-0 items-center justify-center gap-1 px-2 text-xs whitespace-nowrap [&_svg]:size-4"
-                disabled={loading}
-                onClick={() => {
-                  replacePosition.current = null;
-                  upload.current?.click();
-                }}
-              >
-                <ImagePlus aria-hidden="true" />
-                {'SVG\u00a0/\u00a0PNG'}
-              </button>
-            </Tooltip>
             <input
               ref={upload}
               type="file"
