@@ -1,3 +1,4 @@
+import { createLayerBackground } from '@/domain/layer-background';
 import { builtinPresets } from '@/domain/builtin-presets';
 import { createMetadataField } from '@/domain/metadata';
 import { Button } from '@/components/ui/button';
@@ -465,5 +466,35 @@ export const LongExposureTenMinutes: Story = {
           'Demonstration override: ExposureTime is set to 600 seconds in memory to preview 10 min. This is not the actual exposure recorded in the fixture. The source file is unchanged.',
       },
     },
+  },
+};
+
+function backgroundExample(type: 'color' | 'glass') {
+  const caption = createCaption();
+  caption.template = '{author}\n{lens}\n{exposure}';
+  caption.background = createLayerBackground();
+  caption.background.type = type;
+  caption.background.shadow.enabled = type === 'color';
+  return createCaptionLayout(caption);
+}
+export const ColorLayerBackground: Story = {
+  args: {
+    src: wildlifeUrl,
+    name: 'Wildlife.jpg',
+    initialLayout: backgroundExample('color'),
+  },
+};
+export const GlassLayerBackground: Story = {
+  args: {
+    src: wildlifeUrl,
+    name: 'Wildlife.jpg',
+    initialLayout: backgroundExample('glass'),
+  },
+};
+export const GlassPortraitBackground: Story = {
+  args: {
+    src: portraitUrl,
+    name: 'Portrait.jpg',
+    initialLayout: backgroundExample('glass'),
   },
 };

@@ -124,10 +124,38 @@ async function renderPhotoCaptions(
   captions: readonly RenderedCaption[],
   qualityPercent = 95,
 ): Promise<Blob> {
+  return withPhotoStage(image, dimensions, captions, async (stage) => {
+    const blob = await stage.toBlob({
+      mimeType: 'image/jpeg',
+      quality: jpegQuality(qualityPercent),
+      pixelRatio: 1,
+    });
+    if (!blob || blob.size === 0 || blob.type !== 'image/jpeg')
+      throw new Error('The browser could not export this photo.');
+    return blob;
+  });
+}
+
+/** Preview rendering uses the same ordered composition as full-resolution JPG. */
+export function renderPhotoCanvas(
+  image: CanvasImageSource,
+  dimensions: ImageDimensions,
+  captions: readonly RenderedCaption[],
+): Promise<HTMLCanvasElement> {
+  return withPhotoStage(image, dimensions, captions, (stage) =>
+    stage.toCanvas({ pixelRatio: 1 }),
+  );
+}
+
+async function withPhotoStage<T>(
+  image: CanvasImageSource,
+  dimensions: ImageDimensions,
+  captions: readonly RenderedCaption[],
+  consume: (stage: Konva.Stage) => T | Promise<T>,
+): Promise<T> {
   const alphaMatte = getComputedStyle(document.documentElement)
     .getPropertyValue('--color-caption-white')
     .trim();
-  const quality = jpegQuality(qualityPercent);
   await Promise.all(
     captions.map(({ caption, text }) => ensureCaptionFont(caption.style, text)),
   );
@@ -137,6 +165,7 @@ async function renderPhotoCaptions(
     width: dimensions.width,
     height: dimensions.height,
   });
+  const decorations: HTMLCanvasElement[] = [];
   try {
     const layer = new Konva.Layer();
     stage.add(layer);
@@ -164,10 +193,14 @@ async function renderPhotoCaptions(
         : inlineLayout(dimensions, caption, text, icons);
       const background =
         text.trim() || caption.logo
-          ? renderBackgroundTile(geometry, caption, dimensions)
+          ? renderBackgroundTile(geometry, caption, dimensions, (rect) =>
+              layer.toCanvas({ ...rect, pixelRatio: 1 }),
+            )
           : null;
-      if (background)
+      if (background) {
+        decorations.push(background.image);
         layer.add(new Konva.Image({ ...background, listening: false }));
+      }
       if (caption.logo) {
         const scene = logoLayout(dimensions, caption);
         const raw = await loadIcon(caption.logo.asset);
@@ -228,16 +261,12 @@ async function renderPhotoCaptions(
       }
     }
     layer.draw();
-    const blob = await stage.toBlob({
-      mimeType: 'image/jpeg',
-      quality,
-      pixelRatio: 1,
-    });
-    if (!blob || blob.size === 0 || blob.type !== 'image/jpeg')
-      throw new Error('The browser could not export this photo.');
-    return blob;
+    return await consume(stage);
   } finally {
     stage.destroy();
+    decorations.forEach((canvas) => {
+      canvas.width = canvas.height = 0;
+    });
   }
 }
 

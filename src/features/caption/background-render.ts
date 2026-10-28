@@ -1,3 +1,5 @@
+import { blurBackdrop } from './blur-backdrop';
+import { glassSampleRect } from './glass-geometry';
 import type { Caption, ImageDimensions } from '../../domain/document';
 import {
   backgroundRect,
@@ -42,6 +44,7 @@ export function renderBackgroundTile(
   content: ContentRect,
   caption: Caption,
   dimensions: ImageDimensions,
+  capture?: (rect: ContentRect) => HTMLCanvasElement,
 ) {
   const background = pixelBackground(caption, dimensions);
   if (
@@ -52,8 +55,21 @@ export function renderBackgroundTile(
   )
     return null;
   const rect = backgroundRect(content, background);
-  const shadow = background.shadow;
-  const hasShadow = background.type === 'color' && shadow.enabled;
+  const glass = background.type === 'glass';
+  const scale = Math.min(dimensions.width, dimensions.height) / 800;
+  const shadow = glass
+    ? {
+        ...background.shadow,
+        enabled: true,
+        color: 'caption-black',
+        opacity: 0.4,
+        blur: 24 * scale,
+        spread: 0,
+        x: 0,
+        y: 8 * scale,
+      }
+    : background.shadow;
+  const hasShadow = shadow.enabled;
   const bleed = hasShadow
     ? Math.ceil(
         shadow.blur * 3 +
@@ -116,11 +132,66 @@ export function renderBackgroundTile(
       context.restore();
     }
   }
+  if (glass && capture) {
+    const sample = glassSampleRect(rect, background.blur, dimensions);
+    if (sample) {
+      const crop = capture(sample);
+      let blurred: HTMLCanvasElement | undefined;
+      try {
+        if (background.blur > 0) {
+          blurred = blurBackdrop(crop, background.blur);
+        }
+        context.save();
+        path(context, rect, background.radius);
+        context.clip();
+        context.drawImage(
+          blurred ?? crop,
+          sample.x,
+          sample.y,
+          sample.width,
+          sample.height,
+        );
+        context.restore();
+      } finally {
+        crop.width = crop.height = 0;
+        if (blurred) blurred.width = blurred.height = 0;
+      }
+    }
+  }
   context.save();
   context.globalAlpha = background.opacity;
   context.fillStyle = resolvedColor(background.color);
   path(context, rect, background.radius);
   context.fill();
   context.restore();
+  if (glass) {
+    const light = resolvedColor('caption-white'),
+      dark = resolvedColor('caption-black');
+    context.save();
+    path(context, rect, background.radius);
+    context.clip();
+    const reflection = context.createLinearGradient(
+      rect.x,
+      rect.y,
+      rect.x + rect.width,
+      rect.y + rect.height,
+    );
+    reflection.addColorStop(0, light);
+    reflection.addColorStop(0.5, resolvedColor(background.color));
+    reflection.addColorStop(1, dark);
+    context.globalAlpha = 0.18;
+    context.fillStyle = reflection;
+    context.fillRect(rect.x, rect.y, rect.width, rect.height);
+    context.lineWidth = 2 * scale;
+    context.globalAlpha = 0.55;
+    context.strokeStyle = light;
+    path(context, { ...rect, y: rect.y + scale }, background.radius);
+    context.stroke();
+    context.globalAlpha = 0.4;
+    context.strokeStyle = dark;
+    path(context, { ...rect, y: rect.y - scale }, background.radius);
+    context.stroke();
+    context.restore();
+  }
   return { image, x, y, width: image.width, height: image.height };
 }

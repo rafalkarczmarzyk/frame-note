@@ -16,6 +16,10 @@ when explicitly requested; a commit does not automatically create a release.
   a canvas/JPG glass trial with overlapping panels and image-edge checks.
   The selected layer inspector exposes Color backgrounds and drop shadows with
   shared padding controls; preview and JPG use the same decoration renderer.
+  Glass backgrounds blur the photo and visible lower layers, with independent
+  base color/opacity, blur and raised material shading. The editor uses a bounded
+  screen-resolution composition; export uses the same renderer at full resolution.
+  Large blur radii retain their scale instead of hitting the pixel-filter limit.
 
 - Shared selection settings for metadata, icons and SVG/PNG, with a labeled Remove
   action instead of overlapping close badges. Icons and images support individual

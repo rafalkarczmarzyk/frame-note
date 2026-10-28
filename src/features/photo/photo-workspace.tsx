@@ -1,3 +1,4 @@
+import { useGlassPreview } from '../caption/use-glass-preview';
 import { BackgroundControls } from '../caption/background-controls';
 import { BackgroundPreview } from '../caption/background-preview';
 import { captionBackgroundRect } from '../caption/background-render';
@@ -408,6 +409,12 @@ function PhotoWorkspaceContent({
   );
   const fontReady = loadedFont === fontKey;
   const fontError = fontFailure?.key === fontKey ? fontFailure.message : '';
+  const glassPreview = useGlassPreview(
+    photo,
+    exportCaptions,
+    fontReady && iconsReady && !loading,
+    Math.max(size.width, size.height),
+  );
   const prepared = usePreparedExport(
     exportRequest,
     !!photo && fontReady && iconsReady && !batchBusy && !loading,
@@ -547,6 +554,7 @@ function PhotoWorkspaceContent({
         <div
           ref={host}
           data-photo-canvas
+          data-glass-ready={glassPreview.canvas ? 'true' : 'false'}
           className="relative flex min-h-[40vh] min-w-0 flex-1 flex-col bg-workspace-base md:min-h-0"
         >
           {loadingLabel && (
@@ -584,7 +592,11 @@ function PhotoWorkspaceContent({
                         listening={false}
                       />
                       <CanvasImage
-                        image={photo.previewImage ?? photo.image}
+                        image={
+                          glassPreview.canvas ??
+                          photo.previewImage ??
+                          photo.image
+                        }
                         width={width}
                         height={height}
                       />
@@ -652,13 +664,15 @@ function PhotoWorkspaceContent({
                                 });
                             return (
                               <Group key={id}>
-                                {!placeholder && text.trim() && (
-                                  <BackgroundPreview
-                                    content={geometry}
-                                    caption={caption}
-                                    dimensions={{ width, height }}
-                                  />
-                                )}
+                                {!glassPreview.canvas &&
+                                  !placeholder &&
+                                  (text.trim() || caption.logo) && (
+                                    <BackgroundPreview
+                                      content={geometry}
+                                      caption={caption}
+                                      dimensions={{ width, height }}
+                                    />
+                                  )}
                                 <Group
                                   x={geometry.x}
                                   y={geometry.y}
@@ -727,42 +741,43 @@ function PhotoWorkspaceContent({
                                     fill={color}
                                     opacity={0}
                                   />
-                                  {caption.logo && logoGeometry ? (
-                                    <CanvasImage
-                                      listening={false}
-                                      width={logoGeometry.width}
-                                      height={logoGeometry.height}
-                                      image={
-                                        caption.logo.colorMode === 'single'
-                                          ? tintedIcon(
-                                              caption.logo.asset,
-                                              iconImages.get(
+                                  {(!glassPreview.canvas || placeholder) &&
+                                    (caption.logo && logoGeometry ? (
+                                      <CanvasImage
+                                        listening={false}
+                                        width={logoGeometry.width}
+                                        height={logoGeometry.height}
+                                        image={
+                                          caption.logo.colorMode === 'single'
+                                            ? tintedIcon(
+                                                caption.logo.asset,
+                                                iconImages.get(
+                                                  caption.logo.asset.svg,
+                                                )!,
+                                                logoGeometry.height,
+                                                color,
+                                              )
+                                            : iconImages.get(
                                                 caption.logo.asset.svg,
-                                              )!,
-                                              logoGeometry.height,
-                                              color,
-                                            )
-                                          : iconImages.get(
-                                              caption.logo.asset.svg,
-                                            )
-                                      }
-                                    />
-                                  ) : scene ? (
-                                    <InlinePreview
-                                      scene={scene}
-                                      caption={caption}
-                                      color={visualColor}
-                                      images={iconImages}
-                                    />
-                                  ) : (
-                                    <Text
-                                      {...config}
-                                      x={0}
-                                      y={0}
-                                      opacity={1}
-                                      listening={false}
-                                    />
-                                  )}
+                                              )
+                                        }
+                                      />
+                                    ) : scene ? (
+                                      <InlinePreview
+                                        scene={scene}
+                                        caption={caption}
+                                        color={visualColor}
+                                        images={iconImages}
+                                      />
+                                    ) : (
+                                      <Text
+                                        {...config}
+                                        x={0}
+                                        y={0}
+                                        opacity={1}
+                                        listening={false}
+                                      />
+                                    ))}
                                 </Group>
                                 {(hoveredId === id ||
                                   editingId === id ||
@@ -1103,9 +1118,9 @@ function PhotoWorkspaceContent({
               iconTone="caption"
               icon={<Layers />}
             >
-              {(assetError || fontError) && (
+              {(assetError || fontError || glassPreview.error) && (
                 <p role="alert" className="px-4 pt-2 pb-3 text-xs">
-                  {assetError || fontError}
+                  {assetError || fontError || glassPreview.error}
                 </p>
               )}
               <LayerList
@@ -1311,6 +1326,7 @@ function PhotoWorkspaceContent({
                     dimensions={dimensions}
                     onChange={setSettings}
                     disabled={exporting}
+                    glassEnabled
                   />
                   <CaptionControls
                     colorSelectionSource={
