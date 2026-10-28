@@ -1,3 +1,4 @@
+import { replaceCaption } from './caption-helpers.js';
 import { expect, test } from '@playwright/test';
 
 test('saves and restores a layout after reload and imports an exported preset', async ({
@@ -17,11 +18,11 @@ test('saves and restores a layout after reload and imports an exported preset', 
     buffer: Buffer.from(data, 'base64'),
   };
   await page.getByLabel('Choose JPG or PNG photo').setInputFiles(photo);
-  await page.getByLabel('Caption', { exact: true }).fill('Saved {author}');
+  await replaceCaption(page, 'Saved {author}');
   await page.getByRole('button', { name: 'Save preset', exact: true }).click();
   await page.getByLabel('Preset name', { exact: true }).fill('Wildlife');
   await page.getByRole('button', { name: 'Save', exact: true }).click();
-  await page.getByLabel('Caption', { exact: true }).fill('Changed');
+  await replaceCaption(page, 'Changed');
   await expect(page.getByText('Modified', { exact: true })).toBeVisible();
   await page.reload();
   await page.getByLabel('Choose JPG or PNG photo').setInputFiles(photo);

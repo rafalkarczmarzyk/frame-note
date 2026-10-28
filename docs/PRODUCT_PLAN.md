@@ -429,3 +429,14 @@ próba renderowania Glass i proponowane etapy znajdują się w
 [planie obsługi teł warstw](LAYER_BACKGROUND_PLAN.md). Storybook zawiera
 prototyp interfejsu Screens/LayerBackground. Plan nie oznacza zgody na
 automatyczną implementację kolejnych etapów.
+
+### Tła warstw — realizacja 2026-10-28
+
+Użytkownik zlecił kolejne etapy po szybkiej weryfikacji i commicie, bez osobnego
+potwierdzania każdego przejścia. Wdrożono model/presety i jednostki, Color wraz
+z cieniem oraz Glass we właściwym edytorze i wspólnym rendererze JPG/batch.
+Padding rozszerza obrys dekoracji bez zmiany pozycji treści. Kontrolki Background
+należą do jaśniejszego inspektora; Layers zwija całość. Przypadki produkcyjne
+są w Storybooku Screens/TestPhotos. Szczegóły w LAYER_BACKGROUND_PLAN.md.
+Separatory poziome są odłożone jako NTH-004. Nie zmieniono wersji ani nie
+przygotowano wydania.

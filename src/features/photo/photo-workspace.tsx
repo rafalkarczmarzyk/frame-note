@@ -375,7 +375,8 @@ function PhotoWorkspaceContent({
   );
   const exportCaptions = useMemo(
     () =>
-      renderedCaptions.map(({ caption, text, color, icons }) => ({
+      renderedCaptions.map(({ id, caption, text, color, icons }) => ({
+        id,
         caption,
         text,
         color,
@@ -554,7 +555,7 @@ function PhotoWorkspaceContent({
         <div
           ref={host}
           data-photo-canvas
-          data-glass-ready={glassPreview.canvas ? 'true' : 'false'}
+          data-glass-ready={glassPreview.tiles ? 'true' : 'false'}
           className="relative flex min-h-[40vh] min-w-0 flex-1 flex-col bg-workspace-base md:min-h-0"
         >
           {loadingLabel && (
@@ -592,11 +593,7 @@ function PhotoWorkspaceContent({
                         listening={false}
                       />
                       <CanvasImage
-                        image={
-                          glassPreview.canvas ??
-                          photo.previewImage ??
-                          photo.image
-                        }
+                        image={photo.previewImage ?? photo.image}
                         width={width}
                         height={height}
                       />
@@ -664,15 +661,21 @@ function PhotoWorkspaceContent({
                                 });
                             return (
                               <Group key={id}>
-                                {!glassPreview.canvas &&
-                                  !placeholder &&
-                                  (text.trim() || caption.logo) && (
+                                {!placeholder &&
+                                  (text.trim() || caption.logo) &&
+                                  caption.background?.type !== 'none' &&
+                                  (glassPreview.tiles?.has(id) ? (
+                                    <CanvasImage
+                                      {...glassPreview.tiles.get(id)!}
+                                      listening={false}
+                                    />
+                                  ) : (
                                     <BackgroundPreview
                                       content={geometry}
                                       caption={caption}
                                       dimensions={{ width, height }}
                                     />
-                                  )}
+                                  ))}
                                 <Group
                                   x={geometry.x}
                                   y={geometry.y}
@@ -741,43 +744,42 @@ function PhotoWorkspaceContent({
                                     fill={color}
                                     opacity={0}
                                   />
-                                  {(!glassPreview.canvas || placeholder) &&
-                                    (caption.logo && logoGeometry ? (
-                                      <CanvasImage
-                                        listening={false}
-                                        width={logoGeometry.width}
-                                        height={logoGeometry.height}
-                                        image={
-                                          caption.logo.colorMode === 'single'
-                                            ? tintedIcon(
-                                                caption.logo.asset,
-                                                iconImages.get(
-                                                  caption.logo.asset.svg,
-                                                )!,
-                                                logoGeometry.height,
-                                                color,
-                                              )
-                                            : iconImages.get(
+                                  {caption.logo && logoGeometry ? (
+                                    <CanvasImage
+                                      listening={false}
+                                      width={logoGeometry.width}
+                                      height={logoGeometry.height}
+                                      image={
+                                        caption.logo.colorMode === 'single'
+                                          ? tintedIcon(
+                                              caption.logo.asset,
+                                              iconImages.get(
                                                 caption.logo.asset.svg,
-                                              )
-                                        }
-                                      />
-                                    ) : scene ? (
-                                      <InlinePreview
-                                        scene={scene}
-                                        caption={caption}
-                                        color={visualColor}
-                                        images={iconImages}
-                                      />
-                                    ) : (
-                                      <Text
-                                        {...config}
-                                        x={0}
-                                        y={0}
-                                        opacity={1}
-                                        listening={false}
-                                      />
-                                    ))}
+                                              )!,
+                                              logoGeometry.height,
+                                              color,
+                                            )
+                                          : iconImages.get(
+                                              caption.logo.asset.svg,
+                                            )
+                                      }
+                                    />
+                                  ) : scene ? (
+                                    <InlinePreview
+                                      scene={scene}
+                                      caption={caption}
+                                      color={visualColor}
+                                      images={iconImages}
+                                    />
+                                  ) : (
+                                    <Text
+                                      {...config}
+                                      x={0}
+                                      y={0}
+                                      opacity={1}
+                                      listening={false}
+                                    />
+                                  )}
                                 </Group>
                                 {(hoveredId === id ||
                                   editingId === id ||

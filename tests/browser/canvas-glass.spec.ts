@@ -124,3 +124,49 @@ for (const story of ['glass', 'overlap', 'photo-edge']) {
     }
   });
 }
+
+for (const story of [
+  'color-layer-background',
+  'glass-layer-background',
+  'glass-portrait-background',
+]) {
+  test(`production background / ${story} / full photo JPG`, async ({
+    page,
+  }, testInfo) => {
+    await page.goto(
+      `/iframe.html?id=screens-testphotos--${story}&viewMode=story`,
+    );
+    const button = page.getByRole('button', {
+      name: 'Export JPG',
+      exact: true,
+    });
+    await expect(button).toBeEnabled({ timeout: 60000 });
+    await expect(page.getByRole('alert')).toHaveCount(0);
+    if (story.startsWith('glass'))
+      await expect(page.locator('[data-photo-canvas]')).toHaveAttribute(
+        'data-glass-ready',
+        'true',
+      );
+    await page.mouse.move(0, 0);
+    await page.screenshot({
+      path: testInfo.outputPath('production-background.png'),
+      fullPage: true,
+    });
+    const pending = page.waitForEvent('download');
+    await button.click();
+    const bytes = await readFile((await (await pending).path())!);
+    const dimensions = await page.evaluate(async (base64) => {
+      const image = new Image();
+      image.src = `data:image/jpeg;base64,${base64}`;
+      await image.decode();
+      return { width: image.naturalWidth, height: image.naturalHeight };
+    }, bytes.toString('base64'));
+    expect(dimensions.width).toBeGreaterThan(3000);
+    expect(dimensions.height).toBeGreaterThan(3000);
+    expect(
+      story.includes('portrait')
+        ? dimensions.height > dimensions.width
+        : dimensions.width > dimensions.height,
+    ).toBe(true);
+  });
+}

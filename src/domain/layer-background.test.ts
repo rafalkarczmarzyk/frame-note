@@ -50,19 +50,28 @@ describe('layer backgrounds', () => {
   it('rejects invalid background dimensions and colors in presets', () => {
     const c = createCaption();
     c.background = createLayerBackground();
-    const p = createPreset('id', 'Background', createCaptionLayout(c), []);
+    const original = createPreset(
+      'id',
+      'Background',
+      createCaptionLayout(c),
+      [],
+    );
     for (const change of [
-      () => {
-        p.layout.containers[0]!.background!.blur = -1;
+      (b: NonNullable<typeof c.background>) => {
+        b.blur = -1;
       },
-      () => {
-        p.layout.containers[0]!.background!.color = 'url(unsafe)';
+      (b: NonNullable<typeof c.background>) => {
+        b.color = 'url(unsafe)';
       },
-      () => {
-        p.layout.containers[0]!.background!.shadow.opacity = 2;
+      (b: NonNullable<typeof c.background>) => {
+        b.shadow.opacity = 2;
+      },
+      (b: NonNullable<typeof c.background>) => {
+        b.padding.top = -1;
       },
     ]) {
-      change();
+      const p = structuredClone(original);
+      change(p.layout.containers[0]!.background!);
       expect(() =>
         parsePreset(JSON.stringify(p), () => {
           throw Error('no svg');

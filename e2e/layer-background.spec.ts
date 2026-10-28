@@ -1,3 +1,4 @@
+import { replaceCaption } from './caption-helpers.js';
 import { expect, test } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 
@@ -246,9 +247,105 @@ test('glass renders lower content with blur and matches its exported JPG', async
   await blur.press('Tab');
   await expect(button).toBeEnabled();
   await page.getByRole('button', { name: 'Hide layer 2', exact: true }).click();
-  expect((await download()).equals(bytes)).toBe(false);
+  const hidden = await download();
+  expect(hidden.equals(bytes)).toBe(false);
+  // Compare only the glass interior, so this proves lower content is sampled
+  // into the panel rather than merely disappearing elsewhere in the photo.
+  const interiorDifference = await page.evaluate(
+    async ({ before, after }) => {
+      const pixels = async (base64: string) => {
+        const image = new Image();
+        image.src = `data:image/jpeg;base64,${base64}`;
+        await image.decode();
+        const canvas = document.createElement('canvas');
+        canvas.width = 800;
+        canvas.height = 600;
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(image, 0, 0);
+        return ctx.getImageData(335, 265, 130, 22).data;
+      };
+      const a = await pixels(before),
+        b = await pixels(after);
+      let error = 0;
+      for (let i = 0; i < a.length; i += 4) error += Math.abs(a[i]! - b[i]!);
+      return error / (130 * 22);
+    },
+    { before: bytes.toString('base64'), after: hidden.toString('base64') },
+  );
+  expect(interiorDifference).toBeGreaterThan(2);
+  // Drag the visible glass panel using its padded hit area.
+  const bounds = (await page
+    .locator('[data-photo-canvas] .konvajs-content')
+    .boundingBox())!;
+  await page.mouse.move(
+    bounds.x + bounds.width / 2,
+    bounds.y + bounds.height / 2 - 30,
+  );
+  await page.mouse.down();
+  await page.mouse.move(
+    bounds.x + bounds.width / 2 + 50,
+    bounds.y + bounds.height / 2 - 60,
+    { steps: 8 },
+  );
+  await page.mouse.up();
+  const xPosition = page.getByRole('spinbutton', {
+    name: 'X position',
+    exact: true,
+  });
+  await expect(xPosition).toBeEnabled();
+  await expect
+    .poll(async () => Number(await xPosition.inputValue()))
+    .toBeGreaterThan(50);
+  const moved = await download();
+  expect(moved.equals(hidden)).toBe(false);
+  await page.locator('details[data-section="sizing"] > summary').click();
+  await page
+    .getByRole('combobox', { name: 'Sizing unit', exact: true })
+    .click();
+  await page
+    .getByRole('option', { name: '% of short edge', exact: true })
+    .click();
+  expect((await download()).equals(moved)).toBe(true);
+  await page
+    .getByRole('combobox', { name: 'Sizing unit', exact: true })
+    .click();
+  await page.getByRole('option', { name: 'Pixels (px)', exact: true }).click();
+  expect((await download()).equals(moved)).toBe(true);
   await page.screenshot({
     path: testInfo.outputPath('glass-production.png'),
     fullPage: true,
   });
+  // Per-photo glass layouts survive switching and use the same batch renderer.
+  await page.getByLabel('Choose JPG or PNG photo').setInputFiles({
+    name: 'checker2.jpg',
+    mimeType: 'image/jpeg',
+    buffer: Buffer.from(source, 'base64'),
+  });
+  await replaceCaption(page, 'Second glass');
+  await page
+    .getByRole('radiogroup', { name: 'Background type', exact: true })
+    .getByRole('radio', { name: 'Glass', exact: true })
+    .click();
+  const second = await download();
+  await page
+    .getByRole('button', { name: 'Export actions', exact: true })
+    .click();
+  const zipDownload = page.waitForEvent('download');
+  await page.getByRole('menuitem', { name: 'Export all', exact: true }).click();
+  const zip = await readFile((await (await zipDownload).path())!);
+  const entries: Buffer[] = [];
+  let offset = 0;
+  while (zip.readUInt32LE(offset) === 0x04034b50) {
+    const size = zip.readUInt32LE(offset + 18);
+    const start =
+      offset +
+      30 +
+      zip.readUInt16LE(offset + 26) +
+      zip.readUInt16LE(offset + 28);
+    entries.push(zip.subarray(start, start + size));
+    offset = start + size;
+  }
+  expect(entries).toHaveLength(2);
+  expect(entries[0]!.equals(moved)).toBe(true);
+  expect(entries[1]!.equals(second)).toBe(true);
 });

@@ -13,9 +13,17 @@ export function BackgroundPreview({
   caption: Caption;
   dimensions: ImageDimensions;
 }) {
+  const { x, y, width, height } = content;
+  const imageWidth = dimensions.width,
+    imageHeight = dimensions.height;
+  // Hover/selection produces fresh geometry objects, but doesn't change pixels.
   const tile = useMemo(
-    () => renderBackgroundTile(content, caption, dimensions),
-    [content, caption, dimensions],
+    () =>
+      renderBackgroundTile({ x, y, width, height }, caption, {
+        width: imageWidth,
+        height: imageHeight,
+      }),
+    [x, y, width, height, caption, imageWidth, imageHeight],
   );
   return tile && <CanvasImage {...tile} listening={false} />;
 }
