@@ -1,3 +1,4 @@
+import type { LayerBackground } from './layer-background';
 import type { FontFamily } from './fonts';
 import type { ImageAsset } from './inline-image';
 import type { LogoContent } from './svg-asset';
@@ -30,6 +31,7 @@ export type Anchor =
   | 'bottom-right';
 
 export interface Caption {
+  background?: LayerBackground;
   visible?: boolean;
   logo?: LogoContent;
   images?: ImageAsset[];
