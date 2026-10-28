@@ -15,7 +15,15 @@ import {
 import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { ContentImageDropOverlay } from './content-image-drop-overlay';
-import { ImagePlus, Plus, Tag, Camera, Trash2, Pilcrow } from 'lucide-react';
+import {
+  ImagePlus,
+  Plus,
+  Tag,
+  Camera,
+  Trash2,
+  Pilcrow,
+  Replace,
+} from 'lucide-react';
 import { createId } from '@/lib/create-id';
 import type { JSONContent } from '@tiptap/core';
 import { NodeSelection } from '@tiptap/pm/state';
@@ -820,7 +828,8 @@ export function CaptionEditor({
                   upload.current?.click();
                 }}
               >
-                Replace image
+                <Replace aria-hidden="true" />
+                Replace graphic
               </Button>
             )}
             <Button
