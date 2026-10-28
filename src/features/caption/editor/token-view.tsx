@@ -1,3 +1,4 @@
+import { metadataTokenStatus } from './token-status';
 import { Tooltip } from '@/components/ui/tooltip';
 import { parseImageToken } from '@/domain/inline-image';
 import { imageSource } from '../image-assets';
@@ -45,6 +46,7 @@ export function TokenView({
         ? !asset
         : !['icon:aperture', 'icon:camera'].includes(token)
       : !values[token]?.trim();
+  const status = icon ? undefined : metadataTokenStatus(token, values);
   return (
     <Tooltip
       selectionActive={!!selected}
@@ -52,8 +54,10 @@ export function TokenView({
         graphic
           ? graphic.name
           : missing
-            ? `${icon ? (imageRef ? 'Missing image' : 'Missing icon') : 'No value found for'} · {${token}}`
-            : `{${token}}${icon ? '' : ` · ${values[token]}`}`
+            ? `${icon ? (imageRef ? 'Missing image' : 'Missing icon') : status === 'absent' ? 'Tag not found in this photo' : 'No value returned for'} · {${token}}`
+            : icon
+              ? `{${token}}`
+              : values[token]
       }
     >
       <NodeViewWrapper
@@ -68,7 +72,8 @@ export function TokenView({
         }}
         data-token={token}
         data-missing={missing || undefined}
-        className={`caption-token relative inline-flex cursor-grab items-center rounded text-content-primary ${icon ? 'align-middle text-inherit' : 'control-neutral gap-1 px-1.5 py-0.5 align-baseline text-xs'} ${selected ? 'outline-2 outline-input-focus-ring' : ''} ${missing && !icon ? 'border border-dashed' : ''}`}
+        data-value-status={status}
+        className={`caption-token relative inline-flex cursor-grab items-center rounded text-content-primary ${icon ? 'align-middle text-inherit' : 'control-neutral gap-1 px-1.5 py-0.5 align-baseline text-xs'} ${selected ? 'outline-2 outline-input-focus-ring' : ''}`}
       >
         {missing ? (
           <TriangleAlert

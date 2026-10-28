@@ -547,34 +547,41 @@ export function CaptionEditor({
             </span>
           )}
         </div>
-        <div className="mt-2 flex items-center justify-end gap-2">
-          {actions}
-          <Tooltip content="Insert an SVG or PNG at the text cursor">
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={loading}
-              onClick={() => {
-                replacePosition.current = null;
-                upload.current?.click();
+        <div className="mt-2 flex w-full items-center gap-2">
+          <span className="text-xs text-content-secondary">Add</span>
+          <div
+            role="group"
+            aria-label="Add content"
+            className="control-segments grid min-w-0 flex-1 auto-cols-fr grid-flow-col items-center gap-1 p-1"
+          >
+            {actions}
+            <Tooltip content="Insert an SVG or PNG at the text cursor">
+              <button
+                type="button"
+                className="control-segment flex h-7 min-w-0 items-center justify-center gap-1 px-2 text-xs [&_svg]:size-4"
+                disabled={loading}
+                onClick={() => {
+                  replacePosition.current = null;
+                  upload.current?.click();
+                }}
+              >
+                <ImagePlus aria-hidden="true" />
+                Image
+              </button>
+            </Tooltip>
+            <input
+              ref={upload}
+              type="file"
+              accept="image/svg+xml,image/png,.svg,.png"
+              className="sr-only"
+              aria-label="Upload image"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                event.target.value = '';
+                if (file) void addImage(file, replacePosition.current);
               }}
-            >
-              <ImagePlus aria-hidden="true" />
-              Image
-            </Button>
-          </Tooltip>
-          <input
-            ref={upload}
-            type="file"
-            accept="image/svg+xml,image/png,.svg,.png"
-            className="sr-only"
-            aria-label="Upload image"
-            onChange={(event) => {
-              const file = event.target.files?.[0];
-              event.target.value = '';
-              if (file) void addImage(file, replacePosition.current);
-            }}
-          />
+            />
+          </div>
         </div>
         {loading && (
           <p role="status" className="mt-2 text-xs text-content-secondary">
