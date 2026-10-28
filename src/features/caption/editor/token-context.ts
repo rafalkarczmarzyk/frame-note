@@ -7,6 +7,7 @@ export const TokenContext = createContext<{
   imageFontPixels?: number;
   imageUnitPixels?: number;
   values: Record<string, string>;
+  hasPhoto?: boolean;
   icons?: readonly SvgIcon[];
 }>({
   values: {

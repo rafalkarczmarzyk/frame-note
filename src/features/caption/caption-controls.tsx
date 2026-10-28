@@ -174,7 +174,7 @@ export function CaptionControls({
                 disabled={disabled}
                 className="space-y-2 disabled:opacity-70"
               >
-                <div className="grid min-w-0 grid-cols-[1rem_minmax(0,1fr)] items-center gap-1">
+                <div className="grid min-w-0 grid-cols-[1rem_minmax(0,1fr)] items-center gap-2">
                   <Type
                     className="size-4 shrink-0 text-content-secondary"
                     aria-hidden="true"
@@ -202,7 +202,7 @@ export function CaptionControls({
                   </Field>
                 </div>
                 <div className="grid grid-cols-2 items-center gap-2">
-                  <div className="grid min-w-0 grid-cols-[1rem_minmax(0,1fr)] items-center gap-1">
+                  <div className="grid min-w-0 grid-cols-[1rem_minmax(0,1fr)] items-center gap-2">
                     <Tooltip content="Font size">
                       <ALargeSmall
                         className="size-4 shrink-0 text-content-secondary"
@@ -225,7 +225,7 @@ export function CaptionControls({
                       onValueChange={(fontSize) => style({ fontSize })}
                     />
                   </div>
-                  <div className="grid min-w-0 grid-cols-[1rem_minmax(0,1fr)] items-center gap-1">
+                  <div className="grid min-w-0 grid-cols-[1rem_minmax(0,1fr)] items-center gap-2">
                     <Tooltip content="Line spacing · multiple of font size">
                       <ArrowDownUp
                         className="size-4 shrink-0 text-content-secondary"

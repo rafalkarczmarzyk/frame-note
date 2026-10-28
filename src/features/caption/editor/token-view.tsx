@@ -19,6 +19,7 @@ export function TokenView({
 }: NodeViewProps) {
   const {
     values,
+    hasPhoto = true,
     icons,
     images,
     selectedImagePosition,
@@ -45,8 +46,9 @@ export function TokenView({
       ? icons
         ? !asset
         : !['icon:aperture', 'icon:camera'].includes(token)
-      : !values[token]?.trim();
-  const status = icon ? undefined : metadataTokenStatus(token, values);
+      : hasPhoto && !values[token]?.trim();
+  const status =
+    icon || !hasPhoto ? undefined : metadataTokenStatus(token, values);
   return (
     <Tooltip
       selectionActive={!!selected}
@@ -57,7 +59,9 @@ export function TokenView({
             ? `${icon ? (imageRef ? 'Missing image' : 'Missing icon') : status === 'absent' ? 'Tag not found in this photo' : 'No value returned for'} · {${token}}`
             : icon
               ? `{${token}}`
-              : values[token]
+              : !hasPhoto
+                ? 'Open a photo to preview this value'
+                : values[token]
       }
     >
       <NodeViewWrapper

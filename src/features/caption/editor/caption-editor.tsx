@@ -6,7 +6,7 @@ import {
 import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { ContentImageDropOverlay } from './content-image-drop-overlay';
-import { ImagePlus } from 'lucide-react';
+import { ImagePlus, Plus } from 'lucide-react';
 import { createId } from '@/lib/create-id';
 import type { JSONContent } from '@tiptap/core';
 import { NodeSelection } from '@tiptap/pm/state';
@@ -45,6 +45,7 @@ export function CaptionEditor({
   fontSize = 20,
   dimensions = { width: 1000, height: 1000 },
   fields,
+  hasPhoto = true,
   icons,
   onChange,
   onFocus,
@@ -58,6 +59,7 @@ export function CaptionEditor({
   fontSize?: number;
   dimensions?: ImageDimensions;
   fields: readonly MetadataField[];
+  hasPhoto?: boolean;
   icons: readonly SvgIcon[];
   onChange: (value: string, images?: ImageAsset[]) => void;
   onFocus: () => void;
@@ -511,6 +513,7 @@ export function CaptionEditor({
     <TokenContext.Provider
       value={{
         values,
+        hasPhoto,
         icons,
         images,
         selectedImagePosition: selectedPosition,
@@ -548,17 +551,20 @@ export function CaptionEditor({
           )}
         </div>
         <div className="mt-2 flex w-full items-center gap-2">
-          <span className="text-xs text-content-secondary">Add</span>
+          <Plus
+            aria-hidden="true"
+            className="size-4 shrink-0 text-content-secondary"
+          />
           <div
             role="group"
             aria-label="Add content"
-            className="control-segments grid min-w-0 flex-1 auto-cols-fr grid-flow-col items-center gap-1 p-1"
+            className="control-segments grid min-w-0 flex-1 auto-cols-auto grid-flow-col items-center gap-1 p-1"
           >
             {actions}
             <Tooltip content="Insert an SVG or PNG at the text cursor">
               <button
                 type="button"
-                className="control-segment flex h-7 min-w-0 items-center justify-center gap-1 px-2 text-xs [&_svg]:size-4"
+                className="control-segment flex h-7 min-w-0 items-center justify-center gap-1 px-2 text-xs whitespace-nowrap [&_svg]:size-4"
                 disabled={loading}
                 onClick={() => {
                   replacePosition.current = null;
@@ -566,7 +572,7 @@ export function CaptionEditor({
                 }}
               >
                 <ImagePlus aria-hidden="true" />
-                Image
+                {'SVG\u00a0/\u00a0PNG'}
               </button>
             </Tooltip>
             <input

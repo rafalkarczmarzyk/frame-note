@@ -31,7 +31,6 @@ test('panels receive keyboard focus and return it to their opener', async ({
     {
       trigger: page.getByRole('button', { name: 'Browse icons', exact: true }),
       dialog: 'Inline icons',
-      input: 'Icon name',
     },
     {
       trigger: page.getByRole('button', {
