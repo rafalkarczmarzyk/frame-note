@@ -1,3 +1,6 @@
+import { BackgroundControls } from '../caption/background-controls';
+import { BackgroundPreview } from '../caption/background-preview';
+import { captionBackgroundRect } from '../caption/background-render';
 import { parseIconToken } from '@/domain/inline-icon';
 import { metadataTokenStatus } from '../caption/editor/token-status';
 import type { SessionDocument } from './session-document';
@@ -641,8 +644,21 @@ function PhotoWorkspaceContent({
                                   config.fontSize *
                                   config.lineHeight,
                               };
+                            const decoration = placeholder
+                              ? geometry
+                              : captionBackgroundRect(geometry, caption, {
+                                  width,
+                                  height,
+                                });
                             return (
                               <Group key={id}>
+                                {!placeholder && text.trim() && (
+                                  <BackgroundPreview
+                                    content={geometry}
+                                    caption={caption}
+                                    dimensions={{ width, height }}
+                                  />
+                                )}
                                 <Group
                                   x={geometry.x}
                                   y={geometry.y}
@@ -704,8 +720,10 @@ function PhotoWorkspaceContent({
                                   onTap={() => selectContainer(id)}
                                 >
                                   <Rect
-                                    width={geometry.width}
-                                    height={geometry.height}
+                                    x={decoration.x - geometry.x}
+                                    y={decoration.y - geometry.y}
+                                    width={decoration.width}
+                                    height={decoration.height}
                                     fill={color}
                                     opacity={0}
                                   />
@@ -751,10 +769,10 @@ function PhotoWorkspaceContent({
                                   draggingId === id) &&
                                   (text || placeholder || caption.logo) && (
                                     <Rect
-                                      x={geometry.x - 4 / scale}
-                                      y={geometry.y - 4 / scale}
-                                      width={geometry.width + 8 / scale}
-                                      height={geometry.height + 8 / scale}
+                                      x={decoration.x - 4 / scale}
+                                      y={decoration.y - 4 / scale}
+                                      width={decoration.width + 8 / scale}
+                                      height={decoration.height + 8 / scale}
                                       stroke={getComputedStyle(
                                         document.documentElement,
                                       )
@@ -1288,6 +1306,12 @@ function PhotoWorkspaceContent({
                         )}
                     </InspectorSection>
                   </>
+                  <BackgroundControls
+                    caption={settings}
+                    dimensions={dimensions}
+                    onChange={setSettings}
+                    disabled={exporting}
+                  />
                   <CaptionControls
                     colorSelectionSource={
                       colorSelections[activeContainer.id]?.value ===

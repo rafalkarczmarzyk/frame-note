@@ -1,4 +1,4 @@
-import { resolveCaptionColor, normalizeHex } from '@/domain/caption-colors';
+import { resolveCaptionColor, normalizeHex } from '../../domain/caption-colors';
 
 export function resolvedColor(value: string) {
   const resolved = resolveCaptionColor(value, (name) =>

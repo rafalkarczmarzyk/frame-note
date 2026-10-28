@@ -1,3 +1,4 @@
+import { renderBackgroundTile } from './background-render';
 import { ensureCaptionFont } from './font-loading';
 import { canvasFontStyle } from '../../domain/font-style';
 import { resolvedTextAlign } from '../../domain/document';
@@ -158,6 +159,15 @@ async function renderPhotoCaptions(
     );
     for (const { caption, text, color, icons = [] } of captions) {
       if (caption.visible === false) continue;
+      const geometry = caption.logo
+        ? logoLayout(dimensions, caption)
+        : inlineLayout(dimensions, caption, text, icons);
+      const background =
+        text.trim() || caption.logo
+          ? renderBackgroundTile(geometry, caption, dimensions)
+          : null;
+      if (background)
+        layer.add(new Konva.Image({ ...background, listening: false }));
       if (caption.logo) {
         const scene = logoLayout(dimensions, caption);
         const raw = await loadIcon(caption.logo.asset);

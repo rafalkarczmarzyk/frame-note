@@ -50,7 +50,8 @@ export function MarginEditor({
 }: MarginEditorProps) {
   const [hovered, setHovered] = useState<keyof Margins | null>(null);
   const [focused, setFocused] = useState<keyof Margins | null>(null);
-  const preview = useMarginPreview();
+  const inheritedPreview = useMarginPreview();
+  const preview = purpose === 'padding' ? null : inheritedPreview;
   const active = preview ? preview.active : (focused ?? hovered);
   const clearHover = preview?.hover;
   const clearFocus = preview?.focus;
