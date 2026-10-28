@@ -84,7 +84,10 @@ import { formatBytes } from '@/lib/format-bytes';
 import { usePreparedExport } from '../caption/use-prepared-export';
 import { createPortal } from 'react-dom';
 import { usedTokens } from '../caption/insert-token';
-import { CaptionControls } from '../caption/caption-controls';
+import {
+  CaptionControls,
+  CaptionPositionControls,
+} from '../caption/caption-controls';
 import { Button } from '@/components/ui/button';
 import { captionConfig, exportName } from '../caption/render';
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
@@ -1323,13 +1326,6 @@ function PhotoWorkspaceContent({
                         )}
                     </InspectorSection>
                   </>
-                  <BackgroundControls
-                    caption={settings}
-                    dimensions={dimensions}
-                    onChange={setSettings}
-                    disabled={exporting}
-                    glassEnabled
-                  />
                   <CaptionControls
                     colorSelectionSource={
                       colorSelections[activeContainer.id]?.value ===
@@ -1358,6 +1354,19 @@ function PhotoWorkspaceContent({
                         value === 'fonts' ? null : 'fonts',
                       )
                     }
+                  />
+                  <BackgroundControls
+                    caption={settings}
+                    dimensions={dimensions}
+                    onChange={setSettings}
+                    disabled={exporting}
+                    glassEnabled
+                  />
+                  <CaptionPositionControls
+                    caption={settings}
+                    dimensions={dimensions}
+                    onChange={setSettings}
+                    disabled={exporting}
                   />
                 </SidebarSection>
               )}

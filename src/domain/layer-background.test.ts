@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { backgroundRect, createLayerBackground } from './layer-background';
+import {
+  backgroundRect,
+  createColorLayerBackground,
+  createGlassLayerBackground,
+  createLayerBackground,
+} from './layer-background';
 import { createCaption } from './document';
 import { convertSizing } from './sizing';
 import { addCaption, createCaptionLayout } from './caption-layout';
@@ -7,6 +12,28 @@ import { createPreset, parsePreset } from './presets';
 
 const dimensions = { width: 1200, height: 800 };
 describe('layer backgrounds', () => {
+  it('provides the intended glass starting values', () => {
+    expect(createGlassLayerBackground()).toMatchObject({
+      type: 'glass',
+      color: 'caption-dark-gray',
+      opacity: 0.12,
+      padding: { top: 0.8, right: 1.7, bottom: 0.8, left: 1.7 },
+      paddingLinkMode: 'pairs',
+      radius: 1.5,
+      blur: 0.5,
+    });
+  });
+  it('provides the intended color starting values', () => {
+    expect(createColorLayerBackground()).toMatchObject({
+      type: 'color',
+      color: 'charcoal',
+      opacity: 0.67,
+      padding: { top: 0.8, right: 1.7, bottom: 0.8, left: 1.7 },
+      paddingLinkMode: 'pairs',
+      radius: 1.5,
+      shadow: { enabled: false },
+    });
+  });
   it('expands around stable content and ignores None and empty content', () => {
     const b = createLayerBackground();
     const rect = { x: 30, y: 40, width: 200, height: 50 };

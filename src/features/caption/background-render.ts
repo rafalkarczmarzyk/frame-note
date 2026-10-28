@@ -182,14 +182,14 @@ export function renderBackgroundTile(
     context.globalAlpha = 0.18;
     context.fillStyle = reflection;
     context.fillRect(rect.x, rect.y, rect.width, rect.height);
-    context.lineWidth = 2 * scale;
-    context.globalAlpha = 0.55;
+    context.lineWidth = scale;
+    context.globalAlpha = 0.35;
     context.strokeStyle = light;
-    path(context, { ...rect, y: rect.y + scale }, background.radius);
+    path(context, { ...rect, y: rect.y + 0.25 * scale }, background.radius);
     context.stroke();
-    context.globalAlpha = 0.4;
+    context.globalAlpha = 0.22;
     context.strokeStyle = dark;
-    path(context, { ...rect, y: rect.y - scale }, background.radius);
+    path(context, { ...rect, y: rect.y - 0.25 * scale }, background.radius);
     context.stroke();
     context.restore();
   }

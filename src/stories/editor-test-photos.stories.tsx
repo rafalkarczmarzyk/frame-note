@@ -1,4 +1,7 @@
-import { createLayerBackground } from '@/domain/layer-background';
+import {
+  createColorLayerBackground,
+  createGlassLayerBackground,
+} from '@/domain/layer-background';
 import { builtinPresets } from '@/domain/builtin-presets';
 import { createMetadataField } from '@/domain/metadata';
 import { Button } from '@/components/ui/button';
@@ -472,9 +475,10 @@ export const LongExposureTenMinutes: Story = {
 function backgroundExample(type: 'color' | 'glass') {
   const caption = createCaption();
   caption.template = '{author}\n{lens}\n{exposure}';
-  caption.background = createLayerBackground();
-  caption.background.type = type;
-  caption.background.shadow.enabled = type === 'color';
+  caption.background =
+    type === 'glass'
+      ? createGlassLayerBackground()
+      : createColorLayerBackground();
   return createCaptionLayout(caption);
 }
 export const ColorLayerBackground: Story = {
