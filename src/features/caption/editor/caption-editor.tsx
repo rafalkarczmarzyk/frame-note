@@ -35,6 +35,7 @@ import {
 import { importImage, prepareImageAssets } from '../image-assets';
 import { Button } from '@/components/ui/button';
 import { SegmentedControl } from '@/components/ui/segmented-control';
+import { InlineInputGroup } from '@/components/ui/inline-input-group';
 import {
   toPixels,
   pixelsPerUnit,
@@ -179,7 +180,7 @@ export function CaptionEditor({
         'aria-placeholder': 'Add text, a tag or an icon…',
         spellcheck: 'false',
         class:
-          'caption-content-editor control-field min-h-24 max-h-48 overflow-y-auto p-2 text-xs whitespace-pre-wrap outline-none [&_.ProseMirror-selectednode]:outline-none',
+          'caption-content-editor isolate control-field min-h-24 max-h-48 overflow-y-auto p-2 text-xs whitespace-pre-wrap outline-none [&_.ProseMirror-selectednode]:outline-none',
       }),
       clipboardTextSerializer: (slice) =>
         documentTemplate({ type: 'doc', content: slice.content.toJSON() }),
@@ -644,55 +645,60 @@ export function CaptionEditor({
             aria-hidden="true"
             className="size-4 shrink-0 text-content-secondary"
           />
-          <div
-            role="group"
-            aria-label="Add content"
-            className="control-segments grid min-w-0 flex-1 auto-cols-auto grid-flow-col items-center gap-1 p-1"
+          <InlineInputGroup
+            label="Add content controls"
+            className="min-w-0 flex-1"
           >
-            {actions}
-            <input
-              ref={upload}
-              type="file"
-              accept="image/svg+xml,image/png,.svg,.png"
-              className="sr-only"
-              aria-label="Upload image"
-              onChange={(event) => {
-                const file = event.target.files?.[0];
-                event.target.value = '';
-                if (file) void addImage(file, replacePosition.current);
-              }}
-            />
-          </div>
-          <span className="control-segments inline-flex shrink-0 p-1">
-            <Tooltip
-              content={
-                showWhitespace
-                  ? 'Hide spaces and line breaks'
-                  : 'Show spaces and line breaks'
-              }
+            <div
+              role="group"
+              aria-label="Add content"
+              className="control-segments grid control-height min-w-0 flex-1 auto-cols-auto grid-flow-col items-center gap-1 px-1"
             >
-              <button
-                type="button"
-                aria-label="Show formatting marks"
-                aria-pressed={showWhitespace}
-                className="control-segment flex size-7 shrink-0 items-center justify-center"
-                data-state={showWhitespace ? 'on' : 'off'}
-                onMouseDown={(event) => event.preventDefault()}
-                onClick={() => {
-                  const next = !showWhitespace;
-                  setShowWhitespace(next);
-                  if (editor)
-                    editor.view.dispatch(
-                      closeHistory(editor.state.tr)
-                        .setMeta(whitespaceKey, next)
-                        .setMeta('addToHistory', false),
-                    );
+              {actions}
+              <input
+                ref={upload}
+                type="file"
+                accept="image/svg+xml,image/png,.svg,.png"
+                className="sr-only"
+                aria-label="Upload image"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  event.target.value = '';
+                  if (file) void addImage(file, replacePosition.current);
                 }}
+              />
+            </div>
+            <span className="control-segments inline-flex control-height shrink-0 px-1">
+              <Tooltip
+                content={
+                  showWhitespace
+                    ? 'Hide spaces and line breaks'
+                    : 'Show spaces and line breaks'
+                }
               >
-                <Pilcrow aria-hidden="true" className="size-4" />
-              </button>
-            </Tooltip>
-          </span>
+                <button
+                  type="button"
+                  aria-label="Show formatting marks"
+                  aria-pressed={showWhitespace}
+                  className="control-segment control-height flex min-w-10 shrink-0 items-center justify-center px-2"
+                  data-state={showWhitespace ? 'on' : 'off'}
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => {
+                    const next = !showWhitespace;
+                    setShowWhitespace(next);
+                    if (editor)
+                      editor.view.dispatch(
+                        closeHistory(editor.state.tr)
+                          .setMeta(whitespaceKey, next)
+                          .setMeta('addToHistory', false),
+                      );
+                  }}
+                >
+                  <Pilcrow aria-hidden="true" className="size-4" />
+                </button>
+              </Tooltip>
+            </span>
+          </InlineInputGroup>
         </div>
         {loading && (
           <p role="status" className="mt-2 text-xs text-content-secondary">

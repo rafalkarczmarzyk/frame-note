@@ -81,6 +81,14 @@
 
 /* Base palette above is also used by photo captions. UI roles below are independent. */
 :root {
+  --control-height: 36px;
+  --button-icon-size: 14px;
+  --button-icon-only-size: 18px;
+  --button-icon-only-size-inset: 16px;
+  --button-icon-size-inset: 12px;
+  --control-group-padding: 4px;
+  --control-height-inline-button: 28px;
+  --control-square-size: 36px;
   --film-tabletop-base: color-mix(
     in srgb,
     var(--sidebar-base) 85%,
@@ -592,9 +600,21 @@
   }
 
   .control-segments {
+    height: var(--control-height);
+    box-sizing: border-box;
+    padding: var(--control-group-padding);
+    align-items: center;
+    border-width: 0;
     border-radius: calc(var(--radius) + 4px);
     background: var(--segment-base);
     box-shadow: var(--shadow-inset);
+  }
+  .control-segments > .control-segment,
+  .control-segments > .control-button,
+  .control-segments > .numeric-input,
+  .control-segments > .control-field {
+    height: var(--control-height-inline-button);
+    min-height: var(--control-height-inline-button);
   }
   .control-segment {
     border-radius: var(--radius);
@@ -795,7 +815,7 @@
     background: var(--tone-surface);
   }
   .margin-editor-compact {
-    grid-template-rows: 30px 56px 30px;
+    grid-template-rows: var(--control-height) 56px var(--control-height);
     gap: 0;
     padding: 8px;
   }
@@ -817,7 +837,7 @@
     bottom: -1px;
   }
   .margin-model-value .numeric-input {
-    height: 30px;
+    height: var(--control-height);
     padding-inline: 3px;
     background: transparent;
     border-color: transparent;
@@ -888,9 +908,30 @@
 }
 
 @layer components {
+  .control-height {
+    height: var(--control-height);
+  }
+  .control-min-height {
+    min-height: var(--control-height);
+  }
+  .control-square {
+    width: var(--control-square-size);
+    height: var(--control-square-size);
+  }
+  .inline-input-group {
+    display: flex;
+    height: var(--control-height);
+    min-width: 0;
+    align-items: center;
+    gap: 4px;
+  }
+  .picker-controls-grid button {
+    height: var(--control-height);
+    min-width: 40px;
+  }
   .numeric-input {
     display: flex;
-    height: 36px;
+    height: var(--control-height);
     min-width: 0;
     align-items: center;
     gap: 4px;
@@ -1208,4 +1249,51 @@ fieldset:disabled .glass-switch {
 .caption-content-editor .caption-token {
   letter-spacing: normal;
   word-spacing: normal;
+}
+
+@layer components {
+  .control-segments > .control-segments {
+    height: var(--control-height-inline-button);
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+}
+
+/* Anchor selection is a three-row grid, independent of inline control sizing. */
+@layer components {
+  .control-segments.anchor-picker {
+    height: auto;
+  }
+  .control-segments.anchor-picker > .control-segment {
+    height: 36px;
+    min-height: 36px;
+  }
+}
+
+/* Shared icon geometry for text buttons, icon buttons and toggle buttons. */
+@layer utilities {
+  :is(.control-button, .control-segment) > svg {
+    width: var(--button-icon-size);
+    height: var(--button-icon-size);
+    flex-shrink: 0;
+  }
+  .control-segments :is(.control-button, .control-segment) > svg {
+    width: var(--button-icon-size-inset);
+    height: var(--button-icon-size-inset);
+  }
+  :is(.control-button, .control-segment)[data-button-content='icon'] > svg {
+    width: var(--button-icon-only-size);
+    height: var(--button-icon-only-size);
+  }
+  .control-segments
+    :is(.control-button, .control-segment)[data-button-content='icon']
+    > svg {
+    width: var(--button-icon-only-size-inset);
+    height: var(--button-icon-only-size-inset);
+  }
+  .anchor-picker .control-segment > svg {
+    width: 16px;
+    height: 16px;
+  }
 }

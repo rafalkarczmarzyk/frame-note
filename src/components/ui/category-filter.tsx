@@ -38,7 +38,7 @@ export function CategoryFilter({
         <ToggleGroup.Item
           key={category.value}
           value={category.value}
-          className="control-segment max-w-full rounded-full px-3 py-1.5 text-xs break-words focus-visible:outline-2 focus-visible:outline-input-focus-ring"
+          className="control-segment control-min-height max-w-full rounded-full px-3 py-1.5 text-xs break-words focus-visible:outline-2 focus-visible:outline-input-focus-ring"
         >
           {category.label}
         </ToggleGroup.Item>

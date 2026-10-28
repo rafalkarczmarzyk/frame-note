@@ -20,7 +20,7 @@ export function AppHeader({
         <button
           type="button"
           aria-label="About FrameNote"
-          className="shrink-0 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring"
+          className="control-button control-height inline-flex min-w-10 shrink-0 items-center justify-center px-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring"
           onClick={() => setAboutOpen(true)}
         >
           <FrameNoteLogo className="hidden h-[22px] w-auto sm:block" />

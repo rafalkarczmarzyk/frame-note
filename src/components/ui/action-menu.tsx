@@ -212,7 +212,7 @@ export function ActionMenu({
                       role="menuitem"
                       disabled={item.disabled}
                       tabIndex={-1}
-                      className="control-button flex w-full items-center gap-2 rounded px-3 py-2 text-left text-xs enabled:hover:bg-menu-item-hover disabled:opacity-40 focus-visible:bg-menu-item-hover focus-visible:outline-2 focus-visible:outline-input-focus-ring [&_svg]:size-4"
+                      className="control-button flex w-full items-center gap-2 rounded px-3 py-2 text-left text-xs control-min-height enabled:hover:bg-menu-item-hover disabled:opacity-40 focus-visible:bg-menu-item-hover focus-visible:outline-2 focus-visible:outline-input-focus-ring [&_svg]:size-4"
                       onClick={() => {
                         close(true);
                         item.onSelect();

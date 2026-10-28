@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Tooltip } from './tooltip';
 import { NumberField } from './number-field';
 import { Slider } from './slider';
+import { InlineInputGroup } from './inline-input-group';
 
 /** Consistent labeled slider and numeric input used for inspector adjustments. */
 export function RangeField({
@@ -32,7 +33,10 @@ export function RangeField({
   tooltip: string;
 }) {
   return (
-    <div className="grid grid-cols-[1rem_minmax(0,1fr)_5rem] items-center gap-2">
+    <InlineInputGroup
+      label={label}
+      className="grid grid-cols-[1rem_minmax(0,1fr)_5rem] gap-2"
+    >
       <Tooltip content={tooltip}>
         <span className="inline-flex size-4 items-center justify-center text-content-secondary">
           {icon}
@@ -62,6 +66,6 @@ export function RangeField({
           disabled={disabled}
         />
       </Tooltip>
-    </div>
+    </InlineInputGroup>
   );
 }

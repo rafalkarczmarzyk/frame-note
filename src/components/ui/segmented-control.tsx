@@ -1,3 +1,4 @@
+import { buttonContentMode } from './button-content';
 import { Tooltip } from './tooltip';
 import * as ToggleGroup from '@radix-ui/react-toggle-group';
 import type { ReactNode } from 'react';
@@ -34,7 +35,7 @@ export function SegmentedControl<T extends string>({
         if (next) onValueChange(next as T);
       }}
       disabled={disabled}
-      className={cn('control-segments grid gap-1 p-1', className)}
+      className={cn('control-segments grid control-height gap-1', className)}
       style={{
         gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))`,
       }}
@@ -44,9 +45,12 @@ export function SegmentedControl<T extends string>({
           <ToggleGroup.Item
             key={option.value}
             value={option.value}
+            data-button-content={buttonContentMode(
+              option.content ?? option.label,
+            )}
             aria-label={option.label}
             title={option.tooltip ? undefined : (option.title ?? option.label)}
-            className="control-segment flex h-7 min-w-0 items-center justify-center gap-1 px-2 text-xs [&_svg]:size-4"
+            className="control-segment flex h-full min-w-0 items-center justify-center gap-1 px-2 text-xs"
           >
             {option.content ?? option.label}
           </ToggleGroup.Item>

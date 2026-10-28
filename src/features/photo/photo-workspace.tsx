@@ -1249,7 +1249,7 @@ function PhotoWorkspaceContent({
                             <Tooltip content="Insert photo metadata at the text cursor">
                               <button
                                 type="button"
-                                className="control-segment flex h-7 min-w-0 items-center justify-center gap-1 px-2 text-xs whitespace-nowrap [&_svg]:size-4 [&_svg]:shrink-0"
+                                className="control-segment control-height flex min-w-0 items-center justify-center gap-1 px-2 text-xs whitespace-nowrap [&_svg]:size-4 [&_svg]:shrink-0"
                                 aria-label={
                                   tagsOpen
                                     ? 'Hide available tags'
@@ -1271,7 +1271,7 @@ function PhotoWorkspaceContent({
                             <Tooltip content="Insert a built-in icon or SVG / PNG graphic">
                               <button
                                 type="button"
-                                className="control-segment flex h-7 min-w-0 items-center justify-center gap-1 px-2 text-xs whitespace-nowrap [&_svg]:size-4 [&_svg]:shrink-0"
+                                className="control-segment control-height flex min-w-0 items-center justify-center gap-1 px-2 text-xs whitespace-nowrap [&_svg]:size-4 [&_svg]:shrink-0"
                                 aria-label="Browse graphics"
                                 data-state={
                                   activePanel === 'graphics' ? 'on' : 'off'

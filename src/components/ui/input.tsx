@@ -5,7 +5,10 @@ export function Input({ className, ...props }: ComponentProps<'input'>) {
   return (
     <input
       data-slot="input"
-      className={cn('control-field h-9 w-full min-w-0 px-3 text-xs', className)}
+      className={cn(
+        'control-field control-height w-full min-w-0 px-3 text-xs',
+        className,
+      )}
       {...props}
     />
   );

@@ -80,8 +80,8 @@ export function MarginEditor({
         size="sm"
         className={
           compact
-            ? 'absolute right-2 bottom-2 z-10 h-6 gap-1 px-1.5 text-xs'
-            : 'h-6 gap-1 px-1.5 text-xs'
+            ? 'absolute right-2 bottom-2 z-10 min-w-10 gap-1 px-1.5 text-xs'
+            : 'min-w-10 gap-1 px-1.5 text-xs'
         }
         aria-label={`Reset ${purpose}`}
         title=""

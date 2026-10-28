@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { PickerList } from '@/components/ui/picker-list';
 import { IconButton } from '@/components/ui/icon-button';
+import { InlineInputGroup } from '@/components/ui/inline-input-group';
 import { ActionMenu } from '@/components/ui/action-menu';
 import { AnchorIcon } from '@/components/ui/anchor-picker';
 import { captionTags } from '@/domain/caption-tags';
@@ -163,14 +164,13 @@ export function LayerList({
             tooltip: layerContentLabel(container),
             selected: layout.activeId === container.id,
             actions: (
-              <span className="control-segments inline-flex shrink-0 gap-1 p-1">
+              <InlineInputGroup
+                label={`Layer ${index + 1} actions`}
+                className="control-segments shrink-0 px-1"
+              >
                 <IconButton
                   aria-pressed={container.visible !== false}
-                  className={
-                    appearance === 'compact'
-                      ? 'size-7 control-segment layer-glass-button'
-                      : 'control-segment layer-glass-button'
-                  }
+                  className="control-segment layer-glass-button"
                   label={`${container.visible === false ? 'Show' : 'Hide'} layer ${index + 1}`}
                   onClick={() => onToggleVisibility(container.id)}
                 >
@@ -178,11 +178,7 @@ export function LayerList({
                 </IconButton>
 
                 <ActionMenu
-                  triggerClassName={
-                    appearance === 'compact'
-                      ? 'size-7 control-segment layer-glass-button'
-                      : 'control-segment layer-glass-button'
-                  }
+                  triggerClassName="control-segment layer-glass-button"
                   label={`Layer ${index + 1} actions`}
                   items={[
                     {
@@ -250,7 +246,7 @@ export function LayerList({
                     },
                   ]}
                 />
-              </span>
+              </InlineInputGroup>
             ),
           };
         })}

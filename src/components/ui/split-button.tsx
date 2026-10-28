@@ -81,7 +81,7 @@ export function SplitButton({
         triggerAppearance={{ variant, size, color }}
         triggerClassName={cn(
           'shrink-0 rounded-l-none border-l border-border-subtle px-0 py-0',
-          size === 'sm' ? 'w-8' : 'w-10',
+          'w-10',
         )}
       />
     </div>

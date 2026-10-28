@@ -57,7 +57,7 @@ export function Slider({
         max={max}
         step={step}
         disabled={disabled}
-        className="control-slider relative flex h-10 w-full touch-none select-none items-center data-[disabled]:opacity-40"
+        className="control-slider control-height relative flex w-full touch-none select-none items-center data-[disabled]:opacity-40"
       >
         <SliderPrimitive.Track className="control-slider-track relative h-2 flex-1 rounded-full">
           <SliderPrimitive.Range className="control-slider-range absolute h-full rounded-full" />

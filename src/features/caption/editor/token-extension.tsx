@@ -66,7 +66,8 @@ export const CaptionToken = Node.create({
               )
                 decorations.push(
                   Decoration.node(position, position + node.nodeSize, {
-                    class: 'outline-2 outline-input-focus-ring rounded',
+                    class:
+                      'relative z-10 outline-2 outline-input-focus-ring rounded',
                   }),
                 );
             });

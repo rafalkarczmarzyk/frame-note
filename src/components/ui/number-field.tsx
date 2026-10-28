@@ -16,7 +16,9 @@ export function NumberField({
   hint,
   unit,
   hideLabel = false,
+  className,
 }: {
+  className?: string;
   label: string;
   title?: string;
   tooltip?: string;
@@ -30,11 +32,32 @@ export function NumberField({
   unit?: string;
   hideLabel?: boolean;
 }) {
+  if (hideLabel && !hint) {
+    const props = {
+      'aria-label': label,
+      title: tooltip ? '' : title,
+      value,
+      onValueChange,
+      min,
+      max,
+      step,
+      disabled,
+      stepperLabel: label,
+      className,
+    };
+    const control = unit ? (
+      <DimensionInput {...props} unit={unit} />
+    ) : (
+      <NumberInput {...props} />
+    );
+    return tooltip ? <Tooltip content={tooltip}>{control}</Tooltip> : control;
+  }
   return (
     <Field label={label} hint={hint} hideLabel={hideLabel}>
       {(id, descriptionId) => {
         const props = {
           id,
+          className,
           title: tooltip ? '' : title,
           'aria-describedby': descriptionId,
           value,
