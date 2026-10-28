@@ -30,7 +30,8 @@ import { NumberField } from '@/components/ui/number-field';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { AnchorPicker } from '@/components/ui/anchor-picker';
 import { MarginEditor } from '@/components/ui/margin-editor';
-import { Slider } from '@/components/ui/slider';
+import { RangeField } from '@/components/ui/range-field';
+import { Blend } from 'lucide-react';
 import {
   convertSizing,
   pixelsPerUnit,
@@ -38,6 +39,13 @@ import {
   type SizingUnit,
 } from '@/domain/sizing';
 import type { Caption, ImageDimensions } from '../../domain/document';
+
+type CaptionControlsProps = {
+  caption: Caption;
+  dimensions: ImageDimensions;
+  onChange: (caption: Caption) => void;
+  disabled: boolean;
+};
 
 export function CaptionControls({
   caption,
@@ -51,7 +59,7 @@ export function CaptionControls({
   scope = 'all',
   hideTypography = false,
   canConvertUnits = true,
-}: {
+}: CaptionControlsProps & {
   scope?: 'all' | 'local' | 'global';
   hideTypography?: boolean;
   canConvertUnits?: boolean;
@@ -74,39 +82,6 @@ export function CaptionControls({
   const unit = sizingLabels[caption.sizingUnit];
   const factor = pixelsPerUnit(caption.sizingUnit, dimensions);
   const opacity = Math.round(caption.style.opacity * 100);
-  const anchorCoordinates = customPoint(
-    dimensions,
-    { width: 0, height: 0 },
-    caption.position.anchor,
-    anchoredPosition(
-      dimensions,
-      { width: 0, height: 0 },
-      caption.position.anchor,
-      {
-        top: toPixels(
-          caption.position.margins.top,
-          caption.sizingUnit,
-          dimensions,
-        ),
-        right: toPixels(
-          caption.position.margins.right,
-          caption.sizingUnit,
-          dimensions,
-        ),
-        bottom: toPixels(
-          caption.position.margins.bottom,
-          caption.sizingUnit,
-          dimensions,
-        ),
-        left: toPixels(
-          caption.position.margins.left,
-          caption.sizingUnit,
-          dimensions,
-        ),
-      },
-    ),
-  );
-  const coordinates = caption.position.custom ?? anchorCoordinates;
 
   return (
     <>
@@ -351,123 +326,155 @@ export function CaptionControls({
                   onSelectionSourceChange={onColorSelectionSourceChange}
                   disabled={disabled}
                 />
-                <div className="grid grid-cols-[auto_minmax(0,1fr)_5rem] items-center gap-2">
-                  <span className="text-xs text-label">Opacity</span>
-                  <div className="space-y-2">
-                    <Slider
-                      label="Opacity"
-                      value={opacity}
-                      min={0}
-                      max={100}
-                      disabled={disabled}
-                      onValueChange={(value) => style({ opacity: value / 100 })}
-                    />
-                  </div>
-                  <NumberField
-                    label="Opacity value"
-                    hideLabel
-                    unit="%"
-                    value={opacity}
-                    min={0}
-                    max={100}
-                    step={1}
-                    disabled={disabled}
-                    onValueChange={(value) => style({ opacity: value / 100 })}
-                  />
-                </div>
+                <RangeField
+                  label="Opacity"
+                  icon={<Blend className="size-4" aria-hidden="true" />}
+                  tooltip="Text opacity"
+                  value={opacity}
+                  onValueChange={(value) => style({ opacity: value / 100 })}
+                  unit="%"
+                  disabled={disabled}
+                />
               </fieldset>
             </InspectorSection>
           )}
-          <InspectorSection title="Position">
-            <fieldset
-              disabled={disabled}
-              className="space-y-2 disabled:opacity-70"
-            >
-              <SegmentedControl
-                label="Position mode"
-                value={caption.position.custom ? 'custom' : 'anchor'}
-                disabled={disabled}
-                options={[
-                  {
-                    value: 'anchor',
-                    label: 'Anchor',
-                    tooltip: 'Position the layer within the photo margins',
-                  },
-                  {
-                    value: 'custom',
-                    label: 'Manual',
-                    tooltip:
-                      'Position the layer anywhere on the photo; margins do not apply',
-                  },
-                ]}
-                onValueChange={(mode) => {
-                  if (mode === 'anchor') position({ custom: undefined });
-                  else position({ custom: anchorCoordinates });
-                }}
-              />
-              <div className="grid grid-cols-2 divide-x divide-border-subtle">
-                <Tooltip
-                  disabled={!caption.position.custom}
-                  content="Switch to Anchor to use the position grid"
-                >
-                  <fieldset
-                    disabled={disabled || !!caption.position.custom}
-                    tabIndex={caption.position.custom ? 0 : undefined}
-                    aria-label="Anchor position"
-                    className="min-w-0 pr-3 disabled:opacity-50"
-                  >
-                    <AnchorPicker
-                      value={caption.position.anchor}
-                      onValueChange={(anchor) =>
-                        position({ anchor, custom: undefined })
-                      }
-                      disabled={disabled || !!caption.position.custom}
-                    />
-                  </fieldset>
-                </Tooltip>
-                <Tooltip
-                  disabled={!!caption.position.custom}
-                  content="Switch to Manual to edit X and Y"
-                >
-                  <fieldset
-                    disabled={disabled || !caption.position.custom}
-                    tabIndex={!caption.position.custom ? 0 : undefined}
-                    aria-label="Manual position"
-                    className="min-w-0 space-y-2 pl-3 disabled:opacity-50"
-                  >
-                    <NumberField
-                      label="X position"
-                      tooltip="Horizontal position of the layer reference point · % of photo width"
-                      unit="%"
-                      value={coordinates.x}
-                      min={0}
-                      max={100}
-                      step={0.1}
-                      disabled={disabled || !caption.position.custom}
-                      onValueChange={(x) =>
-                        position({ custom: { ...coordinates, x } })
-                      }
-                    />
-                    <NumberField
-                      label="Y position"
-                      tooltip="Vertical position of the layer reference point · % of photo height"
-                      unit="%"
-                      value={coordinates.y}
-                      min={0}
-                      max={100}
-                      step={0.1}
-                      disabled={disabled || !caption.position.custom}
-                      onValueChange={(y) =>
-                        position({ custom: { ...coordinates, y } })
-                      }
-                    />
-                  </fieldset>
-                </Tooltip>
-              </div>
-            </fieldset>
-          </InspectorSection>
         </>
       )}
     </>
+  );
+}
+
+export function CaptionPositionControls({
+  caption,
+  dimensions,
+  onChange,
+  disabled,
+}: Pick<
+  CaptionControlsProps,
+  'caption' | 'dimensions' | 'onChange' | 'disabled'
+>) {
+  const position = (patch: Partial<Caption['position']>) =>
+    onChange({ ...caption, position: { ...caption.position, ...patch } });
+  const anchorCoordinates = customPoint(
+    dimensions,
+    { width: 0, height: 0 },
+    caption.position.anchor,
+    anchoredPosition(
+      dimensions,
+      { width: 0, height: 0 },
+      caption.position.anchor,
+      {
+        top: toPixels(
+          caption.position.margins.top,
+          caption.sizingUnit,
+          dimensions,
+        ),
+        right: toPixels(
+          caption.position.margins.right,
+          caption.sizingUnit,
+          dimensions,
+        ),
+        bottom: toPixels(
+          caption.position.margins.bottom,
+          caption.sizingUnit,
+          dimensions,
+        ),
+        left: toPixels(
+          caption.position.margins.left,
+          caption.sizingUnit,
+          dimensions,
+        ),
+      },
+    ),
+  );
+  const coordinates = caption.position.custom ?? anchorCoordinates;
+
+  return (
+    <InspectorSection title="Position">
+      <fieldset disabled={disabled} className="space-y-2 disabled:opacity-70">
+        <SegmentedControl
+          label="Position mode"
+          value={caption.position.custom ? 'custom' : 'anchor'}
+          disabled={disabled}
+          options={[
+            {
+              value: 'anchor',
+              label: 'Anchor',
+              tooltip: 'Position the layer within the photo margins',
+            },
+            {
+              value: 'custom',
+              label: 'Manual',
+              tooltip:
+                'Position the layer anywhere on the photo; margins do not apply',
+            },
+          ]}
+          onValueChange={(mode) =>
+            position({
+              custom: mode === 'anchor' ? undefined : anchorCoordinates,
+            })
+          }
+        />
+        <div className="grid grid-cols-2 divide-x divide-border-subtle">
+          <Tooltip
+            disabled={!caption.position.custom}
+            content="Switch to Anchor to use the position grid"
+          >
+            <fieldset
+              disabled={disabled || !!caption.position.custom}
+              tabIndex={caption.position.custom ? 0 : undefined}
+              aria-label="Anchor position"
+              className="min-w-0 pr-3 disabled:opacity-50"
+            >
+              <AnchorPicker
+                value={caption.position.anchor}
+                onValueChange={(anchor) =>
+                  position({ anchor, custom: undefined })
+                }
+                disabled={disabled || !!caption.position.custom}
+              />
+            </fieldset>
+          </Tooltip>
+          <Tooltip
+            disabled={!!caption.position.custom}
+            content="Switch to Manual to edit X and Y"
+          >
+            <fieldset
+              disabled={disabled || !caption.position.custom}
+              tabIndex={!caption.position.custom ? 0 : undefined}
+              aria-label="Manual position"
+              className="min-w-0 space-y-2 pl-3 disabled:opacity-50"
+            >
+              <NumberField
+                label="X position"
+                tooltip="Horizontal position of the layer reference point · % of photo width"
+                unit="%"
+                value={coordinates.x}
+                min={0}
+                max={100}
+                step={0.1}
+                disabled={disabled || !caption.position.custom}
+                onValueChange={(x) =>
+                  position({ custom: { ...coordinates, x } })
+                }
+              />
+              <NumberField
+                label="Y position"
+                tooltip="Vertical position of the layer reference point · % of photo height"
+                unit="%"
+                value={coordinates.y}
+                min={0}
+                max={100}
+                step={0.1}
+                disabled={disabled || !caption.position.custom}
+                onValueChange={(y) =>
+                  position({ custom: { ...coordinates, y } })
+                }
+              />
+            </fieldset>
+          </Tooltip>
+        </div>
+      </fieldset>
+    </InspectorSection>
   );
 }

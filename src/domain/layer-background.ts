@@ -40,6 +40,34 @@ export function createLayerBackground(): LayerBackground {
   };
 }
 
+/** Glass starts with the compact, rounded surface values used in the editor. */
+export function createGlassLayerBackground(): LayerBackground {
+  return {
+    ...createLayerBackground(),
+    type: 'glass',
+    color: 'caption-dark-gray',
+    opacity: 0.12,
+    padding: { top: 0.8, right: 1.7, bottom: 0.8, left: 1.7 },
+    paddingLinkMode: 'pairs',
+    radius: 1.5,
+    blur: 0.5,
+  };
+}
+
+/** Color backgrounds start with a compact, subtle panel behind the text. */
+export function createColorLayerBackground(): LayerBackground {
+  return {
+    ...createLayerBackground(),
+    type: 'color',
+    color: 'charcoal',
+    opacity: 0.67,
+    padding: { top: 0.8, right: 1.7, bottom: 0.8, left: 1.7 },
+    paddingLinkMode: 'pairs',
+    radius: 1.5,
+    shadow: { ...createLayerBackground().shadow, enabled: false },
+  };
+}
+
 /** All lengths use the document unit, including settings retained under None. */
 export function mapBackgroundLengths(
   background: LayerBackground,

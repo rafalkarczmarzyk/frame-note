@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import type { Caption, ImageDimensions } from '@/domain/document';
 import {
+  createColorLayerBackground,
+  createGlassLayerBackground,
   createLayerBackground,
   mapBackgroundLengths,
 } from '@/domain/layer-background';
@@ -8,11 +10,12 @@ import { pixelsPerUnit, sizingLabels } from '@/domain/sizing';
 import { InspectorSection } from '@/components/layout/inspector-section';
 import { MarginEditor } from '@/components/ui/margin-editor';
 import { NumberField } from '@/components/ui/number-field';
+import { RangeField } from '@/components/ui/range-field';
 import { SegmentedControl } from '@/components/ui/segmented-control';
-import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { ColorControls } from './color-controls';
 import { ColorPickerPanel } from './color-picker-panel';
+import { Aperture, Blend, SquareRoundCorner } from 'lucide-react';
 
 export function BackgroundControls({
   caption,
@@ -54,7 +57,19 @@ export function BackgroundControls({
           disabled={disabled}
           onValueChange={(type) => {
             setPalette(null);
-            change({ type });
+            if ((type === 'glass' || type === 'color') && !caption.background) {
+              onChange({
+                ...caption,
+                background: mapBackgroundLengths(
+                  type === 'glass'
+                    ? createGlassLayerBackground()
+                    : createColorLayerBackground(),
+                  (value) =>
+                    (value * pixelsPerUnit('short-edge', dimensions)) /
+                    pixelsPerUnit(caption.sizingUnit, dimensions),
+                ),
+              });
+            } else change({ type });
           }}
           options={[
             {
@@ -85,51 +100,29 @@ export function BackgroundControls({
                 onBrowse={() => setPalette(palette === 'base' ? null : 'base')}
               />
             </div>
-            <div
-              className="grid items-end gap-3"
-              style={{ gridTemplateColumns: '1fr 104px' }}
-            >
-              <div className="pb-3">
-                <Slider
-                  disabled={disabled}
-                  label="Background opacity"
-                  value={b.opacity * 100}
-                  onValueChange={(value) => change({ opacity: value / 100 })}
-                />
-              </div>
-              <NumberField
-                label="Background opacity"
-                hideLabel
-                value={b.opacity * 100}
-                onValueChange={(value) => change({ opacity: value / 100 })}
+            <RangeField
+              label="Opacity"
+              inputLabel="Background opacity"
+              icon={<Blend className="size-4" aria-hidden="true" />}
+              tooltip="Background opacity · controls the tint strength"
+              value={b.opacity * 100}
+              onValueChange={(value) => change({ opacity: value / 100 })}
+              unit="%"
+              disabled={disabled}
+            />
+            {b.type === 'glass' && (
+              <RangeField
+                label="Glass blur"
+                icon={<Aperture className="size-4" aria-hidden="true" />}
+                tooltip="Glass blur · lens-style backdrop blur"
+                value={b.blur}
+                onValueChange={(blur) => change({ blur })}
                 min={0}
-                max={100}
-                unit="%"
+                max={max * 0.05}
+                step={step}
+                unit={unit}
                 disabled={disabled}
               />
-            </div>
-            {b.type === 'glass' && (
-              <>
-                <NumberField
-                  label="Glass blur"
-                  value={b.blur}
-                  onValueChange={(blur) => change({ blur })}
-                  min={0}
-                  max={max * 0.05}
-                  step={step}
-                  unit={unit}
-                  disabled={disabled}
-                />
-                <Slider
-                  label="Glass blur"
-                  value={b.blur}
-                  onValueChange={(blur) => change({ blur })}
-                  min={0}
-                  max={max * 0.05}
-                  step={step}
-                  disabled={disabled}
-                />
-              </>
             )}
             {palette === 'base' && (
               <ColorPickerPanel
@@ -153,12 +146,14 @@ export function BackgroundControls({
                 change({ padding, paddingLinkMode })
               }
             />
-            <NumberField
+            <RangeField
               label="Corner radius"
+              icon={<SquareRoundCorner className="size-4" aria-hidden="true" />}
+              tooltip="Corner radius"
               value={b.radius}
               onValueChange={(radius) => change({ radius })}
               min={0}
-              max={max}
+              max={Math.min(max, 10)}
               step={step}
               unit={unit}
               disabled={disabled}

@@ -21,6 +21,11 @@ when explicitly requested; a commit does not automatically create a release.
   screen-resolution composition for background tiles while retaining the sharp
   photo and content nodes; export uses the same renderer at full resolution.
   Large blur radii retain their scale instead of hitting the pixel-filter limit.
+  New Color and Glass backgrounds start with separately tuned colors, opacity,
+  padding, radius and blur values. Shared icon-led range controls align the
+  opacity and background sliders; Typography, Background and Position appear
+  in that order, with Position last. Glass bevel highlights have a thinner,
+  softer edge.
 
 - Shared selection settings for metadata, icons and SVG/PNG, with a labeled Remove
   action instead of overlapping close badges. Icons and images support individual

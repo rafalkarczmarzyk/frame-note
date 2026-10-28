@@ -124,14 +124,14 @@ export function renderGlassPrototype(
         context.fillRect(panel.x, panel.y, panel.width, panel.height);
         // Clipped shifted strokes form the bevel with a light upper edge and
         // dark lower edge, avoiding blur/shadow support differences in CSS.
-        context.globalAlpha = 0.55;
+        context.globalAlpha = 0.35;
         context.strokeStyle = colors.light;
-        context.lineWidth = 2 * scale;
-        roundedPath(context, { ...panel, y: panel.y + scale });
+        context.lineWidth = scale;
+        roundedPath(context, { ...panel, y: panel.y + 0.25 * scale });
         context.stroke();
-        context.globalAlpha = 0.4;
+        context.globalAlpha = 0.22;
         context.strokeStyle = colors.dark;
-        roundedPath(context, { ...panel, y: panel.y - scale });
+        roundedPath(context, { ...panel, y: panel.y - 0.25 * scale });
         context.stroke();
         context.restore();
       } finally {
