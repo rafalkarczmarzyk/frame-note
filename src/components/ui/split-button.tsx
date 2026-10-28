@@ -76,7 +76,12 @@ export function SplitButton({
       <ActionMenu
         label={menuLabel}
         items={items}
-        disabled={disabled || menuDisabled || loading || !items.length}
+        disabled={
+          disabled ||
+          menuDisabled ||
+          loading ||
+          items.every((item) => item.disabled)
+        }
         triggerIcon={<ChevronDown aria-hidden="true" />}
         triggerAppearance={{ variant, size, color }}
         triggerClassName={cn(
