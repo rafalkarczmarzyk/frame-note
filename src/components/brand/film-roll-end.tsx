@@ -3,9 +3,10 @@ import type { SVGProps } from 'react';
 export function FilmRollEnd(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
-      width={65}
-      height={56}
-      viewBox="0 0 65 56"
+      width={150}
+      height={129}
+      viewBox="0 0 150 129"
+      preserveAspectRatio="none"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
@@ -13,7 +14,7 @@ export function FilmRollEnd(props: SVGProps<SVGSVGElement>) {
       {...props}
     >
       <path
-        d="M64 0C64.5523 0 65 0.447715 65 1V33C65 33.5523 64.5523 34 64 34H27C16.5 34 8 49 7.5 54C7.4051 54.9491 7 56 5.5 56H0V0H64ZM2.5 53H5.5V49H2.5V53ZM2.5 7H5.5V3H2.5V7ZM10.5 7H13.5V3H10.5V7ZM18.5 7H21.5V3H18.5V7ZM26.5 7H29.5V3H26.5V7ZM34.5 7H37.5V3H34.5V7ZM42.5 7H45.5V3H42.5V7ZM50.5 7H53.5V3H50.5V7ZM58.5 7H61.5V3H58.5V7Z"
+        d="M 148 0 C 149 0 150 1 150 2 V 76 C 150 77 149 78 148 78 H 62 C 38 78 18 113 17 124 C 17 127 16 129 13 129 H 0 V 0 H 148 Z M 6 122 H 13 V 113 H 6 V 122 Z M 6 16 H 13 V 7 H 6 V 16 Z M 24 16 H 31 V 7 H 24 V 16 Z M 43 16 H 50 V 7 H 43 V 16 Z M 61 16 H 68 V 7 H 61 V 16 Z M 80 16 H 87 V 7 H 80 V 16 Z M 98 16 H 105 V 7 H 98 V 16 Z M 117 16 H 123 V 7 H 117 V 16 Z M 135 16 H 142 V 7 H 135 V 16 Z"
         fill="var(--color-film-stock)"
       />
     </svg>

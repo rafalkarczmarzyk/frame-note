@@ -15,12 +15,14 @@ when explicitly requested; a commit does not automatically create a release.
   The stationary cassette has Emerald, Gold, Ivory and Coral labels with a live
   exposure count. Drag any part of the film to browse or pull beyond its range,
   then release to return; photo clicks remain separate from dragging. The compact
-  cassette, translucent dark film, active-frame highlight and cool wood-textured
+  cassette, translucent dark film, active-frame outline and finely textured graphite
   tray include interactive Storybook previews and reduced-motion support.
   Keyboard focus uses a small marker above frames and the film tail, stays hidden
   during pointer interaction, and skips the decorative tabletop. The lower
   180 px roll reaches the tray edge while browsing, with a softly animated edge
-  shade when more film remains and a small gap after the tail.
+  shade when more film remains and a small gap after the tail. Native pixel-sized
+  SVG artwork keeps the current dimensions without scaling legacy geometry; the
+  cassette artboard is trimmed to its shell, and film joins no longer use overlaps.
 - Export all prepares full-resolution JPGs sequentially and downloads one ZIP,
   with shared quality/metadata settings, collision-safe names, combined token
   warnings, progress, cancellation and per-file failure reporting.

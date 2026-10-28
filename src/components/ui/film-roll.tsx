@@ -43,6 +43,15 @@ export function FilmRoll({
   disabled = false,
   variant = 'emerald',
 }: FilmRollProps) {
+  const frameWidth = Math.round((height * 148) / 180);
+  const frameHeight = Math.round((height * 129) / 180);
+  const cassetteHeight = Math.round(
+    height * Math.max(0.8, Math.min(1, cassetteScale)),
+  );
+  const cassetteWidth = Math.round((cassetteHeight * 96) / 162);
+  const tapeTop = Math.round(
+    (cassetteHeight - frameHeight) / 2 + (height * 2) / 78,
+  );
   const rollRef = useRef<HTMLDivElement>(null);
   const stripRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{
@@ -88,7 +97,7 @@ export function FilmRoll({
     const desired = drag.scroll - distance;
     const clamped = Math.max(0, Math.min(drag.max, desired));
     // The leader repeats at a fixed pitch, so pulling never stretches the holes.
-    const pull = clamped - desired;
+    const pull = Math.round(clamped - desired);
     strip.style.setProperty(
       '--film-leader-width',
       `${Math.max(0, pull) + 1}px`,
@@ -208,7 +217,12 @@ export function FilmRoll({
       style={
         {
           '--film-roll-height': `${height}px`,
-          '--film-cassette-height': `${height * Math.max(0.8, Math.min(1, cassetteScale))}px`,
+          '--film-cassette-height': `${cassetteHeight}px`,
+          '--film-cassette-width': `${cassetteWidth}px`,
+          '--film-frame-width': `${frameWidth}px`,
+          '--film-frame-height': `${frameHeight}px`,
+          '--film-tail-width': `${Math.round((height * 150) / 180)}px`,
+          '--film-tape-top': `${tapeTop}px`,
         } as CSSProperties
       }
     >
@@ -243,7 +257,10 @@ export function FilmRoll({
             }
           }}
         >
-          <FilmRollLeader scale={height / 78} className="film-roll-leader" />
+          <FilmRollLeader
+            scale={frameHeight / 129}
+            className="film-roll-leader"
+          />
           {photos.map((photo, index) => (
             <button
               key={photo.id}
@@ -276,10 +293,7 @@ export function FilmRoll({
                 return;
               event.preventDefault();
               rollRef.current?.scrollBy({
-                left:
-                  event.key === 'ArrowRight'
-                    ? (height * 64) / 78
-                    : (-height * 64) / 78,
+                left: event.key === 'ArrowRight' ? frameWidth : -frameWidth,
               });
             }}
           >

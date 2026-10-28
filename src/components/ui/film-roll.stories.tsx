@@ -204,3 +204,40 @@ export const CassetteProportions: Story = {
 };
 export const CompactCassette: Story = { args: { cassetteScale: 0.9 } };
 export const SmallCassette: Story = { args: { cassetteScale: 0.85 } };
+
+export const GraphiteTones: Story = {
+  render: (args) => (
+    <div className="space-y-5">
+      {[
+        { label: 'Light graphite', className: 'film-roll-tone-light' },
+        {
+          label: 'Soft graphite · slightly darker',
+          className: 'film-roll-tone-soft',
+        },
+        {
+          label: 'Sidebar graphite · application surface',
+          className: 'film-roll-tone-sidebar',
+        },
+        { label: 'Deep graphite · darkest', className: 'film-roll-tone-deep' },
+      ].map(({ label, className }) => (
+        <section key={label} className="space-y-2">
+          <h2 className="text-sm font-medium text-content-primary">{label}</h2>
+          <InteractiveRoll
+            {...args}
+            photos={photos.slice(0, 3)}
+            className={className}
+          />
+        </section>
+      ))}
+    </div>
+  ),
+};
+export const SoftGraphite: Story = {
+  args: { className: 'film-roll-tone-soft' },
+};
+export const SidebarGraphite: Story = {
+  args: { className: 'film-roll-tone-sidebar' },
+};
+export const DeepGraphite: Story = {
+  args: { className: 'film-roll-tone-deep' },
+};

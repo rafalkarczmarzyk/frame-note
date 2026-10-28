@@ -7,7 +7,7 @@ import { FilmRollEnd } from './film-roll-end';
 const meta = {
   title: 'Components/Brand/FilmRoll',
   component: FilmRollStart,
-  args: { width: 122.5, height: 195, variant: 'emerald', exposures: 12 },
+  args: { width: 96, height: 162, variant: 'emerald', exposures: 12 },
   argTypes: {
     variant: {
       control: 'select',
@@ -21,24 +21,24 @@ type Story = StoryObj<typeof meta>;
 
 export const Start: Story = {};
 export const Frame: Story = {
-  render: () => <FilmRollFrame width={128} height={112} />,
+  render: () => <FilmRollFrame width={148} height={129} />,
 };
 export const End: Story = {
-  render: () => <FilmRollEnd width={130} height={112} />,
+  render: () => <FilmRollEnd width={150} height={129} />,
 };
 export const Joined: Story = {
   render: () => (
     <div className="flex items-start overflow-x-auto">
       <FilmRollStart
-        width={98}
-        height={156}
+        width={96}
+        height={162}
         exposures={3}
-        className="relative z-10 -mr-[6px] shrink-0"
+        className="relative z-10 -mr-px shrink-0"
       />
-      <FilmRollFrame width={128} height={112} className="mt-[26px] shrink-0" />
-      <FilmRollFrame width={128} height={112} className="mt-[26px] shrink-0" />
-      <FilmRollFrame width={128} height={112} className="mt-[26px] shrink-0" />
-      <FilmRollEnd width={130} height={112} className="mt-[26px] shrink-0" />
+      <FilmRollFrame width={148} height={129} className="mt-[21px] shrink-0" />
+      <FilmRollFrame width={148} height={129} className="mt-[21px] shrink-0" />
+      <FilmRollFrame width={148} height={129} className="mt-[21px] shrink-0" />
+      <FilmRollEnd width={150} height={129} className="mt-[21px] shrink-0" />
     </div>
   ),
 };
@@ -46,9 +46,9 @@ export const Joined: Story = {
 export const MultipleInstances: Story = {
   render: () => (
     <div className="flex flex-wrap items-end gap-6">
-      <FilmRollStart width={98} height={156} />
-      <FilmRollStart width={122.5} height={195} />
-      <FilmRollStart width={147} height={234} />
+      <FilmRollStart width={80} height={135} />
+      <FilmRollStart width={96} height={162} />
+      <FilmRollStart width={112} height={189} />
     </div>
   ),
 };
@@ -65,8 +65,8 @@ export const LabelVariants: Story = {
           key={variant}
           variant={variant}
           exposures={12}
-          width={122.5}
-          height={195}
+          width={96}
+          height={162}
         />
       ))}
     </div>
@@ -79,8 +79,8 @@ export const ExposureCounts: Story = {
         <FilmRollStart
           key={exposures}
           exposures={exposures}
-          width={122.5}
-          height={195}
+          width={96}
+          height={162}
         />
       ))}
     </div>
@@ -88,5 +88,5 @@ export const ExposureCounts: Story = {
 };
 
 export const Leader: Story = {
-  render: () => <FilmRollLeader scale={2.5} width={640} height={140} />,
+  render: () => <FilmRollLeader width={592} height={129} />,
 };
