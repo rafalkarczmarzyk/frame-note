@@ -191,7 +191,9 @@ async function renderPhotoCaptions(
               x: run.x,
               y:
                 run.y +
-                (run.icon.image ? 0 : (scene.lineHeight - scene.fontSize) / 2),
+                (run.icon.image || run.icon.sizing
+                  ? 0
+                  : (scene.lineHeight - scene.fontSize) / 2),
               width: run.width,
               height: run.height,
               image: run.original

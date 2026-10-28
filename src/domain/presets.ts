@@ -1,3 +1,4 @@
+import { parseIconToken } from './inline-icon';
 import { fontIds } from './fonts';
 import { migrateLogo, parseImageToken } from './inline-image';
 import { validateImageAssets } from './image-validation';
@@ -184,7 +185,9 @@ export function createPreset(
 ): LayoutPreset {
   const used = new Set([
     ...layout.containers.flatMap((c) =>
-      [...c.template.matchAll(/\{icon:([^{}]+)\}/gu)].map((match) => match[1]),
+      [...c.template.matchAll(/\{icon:([^{}]+)\}/gu)].map(
+        (match) => parseIconToken(`icon:${match[1]}`)?.name,
+      ),
     ),
   ]);
   return structuredClone({

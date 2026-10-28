@@ -269,7 +269,7 @@ test('Photo export / mixed inline SVG and PNG', async ({ page }, testInfo) => {
       rich: data.getData('application/x-framenote-content'),
     };
   });
-  await page.getByRole('button', { name: 'Remove image', exact: true }).click();
+  await page.getByRole('button', { name: 'Remove', exact: true }).click();
   await expect(raster).toHaveCount(0);
   await page.getByLabel('Caption', { exact: true }).press('ControlOrMeta+z');
   await expect(raster).toBeVisible();

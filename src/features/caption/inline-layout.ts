@@ -43,10 +43,11 @@ export function inlineLayout(
               wrap: 'none',
             })
           : null;
-      const height = icon?.image
-        ? icon.image.unit === 'font'
-          ? fontSize * icon.image.height
-          : toPixels(icon.image.height, caption.sizingUnit, dimensions)
+      const sizing = icon?.image ?? icon?.sizing;
+      const height = sizing
+        ? sizing.unit === 'font'
+          ? fontSize * sizing.height
+          : toPixels(sizing.height, caption.sizingUnit, dimensions)
         : fontSize;
       const size = icon ? height * icon.aspect : (metrics?.width() ?? 0);
       metrics?.destroy();
@@ -63,12 +64,27 @@ export function inlineLayout(
       width += size;
       return result;
     });
-    const hasImage = runs.some((run) => run.icon?.image);
     const imageOnly = runs.length > 0 && runs.every((run) => run.icon?.image);
-    const height = hasImage
-      ? Math.max(imageOnly ? 0 : lineHeight, ...runs.map((run) => run.height))
-      : lineHeight;
-    return { width, runs, height, hasImage };
+    const referenceHeight = imageOnly ? 0 : lineHeight;
+    const positioned = runs.map((run) => {
+      const sizing = run.icon?.image ?? run.icon?.sizing;
+      const factor =
+        sizing?.alignment === 'top'
+          ? 0
+          : sizing?.alignment === 'bottom'
+            ? 1
+            : 0.5;
+      return {
+        ...run,
+        y: sizing ? (referenceHeight - run.height) * factor : 0,
+      };
+    });
+    const top = Math.min(0, ...positioned.map((run) => run.y));
+    const bottom = Math.max(
+      referenceHeight,
+      ...positioned.map((run) => run.y + (run.icon ? run.height : lineHeight)),
+    );
+    return { width, runs: positioned, height: bottom - top, top };
   });
   const block = {
     width: Math.max(0, ...lines.map((line) => line.width)),
@@ -113,11 +129,7 @@ export function inlineLayout(
     return line.runs.map((run) => ({
       ...run,
       x: run.x + offset,
-      y:
-        y +
-        (line.hasImage
-          ? (line.height - (run.icon ? run.height : lineHeight)) / 2
-          : 0),
+      y: y + run.y - line.top,
     }));
   });
   return { ...block, ...position, fontSize, lineHeight, runs };

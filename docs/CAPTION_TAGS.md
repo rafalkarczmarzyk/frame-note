@@ -133,3 +133,16 @@ zaokrąglania do pełnych minut: `60 s` → `1 min`, `90 s` → `1 min 30 s`,
 Pomija zerowe jednostki. Oryginalne `{shutter}` i `{exposure}` pozostają bez
 zmian. Brak poprawnej dodatniej wartości jest raportowany jak dla innych helperów.
 Astrophotography i Long Exposure używają nowego helpera.
+
+## Individual inline graphic settings
+
+The editor writes configured icons as `{icon:name:height:font|document:top|center|bottom}`,
+for example `{icon:camera:1.5:font:center}`. Plain `{icon:camera}` remains supported
+with its existing size and placement. `font` multiplies the layer font size;
+`document` uses the document sizing unit. Changing that unit converts fixed
+heights while retaining the rendered size.
+
+SVG/PNG references may append `:top`, `:center` or `:bottom` after their color mode.
+Existing image references without this suffix retain centered alignment. Alignment
+is within each caption line; taller graphics increase that line's height.
+Settings are per occurrence and are included in copied text and layout presets.

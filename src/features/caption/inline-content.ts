@@ -1,3 +1,4 @@
+import { parseIconToken } from '../../domain/inline-icon';
 import {
   parseImageToken,
   type ImageAsset,
@@ -19,12 +20,13 @@ export function resolveCaptionContent(
   const replaced = template.replace(
     /\{icon:([^{}]*)\}/gu,
     (_, name: string) => {
-      const icon = available.find((item) => item.name === name);
+      const ref = parseIconToken(`icon:${name}`);
+      const icon = ref && available.find((item) => item.name === ref.name);
       if (!icon) {
         missing.push(`icon:${name}`);
         return '';
       }
-      icons.push(icon);
+      icons.push(ref?.alignment ? { ...icon, sizing: ref } : icon);
       return iconMarker(icons.length - 1);
     },
   );

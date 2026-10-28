@@ -1,3 +1,4 @@
+import { parseIconToken } from '@/domain/inline-icon';
 import { Tag, TriangleAlert } from 'lucide-react';
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import type { CaptionContainer } from '@/domain/caption-layout';
@@ -50,7 +51,9 @@ export function LayerContentPreview({
         const image = parseImageToken(token);
         const graphic =
           image && layer.images?.find((asset) => asset.id === image.assetId);
-        const icon = icons.find((asset) => `icon:${asset.name}` === token);
+        const icon = icons.find(
+          (asset) => asset.name === parseIconToken(token)?.name,
+        );
         const isGraphic =
           token.startsWith('image:') || token.startsWith('icon:');
         const missing = isGraphic ? !graphic && !icon : !values[token]?.trim();

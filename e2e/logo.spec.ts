@@ -91,7 +91,7 @@ test('adds SVG through container content and exports original and single colors'
   await page.getByRole('img', { name: 'two-colors.svg', exact: true }).click();
   await expect(height).toHaveValue('7.5');
   await page.getByRole('img', { name: 'two-colors.svg', exact: true }).click();
-  await page.getByRole('button', { name: 'Remove image', exact: true }).click();
+  await page.getByRole('button', { name: 'Remove', exact: true }).click();
   await expect(
     page.getByRole('img', { name: 'two-colors.svg', exact: true }),
   ).toHaveCount(0);

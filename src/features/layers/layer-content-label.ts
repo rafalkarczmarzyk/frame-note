@@ -1,3 +1,4 @@
+import { parseIconToken } from '@/domain/inline-icon';
 import type { CaptionContainer } from '@/domain/caption-layout';
 import { parseImageToken } from '@/domain/inline-image';
 import { templateInline } from '../caption/editor/template-document';
@@ -18,7 +19,7 @@ export function layerContentLabel(layer: Content) {
             'Missing image'
           );
         }
-        return token.replace(/^icon:/u, '');
+        return parseIconToken(token)?.name ?? token;
       })
       .join(' ')
       .replace(/\s+/gu, ' ')

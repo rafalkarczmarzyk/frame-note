@@ -1,3 +1,12 @@
+import { closeHistory } from '@tiptap/pm/history';
+import { CaptionWhitespace, whitespaceKey } from './whitespace-extension';
+import { metadataTokenStatus } from './token-status';
+import { ElementSizeSettings } from './element-size-settings';
+import {
+  parseIconToken,
+  iconToken,
+  type ElementSizing,
+} from '@/domain/inline-icon';
 import { Tooltip } from '@/components/ui/tooltip';
 import {
   activeImageAssets,
@@ -6,7 +15,7 @@ import {
 import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { ContentImageDropOverlay } from './content-image-drop-overlay';
-import { ImagePlus, Plus } from 'lucide-react';
+import { ImagePlus, Plus, Tag, Camera, Trash2, Pilcrow } from 'lucide-react';
 import { createId } from '@/lib/create-id';
 import type { JSONContent } from '@tiptap/core';
 import { NodeSelection } from '@tiptap/pm/state';
@@ -17,7 +26,6 @@ import {
 } from '@/domain/inline-image';
 import { importImage, prepareImageAssets } from '../image-assets';
 import { Button } from '@/components/ui/button';
-import { NumberField } from '@/components/ui/number-field';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import {
   toPixels,
@@ -95,6 +103,7 @@ export function CaptionEditor({
         node,
     );
   }, []);
+  const [showWhitespace, setShowWhitespace] = useState(true);
   const [composing, setComposing] = useState(false);
   const editor = useEditor({
     extensions: [
@@ -114,6 +123,7 @@ export function CaptionEditor({
         underline: false,
       }),
       CaptionToken,
+      CaptionWhitespace,
     ],
     content: templateDocument(value),
     onUpdate: ({ editor }) =>
@@ -129,18 +139,17 @@ export function CaptionEditor({
       const selection = editor.state.selection;
       if (
         selection instanceof NodeSelection &&
-        parseImageToken(String(selection.node.attrs.token))
+        selection.node.type.name === 'captionToken'
       )
         selectedRef.current = selection.from;
       else if (editor.isFocused && !inSettings.current)
         selectedRef.current = null;
       else if (selectedRef.current !== null && transaction.docChanged) {
         const position = transaction.mapping.map(selectedRef.current);
-        selectedRef.current = parseImageToken(
-          String(editor.state.doc.nodeAt(position)?.attrs.token),
-        )
-          ? position
-          : null;
+        selectedRef.current =
+          editor.state.doc.nodeAt(position)?.type.name === 'captionToken'
+            ? position
+            : null;
       }
       setSelectedPosition(selectedRef.current);
     },
@@ -155,7 +164,7 @@ export function CaptionEditor({
         'aria-placeholder': 'Add text, a tag or an icon…',
         spellcheck: 'false',
         class:
-          'control-field min-h-24 max-h-48 overflow-y-auto p-2 text-xs leading-7 whitespace-pre-wrap outline-none [&_.ProseMirror-selectednode]:outline-none',
+          'caption-content-editor control-field min-h-24 max-h-48 overflow-y-auto p-2 text-xs whitespace-pre-wrap outline-none [&_.ProseMirror-selectednode]:outline-none',
       }),
       clipboardTextSerializer: (slice) =>
         documentTemplate({ type: 'doc', content: slice.content.toJSON() }),
@@ -492,6 +501,14 @@ export function CaptionEditor({
       field.displayValue,
     ]),
   );
+  const selectedToken =
+    selectedPosition === null
+      ? null
+      : String(editor?.state.doc.nodeAt(selectedPosition)?.attrs.token ?? '');
+  const selectedIcon = selectedToken ? parseIconToken(selectedToken) : null;
+  const selectedIconAsset = icons.find(
+    (item) => item.name === selectedIcon?.name,
+  );
   const token =
     selectedPosition === null
       ? null
@@ -508,6 +525,19 @@ export function CaptionEditor({
       .updateAttributes('captionToken', { token: imageToken(next) })
       .setNodeSelection(selectedPosition)
       .run();
+  };
+  const selectedSizing = token ?? selectedIcon;
+  const updateSizing = (next: ElementSizing) => {
+    if (token) updateImage({ ...token, ...next });
+    else if (selectedIcon && editor && selectedPosition !== null)
+      editor
+        .chain()
+        .setNodeSelection(selectedPosition)
+        .updateAttributes('captionToken', {
+          token: iconToken({ ...selectedIcon, ...next }),
+        })
+        .setNodeSelection(selectedPosition)
+        .run();
   };
   return (
     <TokenContext.Provider
@@ -588,6 +618,36 @@ export function CaptionEditor({
               }}
             />
           </div>
+          <span className="control-segments inline-flex shrink-0 p-1">
+            <Tooltip
+              content={
+                showWhitespace
+                  ? 'Hide spaces and line breaks'
+                  : 'Show spaces and line breaks'
+              }
+            >
+              <button
+                type="button"
+                aria-label="Show formatting marks"
+                aria-pressed={showWhitespace}
+                className="control-segment flex size-7 shrink-0 items-center justify-center"
+                data-state={showWhitespace ? 'on' : 'off'}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => {
+                  const next = !showWhitespace;
+                  setShowWhitespace(next);
+                  if (editor)
+                    editor.view.dispatch(
+                      closeHistory(editor.state.tr)
+                        .setMeta(whitespaceKey, next)
+                        .setMeta('addToHistory', false),
+                    );
+                }}
+              >
+                <Pilcrow aria-hidden="true" className="size-4" />
+              </button>
+            </Tooltip>
+          </span>
         </div>
         {loading && (
           <p role="status" className="mt-2 text-xs text-content-secondary">
@@ -599,9 +659,11 @@ export function CaptionEditor({
             {error}
           </p>
         )}
-        {token && selectedAsset && (
+        {selectedToken && (
           <div
-            aria-label="Selected image settings"
+            aria-label={
+              token ? 'Selected image settings' : 'Selected element settings'
+            }
             className="mt-3 space-y-3 rounded-lg border border-container-settings-border bg-selected-element-base p-3"
             onPointerDownCapture={() => {
               inSettings.current = true;
@@ -610,55 +672,76 @@ export function CaptionEditor({
               inSettings.current = true;
             }}
           >
-            <p className="text-xs text-content-secondary">
-              Selected image · {selectedAsset.name}
-            </p>
-            <SegmentedControl
-              label="Image sizing"
-              value={token.unit}
-              options={[
-                {
-                  value: 'font',
-                  label: 'Relative to font',
-                  tooltip: 'Scale image height with the font size',
-                },
-                {
-                  value: 'document',
-                  label: 'Fixed height',
-                  tooltip: 'Set image height in document units',
-                },
-              ]}
-              onValueChange={(unit) => {
-                const font = Math.max(
-                  0.01,
-                  toPixels(fontSize, sizingUnit, dimensions),
-                );
-                const px =
-                  token.unit === 'font'
-                    ? token.height * font
-                    : toPixels(token.height, sizingUnit, dimensions);
-                updateImage({
-                  ...token,
-                  unit,
-                  height:
-                    unit === 'font'
-                      ? px / font
-                      : px / pixelsPerUnit(sizingUnit, dimensions),
-                });
-              }}
-            />
-            <NumberField
-              label="Image height"
-              value={token.height}
-              min={token.unit === 'font' ? 0.25 : sizingUnit === 'px' ? 1 : 0.1}
-              max={1e7}
-              step={
-                token.unit === 'font' ? 0.25 : sizingUnit === 'px' ? 1 : 0.1
-              }
-              unit={token.unit === 'font' ? '×' : sizingLabels[sizingUnit]}
-              onValueChange={(height) => updateImage({ ...token, height })}
-            />
-            {selectedAsset.format === 'svg' && (
+            <div className="flex min-w-0 items-center gap-2">
+              {token ? (
+                <ImagePlus aria-hidden="true" className="size-4 shrink-0" />
+              ) : selectedIcon ? (
+                <Camera aria-hidden="true" className="size-4 shrink-0" />
+              ) : (
+                <Tag aria-hidden="true" className="size-4 shrink-0" />
+              )}
+              <div className="min-w-0">
+                <p className="text-xs text-content-secondary">
+                  {token
+                    ? (selectedAsset?.format.toUpperCase() ?? 'Image')
+                    : selectedIcon
+                      ? 'Icon'
+                      : 'Metadata'}
+                </p>
+                <p className="truncate text-sm">
+                  {selectedAsset?.name ??
+                    selectedIconAsset?.name ??
+                    selectedIcon?.name ??
+                    selectedToken}
+                </p>
+              </div>
+            </div>
+            {selectedSizing ? (
+              <ElementSizeSettings
+                height={selectedSizing.height}
+                unit={selectedSizing.unit}
+                alignment={selectedSizing.alignment ?? 'center'}
+                documentUnit={sizingLabels[sizingUnit]}
+                onHeight={(height) =>
+                  updateSizing({ ...selectedSizing, height })
+                }
+                onAlignment={(alignment) =>
+                  updateSizing({ ...selectedSizing, alignment })
+                }
+                onUnit={(unit) => {
+                  const font = Math.max(
+                    0.01,
+                    toPixels(fontSize, sizingUnit, dimensions),
+                  );
+                  const px =
+                    selectedSizing.unit === 'font'
+                      ? selectedSizing.height * font
+                      : toPixels(selectedSizing.height, sizingUnit, dimensions);
+                  updateSizing({
+                    ...selectedSizing,
+                    unit,
+                    height:
+                      unit === 'font'
+                        ? px / font
+                        : px / pixelsPerUnit(sizingUnit, dimensions),
+                  });
+                }}
+              />
+            ) : (
+              <div className="space-y-1">
+                <p className="text-xs text-content-secondary">Value</p>
+                <p className="rounded border border-border-subtle p-2 text-sm break-words">
+                  {!hasPhoto
+                    ? 'Open a photo to preview this value'
+                    : values[selectedToken]?.trim()
+                      ? values[selectedToken]
+                      : metadataTokenStatus(selectedToken, values) === 'absent'
+                        ? 'Tag not found in this photo.'
+                        : 'No value returned for this photo.'}
+                </p>
+              </div>
+            )}
+            {token && selectedAsset?.format === 'svg' && (
               <SegmentedControl
                 label="Image colors"
                 value={token.colorMode}
@@ -679,7 +762,8 @@ export function CaptionEditor({
                 }
               />
             )}
-            {selectedAsset.format === 'png' &&
+            {token &&
+              selectedAsset?.format === 'png' &&
               (token.unit === 'font'
                 ? token.height * toPixels(fontSize, sizingUnit, dimensions)
                 : toPixels(token.height, sizingUnit, dimensions)) >
@@ -688,20 +772,24 @@ export function CaptionEditor({
                   Larger than the source image; exported edges may look soft.
                 </p>
               )}
+            {token && selectedAsset && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-full"
+                disabled={loading}
+                onClick={() => {
+                  replacePosition.current = selectedPosition;
+                  upload.current?.click();
+                }}
+              >
+                Replace image
+              </Button>
+            )}
             <Button
               size="sm"
               variant="outline"
-              disabled={loading}
-              onClick={() => {
-                replacePosition.current = selectedPosition;
-                upload.current?.click();
-              }}
-            >
-              Replace image
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
+              className="w-full"
               onClick={() =>
                 editor
                   ?.chain()
@@ -710,7 +798,8 @@ export function CaptionEditor({
                   .run()
               }
             >
-              Remove image
+              <Trash2 aria-hidden="true" />
+              Remove
             </Button>
           </div>
         )}

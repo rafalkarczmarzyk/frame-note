@@ -1,3 +1,4 @@
+import { parseIconToken } from '@/domain/inline-icon';
 import { metadataTokenStatus } from '../caption/editor/token-status';
 import type { SessionDocument } from './session-document';
 import type { RollExportOptions } from './export-roll';
@@ -216,7 +217,7 @@ function PhotoWorkspaceContent({
     const used = new Set(
       visible.flatMap((container) =>
         [...container.template.matchAll(/\{icon:([^{}]+)\}/gu)].map(
-          (match) => match[1],
+          (match) => parseIconToken(`icon:${match[1]}`)?.name,
         ),
       ),
     );

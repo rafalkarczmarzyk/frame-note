@@ -1,3 +1,4 @@
+import { iconToken, parseIconToken } from './inline-icon';
 import { imageToken, parseImageToken } from './inline-image';
 import type { Caption, ImageDimensions } from './document';
 
@@ -58,8 +59,11 @@ export function convertSizing(
     ...caption,
     sizingUnit: unit,
     template: caption.template.replace(
-      /\{(image:[^{}]*)\}/gu,
+      /\{((?:image|icon):[^{}]*)\}/gu,
       (original, token: string) => {
+        const icon = parseIconToken(token);
+        if (icon?.unit === 'document')
+          return `{${iconToken({ ...icon, height: convert(icon.height) })}}`;
         const image = parseImageToken(token);
         return image?.unit === 'document'
           ? `{${imageToken({ ...image, height: convert(image.height) })}}`

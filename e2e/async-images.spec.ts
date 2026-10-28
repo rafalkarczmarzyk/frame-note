@@ -216,7 +216,7 @@ test('reports cancellation when an image being replaced is removed during decodi
     'data-import-pending',
     'yes',
   );
-  await page.getByRole('button', { name: 'Remove image', exact: true }).click();
+  await page.getByRole('button', { name: 'Remove', exact: true }).click();
   await page.evaluate(() => window.dispatchEvent(new Event('release-import')));
   await expect(page.getByRole('alert')).toContainText('Content changed');
   await expect(image).toHaveCount(0);
