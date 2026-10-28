@@ -115,6 +115,11 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Changed
 
+- Icon and color pickers use three-column button grids with larger previews.
+  Icon names sit below the artwork, truncate to one line and remain available
+  in tooltips; token syntax is hidden. Palette rows fit their swatches and labels
+  without overlap. Graphics thumbnails have a wider preview area.
+
 - Buttons, inputs and inline control groups share a 36 px outer height, with
   28 px controls and 4 px padding inside shared groups. Numeric fields avoid
   redundant wrappers; the anchor picker retains its separate 3 × 3 layout.

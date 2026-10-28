@@ -1297,3 +1297,28 @@ fieldset:disabled .glass-switch {
     height: 16px;
   }
 }
+
+/* Icon picker rows grow independently of inline control group heights. */
+@layer components {
+  .control-segments.icon-picker-grid {
+    height: auto;
+    align-items: stretch;
+  }
+  .control-segments.icon-picker-grid > .control-segment {
+    height: auto;
+    min-height: 56px;
+  }
+}
+
+/* Color palettes need full-height rows for their swatches and labels. */
+@layer components {
+  .control-segments.color-picker-grid {
+    height: auto;
+    align-items: stretch;
+  }
+  .control-segments.color-picker-grid > .control-segment {
+    height: auto;
+    min-height: 88px;
+    justify-content: flex-start;
+  }
+}

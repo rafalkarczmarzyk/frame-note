@@ -36,7 +36,7 @@ export function ColorPickerPanel({
         </p>
       }
     >
-      <div className="control-segments grid grid-cols-4 gap-1 p-1">
+      <div className="control-segments color-picker-grid grid grid-cols-3 gap-1 p-1">
         {captionColors.map((color) => {
           const selected = resolvedColor(color.value) === resolvedColor(value);
           return (
@@ -51,7 +51,7 @@ export function ColorPickerPanel({
                 onClick={() => onChange(color.value)}
                 className={`control-segment flex min-w-0 flex-col items-center gap-2 px-1 py-3 ${selected ? 'control-selected' : ''}`}
               >
-                <ColorSwatch value={color.value} className="size-8" />
+                <ColorSwatch value={color.value} className="size-10" />
                 <span className="text-center text-[10px] leading-4">
                   {color.label}
                 </span>
