@@ -67,6 +67,13 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Changed
 
+- Unified layer selection and editing in one sidebar panel, with a recessed glass
+  list, raised active rows, grouped visibility/menu controls and direct removal
+  of the selected layer. Visibility buttons reflect their on/off state. Clearer
+  Photo info, Units & Margins, Metadata and Export settings labels describe the
+  available controls; the layer inspector stays open without a duplicate heading.
+  Storybook includes the final shared component and a primary-color comparison.
+
 - Add photos and canvas drops append one or more JPG/PNG files to the session.
   Added photos start with Default; a single first import preserves the prepared
   layout. Close photo selects a neighbor, while Dispose roll closes the series

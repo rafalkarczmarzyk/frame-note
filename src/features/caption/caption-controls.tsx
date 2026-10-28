@@ -113,7 +113,7 @@ export function CaptionControls({
       {scope !== 'local' && (
         <SidebarSection
           id="sizing"
-          title="Sizing & Margins"
+          title="Units & Margins"
           defaultOpen={false}
           iconTone="sizing"
           icon={<Ruler />}

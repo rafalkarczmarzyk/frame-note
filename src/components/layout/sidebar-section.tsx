@@ -6,8 +6,17 @@ interface SidebarSectionProps {
   title: string;
   icon?: ReactNode;
   iconTone?:
-    'photo' | 'caption' | 'typography' | 'sizing' | 'position' | 'export';
+    | 'photo'
+    | 'caption'
+    | 'typography'
+    | 'sizing'
+    | 'position'
+    | 'export'
+    | 'primary';
   defaultOpen?: boolean;
+  collapsible?: boolean;
+  description?: string;
+  hideHeading?: boolean;
   children: ReactNode;
   surface?: 'default' | 'container';
   contentPadding?: 'default' | 'none';
@@ -20,51 +29,70 @@ export function SidebarSection({
   icon,
   iconTone,
   defaultOpen = true,
+  collapsible = true,
+  description,
+  hideHeading = false,
   children,
   surface = 'default',
   contentPadding = 'default',
 }: SidebarSectionProps) {
   const [open, setOpen] = useState(defaultOpen);
+  const Root = collapsible ? 'details' : 'section';
+  const Heading = collapsible ? 'summary' : 'div';
   return (
-    <details
+    <Root
       data-section={id}
-      open={open}
+      aria-label={hideHeading ? title : undefined}
+      open={collapsible ? open : undefined}
       onToggle={(event) => {
         const next = event.currentTarget.open;
         setOpen(next);
       }}
-      className={`group/section mx-3 my-3 overflow-hidden rounded-xl ${surface === 'container' ? 'border border-container-settings-border bg-container-settings-base' : 'bg-accordion-base'}`}
+      className={`group/section mx-3 ${id === 'selected-container' ? '-mt-1 mb-3' : 'my-3'} overflow-hidden rounded-xl ${surface === 'container' ? 'border border-container-settings-border bg-container-settings-base' : 'bg-accordion-base'}`}
     >
-      <summary className="control-disclosure flex cursor-pointer list-none items-center gap-3 px-4 py-3.5 text-xs font-semibold [&::-webkit-details-marker]:hidden">
-        {icon && (
-          <span
-            aria-hidden="true"
-            className={`flex size-7 shrink-0 items-center justify-center rounded-lg [&_svg]:size-4 ${
-              iconTone
-                ? {
-                    photo: 'bg-section-photo text-section-icon',
-                    caption: 'bg-section-caption text-section-icon',
-                    typography: 'bg-section-typography text-section-icon',
-                    sizing: 'bg-section-sizing text-section-icon-dark',
-                    position: 'bg-section-position text-section-icon',
-                    export: 'bg-section-export text-button-primary-text',
-                  }[iconTone]
-                : 'bg-accordion-icon-base text-accordion-icon'
-            }`}
-          >
-            {icon}
+      {!hideHeading && (
+        <Heading
+          className={`control-disclosure flex ${collapsible ? 'cursor-pointer' : ''} list-none items-center gap-3 px-4 py-3.5 text-xs font-semibold [&::-webkit-details-marker]:hidden`}
+        >
+          {icon && (
+            <span
+              aria-hidden="true"
+              className={`flex size-7 shrink-0 items-center justify-center rounded-lg [&_svg]:size-4 ${
+                iconTone
+                  ? {
+                      primary:
+                        'bg-button-primary-base text-button-primary-text',
+                      photo: 'bg-section-photo text-section-icon',
+                      caption: 'bg-section-caption text-section-icon',
+                      typography: 'bg-section-typography text-section-icon',
+                      sizing: 'bg-section-sizing text-section-icon-dark',
+                      position: 'bg-section-position text-section-icon',
+                      export: 'bg-section-export text-button-primary-text',
+                    }[iconTone]
+                  : 'bg-accordion-icon-base text-accordion-icon'
+              }`}
+            >
+              {icon}
+            </span>
+          )}
+          <span className="min-w-0 flex-1">
+            <span className="block font-display text-xl leading-6 font-normal text-accordion-label">
+              {title}
+            </span>
+            {description && (
+              <span className="mt-1 block truncate text-xs font-normal text-content-secondary">
+                {description}
+              </span>
+            )}
           </span>
-        )}
-        <span className="min-w-0 flex-1">
-          <span className="block font-display text-xl leading-6 font-normal text-accordion-label">
-            {title}
-          </span>
-        </span>
-        <ChevronDown
-          aria-hidden="true"
-          className="size-3.5 shrink-0 text-content-muted -rotate-90 transition-transform group-open/section:rotate-0 motion-reduce:transition-none"
-        />
-      </summary>
+          {collapsible && (
+            <ChevronDown
+              aria-hidden="true"
+              className="size-3.5 shrink-0 text-content-muted -rotate-90 transition-transform group-open/section:rotate-0 motion-reduce:transition-none"
+            />
+          )}
+        </Heading>
+      )}
       <div
         className={
           contentPadding === 'none'
@@ -76,6 +104,6 @@ export function SidebarSection({
       >
         {children}
       </div>
-    </details>
+    </Root>
   );
 }

@@ -77,7 +77,7 @@ export function LayerList({
       ref={root}
       className={
         appearance === 'compact'
-          ? 'px-2'
+          ? 'layer-selector'
           : 'max-h-80 overflow-y-auto overscroll-contain'
       }
     >
@@ -111,15 +111,44 @@ export function LayerList({
               appearance === 'compact'
                 ? layerSummary(container)
                 : layerContentLabel(container),
-            leading:
-              appearance === 'compact' && thumbnail ? (
-                <img
-                  src={thumbnail}
-                  alt=""
-                  draggable={false}
-                  className="h-5 max-w-8 shrink-0 object-contain"
-                />
-              ) : undefined,
+            leading: (
+              <>
+                <Tooltip
+                  content={
+                    container.position.custom
+                      ? `Manual position · X ${Number(container.position.custom.x.toFixed(2))}%, Y ${Number(container.position.custom.y.toFixed(2))}%`
+                      : `Anchor · ${container.position.anchor.replaceAll('-', ' ')}`
+                  }
+                >
+                  <span
+                    className="flex size-6 items-center justify-center text-content-secondary"
+                    role="img"
+                    aria-label={
+                      container.position.custom
+                        ? 'Manual position'
+                        : `Anchor: ${container.position.anchor.replaceAll('-', ' ')}`
+                    }
+                  >
+                    {container.position.custom ? (
+                      <Move aria-hidden="true" className="size-3.5" />
+                    ) : (
+                      <AnchorIcon
+                        value={container.position.anchor}
+                        className="size-3.5"
+                      />
+                    )}
+                  </span>
+                </Tooltip>
+                {appearance === 'compact' && thumbnail && (
+                  <img
+                    src={thumbnail}
+                    alt=""
+                    draggable={false}
+                    className="h-5 max-w-8 shrink-0 object-contain"
+                  />
+                )}
+              </>
+            ),
             content:
               appearance === 'compact' ? undefined : (
                 <span className="block min-h-10 rounded-md border border-layer-preview-border bg-layer-preview-base p-2">
@@ -133,110 +162,95 @@ export function LayerList({
             muted: container.visible === false,
             tooltip: layerContentLabel(container),
             selected: layout.activeId === container.id,
-            controlsLeft: (
-              <IconButton
-                aria-pressed={container.visible !== false}
-                className={appearance === 'compact' ? 'size-7' : undefined}
-                label={`${container.visible === false ? 'Show' : 'Hide'} layer ${index + 1}`}
-                onClick={() => onToggleVisibility(container.id)}
-              >
-                {container.visible === false ? <EyeOff /> : <Eye />}
-              </IconButton>
-            ),
-            trailing: (
-              <Tooltip
-                content={
-                  container.position.custom
-                    ? `Manual position · X ${Number(container.position.custom.x.toFixed(2))}%, Y ${Number(container.position.custom.y.toFixed(2))}%`
-                    : `Anchor · ${container.position.anchor.replaceAll('-', ' ')}`
-                }
-              >
-                <span
-                  className="flex size-6 items-center justify-center text-content-secondary"
-                  role="img"
-                  aria-label={
-                    container.position.custom
-                      ? 'Manual position'
-                      : `Anchor: ${container.position.anchor.replaceAll('-', ' ')}`
-                  }
-                >
-                  {container.position.custom ? (
-                    <Move aria-hidden="true" className="size-3.5" />
-                  ) : (
-                    <AnchorIcon
-                      value={container.position.anchor}
-                      className="size-3.5"
-                    />
-                  )}
-                </span>
-              </Tooltip>
-            ),
             actions: (
-              <ActionMenu
-                label={`Layer ${index + 1} actions`}
-                items={[
-                  {
-                    label: 'Duplicate',
-                    icon: <Copy aria-hidden="true" />,
-                    onSelect: () => onDuplicate(container.id),
-                  },
-                  {
-                    label: 'Move up',
-                    disabledReason: 'This layer is already at the front',
-                    icon: <ArrowUp aria-hidden="true" />,
-                    disabled: index === 0,
-                    separatorBefore: true,
-                    onSelect: () => moveFromMenu(container.id, index - 1),
-                  },
-                  {
-                    label: 'Move down',
-                    disabledReason: 'This layer is already at the back',
-                    icon: <ArrowDown aria-hidden="true" />,
-                    disabled: index === layout.containers.length - 1,
-                    onSelect: () => moveFromMenu(container.id, index + 1),
-                  },
-                  {
-                    label: 'Bring to front',
-                    disabledReason: 'This layer is already at the front',
-                    icon: <ArrowUpToLine aria-hidden="true" />,
-                    disabled: index === 0,
-                    onSelect: () => moveFromMenu(container.id, 0),
-                  },
-                  {
-                    label: 'Send to back',
-                    disabledReason: 'This layer is already at the back',
-                    icon: <ArrowDownToLine aria-hidden="true" />,
-                    disabled: index === layout.containers.length - 1,
-                    onSelect: () =>
-                      moveFromMenu(container.id, layout.containers.length - 1),
-                  },
-                  {
-                    label: 'Delete',
-                    separatorBefore: true,
-                    icon: <Trash2 aria-hidden="true" />,
-                    onSelect: () => {
-                      onDelete(container.id);
-                      requestAnimationFrame(() => {
-                        const target =
-                          root.current?.querySelector<HTMLButtonElement>(
-                            '[data-picker-choice][aria-pressed="true"]',
-                          ) ??
-                          root.current?.querySelector<HTMLButtonElement>(
-                            '[data-picker-choice]',
-                          );
-                        if (target) target.focus({ preventScroll: true });
-                        else
-                          root.current
-                            ?.closest('details')
-                            ?.querySelector<HTMLButtonElement>(
-                              '[data-add-layer]',
-                            )
-                            ?.focus({ preventScroll: true });
-                      });
+              <span className="control-segments inline-flex shrink-0 gap-1 p-1">
+                <IconButton
+                  aria-pressed={container.visible !== false}
+                  className={
+                    appearance === 'compact'
+                      ? 'size-7 control-segment layer-glass-button'
+                      : 'control-segment layer-glass-button'
+                  }
+                  label={`${container.visible === false ? 'Show' : 'Hide'} layer ${index + 1}`}
+                  onClick={() => onToggleVisibility(container.id)}
+                >
+                  {container.visible === false ? <EyeOff /> : <Eye />}
+                </IconButton>
+
+                <ActionMenu
+                  triggerClassName={
+                    appearance === 'compact'
+                      ? 'size-7 control-segment layer-glass-button'
+                      : 'control-segment layer-glass-button'
+                  }
+                  label={`Layer ${index + 1} actions`}
+                  items={[
+                    {
+                      label: 'Duplicate',
+                      icon: <Copy aria-hidden="true" />,
+                      onSelect: () => onDuplicate(container.id),
                     },
-                  },
-                ]}
-              />
+                    {
+                      label: 'Move up',
+                      disabledReason: 'This layer is already at the front',
+                      icon: <ArrowUp aria-hidden="true" />,
+                      disabled: index === 0,
+                      separatorBefore: true,
+                      onSelect: () => moveFromMenu(container.id, index - 1),
+                    },
+                    {
+                      label: 'Move down',
+                      disabledReason: 'This layer is already at the back',
+                      icon: <ArrowDown aria-hidden="true" />,
+                      disabled: index === layout.containers.length - 1,
+                      onSelect: () => moveFromMenu(container.id, index + 1),
+                    },
+                    {
+                      label: 'Bring to front',
+                      disabledReason: 'This layer is already at the front',
+                      icon: <ArrowUpToLine aria-hidden="true" />,
+                      disabled: index === 0,
+                      onSelect: () => moveFromMenu(container.id, 0),
+                    },
+                    {
+                      label: 'Send to back',
+                      disabledReason: 'This layer is already at the back',
+                      icon: <ArrowDownToLine aria-hidden="true" />,
+                      disabled: index === layout.containers.length - 1,
+                      onSelect: () =>
+                        moveFromMenu(
+                          container.id,
+                          layout.containers.length - 1,
+                        ),
+                    },
+                    {
+                      label: 'Delete',
+                      separatorBefore: true,
+                      icon: <Trash2 aria-hidden="true" />,
+                      onSelect: () => {
+                        onDelete(container.id);
+                        requestAnimationFrame(() => {
+                          const target =
+                            root.current?.querySelector<HTMLButtonElement>(
+                              '[data-picker-choice][aria-pressed="true"]',
+                            ) ??
+                            root.current?.querySelector<HTMLButtonElement>(
+                              '[data-picker-choice]',
+                            );
+                          if (target) target.focus({ preventScroll: true });
+                          else
+                            root.current
+                              ?.closest('details')
+                              ?.querySelector<HTMLButtonElement>(
+                                '[data-add-layer]',
+                              )
+                              ?.focus({ preventScroll: true });
+                        });
+                      },
+                    },
+                  ]}
+                />
+              </span>
             ),
           };
         })}

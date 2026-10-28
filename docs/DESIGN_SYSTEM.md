@@ -1168,3 +1168,14 @@ The film viewport reaches the right edge of the graphite tray without a padding 
 GraphiteTones compares the current light graphite base with SoftGraphite (6% porcelain), SidebarGraphite (sidebar surface), and DeepGraphite (35% workspace blend). The fine 2 × 3 px texture, grain opacity, film scale and cassette remain identical. These darker tones are Storybook proposals; production uses DeepGraphite for in-application evaluation.
 
 Film SVG artwork now uses native dimensions for the accepted 180 px roll: frames 148 × 129, tail 150 × 129, and cassette 96 × 162 with its obsolete right-side film area trimmed. The aperture is 132 × 88 at (8,21), preserving 3:2. SVG geometry, gradients, labels and filter lengths are converted to those coordinates; the default viewBoxes and rendered dimensions match. Layout dimensions and the exposed leader movement round to CSS pixels. Alternate Storybook sizes remain supported, but the default no longer scales the legacy 64 × 56 artwork. No overlapping seam patches are used.
+
+### Selected layer inspector
+
+The list and selected layer inspector share one continuous rounded panel.
+The inspector is always visible for the active layer and starts directly with
+Content, without a separate heading or repeated summary. Its accessible section
+label remains Selected layer. The compact list uses a recessed tray with 8 px padding and gaps. Normal rows
+are quiet; selection uses raised glass with shared segment tokens. Visibility and action-menu
+buttons share a dark action surface. The eye uses raised glass while the layer
+is visible, independently of selection; the menu uses glass on hover/focus. Photo info, Units & Margins and Export settings describe
+their current scope explicitly; the content insertion action uses Metadata.

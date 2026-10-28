@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Layers, Plus } from 'lucide-react';
+import { Layers, Plus, Trash2 } from 'lucide-react';
 import { SidebarSection } from '@/components/layout/sidebar-section';
 import { Button } from '@/components/ui/button';
 import {
@@ -54,7 +54,7 @@ export function CompactLayerListConcept({
           }
           onDelete={(id) => setLayout((value) => removeCaption(value, id))}
         />
-        <div className="px-4 pt-3 pb-4">
+        <div className="flex flex-wrap gap-2 px-4 pt-3 pb-4">
           <Button
             data-add-layer=""
             variant="outline"
@@ -70,6 +70,21 @@ export function CompactLayerListConcept({
           >
             <Plus aria-hidden="true" />
             Add layer
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={
+              !layout.containers.some((layer) => layer.id === layout.activeId)
+            }
+            onClick={() =>
+              setLayout((value) =>
+                value.activeId ? removeCaption(value, value.activeId) : value,
+              )
+            }
+          >
+            <Trash2 aria-hidden="true" />
+            Remove layer
           </Button>
         </div>
       </SidebarSection>

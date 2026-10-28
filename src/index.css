@@ -1022,3 +1022,66 @@ fieldset:disabled .glass-switch {
     }
   }
 }
+
+/* Keep hover reflections stable inside the shared layer-action surface. */
+.layer-glass-button {
+  background: transparent;
+  box-shadow: none;
+}
+.layer-glass-button:hover:not(:disabled),
+.layer-glass-button:focus-visible {
+  background-color: var(--segment-selected-hover);
+  background-image: var(--segment-reflection);
+  box-shadow: var(--segment-shadow);
+}
+
+/* Compact layer selector: shared recessed tray and raised active row. */
+.layer-selector {
+  margin-inline: 8px;
+  padding: 8px;
+  border-radius: 12px;
+  background: var(--segment-base);
+  box-shadow: var(--shadow-inset);
+}
+.layer-selector [data-picker-row] {
+  margin-block: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.layer-selector [data-picker-row] + [data-picker-row] {
+  margin-top: 8px;
+}
+.layer-selector
+  [data-picker-row]:has([data-picker-choice][aria-pressed='true']) {
+  background-color: var(--segment-selected-hover);
+  background-image: var(--segment-reflection);
+  color: var(--segment-selected-text);
+  box-shadow: var(--segment-shadow);
+}
+.layer-selector
+  [data-picker-row]:not(:has([data-picker-choice][aria-pressed='true'])):hover {
+  background-color: var(--segment-hover);
+}
+.layer-glass-button[aria-pressed='true'] {
+  background-color: var(--segment-selected);
+  background-image: var(--segment-reflection);
+  color: var(--segment-selected-text);
+  box-shadow: var(--segment-shadow);
+}
+.layer-glass-button[aria-pressed='true']:hover:not(:disabled) {
+  background-color: var(--segment-selected-hover);
+}
+
+/* Storybook comparison of primary selection against the neutral glass material. */
+.layer-selector-primary-preview
+  .layer-selector
+  [data-picker-row]:has([data-picker-choice][aria-pressed='true']) {
+  background-color: var(--button-primary-base);
+  color: var(--button-primary-text);
+}
+.layer-selector-primary-preview
+  .layer-selector
+  [data-picker-row]:has([data-picker-choice][aria-pressed='true'])
+  [role='img'] {
+  color: inherit;
+}
