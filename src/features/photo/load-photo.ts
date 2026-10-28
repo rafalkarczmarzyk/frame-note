@@ -4,6 +4,7 @@ import { extractMetadata } from './extract-metadata';
 import { imageType, pngDimensions } from './metadata';
 
 export interface LoadedPhoto {
+  sourceFile: File;
   document: PhotoDocument;
   image: HTMLImageElement;
   previewImage?: ImageBitmap;
@@ -12,7 +13,10 @@ export interface LoadedPhoto {
 
 export async function loadPhoto(
   file: File,
-  { preview = true }: { preview?: boolean } = {},
+  {
+    preview = true,
+    snapshotSource = false,
+  }: { preview?: boolean; snapshotSource?: boolean } = {},
 ): Promise<LoadedPhoto> {
   validateFileSize(file.size);
   const bytes = await file.arrayBuffer();
@@ -29,7 +33,16 @@ export async function loadPhoto(
       ))
   )
     throw new Error('The photo type does not match its file name or content.');
-  const url = URL.createObjectURL(file);
+  // Session imports own their encoded bytes instead of depending on a readable
+  // disk-backed File for every later switch/export. Reuse the initial read;
+  // wrapping the original File alone would still depend on its backing storage.
+  const sourceFile = snapshotSource
+    ? new File([bytes], file.name, {
+        type: mimeType,
+        lastModified: file.lastModified,
+      })
+    : file;
+  const url = URL.createObjectURL(sourceFile);
   try {
     if (mimeType === 'image/png') {
       const dimensions = pngDimensions(bytesView);
@@ -78,6 +91,7 @@ export async function loadPhoto(
     }
     let disposed = false;
     return {
+      sourceFile,
       image,
       previewImage,
       document: createPhotoDocument({
