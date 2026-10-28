@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FloatingPanel } from '@/components/layout/floating-panel';
 import { PickerList } from '@/components/ui/picker-list';
+import { Tooltip } from '@/components/ui/tooltip';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import type { ImageAsset } from '@/domain/inline-image';
 import { ImagePlus } from 'lucide-react';
@@ -70,27 +71,37 @@ export function GraphicsPickerPanel({
           return (
             <section key={group} aria-label={group} className="mb-4">
               <h3 className="px-3 py-2 text-xs text-label">{group}</h3>
-              <PickerList
-                items={items.map((icon) => ({
-                  id: icon.name,
-                  label: icon.name,
-                  description: `{icon:${icon.name}}`,
-                  leading: (
-                    <span
-                      aria-hidden="true"
-                      className="inline-block size-5 shrink-0 bg-current"
-                      style={{
-                        maskImage: `url("${svgUrl(icon.svg)}")`,
-                        maskSize: 'contain',
-                        maskRepeat: 'no-repeat',
-                        maskPosition: 'center',
-                      }}
-                    />
-                  ),
-                }))}
-                onChoose={onChooseIcon}
-                emptyText="No icons available."
-              />
+              <div
+                role="group"
+                aria-label={`${group} icons`}
+                className="control-segments icon-picker-grid grid grid-cols-3 gap-1"
+              >
+                {items.map((icon) => (
+                  <Tooltip key={icon.name} content={icon.name}>
+                    <button
+                      type="button"
+                      aria-label={icon.name}
+                      onClick={() => onChooseIcon(icon.name)}
+                      className="control-segment flex min-w-0 flex-col items-center justify-center gap-2 px-1 py-3 focus-visible:outline-2 focus-visible:outline-input-focus-ring"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="inline-block h-8 max-w-full shrink-0 bg-current"
+                        style={{
+                          width: `${Math.min(64, 32 * icon.aspect)}px`,
+                          maskImage: `url("${svgUrl(icon.svg)}")`,
+                          maskSize: 'contain',
+                          maskRepeat: 'no-repeat',
+                          maskPosition: 'center',
+                        }}
+                      />
+                      <span className="w-full truncate text-center text-[10px] leading-4">
+                        {icon.name}
+                      </span>
+                    </button>
+                  </Tooltip>
+                ))}
+              </div>
             </section>
           );
         })
@@ -115,7 +126,7 @@ export function GraphicsPickerPanel({
                   <img
                     src={imageSource(asset)}
                     alt=""
-                    className="h-6 w-10 shrink-0 object-contain"
+                    className="h-10 w-24 shrink-0 object-contain"
                   />
                 ),
               }))}
