@@ -145,6 +145,9 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Fixed
 
+- Photo previews and rulers stay centered in the available workspace above the
+  film roll, including when the roll appears or disappears and the window resizes.
+
 - Photo switching and roll export retain access to imported image data even if
   the original file becomes unreadable, using session-owned copies of its bytes.
 

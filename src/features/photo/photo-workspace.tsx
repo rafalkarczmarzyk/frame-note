@@ -488,11 +488,7 @@ function PhotoWorkspaceContent({
     Math.max(1, size.height - 56) / height,
     1,
   );
-  // Keep the preview close to its film tray instead of leaving a centered
-  // letterbox gap between the two related surfaces.
-  const previewY = filmRoll
-    ? Math.max(12, size.height - height * scale - 12)
-    : (size.height - height * scale) / 2;
+  const previewY = (size.height - height * scale) / 2;
   const matchingFieldCount = metadataGroups(fields, query)
     .filter((group) => tagCategory === 'all' || group.name === tagCategory)
     .reduce((count, group) => count + group.fields.length, 0);
