@@ -323,7 +323,7 @@ function CanvasGlass({
   );
 }
 const meta = {
-  title: 'Screens/LayerBackground/CanvasTrial',
+  title: 'Proposals/CanvasGlassTrial',
   component: CanvasGlass,
   parameters: { layout: 'padded' },
 } satisfies Meta<typeof CanvasGlass>;

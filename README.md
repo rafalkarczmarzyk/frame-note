@@ -315,7 +315,6 @@ Some internal product and planning documents are maintained in Polish.
 - [MVP verification and known limits](docs/MVP_VERIFICATION.md)
 - [Photo export visual test plan](docs/EXPORT_VISUAL_TEST_PLAN.md)
 - [Inline image refactor](docs/INLINE_LOGO_PLAN.md)
-- [Technical remediation and open recommendations](docs/TECHNICAL_REMEDIATION_PLAN.md)
 - [Deferred ideas and decisions](docs/NICE_TO_HAVE.md)
 - [Original photo fixtures](tests/fixtures/README.md)
 

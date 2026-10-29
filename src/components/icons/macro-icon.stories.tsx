@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { MacroIcon } from './macro-icon';
 
 const meta = {
-  title: 'Components/UI/MacroIcon',
+  title: 'Foundations/MacroIcon',
   component: MacroIcon,
   args: { width: 24, height: 24, className: 'text-content-primary' },
 } satisfies Meta<typeof MacroIcon>;

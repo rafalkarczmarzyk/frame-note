@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
 import { SegmentedControl } from './segmented-control';
 const meta = {
-  title: 'Components/UI/SegmentedControl',
+  title: 'Selection & feedback/SegmentedControl',
   component: SegmentedControl,
   args: {
     label: 'JPEG quality presets',

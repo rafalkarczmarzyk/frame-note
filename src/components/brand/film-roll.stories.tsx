@@ -5,7 +5,7 @@ import { FilmRollFrame } from './film-roll-frame';
 import { FilmRollEnd } from './film-roll-end';
 
 const meta = {
-  title: 'Components/Brand/FilmRoll',
+  title: 'Photo session/Film roll artwork',
   component: FilmRollStart,
   args: { width: 96, height: 162, variant: 'emerald', exposures: 12 },
   argTypes: {

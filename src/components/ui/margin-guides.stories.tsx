@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { MarginGuides } from './margin-guides';
 const meta = {
-  title: 'Components/UI/MarginGuides',
+  title: 'Position & margins/MarginGuides',
   component: MarginGuides,
   args: {
     width: 480,

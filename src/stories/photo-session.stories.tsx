@@ -5,7 +5,7 @@ import portraitUrl from '../../tests/fixtures/20261021-IMG_0469.jpg';
 import macroUrl from '../../tests/fixtures/20261021-IMG_9959.jpg';
 
 const meta = {
-  title: 'Screens/PhotoSession',
+  title: 'Photo session/Full session',
   component: App,
   parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof App>;

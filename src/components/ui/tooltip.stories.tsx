@@ -5,7 +5,7 @@ import { IconButton } from './icon-button';
 import { Button } from './button';
 
 const meta = {
-  title: 'Components/UI/Tooltip',
+  title: 'Sidebar & panels/Tooltip',
   component: Tooltip,
   args: {
     content: 'Color palette',

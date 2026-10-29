@@ -40,7 +40,7 @@ function ContentDropPreview({
   );
 }
 const meta = {
-  title: 'Components/UI/ContentImageDrop',
+  title: 'Pickers/ContentImageDrop',
   component: ContentDropPreview,
   parameters: {
     docs: {

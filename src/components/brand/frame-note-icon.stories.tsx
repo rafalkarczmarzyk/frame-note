@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { FrameNoteIcon } from './frame-note-icon';
 
 const meta = {
-  title: 'Components/Brand/FrameNoteIcon',
+  title: 'Foundations/FrameNoteIcon',
   component: FrameNoteIcon,
   args: { width: 32, height: 32, className: 'size-8 text-content-primary' },
 } satisfies Meta<typeof FrameNoteIcon>;

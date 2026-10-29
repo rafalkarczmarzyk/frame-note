@@ -6,7 +6,7 @@ import { FloatingPanel } from './floating-panel';
 import { Input } from '../ui/input';
 import { PickerList } from '../ui/picker-list';
 const meta = {
-  title: 'Components/Layout/FloatingPanel',
+  title: 'Sidebar & panels/FloatingPanel',
   component: FloatingPanel,
   args: {
     title: 'Available tags',

@@ -419,7 +419,7 @@ function BackgroundProposal({
   );
 }
 const meta = {
-  title: 'Screens/LayerBackground',
+  title: 'Proposals/LayerBackground',
   component: BackgroundProposal,
   parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof BackgroundProposal>;

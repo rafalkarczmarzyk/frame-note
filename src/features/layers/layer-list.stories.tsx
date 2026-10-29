@@ -154,7 +154,7 @@ function Example({
   );
 }
 const meta = {
-  title: 'Components/UI/LayerList',
+  title: 'Layers/LayerList',
   component: Example,
 } satisfies Meta<typeof Example>;
 export default meta;

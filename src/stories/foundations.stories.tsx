@@ -4,7 +4,7 @@ import { Button } from '../components/ui/button';
 import { SegmentedControl } from '../components/ui/segmented-control';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 const meta = {
-  title: 'Design/Tokens',
+  title: 'Foundations/Tokens',
   parameters: {
     docs: {
       description: {

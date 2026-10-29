@@ -425,8 +425,7 @@ Wzorce pikseli eksportu pozostały bez zmian.
 ### Tła warstw — propozycja rozszerzenia
 
 Ustalenia z 2026-10-28, zakres kontrolek, geometria zachowująca pozycję treści,
-próba renderowania Glass i proponowane etapy znajdują się w
-[planie obsługi teł warstw](LAYER_BACKGROUND_PLAN.md). Storybook zawiera
+próba renderowania Glass i proponowane etapy znajdują się w opisie tła warstw. Storybook zawiera
 prototyp interfejsu Screens/LayerBackground. Plan nie oznacza zgody na
 automatyczną implementację kolejnych etapów.
 
@@ -437,6 +436,6 @@ potwierdzania każdego przejścia. Wdrożono model/presety i jednostki, Color wr
 z cieniem oraz Glass we właściwym edytorze i wspólnym rendererze JPG/batch.
 Padding rozszerza obrys dekoracji bez zmiany pozycji treści. Kontrolki Background
 należą do jaśniejszego inspektora; Layers zwija całość. Przypadki produkcyjne
-są w Storybooku Screens/TestPhotos. Szczegóły w LAYER_BACKGROUND_PLAN.md.
+są w Storybooku Screens/TestPhotos. Szczegóły w sekcji o tle warstw poniżej.
 Separatory poziome są odłożone jako NTH-004. Nie zmieniono wersji ani nie
 przygotowano wydania.

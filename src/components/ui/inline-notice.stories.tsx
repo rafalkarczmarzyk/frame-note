@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { InlineNotice } from './inline-notice';
 const meta = {
-  title: 'Components/UI/InlineNotice',
+  title: 'Selection & feedback/InlineNotice',
   component: InlineNotice,
   args: {
     children: 'Output is larger than the original. Try a lower JPEG quality.',

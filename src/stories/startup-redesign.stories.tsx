@@ -7,7 +7,7 @@ import { PhotoLoadingIndicator } from '@/features/photo/photo-loading-indicator'
 import { PhotoDropOverlay } from '@/features/photo/photo-drop-overlay';
 
 const meta = {
-  title: 'Screens/StartupRedesign',
+  title: 'Proposals/StartupRedesign',
   component: App,
   parameters: {
     layout: 'fullscreen',

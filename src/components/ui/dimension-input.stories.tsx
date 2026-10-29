@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { DimensionInput } from './dimension-input';
 import { Field } from './field';
 const meta = {
-  title: 'Components/UI/DimensionInput',
+  title: 'Fields/DimensionInput',
   component: DimensionInput,
   args: {
     value: 115.68,

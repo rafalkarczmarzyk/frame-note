@@ -6,7 +6,7 @@ import { NumberField } from './number-field';
 import { SegmentedControl } from './segmented-control';
 
 const meta = {
-  title: 'Components/UI/InlineInputGroup',
+  title: 'Field groups/InlineInputGroup',
   component: InlineInputGroup,
   parameters: {
     docs: {

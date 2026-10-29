@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, userEvent, within } from 'storybook/test';
 import { Ruler } from './ruler';
 const meta = {
-  title: 'Components/UI/Ruler',
+  title: 'Position & margins/Ruler',
   component: Ruler,
   args: {
     orientation: 'horizontal',

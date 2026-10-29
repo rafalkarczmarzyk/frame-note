@@ -23,7 +23,7 @@ function WhitespacePreview() {
   );
 }
 const meta = {
-  title: 'Components/UI/CaptionWhitespace',
+  title: 'Pickers/CaptionWhitespace',
   component: WhitespacePreview,
   parameters: { layout: 'padded' },
 } satisfies Meta<typeof WhitespacePreview>;

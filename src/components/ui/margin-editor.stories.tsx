@@ -5,7 +5,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { MarginEditor } from './margin-editor';
 const meta = {
-  title: 'Components/UI/MarginEditor',
+  title: 'Position & margins/MarginEditor',
   component: MarginEditor,
   args: {
     value: { top: 3, right: 3, bottom: 3, left: 3 },

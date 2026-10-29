@@ -7,7 +7,7 @@ import { AnchorPicker, type AnchorValue } from '../ui/anchor-picker';
 import { SidebarSection } from './sidebar-section';
 import { NumberField } from '../ui/number-field';
 const meta = {
-  title: 'Components/UI/Accordion',
+  title: 'Sidebar & panels/SidebarSection',
   component: SidebarSection,
   args: {
     id: 'storybook-section',

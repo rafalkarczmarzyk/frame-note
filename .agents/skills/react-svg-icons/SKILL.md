@@ -5,6 +5,11 @@ description: Add or update SVG icons and brand assets as React components in Fra
 
 # React SVG icons — FrameNote
 
+Before adding a shared UI or brand component, follow
+[FrameNote UI guidance](../../../docs/DESIGN_SYSTEM.md): reuse existing components,
+semantic tokens, spacing rules, and Storybook patterns. A new icon alone does not
+justify a new UI control.
+
 ## Components
 
 - Check installed `lucide-react` exports for standard UI symbols before adding custom SVGs. Import only the icons used.

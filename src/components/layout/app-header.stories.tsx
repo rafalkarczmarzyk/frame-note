@@ -64,7 +64,7 @@ function HeaderPreview({ width = 1100 }: { width?: number }) {
 }
 
 const meta = {
-  title: 'Components/Layout/AppHeader',
+  title: 'Sidebar & panels/AppHeader',
   component: HeaderPreview,
   parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof HeaderPreview>;

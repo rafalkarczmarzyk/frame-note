@@ -6,7 +6,7 @@ import { createCaption } from '@/domain/document';
 import { convertSizing } from '@/domain/sizing';
 const dimensions = { width: 6000, height: 4000 };
 const meta = {
-  title: 'Components/UI/CaptionControls',
+  title: 'Pickers/CaptionControls',
   component: CaptionControls,
   args: {
     caption: createCaption(),
