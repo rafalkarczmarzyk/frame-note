@@ -238,20 +238,24 @@ The stack combines React, TypeScript, Vite, Tailwind CSS, Konva, Tiptap,
 ExifReader, and Radix UI. Unit tests use Vitest; browser tests use Playwright.
 Shared components and design tokens are documented in Storybook.
 
-| Command                         | Purpose                                                                       |
-| ------------------------------- | ----------------------------------------------------------------------------- |
-| `pnpm dev`                      | Start the app on port 3000                                                    |
-| `pnpm check`                    | Check formatting, color tokens, lint, types, unit tests, and production build |
-| `pnpm test:watch`               | Run unit tests in watch mode                                                  |
-| `pnpm test:e2e`                 | Run browser tests in Chromium and WebKit                                      |
-| `pnpm test:e2e:ui`              | Open the Playwright test interface                                            |
-| `pnpm test:photo-export`        | Run the focused photo export checks                                           |
-| `pnpm test:photo-export:review` | Review export checks in Playwright UI                                         |
-| `pnpm test:photo-export:report` | Open the saved Playwright report                                              |
-| `pnpm storybook`                | Start Storybook on port 6006                                                  |
-| `pnpm build-storybook`          | Build the static component documentation                                      |
-| `pnpm build`                    | Build the production app                                                      |
-| `pnpm preview`                  | Preview the production build                                                  |
+| Command                 | Purpose                                                                            |
+| ----------------------- | ---------------------------------------------------------------------------------- |
+| `pnpm dev`              | Start the app on port 3000                                                         |
+| `pnpm check`            | Check formatting, color tokens, lint, types, all test suites, and production build |
+| `pnpm test`             | Run unit, E2E, all visual UI projects, and Glass tests; report all failed suites   |
+| `pnpm test:unit`        | Run unit tests only                                                                |
+| `pnpm test:e2e`         | Run browser tests in Chromium and WebKit                                           |
+| `pnpm test:glass-trial` | Build Storybook and run Glass rendering tests in Chromium and WebKit               |
+| `pnpm test:e2e:report`  | Open the saved E2E report                                                          |
+| `pnpm test:e2e:ui`      | Open the Playwright test interface                                                 |
+| `pnpm storybook`        | Start Storybook on port 6006                                                       |
+| `pnpm build-storybook`  | Build the static component documentation                                           |
+| `pnpm build`            | Build the production app                                                           |
+| `pnpm preview`          | Preview the production build                                                       |
+
+Pass options to the main commands instead of using separate shortcuts: `pnpm lint --fix`,
+`pnpm test:unit --watch`, `pnpm test:e2e --grep "Photo export"`, or
+`pnpm test:e2e:ui --grep "Photo export"`.
 
 Install browser engines before running E2E tests:
 
@@ -268,7 +272,7 @@ sRGB colors, orientation, and rendered pixels.
 
 Visual export baselines are platform-specific. Review actual/expected/diff images
 before deliberately updating them with
-`pnpm test:e2e:update --project=chromium`. UI-only changes should not require new
+`pnpm test:e2e --update-snapshots --project=chromium`. UI-only changes should not require new
 export baselines. Automated WebKit tests do not replace manual Safari testing.
 
 ### Storybook and design system
