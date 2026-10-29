@@ -39,6 +39,8 @@ function FontPreview({ font }: { font: CaptionFont }) {
   return (
     <span
       ref={host}
+      data-font-preview={font.id}
+      data-font-preview-status={status}
       className="block h-7 truncate text-xl leading-7"
       style={status === 'ready' ? { fontFamily: `"${font.id}"` } : undefined}
     >
