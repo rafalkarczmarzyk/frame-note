@@ -25,4 +25,4 @@ Nie mnożymy stron marginesu, ikon, jednostek ani kombinacji wyrównania. Szczeg
 
 Zwykłe uruchomienie nigdy nie tworzy wzorców. Po celowej aktualizacji obejrzyj nowe obrazy i różnice w Git przed commitem. Wzorce są zależne od systemu i profilu przeglądarki; nie kopiuj obrazów między profilami. W razie różnicy obejrzyj expected, actual i diff przed zmianą wzorca.
 
-Aktualne wzorce sześciu scen Chromium desktop są kandydatami wygenerowanymi 29 października 2026; pozostałe profile wymagają własnych wzorców i weryfikacji. Stare obrazy z wcześniejszego szerokiego zestawu zachowano jako materiał do przeglądu i nie są wykonywane przez `test:visual`.
+Wzorce każdej sceny i profilu wymagają obejrzenia przed zaakceptowaniem zmiany. Usunięte scenariusze i ich obrazy pozostają dostępne w historii Git sprzed uproszczenia zestawu.
