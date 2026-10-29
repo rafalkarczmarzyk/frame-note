@@ -219,11 +219,11 @@ Render może różnić się między środowiskami — zob.
 
 Wykorzystujemy istniejący Playwright. Włączamy raport HTML dostępny w przeglądarce
 oraz udostępniamy panel uruchamiania testów. Nie budujemy osobnej aplikacji do
-zarządzania snapshotami. Proponowane polecenia, do dodania podczas implementacji:
+zarządzania snapshotami. Aktualne polecenia:
 
-- `pnpm test:photo-export` — automatyczne uruchomienie zestawu eksportu.
-- `pnpm test:photo-export:review` — otwarcie panelu Playwrighta dla tego zestawu.
-- `pnpm test:photo-export:report` — otwarcie raportu HTML ostatniego przebiegu.
+- `pnpm test:e2e --grep "Photo export"` — uruchomienie testów z „Photo export” w nazwie.
+- `pnpm test:e2e:ui --grep "Photo export"` — panel Playwrighta z tym samym filtrem.
+- `pnpm test:e2e:report` — otwarcie raportu HTML ostatniego przebiegu E2E.
 
 Scenariusze mają czytelne nazwy, np. `Macro / portrait / Advercase Bold`.
 Panel pokazuje listę przypadków i wynik każdego z nich. Test sam otwiera
