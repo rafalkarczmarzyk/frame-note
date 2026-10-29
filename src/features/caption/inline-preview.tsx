@@ -1,5 +1,6 @@
+import { resolvedColor } from './resolve-color';
 import { canvasFontStyle } from '../../domain/font-style';
-import { Text, Image as CanvasImage } from 'react-konva';
+import { Text, Rect, Image as CanvasImage } from 'react-konva';
 import type { Caption } from '@/domain/document';
 import { inlineLayout, tintedIcon } from './inline-layout';
 export function InlinePreview({
@@ -16,7 +17,18 @@ export function InlinePreview({
   return (
     <>
       {scene.runs.map((run, index) =>
-        run.icon ? (
+        run.separator ? (
+          <Rect
+            key={index}
+            listening={false}
+            x={run.x}
+            y={run.y + (run.height - (run.thickness ?? 0)) / 2}
+            width={run.width}
+            height={run.thickness}
+            fill={resolvedColor(run.separator.color)}
+            opacity={run.separator.opacity}
+          />
+        ) : run.icon ? (
           images.get(run.icon.svg) && (
             <CanvasImage
               key={index}

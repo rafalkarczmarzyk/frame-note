@@ -1,3 +1,5 @@
+import { separatorToken } from '@/domain/inline-separator';
+import type { SeparatorColorActions } from '../caption/editor/caption-editor';
 import { Badge } from '@/components/ui/badge';
 import { useGlassPreview } from '../caption/use-glass-preview';
 import { BackgroundControls } from '../caption/background-controls';
@@ -41,9 +43,11 @@ import { iconMarker } from '../caption/inline-content';
 import { builtinIcons } from '../caption/builtin-icons';
 import type { Editor } from '@tiptap/react';
 import { CaptionEditor } from '../caption/editor/caption-editor';
-import { GraphicsPickerPanel } from '../caption/graphics-picker-panel';
+import {
+  ContentLibraryPanel,
+  type ContentCategory,
+} from '../caption/content-library-panel';
 import type { GraphicsEditorActions } from '../caption/editor/caption-editor';
-import type { ImageAsset } from '@/domain/inline-image';
 import { loadIcon, type SvgIcon } from '../caption/svg-icons';
 import { resolveCaptionContent } from '../caption/inline-content';
 import { inlineLayout } from '../caption/inline-layout';
@@ -58,8 +62,6 @@ import {
   type CaptionLayout,
 } from '@/domain/caption-layout';
 import { createCaption, type Caption } from '@/domain/document';
-import { MetadataPicker } from '../caption/metadata-picker';
-import { metadataGroups } from '@/domain/caption-tags';
 import { ColorPickerPanel } from '../caption/color-picker-panel';
 import {
   Download,
@@ -67,8 +69,6 @@ import {
   Layers,
   Plus,
   Trash2,
-  Tags,
-  Shapes,
   Image,
 } from 'lucide-react';
 import {
@@ -191,8 +191,10 @@ function PhotoWorkspaceContent({
     ReadonlyMap<string, HTMLImageElement>
   >(new Map());
   const [activePanel, setActivePanel] = useState<
-    'tags' | 'fonts' | 'colors' | 'graphics' | 'presets' | null
+    'content' | 'fonts' | 'colors' | 'separator-colors' | 'presets' | null
   >(null);
+  const [separatorColors, setSeparatorColors] =
+    useState<SeparatorColorActions | null>(null);
   const [graphicsActions, setGraphicsActions] =
     useState<GraphicsEditorActions | null>(null);
   const registerGraphicsActions = useCallback(
@@ -204,12 +206,11 @@ function PhotoWorkspaceContent({
     Record<string, { value: string; source: ColorSelectionSource }>
   >({});
   const [presetHost, setPresetHost] = useState<HTMLDivElement | null>(null);
-  const tagsOpen = activePanel === 'tags';
+  const [contentCategory, setContentCategory] =
+    useState<ContentCategory>('metadata');
   const [fontQuery, setFontQuery] = useState('');
   const [fontCategory, setFontCategory] = useState('all');
-  const [tagCategory, setTagCategory] = useState('all');
   const [size, setSize] = useState({ width: 1, height: 1 });
-  const [query, setQuery] = useState('');
   const [localLayout, setLocalLayout] = useState<CaptionLayout>(() =>
     initialLayout
       ? {
@@ -513,9 +514,6 @@ function PhotoWorkspaceContent({
     1,
   );
   const previewY = (size.height - height * scale) / 2;
-  const matchingFieldCount = metadataGroups(fields, query)
-    .filter((group) => tagCategory === 'all' || group.name === tagCategory)
-    .reduce((count, group) => count + group.fields.length, 0);
   const preparingExport =
     !!photo && !prepared.blob && !prepared.error && !fontError && !assetError;
   const exportLabel =
@@ -622,7 +620,8 @@ function PhotoWorkspaceContent({
                               (caption.logo &&
                                 !iconImages.has(caption.logo.asset.svg)) ||
                               inlineIcons.some(
-                                (icon) => !iconImages.has(icon.svg),
+                                (icon) =>
+                                  !icon.separator && !iconImages.has(icon.svg),
                               )
                             )
                               return null;
@@ -905,17 +904,45 @@ function PhotoWorkspaceContent({
           className="max-h-[40vh] w-full shrink-0 md:max-h-none md:w-80"
         />
       )}
-      {activePanel === 'graphics' && (
-        <GraphicsPickerPanel
+      {activePanel === 'content' && (
+        <ContentLibraryPanel
+          category={contentCategory}
+          onCategory={setContentCategory}
+          fields={fields}
+          used={used}
           icons={icons}
           images={settings.images ?? []}
-          onChooseIcon={(name) => addToken(`icon:${name}`)}
-          onChooseGraphic={(asset: ImageAsset) => {
-            graphicsActions?.insert(asset);
-            setActivePanel(null);
-          }}
+          onChooseToken={addToken}
+          onChooseGraphic={(asset) => graphicsActions?.insert(asset)}
           onUploadGraphic={() => graphicsActions?.upload()}
+          onSeparator={() =>
+            addToken(
+              separatorToken({
+                widthMode: 'flex',
+                width: settings.style.fontSize * 8,
+                height: 0.6,
+                unit: 'font',
+                thickness: 0.1,
+                color: settings.style.color,
+                opacity: 1,
+              }),
+            )
+          }
           onClose={() => setActivePanel(null)}
+          className="max-h-[40vh] w-full shrink-0 rounded-none shadow-none md:max-h-none md:w-80"
+        />
+      )}
+      {activePanel === 'separator-colors' && separatorColors && (
+        <ColorPickerPanel
+          value={separatorColors.value}
+          onChange={(color) => {
+            separatorColors.onChange(color);
+            setSeparatorColors((current) =>
+              current ? { ...current, value: color } : null,
+            );
+          }}
+          onClose={() => setActivePanel(null)}
+          surface="solid"
           className="max-h-[40vh] w-full shrink-0 rounded-none shadow-none md:max-h-none md:w-80"
         />
       )}
@@ -938,105 +965,56 @@ function PhotoWorkspaceContent({
           className="max-h-[40vh] w-full shrink-0 rounded-none shadow-none md:max-h-none md:w-80"
         />
       )}
-      {activePanel &&
-        activePanel !== 'colors' &&
-        activePanel !== 'graphics' &&
-        activePanel !== 'presets' && (
-          <FloatingPanel
-            id="auxiliary-panel"
-            title={tagsOpen ? 'Available tags' : 'Choose a font'}
-            description={
-              tagsOpen
-                ? 'Click a field to insert it into your caption.'
-                : 'Preview a font and apply it to your caption.'
-            }
-            onClose={() => setActivePanel(null)}
-            surface="solid"
-            className="max-h-[40vh] w-full shrink-0 rounded-none shadow-none md:max-h-none md:w-80"
-            toolbar={
-              tagsOpen ? (
-                <>
-                  <Input
-                    aria-label="Search metadata"
-                    value={query}
-                    onChange={(event) => setQuery(event.target.value)}
-                    placeholder="Search fields or values…"
-                    className="bg-preview-placeholder"
-                  />
-                  <CategoryFilter
-                    label="Tag categories"
-                    className="mt-2"
-                    value={tagCategory}
-                    onValueChange={setTagCategory}
-                    categories={metadataGroups(fields, '').map((group) => ({
-                      value: group.name,
-                      label:
-                        group.name === 'FrameNote'
-                          ? group.name
-                          : group.name.toUpperCase(),
-                    }))}
-                  />
-                  <p className="mt-2 text-xs text-content-secondary">
-                    {matchingFieldCount} tags
-                  </p>
-                </>
-              ) : (
-                <>
-                  <Input
-                    aria-label="Search fonts"
-                    value={fontQuery}
-                    onChange={(event) => setFontQuery(event.target.value)}
-                    placeholder="Search fonts…"
-                    className="bg-preview-placeholder"
-                  />
-                  <CategoryFilter
-                    label="Font categories"
-                    className="mt-2 -mb-3"
-                    value={fontCategory}
-                    onValueChange={setFontCategory}
-                    categories={fontCategories.map((value) => ({
-                      value,
-                      label: value,
-                    }))}
-                  />
-                </>
-              )
-            }
-          >
-            {tagsOpen ? (
-              <MetadataPicker
-                category={tagCategory}
-                fields={fields}
-                query={query}
-                used={used}
-                onChoose={addToken}
+      {activePanel === 'fonts' && (
+        <FloatingPanel
+          id="auxiliary-panel"
+          title="Choose a font"
+          description="Preview a font and apply it to your caption."
+          onClose={() => setActivePanel(null)}
+          surface="solid"
+          className="max-h-[40vh] w-full shrink-0 rounded-none shadow-none md:max-h-none md:w-80"
+          toolbar={
+            <>
+              <Input
+                aria-label="Search fonts"
+                value={fontQuery}
+                onChange={(event) => setFontQuery(event.target.value)}
+                placeholder="Search fonts…"
+                className="bg-preview-placeholder"
               />
-            ) : (
-              <FontPicker
-                category={fontCategory}
-                value={settings.style.fontFamily}
-                query={fontQuery}
-                onChoose={(id) =>
-                  setSettings((value) => ({
-                    ...value,
-                    style: {
-                      ...value.style,
-                      fontFamily: id,
-                      fontWeight: supportsBold(id)
-                        ? value.style.fontWeight
-                        : 400,
-                      fontStyle: supportsItalic(
-                        id as typeof value.style.fontFamily,
-                      )
-                        ? value.style.fontStyle
-                        : 'normal',
-                    },
-                  }))
-                }
+              <CategoryFilter
+                label="Font categories"
+                className="mt-2 -mb-3"
+                value={fontCategory}
+                onValueChange={setFontCategory}
+                categories={fontCategories.map((value) => ({
+                  value,
+                  label: value,
+                }))}
               />
-            )}
-          </FloatingPanel>
-        )}
+            </>
+          }
+        >
+          <FontPicker
+            category={fontCategory}
+            value={settings.style.fontFamily}
+            query={fontQuery}
+            onChoose={(id) =>
+              setSettings((value) => ({
+                ...value,
+                style: {
+                  ...value.style,
+                  fontFamily: id,
+                  fontWeight: supportsBold(id) ? value.style.fontWeight : 400,
+                  fontStyle: supportsItalic(id as typeof value.style.fontFamily)
+                    ? value.style.fontStyle
+                    : 'normal',
+                },
+              }))
+            }
+          />
+        </FloatingPanel>
+      )}
       <ToolSidebar aria-label="Photo tools">
         <div
           className="min-h-0 flex-1 overflow-y-auto"
@@ -1244,50 +1222,15 @@ function PhotoWorkspaceContent({
                         onBlur={() => setEditingId(null)}
                         onReady={editorReady}
                         onGraphicsActionsReady={registerGraphicsActions}
-                        actions={
-                          <>
-                            <Tooltip content="Insert photo metadata at the text cursor">
-                              <button
-                                type="button"
-                                className="control-segment control-height flex min-w-0 items-center justify-center gap-1 px-2 text-xs whitespace-nowrap [&_svg]:size-4 [&_svg]:shrink-0"
-                                aria-label={
-                                  tagsOpen
-                                    ? 'Hide available tags'
-                                    : 'Browse available tags'
-                                }
-                                data-state={tagsOpen ? 'on' : 'off'}
-                                aria-expanded={tagsOpen}
-                                aria-controls="auxiliary-panel"
-                                onClick={() =>
-                                  setActivePanel((value) =>
-                                    value === 'tags' ? null : 'tags',
-                                  )
-                                }
-                              >
-                                <Tags aria-hidden="true" />
-                                Metadata
-                              </button>
-                            </Tooltip>
-                            <Tooltip content="Insert a built-in icon or SVG / PNG graphic">
-                              <button
-                                type="button"
-                                className="control-segment control-height flex min-w-0 items-center justify-center gap-1 px-2 text-xs whitespace-nowrap [&_svg]:size-4 [&_svg]:shrink-0"
-                                aria-label="Browse graphics"
-                                data-state={
-                                  activePanel === 'graphics' ? 'on' : 'off'
-                                }
-                                aria-expanded={activePanel === 'graphics'}
-                                onClick={() =>
-                                  setActivePanel((value) =>
-                                    value === 'graphics' ? null : 'graphics',
-                                  )
-                                }
-                              >
-                                <Shapes aria-hidden="true" />
-                                Graphics
-                              </button>
-                            </Tooltip>
-                          </>
+                        onBrowseSeparatorColors={(actions) => {
+                          setSeparatorColors(actions);
+                          setActivePanel('separator-colors');
+                        }}
+                        contentOpen={activePanel === 'content'}
+                        onBrowseContent={() =>
+                          setActivePanel((value) =>
+                            value === 'content' ? null : 'content',
+                          )
                         }
                       />
                       {photo &&

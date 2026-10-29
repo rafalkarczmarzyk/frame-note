@@ -1,6 +1,7 @@
+import { parseSeparatorToken } from '@/domain/inline-separator';
 import { Badge } from '@/components/ui/badge';
 import { parseIconToken } from '@/domain/inline-icon';
-import { Tag, TriangleAlert } from 'lucide-react';
+import { Tag, TriangleAlert, SeparatorHorizontal } from 'lucide-react';
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import type { CaptionContainer } from '@/domain/caption-layout';
 import { parseImageToken } from '@/domain/inline-image';
@@ -49,6 +50,17 @@ export function LayerContentPreview({
               </span>
             ));
         const token = String(node.attrs?.token);
+        if (parseSeparatorToken(token))
+          return (
+            <span
+              key={index}
+              className="inline-flex h-6 items-center gap-1"
+              data-layer-token={token}
+            >
+              <SeparatorHorizontal aria-hidden="true" className="h-4 w-8" />
+              {nodes.length === 1 && 'Separator'}
+            </span>
+          );
         const image = parseImageToken(token);
         const graphic =
           image && layer.images?.find((asset) => asset.id === image.assetId);

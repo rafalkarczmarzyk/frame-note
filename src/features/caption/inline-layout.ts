@@ -6,6 +6,7 @@ import { toPixels } from '../../domain/sizing';
 import { anchoredPosition, customPosition } from './layout';
 import { inlineRuns } from './inline-content';
 import type { InlineAsset } from '@/domain/inline-image';
+import type { SeparatorReference } from '@/domain/inline-separator';
 import type { SvgIcon } from './svg-icons';
 
 export interface InlineRun {
@@ -16,6 +17,8 @@ export interface InlineRun {
   icon?: InlineAsset;
   height: number;
   original?: boolean;
+  separator?: SeparatorReference;
+  thickness?: number;
 }
 export function inlineLayout(
   dimensions: ImageDimensions,
@@ -43,13 +46,23 @@ export function inlineLayout(
               wrap: 'none',
             })
           : null;
-      const sizing = icon?.image ?? icon?.sizing;
-      const height = sizing
+      const sizing = icon?.separator ?? icon?.image ?? icon?.sizing;
+      const measuredHeight = sizing
         ? sizing.unit === 'font'
           ? fontSize * sizing.height
           : toPixels(sizing.height, caption.sizingUnit, dimensions)
         : fontSize;
-      const size = icon ? height * icon.aspect : (metrics?.width() ?? 0);
+      const thickness = icon?.separator
+        ? toPixels(icon.separator.thickness, caption.sizingUnit, dimensions)
+        : 0;
+      const height = Math.max(measuredHeight, thickness);
+      const size = icon?.separator
+        ? icon.separator.widthMode === 'fixed'
+          ? toPixels(icon.separator.width, caption.sizingUnit, dimensions)
+          : 0
+        : icon
+          ? height * icon.aspect
+          : (metrics?.width() ?? 0);
       metrics?.destroy();
       const result = {
         x: width,
@@ -60,14 +73,19 @@ export function inlineLayout(
         width: size,
         text: 'text' in run ? run.text : undefined,
         icon,
+        separator: icon?.separator,
+        thickness,
       };
       width += size;
       return result;
     });
-    const imageOnly = runs.length > 0 && runs.every((run) => run.icon?.image);
+    const imageOnly =
+      runs.length > 0 && runs.every((run) => run.icon?.image || run.separator);
     const referenceHeight = imageOnly ? 0 : lineHeight;
     const positioned = runs.map((run) => {
-      const sizing = run.icon?.image ?? run.icon?.sizing;
+      const sizing = run.separator
+        ? { alignment: 'center' }
+        : (run.icon?.image ?? run.icon?.sizing);
       const factor =
         sizing?.alignment === 'top'
           ? 0
@@ -86,6 +104,36 @@ export function inlineLayout(
     );
     return { width, runs: positioned, height: bottom - top, top };
   });
+  // Flex items do not contribute to intrinsic width. With no intrinsic content,
+  // use their stored fixed widths as a useful standalone fallback.
+  const intrinsicWidth = Math.max(0, ...lines.map((line) => line.width));
+  const contentWidth =
+    intrinsicWidth ||
+    Math.max(
+      0,
+      ...lines.map((line) =>
+        line.runs.reduce(
+          (sum, run) =>
+            sum +
+            (run.separator
+              ? toPixels(run.separator.width, caption.sizingUnit, dimensions)
+              : 0),
+          0,
+        ),
+      ),
+    );
+  for (const line of lines) {
+    const flex = line.runs.filter((run) => run.separator?.widthMode === 'flex');
+    if (!flex.length) continue;
+    const share = Math.max(0, contentWidth - line.width) / flex.length;
+    let x = 0;
+    for (const run of line.runs) {
+      run.x = x;
+      if (run.separator?.widthMode === 'flex') run.width = share;
+      x += run.width;
+    }
+    line.width = x;
+  }
   const block = {
     width: Math.max(0, ...lines.map((line) => line.width)),
     height: lines.reduce((sum, line) => sum + line.height, 0),

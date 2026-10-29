@@ -1,3 +1,4 @@
+import { parseSeparatorToken } from '@/domain/inline-separator';
 import { Badge } from '@/components/ui/badge';
 import { parseIconToken } from '@/domain/inline-icon';
 import { NodeSelection } from '@tiptap/pm/state';
@@ -10,7 +11,13 @@ import { TokenContext } from './token-context';
 import { svgUrl } from '../svg-icons';
 import type { MouseEvent } from 'react';
 import { NodeViewWrapper, type NodeViewProps } from '@tiptap/react';
-import { Aperture, Camera, Tag, TriangleAlert } from 'lucide-react';
+import {
+  Aperture,
+  Camera,
+  Tag,
+  TriangleAlert,
+  SeparatorHorizontal,
+} from 'lucide-react';
 
 export function TokenView({
   node,
@@ -26,6 +33,7 @@ export function TokenView({
     selectedImagePosition,
   } = useContext(TokenContext);
   const token = String(node.attrs.token);
+  const separator = parseSeparatorToken(token);
   const iconRef = parseIconToken(token);
   const imageRef = parseImageToken(token);
   const graphic =
@@ -34,28 +42,34 @@ export function TokenView({
   const asset = icons?.find((item) => item.name === iconRef?.name);
   const icon = token.startsWith('icon:') || token.startsWith('image:');
   const Icon = iconRef?.name === 'aperture' ? Aperture : Camera;
-  const missing = token.startsWith('image:')
-    ? !graphic
-    : icon
-      ? icons
-        ? !asset
-        : !['aperture', 'camera'].includes(iconRef?.name ?? '')
-      : hasPhoto && !values[token]?.trim();
+  const missing = separator
+    ? false
+    : token.startsWith('image:')
+      ? !graphic
+      : icon
+        ? icons
+          ? !asset
+          : !['aperture', 'camera'].includes(iconRef?.name ?? '')
+        : hasPhoto && !values[token]?.trim();
   const status =
-    icon || !hasPhoto ? undefined : metadataTokenStatus(token, values);
+    separator || icon || !hasPhoto
+      ? undefined
+      : metadataTokenStatus(token, values);
   return (
     <Tooltip
       selectionActive={!!selected}
       content={
-        graphic
-          ? graphic.name
-          : missing
-            ? `${icon ? (imageRef ? 'Missing image' : 'Missing icon') : status === 'absent' ? 'Tag not found in this photo' : 'No value returned for'} · {${token}}`
-            : icon
-              ? `{${token}}`
-              : !hasPhoto
-                ? 'Open a photo to preview this value'
-                : values[token]
+        separator
+          ? 'Separator · Solid line'
+          : graphic
+            ? graphic.name
+            : missing
+              ? `${icon ? (imageRef ? 'Missing image' : 'Missing icon') : status === 'absent' ? 'Tag not found in this photo' : 'No value returned for'} · {${token}}`
+              : icon
+                ? `{${token}}`
+                : !hasPhoto
+                  ? 'Open a photo to preview this value'
+                  : values[token]
       }
     >
       <Badge
@@ -95,7 +109,9 @@ export function TokenView({
           data-value-status={status}
           className={`caption-token relative cursor-grab ${selected ? 'z-10 outline-2 outline-input-focus-ring' : ''}`}
         >
-          {missing ? (
+          {separator ? (
+            <SeparatorHorizontal aria-label="Separator" className="h-5 w-10" />
+          ) : missing ? (
             <TriangleAlert
               aria-hidden="true"
               className={icon ? 'size-5' : 'size-3'}
@@ -143,7 +159,9 @@ export function TokenView({
           ) : (
             <Tag aria-hidden="true" className="size-3" />
           )}
-          {icon ? (
+          {separator ? (
+            <span className="sr-only">Separator</span>
+          ) : icon ? (
             <span className="sr-only">
               {missing
                 ? imageRef

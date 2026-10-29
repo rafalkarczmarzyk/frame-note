@@ -1,3 +1,6 @@
+import { IconButton } from '@/components/ui/icon-button';
+import { parseSeparatorToken, separatorToken } from '@/domain/inline-separator';
+import { SeparatorSettings } from './separator-settings';
 import { closeHistory } from '@tiptap/pm/history';
 import { CaptionWhitespace, whitespaceKey } from './whitespace-extension';
 import { metadataTokenStatus } from './token-status';
@@ -17,6 +20,7 @@ import { createPortal } from 'react-dom';
 import { ContentImageDropOverlay } from './content-image-drop-overlay';
 import {
   ImagePlus,
+  SeparatorHorizontal,
   Plus,
   Tag,
   Camera,
@@ -35,7 +39,6 @@ import {
 import { importImage, prepareImageAssets } from '../image-assets';
 import { Button } from '@/components/ui/button';
 import { SegmentedControl } from '@/components/ui/segmented-control';
-import { InlineInputGroup } from '@/components/ui/inline-input-group';
 import {
   toPixels,
   pixelsPerUnit,
@@ -54,6 +57,11 @@ import { templateDocument, documentTemplate } from './template-document';
 import { TokenContext } from './token-context';
 import type { SvgIcon } from '../svg-icons';
 
+export interface SeparatorColorActions {
+  value: string;
+  onChange: (color: string) => void;
+}
+
 export interface GraphicsEditorActions {
   upload: () => void;
   insert: (asset: ImageAsset) => void;
@@ -62,6 +70,8 @@ export interface GraphicsEditorActions {
 export function CaptionEditor({
   value,
   actions,
+  onBrowseContent,
+  contentOpen = false,
   images = [],
   sizingUnit = 'px',
   fontSize = 20,
@@ -74,9 +84,13 @@ export function CaptionEditor({
   onBlur,
   onReady,
   onGraphicsActionsReady,
+  onBrowseSeparatorColors,
 }: {
+  onBrowseSeparatorColors?: (actions: SeparatorColorActions) => void;
   value: string;
   actions?: ReactNode;
+  onBrowseContent?: () => void;
+  contentOpen?: boolean;
   images?: readonly ImageAsset[];
   sizingUnit?: SizingUnit;
   fontSize?: number;
@@ -570,6 +584,31 @@ export function CaptionEditor({
     selectedPosition === null
       ? null
       : String(editor?.state.doc.nodeAt(selectedPosition)?.attrs.token ?? '');
+  const selectedSeparator = selectedToken
+    ? parseSeparatorToken(selectedToken)
+    : null;
+  const browseSeparatorColors = () => {
+    if (!selectedSeparator || !editor || selectedPosition === null) return;
+    onBrowseSeparatorColors?.({
+      value: selectedSeparator.color,
+      onChange: (color) => {
+        const position = selectedRef.current;
+        if (editor.isDestroyed || position === null) return;
+        const current = parseSeparatorToken(
+          String(editor.state.doc.nodeAt(position)?.attrs.token ?? ''),
+        );
+        if (!current) return;
+        editor
+          .chain()
+          .setNodeSelection(position)
+          .updateAttributes('captionToken', {
+            token: separatorToken({ ...current, color }),
+          })
+          .setNodeSelection(position)
+          .run();
+      },
+    });
+  };
   const selectedIcon = selectedToken ? parseIconToken(selectedToken) : null;
   const selectedIconAsset = icons.find(
     (item) => item.name === selectedIcon?.name,
@@ -640,66 +679,66 @@ export function CaptionEditor({
             </span>
           )}
         </div>
-        <div className="mt-2 flex w-full items-center gap-2">
-          <Plus
-            aria-hidden="true"
-            className="size-4 shrink-0 text-content-secondary"
-          />
-          <InlineInputGroup
-            label="Add content controls"
-            className="min-w-0 flex-1"
-          >
-            <div
-              role="group"
-              aria-label="Add content"
-              className="control-segments grid control-height min-w-0 flex-1 auto-cols-auto grid-flow-col items-center gap-1 px-1"
-            >
-              {actions}
-              <input
-                ref={upload}
-                type="file"
-                accept="image/svg+xml,image/png,.svg,.png"
-                className="sr-only"
-                aria-label="Upload image"
-                onChange={(event) => {
-                  const file = event.target.files?.[0];
-                  event.target.value = '';
-                  if (file) void addImage(file, replacePosition.current);
-                }}
-              />
-            </div>
-            <span className="control-segments inline-flex control-height shrink-0 px-1">
-              <Tooltip
-                content={
-                  showWhitespace
-                    ? 'Hide spaces and line breaks'
-                    : 'Show spaces and line breaks'
-                }
+        <div className="mt-2 flex items-center justify-between gap-2">
+          {actions ?? (
+            <Tooltip content="Browse metadata, icons, graphics and separators">
+              <Button
+                variant="outline"
+                size="sm"
+                aria-label="Add content"
+                aria-expanded={contentOpen}
+                aria-controls="auxiliary-panel"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={onBrowseContent}
               >
-                <button
-                  type="button"
-                  aria-label="Show formatting marks"
-                  aria-pressed={showWhitespace}
-                  className="control-segment control-height flex min-w-10 shrink-0 items-center justify-center px-2"
-                  data-state={showWhitespace ? 'on' : 'off'}
-                  onMouseDown={(event) => event.preventDefault()}
-                  onClick={() => {
-                    const next = !showWhitespace;
-                    setShowWhitespace(next);
-                    if (editor)
-                      editor.view.dispatch(
-                        closeHistory(editor.state.tr)
-                          .setMeta(whitespaceKey, next)
-                          .setMeta('addToHistory', false),
-                      );
-                  }}
-                >
-                  <Pilcrow aria-hidden="true" className="size-4" />
-                </button>
-              </Tooltip>
-            </span>
-          </InlineInputGroup>
+                <Plus aria-hidden="true" />
+                Add
+              </Button>
+            </Tooltip>
+          )}
+          <div
+            role="group"
+            aria-label="Editor display"
+            className="control-segments inline-flex w-9 justify-center"
+          >
+            <IconButton
+              label="Show formatting marks"
+              className="control-segment w-7 min-w-7 px-0"
+              data-state={showWhitespace ? 'on' : 'off'}
+              tooltip={
+                showWhitespace
+                  ? 'Hide spaces and line breaks'
+                  : 'Show spaces and line breaks'
+              }
+              aria-pressed={showWhitespace}
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => {
+                const next = !showWhitespace;
+                setShowWhitespace(next);
+                if (editor)
+                  editor.view.dispatch(
+                    closeHistory(editor.state.tr)
+                      .setMeta(whitespaceKey, next)
+                      .setMeta('addToHistory', false),
+                  );
+              }}
+            >
+              <Pilcrow aria-hidden="true" className="size-4" />
+            </IconButton>
+          </div>
         </div>
+        <input
+          ref={upload}
+          type="file"
+          accept="image/svg+xml,image/png,.svg,.png"
+          className="sr-only"
+          aria-label="Upload image"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            event.target.value = '';
+            if (file) void addImage(file, replacePosition.current);
+          }}
+        />
         {loading && (
           <p role="status" className="mt-2 text-xs text-content-secondary">
             Loading image…
@@ -724,7 +763,12 @@ export function CaptionEditor({
             }}
           >
             <div className="flex min-w-0 items-center gap-2">
-              {token ? (
+              {selectedSeparator ? (
+                <SeparatorHorizontal
+                  aria-hidden="true"
+                  className="size-4 shrink-0"
+                />
+              ) : token ? (
                 <ImagePlus aria-hidden="true" className="size-4 shrink-0" />
               ) : selectedIcon ? (
                 <Camera aria-hidden="true" className="size-4 shrink-0" />
@@ -733,21 +777,44 @@ export function CaptionEditor({
               )}
               <div className="min-w-0">
                 <p className="text-xs text-content-secondary">
-                  {token
-                    ? (selectedAsset?.format.toUpperCase() ?? 'Image')
-                    : selectedIcon
-                      ? 'Icon'
-                      : 'Metadata'}
+                  {selectedSeparator
+                    ? 'Separator'
+                    : token
+                      ? (selectedAsset?.format.toUpperCase() ?? 'Image')
+                      : selectedIcon
+                        ? 'Icon'
+                        : 'Metadata'}
                 </p>
                 <p className="truncate text-sm">
-                  {selectedAsset?.name ??
-                    selectedIconAsset?.name ??
-                    selectedIcon?.name ??
-                    selectedToken}
+                  {selectedSeparator
+                    ? 'Solid line'
+                    : (selectedAsset?.name ??
+                      selectedIconAsset?.name ??
+                      selectedIcon?.name ??
+                      selectedToken)}
                 </p>
               </div>
             </div>
-            {selectedSizing ? (
+            {selectedSeparator ? (
+              <SeparatorSettings
+                onBrowseColors={browseSeparatorColors}
+                value={selectedSeparator}
+                sizingUnit={sizingUnit}
+                fontSize={fontSize}
+                dimensions={dimensions}
+                onChange={(next) => {
+                  if (!editor || selectedPosition === null) return;
+                  editor
+                    .chain()
+                    .setNodeSelection(selectedPosition)
+                    .updateAttributes('captionToken', {
+                      token: separatorToken(next),
+                    })
+                    .setNodeSelection(selectedPosition)
+                    .run();
+                }}
+              />
+            ) : selectedSizing ? (
               <ElementSizeSettings
                 height={selectedSizing.height}
                 unit={selectedSizing.unit}

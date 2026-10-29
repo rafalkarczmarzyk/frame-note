@@ -1,3 +1,4 @@
+import { parseSeparatorToken, separatorToken } from './inline-separator';
 import { mapBackgroundLengths } from './layer-background';
 import { iconToken, parseIconToken } from './inline-icon';
 import { imageToken, parseImageToken } from './inline-image';
@@ -63,8 +64,19 @@ export function convertSizing(
       ? { background: mapBackgroundLengths(caption.background, convert) }
       : {}),
     template: caption.template.replace(
-      /\{((?:image|icon):[^{}]*)\}/gu,
+      /\{((?:image|icon|separator):[^{}]*)\}/gu,
       (original, token: string) => {
+        const separator = parseSeparatorToken(token);
+        if (separator)
+          return `{${separatorToken({
+            ...separator,
+            width: convert(separator.width),
+            thickness: convert(separator.thickness),
+            height:
+              separator.unit === 'document'
+                ? convert(separator.height)
+                : separator.height,
+          })}}`;
         const icon = parseIconToken(token);
         if (icon?.unit === 'document')
           return `{${iconToken({ ...icon, height: convert(icon.height) })}}`;

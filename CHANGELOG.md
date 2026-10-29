@@ -9,6 +9,17 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Added
 
+- Inline horizontal separators with Fixed or Flex width, relative or document-unit
+  height, independent line thickness, color and opacity. Flex fills the remaining
+  row width; Fixed contributes to the layer’s content width. Settings survive
+  clipboard operations, presets and document-unit conversions, with shared
+  geometry for preview and JPG. New separators use Flex, 0.6× text height,
+  0.1 document-unit thickness and full opacity.
+- A single Add button opens a shared content sidebar with Metadata, Icons,
+  Graphics and Separators categories. The panel remembers the last category,
+  supports metadata filters and icon/graphic search, retains SVG/PNG upload,
+  and stays open after insertion. The formatting-marks toggle sits beside Add.
+
 - A compact visual smoke suite covers six full application views: empty editor,
   photo editing, multiple layers, one margin hover, SVG settings and photo roll.
   It runs directly against the app without starting Storybook.
@@ -40,9 +51,8 @@ when explicitly requested; a commit does not automatically create a release.
   relative/fixed heights and top/center/bottom alignment against the text line;
   settings survive clipboard operations, document-unit changes and presets and
   match between preview and JPG export. Editor badges have consistent heights
-  and more space between lines. The Content toolbar groups icon selection and
-  SVG/PNG graphics in a shared panel, with Icons and Graphics tabs, an upload
-  action, and a built-in Canon logo. Inline graphic badges keep the same height
+  and more space between lines. The content library includes built-in icons,
+  SVG/PNG upload and a built-in Canon logo. Inline graphic badges keep the same height
   regardless of their output size. Relative/Fixed mode and numeric graphic size
   share a row, with a more visible unit and no redundant slider. All numeric
   fields support vertical dragging on their steppers; clicks and arrow keys
@@ -60,10 +70,7 @@ when explicitly requested; a commit does not automatically create a release.
   returning no value in yellow. Compact Empty/Unknown summaries show individual
   field badges below the editor; value tooltips display only the resolved text.
   Missing-value indicators stay hidden until a photo is open.
-  Content insertion uses a full-width group of Metadata, Icons and SVG / PNG
-  actions beside a plus icon, with nonbreaking labels and consistent spacing
-  before typography controls. Custom graphics use SVG / PNG; the icon panel
-  no longer includes upload controls, empty custom-icon groups or Back to caption.
+  Custom graphics use SVG / PNG; upload belongs to the Graphics category.
 
 - Multi-photo sessions with independent layouts, artwork and preset selections.
   An SVG film roll appears below the canvas for two or more photos, supports
