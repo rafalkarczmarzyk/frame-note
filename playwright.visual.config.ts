@@ -63,19 +63,7 @@ export default defineConfig({
       },
     },
     {
-      name: 'chromium-retina',
-      testMatch: /composition.spec.ts|session.spec.ts/,
-      grep: /UI-03|UI-18|UI-29/,
-      use: {
-        browserName: 'chromium',
-        launchOptions: { args: ['--disable-gpu'] },
-        deviceScaleFactor: 2,
-      },
-    },
-    {
       name: 'webkit-desktop',
-      testMatch:
-        /composition.spec.ts|panels.spec.ts|graphics.spec.ts|session.spec.ts/,
       use: { browserName: 'webkit' },
     },
   ],
@@ -85,13 +73,6 @@ export default defineConfig({
         'pnpm build && pnpm preview --host 127.0.0.1 --port 4184 --strictPort',
       url: 'http://127.0.0.1:4184',
       reuseExistingServer: false,
-    },
-    {
-      command:
-        'pnpm build-storybook && python3 -m http.server 6018 --bind 127.0.0.1 --directory storybook-static',
-      url: 'http://127.0.0.1:6018',
-      reuseExistingServer: false,
-      stderr: 'ignore',
     },
   ],
 });
