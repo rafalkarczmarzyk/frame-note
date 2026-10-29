@@ -9,6 +9,10 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Added
 
+- A compact visual smoke suite covers six full application views: empty editor,
+  photo editing, multiple layers, one margin hover, SVG settings and photo roll.
+  It runs directly against the app without starting Storybook.
+
 - Supplied macro photography icon in the built-in icon picker and Storybook.
 - Shared Badge component with semantic colors and sizes for asset formats,
   metadata statuses, editor tokens, layer summaries and selection labels.
