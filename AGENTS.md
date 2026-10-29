@@ -32,3 +32,17 @@ zastosuj projektowy skill
 w `docs/NICE_TO_HAVE.md` w tej samej turze. Sprawdź istniejące wpisy, żeby nie
 tworzyć duplikatów. Lista jest pamięcią decyzji, nie zgodą na implementację.
 Nie włączaj odłożonych pomysłów do bieżącego zakresu bez polecenia użytkownika.
+
+## Regresja wizualna interfejsu
+
+Przed oddaniem zmian wyglądu, kontrolek lub układu uruchom `pnpm test:visual`.
+Przy zmianach wspólnych styli i komponentów sprawdź również
+`pnpm test:visual --all-projects`. Katalog scen i sposób przeglądania różnic:
+[UI_VISUAL_REGRESSION_PLAN.md](docs/UI_VISUAL_REGRESSION_PLAN.md).
+
+Różnica wizualna wymaga obejrzenia expected/actual/diff. Nie aktualizuj wzorców,
+żeby jedynie naprawić test; aktualizuj wyłącznie świadomie zaakceptowane sceny.
+Dodając nowy istotny stan interfejsu, dodaj jego scenariusz do zestawu.
+Wzorce są zależne od systemu i profilu przeglądarki; brak właściwego środowiska
+zgłoś jako niewykonaną weryfikację, zamiast zapisywać wzorce z innego systemu.
+Testy UI uzupełniają istniejące testy eksportu JPG.

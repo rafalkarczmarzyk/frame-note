@@ -318,3 +318,29 @@ Some internal product and planning documents are maintained in Polish.
 - [Technical remediation and open recommendations](docs/TECHNICAL_REMEDIATION_PLAN.md)
 - [Deferred ideas and decisions](docs/NICE_TO_HAVE.md)
 - [Original photo fixtures](tests/fixtures/README.md)
+
+### UI visual regression
+
+Compare the current interface against local PNG references (Chromium/macOS):
+
+```sh
+pnpm test:visual
+pnpm test:visual --grep 'UI-20'
+pnpm test:visual:review
+pnpm test:visual:report
+```
+
+The runner builds and serves the app and Storybook automatically, using ports
+4184 and 6018. Missing references fail without creating new ones. Review changes
+before explicitly updating a selected scene:
+
+```sh
+pnpm test:visual:update --project chromium-desktop --grep 'UI-20 / left-hover / none'
+pnpm test:visual --repeat-each=3 --retries=0
+pnpm test:visual --all-projects
+```
+
+Additional projects: `chromium-compact`, `chromium-retina`, `webkit-desktop`.
+References are specific to the project and operating system. Production
+compositions can be reviewed in Storybook under Screens/VisualRegression.
+See [the scenario catalog and workflow](docs/UI_VISUAL_REGRESSION_PLAN.md).

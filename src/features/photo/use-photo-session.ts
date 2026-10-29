@@ -213,7 +213,11 @@ export function usePhotoSession() {
         resources.current.delete(loaded);
       }
     }
-    const retained = new Set(session.items.map((item) => item.thumbnailUrl));
+    // Imports may append a thumbnail before an effect from the preceding render
+    // runs. Use the committed ref so that effect cannot revoke a newer item.
+    const retained = new Set(
+      state.current.items.map((item) => item.thumbnailUrl),
+    );
     for (const url of thumbnails.current) {
       if (!retained.has(url)) {
         URL.revokeObjectURL(url);
