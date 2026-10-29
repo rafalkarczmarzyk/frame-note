@@ -3,7 +3,7 @@ import { IconButton } from './icon-button';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Button } from './button';
 const meta = {
-  title: 'Components/UI/Button',
+  title: 'Actions/Button',
   component: Button,
   args: { children: 'Export JPG' },
   parameters: {

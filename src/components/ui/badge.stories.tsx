@@ -11,7 +11,7 @@ const tones: BadgeTone[] = [
   'inverse',
 ];
 const meta = {
-  title: 'Components/UI/Badge',
+  title: 'Selection & feedback/Badge',
   component: Badge,
   args: { children: 'SVG', tone: 'muted', size: 'sm' },
   argTypes: {

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { PhotoIcon } from './photo-icon';
 const meta = {
-  title: 'Components/UI/PhotoIcon',
+  title: 'Foundations/PhotoIcon',
   component: PhotoIcon,
   args: { width: 40, height: 40, className: 'text-content-primary' },
 } satisfies Meta<typeof PhotoIcon>;

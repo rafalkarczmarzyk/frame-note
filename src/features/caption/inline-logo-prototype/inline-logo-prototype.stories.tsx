@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { InlineLogoPrototype } from './inline-logo-prototype';
 
 const meta = {
-  title: 'Screens/InlineLogoPrototype',
+  title: 'Proposals/InlineLogoPrototype',
   component: InlineLogoPrototype,
   parameters: { layout: 'padded' },
 } satisfies Meta<typeof InlineLogoPrototype>;

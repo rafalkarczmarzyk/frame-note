@@ -138,7 +138,7 @@ function Card({ title, ...props }: Partial<ExampleProps> & { title: string }) {
   );
 }
 const meta = {
-  title: 'Components/UI/MarginRulers',
+  title: 'Position & margins/MarginRulers',
   component: Example,
   subcomponents: { MarginRulers },
   args: defaults,

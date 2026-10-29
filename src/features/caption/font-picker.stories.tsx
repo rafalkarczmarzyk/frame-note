@@ -7,7 +7,7 @@ import { expect, userEvent, within } from 'storybook/test';
 import { Input } from '@/components/ui/input';
 import { FontPicker } from './font-picker';
 const meta = {
-  title: 'Components/UI/FontPicker',
+  title: 'Pickers/FontPicker',
   component: FontPicker,
   args: { value: 'Montserrat Variable', query: '', onChoose: () => {} },
   render: function Interactive(args) {

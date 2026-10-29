@@ -4,7 +4,7 @@ import { expect, userEvent, within } from 'storybook/test';
 import { Switch } from './switch';
 
 const meta = {
-  title: 'Components/UI/Switch',
+  title: 'Selection & feedback/Switch',
   component: Switch,
   args: {
     label: 'Remove all metadata',

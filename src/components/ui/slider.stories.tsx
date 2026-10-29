@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Slider } from './slider';
 const meta = {
-  title: 'Components/UI/Slider',
+  title: 'Selection & feedback/Slider',
   component: Slider,
   args: {
     label: 'JPEG quality',

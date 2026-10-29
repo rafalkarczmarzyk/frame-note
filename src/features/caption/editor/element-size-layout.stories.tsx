@@ -153,7 +153,7 @@ function SizeLayout({ sharedWrapper }: { sharedWrapper: boolean }) {
 }
 
 const meta = {
-  title: 'Screens/GraphicSizeLayout',
+  title: 'Proposals/GraphicSizeLayout',
   parameters: {
     layout: 'centered',
     docs: {

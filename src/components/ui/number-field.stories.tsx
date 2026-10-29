@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 import { NumberField } from './number-field';
 const meta = {
-  title: 'Components/UI/NumberField',
+  title: 'Fields/NumberField',
   component: NumberField,
   args: {
     label: 'Size (% short edge)',

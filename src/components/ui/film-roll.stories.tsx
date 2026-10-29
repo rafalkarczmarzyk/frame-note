@@ -34,7 +34,7 @@ function InteractiveRoll(args: FilmRollProps) {
 }
 
 const meta = {
-  title: 'Components/UI/FilmRoll',
+  title: 'Photo session/FilmRoll',
   component: FilmRoll,
   args: { photos, activePhotoId: 'wildlife', height: 180 },
   argTypes: {

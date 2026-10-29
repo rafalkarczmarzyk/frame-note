@@ -3,7 +3,7 @@ import { GraphicsPickerPanel } from './graphics-picker-panel';
 import { builtinIcons } from './builtin-icons';
 
 const meta = {
-  title: 'Components/UI/GraphicsPicker',
+  title: 'Pickers/GraphicsPicker',
   component: GraphicsPickerPanel,
   args: {
     icons: builtinIcons,

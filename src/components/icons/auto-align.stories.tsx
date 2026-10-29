@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { AutoAlign } from './auto-align';
 
 const meta = {
-  title: 'Components/UI/AutoAlign',
+  title: 'Foundations/AutoAlign',
   component: AutoAlign,
   args: { width: 20, height: 16, className: 'text-content-primary' },
 } satisfies Meta<typeof AutoAlign>;

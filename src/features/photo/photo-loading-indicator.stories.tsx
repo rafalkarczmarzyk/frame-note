@@ -30,7 +30,7 @@ function PreviewSurface({
 }
 
 const meta = {
-  title: 'Components/UI/PhotoLoadingIndicator',
+  title: 'Photo session/Loading and cancellation',
   component: PhotoLoadingIndicator,
   args: { label: 'Preparing preview…' },
   argTypes: {

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { PhotoActions } from './photo-actions';
 
 const meta = {
-  title: 'Components/UI/PhotoActions',
+  title: 'Actions/PhotoActions',
   component: PhotoActions,
   args: { hasPhoto: false, onOpen: () => {}, onClose: () => {} },
 } satisfies Meta<typeof PhotoActions>;

@@ -4,7 +4,7 @@ import { expect, userEvent, within } from 'storybook/test';
 import { CategoryFilter } from './category-filter';
 
 const meta = {
-  title: 'Components/UI/CategoryFilter',
+  title: 'Selection & feedback/CategoryFilter',
   component: CategoryFilter,
   args: {
     categories: [

@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { createMetadataField } from '@/domain/metadata';
 import { MetadataPicker } from './metadata-picker';
 const meta = {
-  title: 'Components/UI/MetadataPicker',
+  title: 'Pickers/MetadataPicker',
   component: MetadataPicker,
   args: {
     fields: [

@@ -72,7 +72,7 @@ import { PhotoIcon } from '../components/icons/photo-icon';
 import { AlignAuto } from '../components/icons/align-auto';
 
 const meta = {
-  title: 'Design/Icons',
+  title: 'Foundations/Icon catalog',
   parameters: {
     docs: {
       description: {

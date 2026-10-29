@@ -3,7 +3,7 @@ import { TokenContext } from '../editor/token-context';
 import { CaptionEditorPrototype } from './caption-editor-prototype';
 
 const meta = {
-  title: 'Screens/CaptionEditorPrototype',
+  title: 'Proposals/CaptionEditorPrototype',
   component: CaptionEditorPrototype,
   parameters: { layout: 'padded' },
 } satisfies Meta<typeof CaptionEditorPrototype>;

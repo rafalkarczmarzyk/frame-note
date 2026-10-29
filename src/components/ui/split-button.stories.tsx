@@ -15,7 +15,7 @@ const items = [
   },
 ];
 const meta = {
-  title: 'Components/UI/SplitButton',
+  title: 'Actions/SplitButton',
   component: SplitButton,
   tags: ['autodocs'],
   args: {

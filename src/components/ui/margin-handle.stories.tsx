@@ -116,7 +116,7 @@ function HandleExample(args: MarginHandleProps) {
   );
 }
 const meta = {
-  title: 'Components/UI/MarginHandle',
+  title: 'Position & margins/MarginHandle',
   component: MarginHandle,
   args: {
     side: 'left',

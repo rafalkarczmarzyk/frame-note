@@ -6,7 +6,7 @@ import { normalizeHex } from '@/domain/caption-colors';
 import { ColorControls } from './color-controls';
 
 const meta = {
-  title: 'Components/UI/ColorPicker',
+  title: 'Pickers/ColorPicker',
   component: ColorPickerPanel,
   args: { value: 'porcelain', onChange: () => {}, onClose: () => {} },
   parameters: { layout: 'fullscreen' },

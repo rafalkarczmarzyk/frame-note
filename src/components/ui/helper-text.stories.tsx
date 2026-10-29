@@ -3,7 +3,7 @@ import { HelperText } from './helper-text';
 import { NumberField } from './number-field';
 
 const meta = {
-  title: 'Components/UI/HelperText',
+  title: 'Fields/HelperText',
   component: HelperText,
   args: {
     children:

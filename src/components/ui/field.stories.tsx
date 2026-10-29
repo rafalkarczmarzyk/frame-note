@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Field } from './field';
 import { Input } from './input';
 const meta = {
-  title: 'Components/UI/Field',
+  title: 'Fields/Field',
   component: Field,
   args: {
     label: 'Photo name',

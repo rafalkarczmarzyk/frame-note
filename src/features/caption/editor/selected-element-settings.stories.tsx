@@ -218,7 +218,7 @@ function Proposal({
 }
 
 const meta = {
-  title: 'Screens/SelectedElementSettingsProposal',
+  title: 'Proposals/SelectedElementSettings',
   component: Proposal,
   parameters: {
     layout: 'padded',
