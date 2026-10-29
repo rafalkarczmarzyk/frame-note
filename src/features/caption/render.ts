@@ -1,3 +1,4 @@
+import { resolvedColor } from './resolve-color';
 import { renderBackgroundTile } from './background-render';
 import { ensureCaptionFont } from './font-loading';
 import { canvasFontStyle } from '../../domain/font-style';
@@ -257,7 +258,18 @@ async function withPhotoStage<T>(
       });
       layer.add(group);
       for (const run of scene.runs) {
-        if (run.icon) {
+        if (run.separator) {
+          group.add(
+            new Konva.Rect({
+              x: run.x,
+              y: run.y + (run.height - (run.thickness ?? 0)) / 2,
+              width: run.width,
+              height: run.thickness,
+              fill: resolvedColor(run.separator.color),
+              opacity: run.separator.opacity,
+            }),
+          );
+        } else if (run.icon) {
           const image = await loadIcon(run.icon);
           group.add(
             new Konva.Image({

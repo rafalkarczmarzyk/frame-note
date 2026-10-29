@@ -1,3 +1,4 @@
+import { parseSeparatorToken } from '../../domain/inline-separator';
 import { parseIconToken } from '../../domain/inline-icon';
 import {
   parseImageToken,
@@ -48,7 +49,19 @@ export function resolveCaptionContent(
       return iconMarker(icons.length - 1);
     },
   );
-  const result = resolveTemplate(withImages, fields, template);
+  const withSeparators = withImages.replace(
+    /\{(separator:[^{}]*)\}/gu,
+    (_, token: string) => {
+      const separator = parseSeparatorToken(token);
+      if (!separator) {
+        missing.push(token);
+        return '';
+      }
+      icons.push({ name: 'Separator', svg: '', aspect: 1, separator });
+      return iconMarker(icons.length - 1);
+    },
+  );
+  const result = resolveTemplate(withSeparators, fields, template);
   return {
     ...result,
     missing: [...new Set([...result.missing, ...missing])],

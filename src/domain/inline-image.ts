@@ -1,3 +1,4 @@
+import type { SeparatorReference } from './inline-separator';
 import type { ElementSizing } from './inline-icon';
 import type { SvgAsset } from './svg-asset';
 
@@ -16,6 +17,7 @@ export interface ImageReference extends ElementSizing {
   colorMode: 'original' | 'single';
 }
 export interface InlineAsset extends SvgAsset {
+  separator?: SeparatorReference;
   sizing?: ElementSizing;
   image?: ImageReference & { asset: ImageAsset };
 }

@@ -30,12 +30,6 @@ export function GraphicsPickerPanel({
   className?: string;
 }) {
   const [tab, setTab] = useState<'icons' | 'graphics'>('icons');
-  const assets = [
-    ...builtinGraphics,
-    ...images.filter(
-      (image) => !builtinGraphics.some((builtin) => builtin.id === image.id),
-    ),
-  ];
 
   return (
     <FloatingPanel
@@ -61,11 +55,49 @@ export function GraphicsPickerPanel({
         />
       }
     >
+      <GraphicsPickerContent
+        icons={icons}
+        images={images}
+        tab={tab}
+        onChooseIcon={onChooseIcon}
+        onChooseGraphic={onChooseGraphic}
+        onUploadGraphic={onUploadGraphic}
+      />
+    </FloatingPanel>
+  );
+}
+
+export function GraphicsPickerContent({
+  icons,
+  images,
+  tab,
+  query = '',
+  onChooseIcon,
+  onChooseGraphic,
+  onUploadGraphic,
+}: {
+  icons: readonly SvgIcon[];
+  images: readonly ImageAsset[];
+  tab: 'icons' | 'graphics';
+  query?: string;
+  onChooseIcon: (name: string) => void;
+  onChooseGraphic: (asset: ImageAsset) => void;
+  onUploadGraphic: () => void;
+}) {
+  const assets = [
+    ...builtinGraphics,
+    ...images.filter(
+      (image) => !builtinGraphics.some((builtin) => builtin.id === image.id),
+    ),
+  ].filter((asset) => asset.name.toLowerCase().includes(query.toLowerCase()));
+  return (
+    <>
       {tab === 'icons' ? (
         ['Built-in', 'Your SVGs'].map((group) => {
           const items = icons.filter(
             (icon) =>
               icon.name !== 'framenote-logo' &&
+              icon.name.toLowerCase().includes(query.toLowerCase()) &&
               builtinIcons.some((builtin) => builtin.name === icon.name) ===
                 (group === 'Built-in'),
           );
@@ -142,6 +174,6 @@ export function GraphicsPickerPanel({
           </section>
         </>
       )}
-    </FloatingPanel>
+    </>
   );
 }

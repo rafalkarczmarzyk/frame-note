@@ -1,3 +1,4 @@
+import { parseSeparatorToken } from '@/domain/inline-separator';
 import { parseIconToken } from '@/domain/inline-icon';
 import type { CaptionContainer } from '@/domain/caption-layout';
 import { parseImageToken } from '@/domain/inline-image';
@@ -12,6 +13,7 @@ export function layerContentLabel(layer: Content) {
       .map((node) => {
         if (node.type === 'text') return node.text;
         const token = String(node.attrs?.token);
+        if (parseSeparatorToken(token)) return 'Separator';
         if (token.startsWith('image:')) {
           const image = parseImageToken(token);
           return (
