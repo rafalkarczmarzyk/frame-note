@@ -1,3 +1,4 @@
+import { platform } from '@/lib/platform';
 import { separatorToken } from '@/domain/inline-separator';
 import type { SeparatorColorActions } from '../caption/editor/caption-editor';
 import { Badge } from '@/components/ui/badge';
@@ -458,7 +459,7 @@ function PhotoWorkspaceContent({
       active = false;
     };
   }, [fontKey]);
-  const download = () => {
+  const download = async () => {
     if (!photo || !prepared.blob) return;
     if (
       renderedCaptions.some(
@@ -470,13 +471,18 @@ function PhotoWorkspaceContent({
     )
       return;
     setExporting(true);
-    const url = URL.createObjectURL(prepared.blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = exportName(photo.document.photo.name);
-    link.click();
-    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-    window.setTimeout(() => setExporting(false), 0);
+    try {
+      await platform().saveFile(
+        prepared.blob,
+        exportName(photo.document.photo.name),
+      );
+    } catch (cause) {
+      window.alert(
+        cause instanceof Error ? cause.message : 'Could not save output.',
+      );
+    } finally {
+      setExporting(false);
+    }
   };
   useEffect(() => {
     const element = host.current;

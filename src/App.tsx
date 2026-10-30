@@ -1,3 +1,4 @@
+import { platform } from '@/lib/platform';
 import { usePhotoSession } from '@/features/photo/use-photo-session';
 import {
   exportRoll,
@@ -113,12 +114,7 @@ export default function App() {
       );
       controller.signal.throwIfAborted();
       if (result.blob) {
-        const url = URL.createObjectURL(result.blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'framenote-roll.zip';
-        link.click();
-        window.setTimeout(() => URL.revokeObjectURL(url), 30_000);
+        await platform().saveFile(result.blob, 'framenote-roll.zip');
       }
       if (result.failures.length)
         setError(
