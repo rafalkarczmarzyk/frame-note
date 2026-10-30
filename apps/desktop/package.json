@@ -5,5 +5,8 @@
   "main": "main.cjs",
   "scripts": {
     "start": "electron ."
+  },
+  "dependencies": {
+    "@framenote/editor": "workspace:*"
   }
 }

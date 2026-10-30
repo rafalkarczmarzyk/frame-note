@@ -20,7 +20,6 @@ protocol.registerSchemesAsPrivileged([
 ]);
 let window;
 let hasWork = false;
-let quitting = false;
 function trusted(event) {
   return (
     event.sender === window?.webContents &&
@@ -56,6 +55,31 @@ app.whenReady().then(async () => {
   ipcMain.on('session-state', (event, value) => {
     if (trusted(event) && typeof value === 'boolean') hasWork = value;
   });
+  ipcMain.handle('save-output', async (event, name, bytes) => {
+    if (
+      !trusted(event) ||
+      typeof name !== 'string' ||
+      name.length > 240 ||
+      path.basename(name) !== name ||
+      !(bytes instanceof Uint8Array) ||
+      bytes.byteLength > 1_000_000_000
+    )
+      throw new Error('Invalid output request');
+    const { canceled, filePath } = await dialog.showSaveDialog(window, {
+      title: 'Save FrameNote output',
+      defaultPath: name,
+    });
+    if (canceled || !filePath) return 'cancelled';
+    const temporary =
+      filePath + '.framenote-' + require('node:crypto').randomUUID() + '.tmp';
+    try {
+      await fs.promises.writeFile(temporary, bytes, { flag: 'wx' });
+      await fs.promises.rename(temporary, filePath);
+      return 'saved';
+    } finally {
+      await fs.promises.rm(temporary, { force: true }).catch(() => {});
+    }
+  });
   window = new BrowserWindow({
     width: 1440,
     height: 960,
@@ -74,7 +98,7 @@ app.whenReady().then(async () => {
     if (!url.startsWith('framenote://app/')) event.preventDefault();
   });
   window.on('close', (event) => {
-    if (!quitting && hasWork) {
+    if (hasWork) {
       const result = dialog.showMessageBoxSync(window, {
         type: 'question',
         buttons: ['Keep editing', 'Discard and close'],
@@ -128,9 +152,7 @@ app.whenReady().then(async () => {
   await window.loadURL('framenote://app/');
 });
 app.on('window-all-closed', () => app.quit());
-app.on('before-quit', () => {
-  quitting = false;
-});
+
 // Keep renderer resources inside the packaged application, never a remote URL.
 if (!fs.existsSync(rendererRoot))
   throw new Error('Build the web renderer before starting desktop.');
