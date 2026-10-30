@@ -6,7 +6,7 @@ from fontTools.ttLib import TTFont
 
 root = Path(__file__).resolve().parent.parent
 polish = 'ąćęłńóśźżĄĆĘŁŃÓŚŹŻ'
-records = json.loads((root / 'src/domain/google-fonts.json').read_text())
+records = json.loads((root / 'packages/core/src/google-fonts.json').read_text())
 for record in records:
     for face in record['faces']:
         path = root / 'public' / face['file'].lstrip('/')

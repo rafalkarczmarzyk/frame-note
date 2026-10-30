@@ -2,7 +2,7 @@ import type { StorybookConfig } from '@storybook/react-vite';
 const config: StorybookConfig = {
   stories: [
     {
-      directory: '../src',
+      directory: '../packages/editor/src',
       files: '**/*.stories.@(ts|tsx)',
       titlePrefix: '',
     },

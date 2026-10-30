@@ -1,3 +1,6 @@
+packages:
+  - apps/*
+  - packages/*
 # Exact versions already installed by npm before migrating to pnpm.
 minimumReleaseAgeExclude:
   - '@babel/helper-string-parser@7.29.11'

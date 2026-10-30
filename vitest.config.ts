@@ -1,9 +1,12 @@
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  resolve: {
+    alias: { '@': new URL('./packages/editor/src', import.meta.url).pathname },
+  },
   test: {
     environment: 'node',
-    include: ['src/**/*.test.ts', 'tests/**/*.test.ts'],
+    include: ['packages/**/*.test.ts', 'tests/**/*.test.ts'],
     clearMocks: true,
   },
 });
