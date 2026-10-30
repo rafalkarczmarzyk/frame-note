@@ -1,3 +1,4 @@
+import { platform } from '@/lib/platform';
 import { PresetStore } from './preset-store';
 import { createId } from '@/lib/create-id';
 import { PresetToolbar } from './preset-toolbar';
@@ -73,8 +74,8 @@ export function PresetControls({
       new PresetStore(
         persist
           ? {
-              getItem: (key) => localStorage.getItem(key),
-              setItem: (key, value) => localStorage.setItem(key, value),
+              getItem: (key) => platform().storage.getItem(key),
+              setItem: (key, value) => platform().storage.setItem(key, value),
             }
           : null,
         svgIcon,
@@ -354,16 +355,14 @@ export function PresetControls({
                         variant="outline"
                         size="sm"
                         onClick={() => {
-                          const url = URL.createObjectURL(
-                            new Blob([collection.original!], {
-                              type: 'application/json',
-                            }),
-                          );
-                          const link = document.createElement('a');
-                          link.href = url;
-                          link.download = 'framenote-presets-recovery.json';
-                          link.click();
-                          setTimeout(() => URL.revokeObjectURL(url), 1000);
+                          void platform()
+                            .saveFile(
+                              new Blob([collection.original!], {
+                                type: 'application/json',
+                              }),
+                              'framenote-presets-recovery.json',
+                            )
+                            .catch((cause) => setError(String(cause)));
                         }}
                       >
                         Download recovery copy
@@ -404,12 +403,12 @@ export function PresetControls({
                         );
                         return;
                       }
-                      const url = URL.createObjectURL(blob);
-                      const link = document.createElement('a');
-                      link.href = url;
-                      link.download = `${preset.name.replace(/[^a-z0-9_-]/gi, '-')}.framenote.json`;
-                      link.click();
-                      setTimeout(() => URL.revokeObjectURL(url), 1000);
+                      void platform()
+                        .saveFile(
+                          blob,
+                          `${preset.name.replace(/[^a-z0-9_-]/gi, '-')}.framenote.json`,
+                        )
+                        .catch((cause) => setError(String(cause)));
                     }}
                   >
                     <Download />
