@@ -189,7 +189,8 @@ it.each(helperFixtures)(
   'records existing helper values and selected sources for $fixture.path',
   async ({ fixture, expected }) => {
     const captionTagsPath = '../packages/core/src/caption-tags.ts';
-    const extractMetadataPath = '../packages/editor/src/features/photo/extract-metadata.ts';
+    const extractMetadataPath =
+      '../packages/editor/src/features/photo/extract-metadata.ts';
     const [{ captionTags }, { extractMetadata }] = await Promise.all([
       import(captionTagsPath),
       import(extractMetadataPath),
@@ -228,7 +229,8 @@ it.each(helperFixtures)(
 
 it('preserves XMP namespace provenance while resolving an existing photo', async () => {
   const bytes = await readFile(xmpPortraitFixture.path);
-  const extractMetadataPath = '../packages/editor/src/features/photo/extract-metadata.ts';
+  const extractMetadataPath =
+    '../packages/editor/src/features/photo/extract-metadata.ts';
   const captionTagsPath = '../packages/core/src/caption-tags.ts';
   const { extractMetadata } = await import(extractMetadataPath);
   const { captionTags } = await import(captionTagsPath);

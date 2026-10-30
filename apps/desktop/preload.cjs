@@ -1,5 +1,6 @@
 const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('frameNoteDesktop', {
+  saveFile: (name, bytes) => ipcRenderer.invoke('save-output', name, bytes),
   setSessionOpen: (value) => {
     if (typeof value === 'boolean') ipcRenderer.send('session-state', value);
   },

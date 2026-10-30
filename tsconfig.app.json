@@ -25,5 +25,5 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["packages", "apps/web/src"]
+  "include": ["packages", "apps/web/src", "apps/desktop/src"]
 }
