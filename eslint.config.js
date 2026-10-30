@@ -14,8 +14,16 @@ export default defineConfig([
     'test-results',
     'coverage',
     'storybook-static',
+    'playwright-visual-report',
+    'visual-test-results',
+    '**/renderer/**',
+    'release',
   ]),
   js.configs.recommended,
+  {
+    files: ['apps/desktop/**/*.cjs'],
+    languageOptions: { globals: globals.node },
+  },
   tseslint.configs.recommended,
   {
     files: ['**/*.{ts,tsx}'],

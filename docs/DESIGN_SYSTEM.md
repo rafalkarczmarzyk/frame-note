@@ -26,18 +26,18 @@ może pozostać w feature, ale powinien składać istniejące prymitywy.
 
 Używaj komponentu z kolumny „Wybierz”, a nie buduj równoważnej kontrolki klasami.
 
-| Potrzeba | Wybierz | Uwagi |
-|---|---|---|
-| Akcja tekstowa | `Button` | `primary` tylko dla głównej akcji; inne akcje używają `outline`. |
-| Akcja ikonowa | `IconButton` | Zawsze podaj zrozumiałą etykietę; tooltip może ją powtórzyć lub objaśnić. |
-| Pole tekstowe | `Field` + `Input` albo `Textarea` | Label, opis i błąd wiąż przez `Field`; nie składaj ich ręcznie. |
-| Wartość z jednostką | `NumberField` / `DimensionInput` | Używaj jawnej jednostki i istniejących reguł wartości domenowej. |
-| Kontrolki w jednym wierszu | `InlineInputGroup` | Dla powiązanych elementów, np. przełącznika/akcji i pola. |
-| Krótka etykieta stanu | `Badge` | Semantyczny `tone`; badge nie jest przyciskiem. |
-| Wybór z listy / zakresu | `Select`, `SegmentedControl`, `Slider`, `Switch` | Wybierz zgodnie z liczbą opcji i sposobem zmiany wartości. |
-| Menu dodatkowych akcji | `ActionMenu` | Krótka lista poleceń dla konkretnego obiektu. |
-| Panel dodatkowych narzędzi | `FloatingPanel` | Większa zawartość, np. picker, wyszukiwanie lub lista. |
-| Powtarzalna lista wyboru | `PickerList` | Utrzymuje wspólne zachowanie wyboru, fokusu i wierszy. |
+| Potrzeba                   | Wybierz                                          | Uwagi                                                                     |
+| -------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------- |
+| Akcja tekstowa             | `Button`                                         | `primary` tylko dla głównej akcji; inne akcje używają `outline`.          |
+| Akcja ikonowa              | `IconButton`                                     | Zawsze podaj zrozumiałą etykietę; tooltip może ją powtórzyć lub objaśnić. |
+| Pole tekstowe              | `Field` + `Input` albo `Textarea`                | Label, opis i błąd wiąż przez `Field`; nie składaj ich ręcznie.           |
+| Wartość z jednostką        | `NumberField` / `DimensionInput`                 | Używaj jawnej jednostki i istniejących reguł wartości domenowej.          |
+| Kontrolki w jednym wierszu | `InlineInputGroup`                               | Dla powiązanych elementów, np. przełącznika/akcji i pola.                 |
+| Krótka etykieta stanu      | `Badge`                                          | Semantyczny `tone`; badge nie jest przyciskiem.                           |
+| Wybór z listy / zakresu    | `Select`, `SegmentedControl`, `Slider`, `Switch` | Wybierz zgodnie z liczbą opcji i sposobem zmiany wartości.                |
+| Menu dodatkowych akcji     | `ActionMenu`                                     | Krótka lista poleceń dla konkretnego obiektu.                             |
+| Panel dodatkowych narzędzi | `FloatingPanel`                                  | Większa zawartość, np. picker, wyszukiwanie lub lista.                    |
+| Powtarzalna lista wyboru   | `PickerList`                                     | Utrzymuje wspólne zachowanie wyboru, fokusu i wierszy.                    |
 
 Pełna lista komponentów i ich aktualnych propsów jest w Storybooku. Tabela jest
 indeksem wyboru, nie drugim API. Jeśli opis różni się od kodu, popraw dokumentację
@@ -55,17 +55,17 @@ Używaj poniższych kontekstów spacingu. Skala odpowiada najczęstszym wartośc
 obecnego interfejsu; mniejsze wyjątki są dopuszczalne dla ikon, segmentów i
 precyzyjnych diagramów.
 
-| Kontekst | Odstęp / wymiar bazowy | Przykład |
-|---|---:|---|
-| Ikona obok etykiety, gęsty wiersz | 4–6 px | ikona w Button, komunikat |
-| Elementy tej samej grupy | 8 px | Buttony, pola w InlineInputGroup |
-| Pola i treści wewnątrz sekcji | 8–12 px | stos pól, opis i kontrolka |
-| Między grupami ustawień | 12–16 px | kolejne grupy w inspektorze |
-| Padding kontrolki | 8–12 px poziomo; pion wynika z wysokości kontrolki | Input, Button |
-| Padding wiersza/listy | 8 px; 4–8 px między wierszami | PickerList, lista warstw |
-| Padding zawartości panelu | 12 px; nagłówek/stopka 16 px | FloatingPanel |
-| Odstęp między sekcjami sidebara | 12 px | SidebarSection |
-| Główne odstępy kompozycji | 16–24 px | ekran, obszary stories |
+| Kontekst                          |                             Odstęp / wymiar bazowy | Przykład                         |
+| --------------------------------- | -------------------------------------------------: | -------------------------------- |
+| Ikona obok etykiety, gęsty wiersz |                                             4–6 px | ikona w Button, komunikat        |
+| Elementy tej samej grupy          |                                               8 px | Buttony, pola w InlineInputGroup |
+| Pola i treści wewnątrz sekcji     |                                            8–12 px | stos pól, opis i kontrolka       |
+| Między grupami ustawień           |                                           12–16 px | kolejne grupy w inspektorze      |
+| Padding kontrolki                 | 8–12 px poziomo; pion wynika z wysokości kontrolki | Input, Button                    |
+| Padding wiersza/listy             |                      8 px; 4–8 px między wierszami | PickerList, lista warstw         |
+| Padding zawartości panelu         |                       12 px; nagłówek/stopka 16 px | FloatingPanel                    |
+| Odstęp między sekcjami sidebara   |                                              12 px | SidebarSection                   |
+| Główne odstępy kompozycji         |                                           16–24 px | ekran, obszary stories           |
 
 Wartości w tabeli są regułami doboru, nie nakazem zastępowania każdej klasy
 mechanicznie. Preferuj wspólne klasy/komponenty i istniejące tokeny. Przy
