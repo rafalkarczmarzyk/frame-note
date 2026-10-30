@@ -1,0 +1,12 @@
+{
+  "name": "@framenote/web",
+  "private": true,
+  "version": "1.0.0-alpha.1",
+  "type": "module",
+  "scripts": {
+    "build": "vite build --config ../../vite.config.ts"
+  },
+  "dependencies": {
+    "@framenote/editor": "workspace:*"
+  }
+}

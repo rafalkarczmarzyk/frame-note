@@ -20,3 +20,19 @@
   production editor. JPEG Canvas encoding passed. No Node require in renderer.
 - References: https://www.electronjs.org/docs/latest/tutorial/security and
   https://www.electronjs.org/docs/latest/api/dialog.
+
+## Stages 3–4 — shared services and monorepo
+
+- 328 unit tests passed after extraction and again after moving the code.
+  Typecheck, web production build, color token checks, lint and Storybook build passed.
+- Shared editor and pure domain code now live in packages/editor and packages/core;
+  bundled preset artwork stays with the editor to avoid a core → editor dependency.
+- Explicit Tailwind source scanning preserves classes after the move.
+- Netlify configuration builds from the workspace root into apps/web/dist.
+  No connected Netlify tool or local site binding was found; remote preview and
+  production deployment have not been performed.
+- Browser baseline was interrupted after existing timeouts (including obsolete
+  Replace image wording). Final regression will distinguish these from regressions.
+- Chromium desktop UI references pass. Compact/WebKit references include the old
+  metadata/graphics toolbar instead of the already implemented unified Add button.
+  Inspected expected/actual/diff; these references are not automatically updated.

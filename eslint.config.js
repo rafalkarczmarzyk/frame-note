@@ -8,7 +8,7 @@ import prettier from 'eslint-config-prettier/flat';
 
 export default defineConfig([
   globalIgnores([
-    'dist',
+    '**/dist/**',
     'node_modules',
     'playwright-report',
     'test-results',
@@ -30,12 +30,20 @@ export default defineConfig([
     languageOptions: { globals: { ...globals.browser, ...globals.node } },
   },
   {
-    files: ['src/**/*.{ts,tsx}'],
+    files: ['packages/editor/src/**/*.{ts,tsx}'],
     extends: [reactHooks.configs.flat.recommended, reactRefresh.configs.vite],
   },
   {
-    files: ['src/**/*.stories.tsx'],
+    files: ['packages/editor/src/**/*.stories.tsx'],
     rules: { 'react-refresh/only-export-components': 'off' },
+  },
+  {
+    files: ['apps/desktop/**/*.cjs'],
+    rules: { '@typescript-eslint/no-require-imports': 'off' },
+  },
+  {
+    files: ['scripts/*desktop.mjs'],
+    languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
   prettier,
 ]);

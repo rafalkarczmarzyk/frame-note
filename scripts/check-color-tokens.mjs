@@ -4,7 +4,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 
 const root = process.cwd();
-const css = await readFile(path.join(root, 'src/index.css'), 'utf8');
+const css = await readFile(path.join(root, 'packages/editor/src/index.css'), 'utf8');
 function block(source, marker) {
   const start = source.indexOf(marker);
   if (start < 0) throw new Error(`Missing ${marker}`);
@@ -73,7 +73,7 @@ async function scan(directory) {
       );
   }
 }
-await scan(path.join(root, 'src'));
+await scan(path.join(root, 'packages/editor/src'));
 if (issues.length) {
   console.error([...new Set(issues)].join('\n'));
   process.exitCode = 1;
