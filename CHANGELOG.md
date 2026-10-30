@@ -9,6 +9,9 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Added
 
+- A macOS Electron application sharing the web editor, bundled local assets and
+  isolated system integration. Desktop support is under verification.
+
 - Inline horizontal separators with Fixed or Flex width, relative or document-unit
   height, independent line thickness, color and opacity. Flex fills the remaining
   row width; Fixed contributes to the layer’s content width. Settings survive

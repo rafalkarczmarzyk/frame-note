@@ -33,3 +33,6 @@ test-results/
 storybook-static/
 playwright-visual-report/
 visual-test-results/
+
+apps/desktop/renderer/
+release/

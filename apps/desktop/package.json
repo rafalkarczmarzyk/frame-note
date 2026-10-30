@@ -1,0 +1,9 @@
+{
+  "name": "@framenote/desktop",
+  "version": "1.0.0-alpha.1",
+  "private": true,
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron ."
+  }
+}
