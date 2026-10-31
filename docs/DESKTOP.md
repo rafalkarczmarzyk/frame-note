@@ -22,10 +22,18 @@ skips Electron's binary download, run `node node_modules/electron/install.js`.
 - `pnpm dev`: web app on port 3000.
 - `pnpm build`: web output in `apps/web/dist`.
 - `pnpm desktop`: build and launch the desktop app.
-- `pnpm desktop:build`: build just the desktop renderer.
+- `pnpm desktop:build`: build the desktop renderer and preset file adapter.
+- `pnpm desktop:clean`: remove the generated `release/` directory.
 - `pnpm test:desktop`: integration smoke test of a previously built desktop.
 - `pnpm desktop:package`: create `release/FrameNote-darwin-arm64/FrameNote.app` and
   `release/FrameNote-macOS-arm64.dmg`.
+
+Both packaging commands (`desktop:package` and `desktop:package:signed`) clean
+all of `release/` before typechecking and building. A failed packaging attempt
+therefore leaves no previous app or DMG to mistake for a new build. The ordinary
+`desktop:build` command leaves `release/` alone; it refreshes the renderer and
+preset adapter used during development.
+
 - `node scripts/verify-desktop-assets.mjs`: compare bundled font/license files.
 
 The desktop smoke test imports seven original photos offline, saves a JPG and ZIP

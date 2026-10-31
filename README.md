@@ -47,11 +47,11 @@ Product milestones and review status live in the
 
 ## Versioning
 
-The current version is **0.1.1-beta**. **1.0.0** is reserved for the first
+The current version is **0.1.2-beta**. **1.0.0** is reserved for the first
 finished stable version. The previous alpha designation `1.0.0-alpha.1` was
 normalized to `0.0.3-alpha`; historical commit contents are unchanged.
 
-To build this beta from source, check out `v0.1.1-beta`, then follow Quick start
+To build this beta from source, check out `v0.1.2-beta`, then follow Quick start
 for web or run `pnpm desktop` / `pnpm desktop:package` for macOS.
 User presets use the same v1 JSON and Zod schema on both platforms. Web keeps
 localStorage; macOS uses `~/FrameNote/presets`. No old preset migration is provided.

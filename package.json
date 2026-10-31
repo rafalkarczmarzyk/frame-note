@@ -1,7 +1,7 @@
 {
   "name": "frame-note",
   "private": true,
-  "version": "0.1.1-beta",
+  "version": "0.1.2-beta",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -28,10 +28,11 @@
     "desktop:build": "pnpm typecheck && node scripts/build-desktop.mjs",
     "desktop": "pnpm desktop:build && electron apps/desktop",
     "test:desktop": "node scripts/test-desktop.mjs",
-    "desktop:package": "pnpm desktop:build && node scripts/package-desktop.mjs",
-    "desktop:package:signed": "pnpm desktop:build && node scripts/package-desktop.mjs --signed",
+    "desktop:package": "pnpm desktop:clean && pnpm desktop:build && node scripts/package-desktop.mjs",
+    "desktop:package:signed": "pnpm desktop:clean && pnpm desktop:build && node scripts/package-desktop.mjs --signed",
     "version:set": "node scripts/versioning.mjs set",
-    "check:version": "node scripts/versioning.mjs check"
+    "check:version": "node scripts/versioning.mjs check",
+    "desktop:clean": "node scripts/clean-desktop.mjs"
   },
   "dependencies": {
     "@fontsource-variable/montserrat": "^5.3.0",

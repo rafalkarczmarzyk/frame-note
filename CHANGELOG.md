@@ -11,6 +11,15 @@ entering master receive a version, dated section and local tag according to
 
 ## Unreleased
 
+## [0.1.2-beta] - 2026-10-31
+
+### Fixed
+
+- Both macOS packaging commands clear `release/` before building, preventing
+  stale apps and DMGs from being mistaken for new output after a failed build.
+  `pnpm desktop:clean` also provides explicit cleanup; ordinary desktop builds
+  leave packaged output untouched.
+
 ## [0.1.1-beta] - 2026-10-31
 
 ### Fixed
