@@ -6,7 +6,7 @@ polecenia. Nowe decyzje dopisujemy lub aktualizujemy w istniejącym wpisie.
 
 ## NTH-002 — Wersjonowane schematy presetów i migracje
 
-- **Status:** podjęte — pierwszy oficjalny format v1 wdrażany przed betą.
+- **Status:** v1 wdrożone w 0.1.0-beta; migracje obowiązują przy przyszłych wersjach.
 - **Data decyzji:** 2026-10-31 (zastępuje wcześniejsze odłożenie).
 - **Zakres:** parser Zod dla v1; przyszłe wersje wymagają osobnych schematów,
   migracji, skryptu konwersji i testów. Wersja formatu jest niezależna od SemVer.

@@ -1,15 +1,17 @@
 # Changelog
 
-Notable user-facing changes in FrameNote. The project is currently in alpha.
+Notable user-facing changes in FrameNote. The project is currently in beta.
 Historical pre-MVP and MVP milestones map to `v0.0.1-alpha` and
 `v0.0.2-alpha`. The previous `1.0.0-alpha.1` designation is normalized below
-to `0.0.3-alpha`; historical commits are unchanged. The first beta targets
+to `0.0.3-alpha`; historical commits are unchanged. The first beta is
 `0.1.0-beta`, with `1.0.0` reserved for the first finished stable product.
 Development changes accumulate under Unreleased. Completed application tasks
 entering master receive a version, dated section and local tag according to
 [the versioning skill](.agents/skills/maintain-versioning/SKILL.md).
 
 ## Unreleased
+
+## [0.1.0-beta] - 2026-10-31
 
 ### Added
 
