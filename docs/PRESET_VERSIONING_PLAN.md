@@ -96,9 +96,9 @@ testowym. Dotychczasowy zapis pozostaje aktywny w wersjach alpha.
 
 ## Plan implementacji
 
-Prace prowadzić na branchu `codex/beta-1-preparation`; nie podbijać wersji przy
-roboczych commitach. PR jest opcjonalny. Każdy etap kończy się wynikami testów
-i oceną użytkownika przed kolejnym. Commity wymagają polecenia użytkownika.
+Prace prowadzić bezpośrednio na `master`, zgodnie z poleceniem użytkownika. Użytkownik polecił realizację na `master`: każdy etap kończy się weryfikacją
+i commitem, po czym automatycznie rozpoczyna się kolejny. Nie wymagamy osobnej
+oceny między etapami. Publikacja zdalna pozostaje osobną operacją.
 Numer docelowy to `0.1.0-beta`, bez dodatkowego licznika. Po wydaniu poprawki
 otrzymują kolejne PATCH, a nowe funkcje i zmiany niezgodne — MINOR z zerowym
 PATCH. Wszystkie poniższe prace składają się na jedną pierwszą betę; nie tworzyć
@@ -240,3 +240,10 @@ formatów pozostają poza tym zakresem. Beta nie jest stabilnym `1.0.0`.
   `v0.0.3-alpha`, ponieważ normalizacja nie jest jeszcze zapisana w commicie.
 - Etap 0 oczekuje oceny użytkownika. Zmiana tagów na origin pozostaje częścią
   publikacji. Schematy Zod, migracje i zapis plikowy nie są jeszcze wdrożone.
+
+### Etapy 0–1 — wykonane
+
+- Etap 0: commit `50ebf71`, lokalny tag `v0.0.3-alpha`.
+- Etap 1: audyt opisany w `PRESET_FORMATS.md`; dodano odtwarzalne przykłady
+  historycznych kontraktów v1/v2. Docelowy format pierwszej bety: v3.
+- Dalsza realizacja obejmuje testy i commity bez zatrzymywania między etapami.
