@@ -13,6 +13,9 @@ entering master receive a version, dated section and local tag according to
 
 ### Added
 
+- First official preset format v1 with a shared Zod contract and SVG/PNG validation
+  for web and macOS. Previous development preset formats are unsupported.
+
 - A local Apple Silicon macOS application sharing the web editor, bundled fonts
   and presets. Includes native output dialogs, file/menu shortcuts, session-close
   confirmation, persistent JPG quality, offline rendering and an unsigned app/DMG

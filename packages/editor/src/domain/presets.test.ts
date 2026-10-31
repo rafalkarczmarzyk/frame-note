@@ -55,11 +55,16 @@ describe('layout presets', () => {
   });
   it('validates SVG assets including standalone logos', () => {
     const preset = example();
-    preset.layout.containers[0]!.logo = {
-      asset: { ...icon, name: 'Signature.svg' },
-      width: 15,
-      colorMode: 'single',
-    };
+    preset.layout.containers[0]!.images = [
+      {
+        id: 'art',
+        name: 'Signature.svg',
+        format: 'svg',
+        source: 'artwork',
+        width: 1,
+        height: 1,
+      },
+    ];
     let count = 0;
     parsePreset(JSON.stringify(preset), (name, svg) => {
       count++;
@@ -75,7 +80,7 @@ describe('layout presets', () => {
   it('rejects invalid fields and unsupported versions', () => {
     for (const change of [
       (p: ReturnType<typeof example>) => {
-        p.version = 3 as 1;
+        p.version = 99 as 1;
       },
       (p: ReturnType<typeof example>) => {
         p.layout.containers[0]!.style.color = 'url(unsafe)';

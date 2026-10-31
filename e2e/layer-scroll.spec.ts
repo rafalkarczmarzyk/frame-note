@@ -16,7 +16,7 @@ test('auto-scrolls a long layer list with a stationary pointer and preserves can
     buffer: Buffer.from(bytes, 'base64'),
   });
   const preset = {
-    version: 2,
+    version: 1,
     id: 'long',
     name: 'Long list',
     icons: [],

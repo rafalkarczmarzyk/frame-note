@@ -103,7 +103,7 @@ test.describe('Photo export geometry / all anchors', () => {
         aspect: 2,
       };
       const preset = {
-        version: 2,
+        version: 1,
         id: `anchor-${anchor}`,
         name: `Anchor ${anchor}`,
         icons: [],
@@ -218,7 +218,7 @@ test.describe('Photo export geometry / all anchors', () => {
       buffer: Buffer.from(photo, 'base64'),
     });
     const preset = {
-      version: 2,
+      version: 1,
       id: 'manual-position',
       name: 'Manual position',
       icons: [],

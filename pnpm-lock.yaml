@@ -108,6 +108,9 @@ importers:
       electron:
         specifier: ^45.1.0
         version: 45.1.0
+      esbuild:
+        specifier: ^0.28.2
+        version: 0.28.2
       eslint:
         specifier: ^10.13.0
         version: 10.13.0(jiti@2.7.0)
@@ -154,7 +157,11 @@ importers:
         specifier: workspace:*
         version: link:../../packages/editor
 
-  packages/core: {}
+  packages/core:
+    dependencies:
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
 
   packages/editor:
     dependencies:

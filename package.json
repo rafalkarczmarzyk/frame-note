@@ -16,7 +16,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report",
-    "check": "pnpm format:check && pnpm check:tokens && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "check": "pnpm format:check && pnpm check:version && pnpm check:tokens && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "storybook": "storybook dev --host 0.0.0.0 -p 6006 --no-open --disable-telemetry",
     "build-storybook": "storybook build --disable-telemetry",
     "check:tokens": "node scripts/check-color-tokens.mjs",
@@ -29,7 +29,9 @@
     "desktop": "pnpm desktop:build && electron apps/desktop",
     "test:desktop": "node scripts/test-desktop.mjs",
     "desktop:package": "pnpm desktop:build && node scripts/package-desktop.mjs",
-    "desktop:package:signed": "pnpm desktop:build && node scripts/package-desktop.mjs --signed"
+    "desktop:package:signed": "pnpm desktop:build && node scripts/package-desktop.mjs --signed",
+    "version:set": "node scripts/versioning.mjs set",
+    "check:version": "node scripts/versioning.mjs check"
   },
   "dependencies": {
     "@fontsource-variable/montserrat": "^5.3.0",
@@ -67,6 +69,7 @@
     "@vitejs/plugin-react": "^6.1.2",
     "@xmldom/xmldom": "0.9.12",
     "electron": "^45.1.0",
+    "esbuild": "^0.28.2",
     "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^7.1.1",

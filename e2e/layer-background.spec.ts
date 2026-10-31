@@ -103,7 +103,7 @@ test('glass renders lower content with blur and matches its exported JPG', async
     buffer: Buffer.from(source, 'base64'),
   });
   const preset = {
-    version: 2,
+    version: 1,
     id: 'glass',
     name: 'Glass test',
     icons: [],

@@ -177,10 +177,19 @@ test('restores SVG assets, blank lines and custom positions across photo orienta
         },
         {
           id: 'signature',
-          template: '',
+          template: '{image:signature:20:document:original}',
           style,
           position: { anchor: 'center', custom: { x: 80, y: 20 } },
-          logo: { asset: green, width: 20, colorMode: 'original' },
+          images: [
+            {
+              id: 'signature',
+              name: green.name,
+              format: 'svg',
+              source: green.svg,
+              width: 1,
+              height: 1,
+            },
+          ],
         },
       ],
     },
