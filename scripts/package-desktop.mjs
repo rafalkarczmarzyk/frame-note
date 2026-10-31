@@ -1,6 +1,6 @@
 import { createRequire } from 'node:module';
 import { execFileSync } from 'node:child_process';
-import { resolve } from 'node:path';
+import { createDesktopDmg } from './create-dmg-desktop.mjs';
 import { packager } from '@electron/packager';
 import { cp, mkdir, rm } from 'node:fs/promises';
 const icon = ['apps/desktop/FrameNote.icns'];
@@ -8,7 +8,9 @@ try {
   execFileSync('actool', ['--version'], { stdio: 'ignore' });
   icon.push('apps/desktop/FrameNoteComposer.icon');
 } catch {
-  console.warn('Full Xcode is unavailable; packaging with the .icns icon only.');
+  console.warn(
+    'Full Xcode is unavailable; packaging with the .icns icon only.',
+  );
 }
 const stage = 'release/staging';
 await rm(stage, { recursive: true, force: true });
@@ -36,20 +38,4 @@ const result = await packager({
 console.log(result.join('\n'));
 await rm(stage, { recursive: true, force: true });
 
-const dmg = resolve('release/FrameNote-macOS-arm64.dmg');
-await rm(dmg, { force: true });
-execFileSync(
-  'hdiutil',
-  [
-    'create',
-    '-volname',
-    'FrameNote',
-    '-srcfolder',
-    result[0],
-    '-format',
-    'UDZO',
-    dmg,
-  ],
-  { stdio: 'inherit' },
-);
-execFileSync('hdiutil', ['verify', dmg], { stdio: 'inherit' });
+await createDesktopDmg(result[0]);

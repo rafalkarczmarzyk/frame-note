@@ -86,3 +86,25 @@ Output uses a native Save dialog and writes through a
 temporary file before renaming. Opening photos/graphics/presets uses the native
 file chooser already provided by HTML inputs; drag-and-drop follows shared import
 validation. Saved presets use the app's persistent Chromium storage.
+
+## DMG installation window
+
+`pnpm desktop:package` also prepares a 640 × 400 Finder window with the app,
+an Applications shortcut, and a FrameNote background with drag-to-install guidance.
+Open the DMG, drag FrameNote into Applications, eject the image, then launch the
+copy in Applications. Quit the existing app before replacing it during an update.
+
+Packaging requires macOS and a graphical Finder session.
+Allow the packaging terminal to control Finder if macOS requests Automation access.
+The committed background PNG can be regenerated from `apps/desktop/installer/background.swift` at 2×
+resolution using system fonts with Swift command-line tools. `scripts/create-dmg-desktop.mjs` stages an HFS+
+image, saves its Finder layout and verifies the
+compressed read-only image before replacing the previous DMG. Temporary images
+are detached and removed after packaging. This does not sign or notarize the app.
+
+Manual packaging acceptance checks:
+
+1. Open the final DMG and inspect the background, icon positions and labels.
+2. Check that Applications points to `/Applications` and the image is read-only.
+3. Copy the app to Applications, eject the image and launch the installed copy.
+4. Quit the app, replace it with a new build and verify saved presets remain.
