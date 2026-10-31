@@ -81,8 +81,8 @@ preferuj semantyczne stany komponentu zamiast ręcznego formatowania w call-site
 
 ### Pasek okna macOS
 
-`AppHeader` przyjmuje `windowChrome="macos-titlebar"` wyłącznie w bootstrapie
-desktopu na macOS. Dodaje nad nagłówkiem z narzędziami osobny pasek 28 px
+`AppHeader` odczytuje platformę przez `usePlatform()`. Dla `isMacOS` pokazuje
+`MacOSTitleBar`: nad nagłówkiem z narzędziami osobny pasek 28 px
 z nazwą FrameNote na środku. Oba korzystają z `bg-header-base`; pasek okna nie
 ma dodatkowej linii oddzielającej. Natywne przyciski macOS są rysowane przez
 system. Przesuwanie okna obejmuje tylko górny pasek, a narzędzia zachowują swój
@@ -91,8 +91,26 @@ pierwszą akcją po lewej jest Add photos. Padding nagłówka wynosi 6 px na ka�
 z czterech stron; wysokość wynika z kontrolek 36 px, paddingu i dolnej linii 1 px
 (łącznie 49 px). Informacje o aplikacji otwiera systemowe
 menu FrameNote → About FrameNote, przez ten sam komponent `AboutSplash`.
-Domyślny wariant `standard` służy wersji web i zachowuje klikalne logo.
+Warunek `isWeb` pokazuje klikalne logo i wybiera dotychczasowe odstępy webu.
 Przykłady: Storybook → Sidebar & panels/AppHeader → MacOS i MacOSMinimum.
+
+### Platforma aplikacji
+
+`PlatformProvider` dostarcza jedną wartość `web | macos | windows | linux`.
+Hook `usePlatform()` zwraca `platform` oraz wyliczone flagi `isWeb`, `isMacOS`,
+`isWindows` i `isLinux`. Korzystaj z tych flag w warunkach UI; nie wykrywaj
+platformy przez user agent, szerokość okna ani API Electrona we wspólnym edytorze.
+Hook wymaga providera — brak konfiguracji zgłasza błąd.
+
+Punkt wejścia webu wywołuje `mountEditor({ platform: 'web' })`, także na Macu.
+Desktop mapuje `darwin → macos`, `win32 → windows`, `linux → linux`.
+Provider jest nad `App`, więc platformy nie przekazujemy przez pośrednie propsy.
+Istniejący `platform()` w `lib/platform.ts` nadal udostępnia usługi zapisu,
+pamięci i menu. Nie służy do warunkowania wyglądu.
+
+Storybook domyślnie dostarcza kontekst `web`; stories nagłówka nadpisują go
+lokalnym providerem. Windows i Linux są przygotowane w typie i podglądach;
+nie oznacza to zweryfikowanych paczek ani natywnej obsługi tych systemów.
 
 ### Sidebar i dodatkowe opcje
 

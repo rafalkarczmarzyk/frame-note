@@ -77,7 +77,12 @@ No remote Netlify site configuration has been read or changed during local setup
 - `public`: single source of bundled fonts and shared static artwork.
 
 The desktop renderer has no Node API. A narrow bridge handles native output and
-menu/session events. Output uses a native Save dialog and writes through a
+menu/session events. Its entry point maps the OS to a `PlatformProvider` value
+(`macos`, `windows` or `linux`); the web entry point explicitly supplies `web`.
+Shared UI reads `usePlatform()` flags, independently of the platform services
+used for saving and storage. Windows/Linux values and Storybook previews prepare
+the UI only; native packages and behavior on those systems remain unverified.
+Output uses a native Save dialog and writes through a
 temporary file before renaming. Opening photos/graphics/presets uses the native
 file chooser already provided by HTML inputs; drag-and-drop follows shared import
 validation. Saved presets use the app's persistent Chromium storage.

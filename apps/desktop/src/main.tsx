@@ -3,6 +3,7 @@ import {
   configurePlatform,
 } from '../../../packages/editor/src/lib/platform';
 import { mountEditor } from '../../../packages/editor/src/mount';
+import { getDesktopPlatform } from './platform.mts';
 
 declare global {
   interface Window {
@@ -17,43 +18,42 @@ declare global {
   }
 }
 const desktop = window.frameNoteDesktop;
-if (desktop) {
-  configurePlatform({
-    ...browserPlatform,
-    async saveFile(blob, name) {
-      return desktop.saveFile(name, new Uint8Array(await blob.arrayBuffer()));
-    },
-    onAbout: (show) =>
-      desktop.onCommand((command) => {
-        if (command === 'about') show();
-      }),
-  });
-  desktop.onCommand((command) => {
-    if (command === 'about') return;
-    const selector =
-      command === 'open'
-        ? 'input[aria-label="Choose JPG or PNG photo"]'
-        : 'button[aria-label="Export JPG"]';
-    const elements = [...document.querySelectorAll<HTMLElement>(selector)];
-    elements
-      .find(
-        (element) =>
-          command === 'open' ||
-          (element.offsetParent !== null &&
-            !(element as HTMLButtonElement).disabled),
-      )
-      ?.click();
-  });
-  let reported = false;
-  new MutationObserver(() => {
-    const open = !!document.querySelector('[data-photo-canvas] canvas');
-    if (open !== reported) {
-      reported = open;
-      desktop.setSessionOpen(open);
-    }
-  }).observe(document.documentElement, { subtree: true, childList: true });
-}
+if (!desktop) throw new Error('FrameNote desktop bridge is unavailable');
+configurePlatform({
+  ...browserPlatform,
+  async saveFile(blob, name) {
+    return desktop.saveFile(name, new Uint8Array(await blob.arrayBuffer()));
+  },
+  onAbout: (show) =>
+    desktop.onCommand((command) => {
+      if (command === 'about') show();
+    }),
+});
+desktop.onCommand((command) => {
+  if (command === 'about') return;
+  const selector =
+    command === 'open'
+      ? 'input[aria-label="Choose JPG or PNG photo"]'
+      : 'button[aria-label="Export JPG"]';
+  const elements = [...document.querySelectorAll<HTMLElement>(selector)];
+  elements
+    .find(
+      (element) =>
+        command === 'open' ||
+        (element.offsetParent !== null &&
+          !(element as HTMLButtonElement).disabled),
+    )
+    ?.click();
+});
+let reported = false;
+new MutationObserver(() => {
+  const open = !!document.querySelector('[data-photo-canvas] canvas');
+  if (open !== reported) {
+    reported = open;
+    desktop.setSessionOpen(open);
+  }
+}).observe(document.documentElement, { subtree: true, childList: true });
 
 mountEditor({
-  windowChrome: desktop?.platform === 'darwin' ? 'macos-titlebar' : 'standard',
+  platform: getDesktopPlatform(desktop.platform),
 });
