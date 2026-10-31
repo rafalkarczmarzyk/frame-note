@@ -14,7 +14,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { AppHeader } from '@/components/layout/app-header';
+import { AppHeader, type WindowChrome } from '@/components/layout/app-header';
 import { EmptyWorkspace } from '@/features/photo/empty-workspace';
 import { Download } from 'lucide-react';
 import { PhotoActions } from '@/features/photo/photo-actions';
@@ -25,7 +25,9 @@ const PhotoWorkspace = lazy(() =>
   loadWorkspace().then((module) => ({ default: module.PhotoWorkspace })),
 );
 
-export default function App() {
+export default function App({
+  windowChrome = 'standard',
+}: { windowChrome?: WindowChrome } = {}) {
   const [isDragging, setIsDragging] = useState(false);
 
   const {
@@ -224,6 +226,7 @@ export default function App() {
   return (
     <div className="flex h-svh flex-col overflow-hidden bg-app-base text-content-primary">
       <AppHeader
+        windowChrome={windowChrome}
         photoAction={
           <PhotoActions
             hasPhoto={session.items.length > 0}

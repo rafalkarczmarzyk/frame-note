@@ -14,6 +14,9 @@ when explicitly requested; a commit does not automatically create a release.
   confirmation, persistent JPG quality, offline rendering and an unsigned app/DMG
   build. Add content restores keyboard focus when its panel closes. Web builds use
   the shared pnpm workspace, with Netlify configured for `apps/web/dist`.
+  The macOS title bar matches the toolbar background, with a centered app name
+  and native window controls. The desktop toolbar starts with Add photos, uses
+  equal 6 px padding on all sides and opens About from the FrameNote menu.
 
 - Inline horizontal separators with Fixed or Flex width, relative or document-unit
   height, independent line thickness, color and opacity. Flex fills the remaining

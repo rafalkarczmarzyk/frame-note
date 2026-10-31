@@ -79,6 +79,21 @@ preferuj semantyczne stany komponentu zamiast ręcznego formatowania w call-site
 
 ## Wzorce FrameNote
 
+### Pasek okna macOS
+
+`AppHeader` przyjmuje `windowChrome="macos-titlebar"` wyłącznie w bootstrapie
+desktopu na macOS. Dodaje nad nagłówkiem z narzędziami osobny pasek 28 px
+z nazwą FrameNote na środku. Oba korzystają z `bg-header-base`; pasek okna nie
+ma dodatkowej linii oddzielającej. Natywne przyciski macOS są rysowane przez
+system. Przesuwanie okna obejmuje tylko górny pasek, a narzędzia zachowują swój
+dotychczasowy układ i obsługę. Wariant desktopowy pomija logo w nagłówku:
+pierwszą akcją po lewej jest Add photos. Padding nagłówka wynosi 6 px na każdej
+z czterech stron; wysokość wynika z kontrolek 36 px, paddingu i dolnej linii 1 px
+(łącznie 49 px). Informacje o aplikacji otwiera systemowe
+menu FrameNote → About FrameNote, przez ten sam komponent `AboutSplash`.
+Domyślny wariant `standard` służy wersji web i zachowuje klikalne logo.
+Przykłady: Storybook → Sidebar & panels/AppHeader → MacOS i MacOSMinimum.
+
 ### Sidebar i dodatkowe opcje
 
 Sidebar grupuje ustawienia według obiektu i zadania. `SidebarSection` zapewnia

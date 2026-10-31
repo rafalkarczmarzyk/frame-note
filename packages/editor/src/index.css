@@ -1340,3 +1340,10 @@ fieldset:disabled .glass-switch {
     justify-content: flex-start;
   }
 }
+
+/* Native macOS controls sit over this separate, compact title bar. */
+.app-window-titlebar {
+  user-select: none;
+  -webkit-app-region: drag;
+  app-region: drag;
+}

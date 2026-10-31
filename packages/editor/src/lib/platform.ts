@@ -5,6 +5,8 @@ export interface PlatformServices {
     name: string,
   ): Promise<'download-started' | 'saved' | 'cancelled'>;
   storage: Pick<Storage, 'getItem' | 'setItem'>;
+  /** Subscribe to an About action supplied by a native application menu. */
+  onAbout?: (show: () => void) => () => void;
 }
 export const browserPlatform: PlatformServices = {
   async saveFile(blob, name) {
