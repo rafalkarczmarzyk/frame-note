@@ -22,8 +22,10 @@ oraz kompaktowanie kontrolek wprowadzone dla tego wariantu.
 - Electron na macOS używa `titleBarStyle: 'hidden'`: usuwa systemowe tło paska,
   zachowując natywne kontrolki w ich standardowej pozycji. Nie ma własnych
   odpowiedników kontrolek ani dodatkowych akcji IPC do sterowania oknem.
-- Bootstrap desktopu przekazuje `windowChrome="macos-titlebar"` przez
-  `mountEditor` do wspólnego `AppHeader`. Wariant `standard` pozostaje webowy.
+- Bootstrap ustawia platformę w `PlatformProvider` przez `mountEditor`.
+  `AppHeader` korzysta z `usePlatform()`: `isMacOS` pokazuje `MacOSTitleBar`,
+  a `isWeb` wybiera logo i układ webu. Typ obejmuje `web`, `macos`, `windows`
+  oraz `linux`; wszystkie flagi wynikają z jednej wartości.
 - Tylko nowy górny pasek jest regionem przesuwania okna. Narzędzia pod nim,
   menu i panele zachowują zwykłą obsługę wskaźnika. Podwójne kliknięcie korzysta
   z zachowania macOS; nie dodano własnego przełączania maksymalizacji.

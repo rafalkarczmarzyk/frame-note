@@ -1,6 +1,7 @@
 import { themes } from 'storybook/theming';
 import type { Preview } from '@storybook/react-vite';
 import '../packages/editor/src/index.css';
+import { PlatformProvider } from '../packages/editor/src/components/platform-provider.tsx';
 const preview: Preview = {
   tags: ['autodocs'],
   parameters: {
@@ -23,7 +24,9 @@ const preview: Preview = {
             : 'min-h-24 bg-app-base p-4 font-sans text-content-primary'
         }
       >
-        <Story />
+        <PlatformProvider platform="web">
+          <Story />
+        </PlatformProvider>
       </div>
     ),
   ],

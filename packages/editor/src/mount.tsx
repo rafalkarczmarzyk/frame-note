@@ -1,14 +1,15 @@
-import type { WindowChrome } from './components/layout/app-header';
+import type { Platform } from './lib/platform-context';
+import { PlatformProvider } from './components/platform-provider';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App';
-export function mountEditor({
-  windowChrome = 'standard',
-}: { windowChrome?: WindowChrome } = {}) {
+export function mountEditor({ platform }: { platform: Platform }) {
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      <App windowChrome={windowChrome} />
+      <PlatformProvider platform={platform}>
+        <App />
+      </PlatformProvider>
     </StrictMode>,
   );
 }

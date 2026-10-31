@@ -1,2 +1,2 @@
 import { mountEditor } from '../../../packages/editor/src/mount';
-mountEditor();
+mountEditor({ platform: 'web' });

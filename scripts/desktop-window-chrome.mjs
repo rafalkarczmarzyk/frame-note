@@ -6,7 +6,7 @@ export async function verifyWindowChrome(app, page) {
   const header = page.getByRole('banner');
   const titlebar = page.locator('[data-window-titlebar]');
   await expect(titlebar).toHaveText('FrameNote');
-  await expect(header).toHaveAttribute('data-window-chrome', 'macos-titlebar');
+  await expect(header).toHaveAttribute('data-platform', 'macos');
   await expect(
     header.getByRole('button', { name: 'About FrameNote', exact: true }),
   ).toHaveCount(0);
