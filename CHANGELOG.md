@@ -21,6 +21,9 @@ when explicitly requested; a commit does not automatically create a release.
   for builds with Xcode and a static icon for builds without it.
   The DMG includes a prepared Finder window with a FrameNote background,
   drag-to-install guidance and an Applications shortcut.
+  Optional signed packaging uses `DEVELOPER_ID`, Hardened Runtime and a secure
+  timestamp, verifies the app signature and stops on signing errors.
+  Notarization remains separate.
 
 - Inline horizontal separators with Fixed or Flex width, relative or document-unit
   height, independent line thickness, color and opacity. Flex fills the remaining

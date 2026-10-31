@@ -108,3 +108,37 @@ Manual packaging acceptance checks:
 2. Check that Applications points to `/Applications` and the image is read-only.
 3. Copy the app to Applications, eject the image and launch the installed copy.
 4. Quit the app, replace it with a new build and verify saved presets remain.
+
+## Code signing
+
+Use the same `DEVELOPER_ID` convention as the Voxel Tycoon CLI:
+
+```sh
+security find-identity -v -p codesigning
+export DEVELOPER_ID='Exact certificate name or SHA-1 from the list above'
+pnpm desktop:package:signed
+```
+
+The signed command requires an exact, valid identity with its private key in the
+macOS keychain. It fails rather than falling back to an unsigned or ad hoc build.
+The ordinary `pnpm desktop:package` command keeps its local unsigned behavior,
+even when `DEVELOPER_ID` is set. Both commands write the same app and DMG paths;
+the most recent successful build determines their signing state.
+
+Electron Packager signs nested code before the app bundle, with a secure timestamp,
+Hardened Runtime and the JIT entitlement needed by V8. The build verifies the whole
+app with `codesign --verify --deep --strict` before creating the DMG. The DMG itself
+is not signed. The entitlement source is `apps/desktop/entitlements.plist`.
+No certificate, private key or password is stored in the repository. macOS may ask
+for permission to use the signing key during packaging.
+
+This command does **not** notarize or upload the app to Apple. A local/self-signed
+certificate does not provide Apple Developer ID trust. Public distribution with
+normal Gatekeeper approval requires an Apple-issued Developer ID Application
+certificate and notarization; a successful local signature check alone does not
+establish this. See [Apple's notarization documentation](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution).
+
+If macOS reports `this identity cannot be used for signing code`, the selected
+certificate/key is not usable for this operation even if `security find-identity`
+lists it. Resolve the certificate/key setup before retrying; the packaging command
+does not weaken certificate validation or change keychain trust settings.
