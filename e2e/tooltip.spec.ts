@@ -174,6 +174,9 @@ test('remaining help explains position, disabled actions and token values withou
     exact: true,
   });
   await expect(about).toBeVisible();
+  await expect(about.locator('[data-build-info]')).toHaveText(
+    /^v\d+\.\d+\.\d+-(?:alpha|beta|rc) · build (?:[a-f0-9]{7,}|unknown)(?:-dirty)?$/u,
+  );
   await about
     .getByRole('button', { name: 'Close about FrameNote', exact: true })
     .focus();

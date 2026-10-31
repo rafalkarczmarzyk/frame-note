@@ -52,7 +52,7 @@ export function AppHeader({
           id="preset-actions"
           className="min-w-0 shrink [&:has(>[data-preset-live])>.preset-placeholder]:hidden"
         >
-          <div className="preset-placeholder">
+          <div className="preset-placeholder" aria-hidden="true" inert>
             <PresetToolbar
               selected="builtin-default"
               options={builtinPresets.map((preset) => ({

@@ -116,7 +116,7 @@ test.describe('Photo export geometry / all anchors', () => {
             {
               id: 'marker-layer',
               visible: true,
-              template: '',
+              template: '{image:marker:24:document:original}',
               style: {
                 fontFamily: 'Montserrat Variable',
                 fontWeight: 400,
@@ -127,7 +127,16 @@ test.describe('Photo export geometry / all anchors', () => {
                 textAlign: 'left',
               },
               position: { anchor },
-              logo: { asset: marker, width: 48, colorMode: 'original' },
+              images: [
+                {
+                  id: 'marker',
+                  name: marker.name,
+                  format: 'svg',
+                  source: marker.svg,
+                  width: 2,
+                  height: 1,
+                },
+              ],
             },
           ],
         },
@@ -230,7 +239,7 @@ test.describe('Photo export geometry / all anchors', () => {
         containers: [
           {
             id: 'marker-layer',
-            template: '',
+            template: '{image:marker:24:document:original}',
             style: {
               fontFamily: 'Montserrat Variable',
               fontWeight: 400,
@@ -241,15 +250,17 @@ test.describe('Photo export geometry / all anchors', () => {
               textAlign: 'left',
             },
             position: { anchor: 'center', custom: { x: 25, y: 75 } },
-            logo: {
-              asset: {
+            images: [
+              {
+                id: 'marker',
                 name: 'marker',
-                svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 24"><rect width="48" height="24" fill="#00ff00"/></svg>',
-                aspect: 2,
+                format: 'svg',
+                source:
+                  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 24"><rect width="48" height="24" fill="#00ff00"/></svg>',
+                width: 2,
+                height: 1,
               },
-              width: 48,
-              colorMode: 'original',
-            },
+            ],
           },
         ],
       },

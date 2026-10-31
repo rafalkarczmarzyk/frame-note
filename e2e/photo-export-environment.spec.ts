@@ -142,7 +142,7 @@ test('Photo export / preview geometry matches the saved marker position', async 
       containers: [
         {
           id: 'marker-layer',
-          template: '',
+          template: '{image:marker:24:document:original}',
           style: {
             fontFamily: 'Montserrat Variable',
             fontWeight: 400,
@@ -153,15 +153,17 @@ test('Photo export / preview geometry matches the saved marker position', async 
             textAlign: 'left',
           },
           position: { anchor: 'center', custom: { x: 25, y: 75 } },
-          logo: {
-            asset: {
+          images: [
+            {
+              id: 'marker',
               name: 'marker',
-              svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 24"><rect width="48" height="24" fill="#00ff00"/></svg>',
-              aspect: 2,
+              format: 'svg',
+              source:
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 24"><rect width="48" height="24" fill="#00ff00"/></svg>',
+              width: 2,
+              height: 1,
             },
-            width: 48,
-            colorMode: 'original',
-          },
+          ],
         },
       ],
     },

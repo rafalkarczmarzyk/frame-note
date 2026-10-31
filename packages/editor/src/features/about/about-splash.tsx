@@ -80,7 +80,7 @@ export function AboutSplash({ onClose }: { onClose: () => void }) {
         </section>
         <footer className="mx-auto mb-5 flex max-w-full shrink-0 flex-wrap items-center justify-center gap-x-4 gap-y-2 rounded-xl bg-header-base px-5 py-3 text-xs">
           <span>© {new Date().getFullYear()} FrameNote</span>
-          <span>
+          <span data-build-info>
             v{version} · build {appBuild}
           </span>
           <a
