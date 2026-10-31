@@ -13,6 +13,9 @@ entering master receive a version, dated section and local tag according to
 
 ### Added
 
+- macOS presets are individual JSON files in `~/FrameNote/presets`, loaded at
+  startup. Saves and deletions persist across restarts; failed saves report an
+  error. Web keeps its existing localStorage key and uses the identical v1 JSON.
 - First official preset format v1 with a shared Zod contract and SVG/PNG validation
   for web and macOS. Previous development preset formats are unsupported.
 

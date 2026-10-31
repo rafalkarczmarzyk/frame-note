@@ -9,6 +9,8 @@ declare global {
   interface Window {
     frameNoteDesktop?: {
       platform: string;
+      readPresets(): Promise<string>;
+      writePresets(source: string): Promise<void>;
       saveFile(name: string, bytes: Uint8Array): Promise<'saved' | 'cancelled'>;
       setSessionOpen(value: boolean): void;
       onCommand(
@@ -21,6 +23,10 @@ const desktop = window.frameNoteDesktop;
 if (!desktop) throw new Error('FrameNote desktop bridge is unavailable');
 configurePlatform({
   ...browserPlatform,
+  presets: {
+    read: () => desktop.readPresets(),
+    write: (source) => desktop.writePresets(source),
+  },
   async saveFile(blob, name) {
     return desktop.saveFile(name, new Uint8Array(await blob.arrayBuffer()));
   },
