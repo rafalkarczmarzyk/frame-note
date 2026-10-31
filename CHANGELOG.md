@@ -216,6 +216,9 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Fixed
 
+- Tooltip glass blur is preserved in production builds, including the Electron
+  desktop app. A desktop regression check verifies the rendered tooltip material.
+
 - Header branding retains its intended proportions instead of inheriting small
   button-icon dimensions. Margin letters sit against their triangle bases,
   forming connected handles on the rulers rather than separate photo overlays.

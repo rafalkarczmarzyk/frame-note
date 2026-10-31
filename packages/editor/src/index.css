@@ -1111,7 +1111,6 @@ fieldset:disabled .glass-switch {
     .glass-popover {
       background: var(--glass-popover);
       backdrop-filter: blur(16px) saturate(160%);
-      -webkit-backdrop-filter: blur(16px) saturate(160%);
     }
     .glass-popover.glass-tooltip {
       background: var(--tooltip-glass);
