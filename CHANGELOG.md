@@ -11,6 +11,14 @@ entering master receive a version, dated section and local tag according to
 
 ## Unreleased
 
+## [0.1.1-beta] - 2026-10-31
+
+### Fixed
+
+- macOS DMG packaging retries the transient Finder busy error up to five times
+  with short backoff, instead of aborting immediately. Other errors still fail
+  immediately; the previous DMG is replaced only after successful verification.
+
 ## [0.1.0-beta] - 2026-10-31
 
 ### Added
