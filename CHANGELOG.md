@@ -63,7 +63,7 @@ when explicitly requested; a commit does not automatically create a release.
   settings survive clipboard operations, document-unit changes and presets and
   match between preview and JPG export. Editor badges have consistent heights
   and more space between lines. The content library includes built-in icons,
-  SVG/PNG upload and a built-in Canon logo. Inline graphic badges keep the same height
+  SVG/PNG upload and built-in Canon and FrameNote app icons. Inline graphic badges keep the same height
   regardless of their output size. Relative/Fixed mode and numeric graphic size
   share a row, with a more visible unit and no redundant slider. All numeric
   fields support vertical dragging on their steppers; clicks and arrow keys
