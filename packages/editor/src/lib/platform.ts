@@ -1,6 +1,9 @@
 /** Platform services are installed once by the application entry point. */
 export interface PlatformServices {
-  saveFile(blob: Blob, name: string): Promise<void>;
+  saveFile(
+    blob: Blob,
+    name: string,
+  ): Promise<'download-started' | 'saved' | 'cancelled'>;
   storage: Pick<Storage, 'getItem' | 'setItem'>;
 }
 export const browserPlatform: PlatformServices = {
@@ -11,6 +14,7 @@ export const browserPlatform: PlatformServices = {
     link.download = name;
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 30_000);
+    return 'download-started';
   },
   storage: {
     getItem: (key) => localStorage.getItem(key),

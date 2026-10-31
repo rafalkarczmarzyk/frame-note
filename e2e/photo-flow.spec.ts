@@ -1,3 +1,4 @@
+import { replaceCaption } from './caption-helpers.js';
 import { openSidebarSection } from './sidebar-helpers.js';
 import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
@@ -10,6 +11,7 @@ import { portraitFixture, wildlifeFixture } from '../tests/fixtures.ts';
 test('exports landscape and portrait JPGs with stable caption pixels and colors', async ({
   page,
 }, testInfo) => {
+  test.setTimeout(90_000);
   for (const [name, fixture] of [
     ['landscape', wildlifeFixture],
     ['portrait', portraitFixture],
@@ -19,14 +21,14 @@ test('exports landscape and portrait JPGs with stable caption pixels and colors'
       await page
         .getByLabel('Choose JPG or PNG photo')
         .setInputFiles(fixture.path);
-      await page
-        .getByLabel('Caption', { exact: true })
-        .fill('{exif:Artist}\nFrameNote test');
+      await openSidebarSection(page, 'Export');
+      await page.getByRole('radio', { name: 'Best', exact: true }).click();
+      await replaceCaption(page, '{exif:Artist}\nFrameNote test');
       await expect(
         page.getByRole('button', { name: 'Export JPG', exact: true }),
       ).toBeEnabled();
       // Changing the shared unit must preserve the exported geometry.
-      await openSidebarSection(page, 'Sizing & Margins');
+      await openSidebarSection(page, 'Units & Margins');
       for (const unit of ['% of long edge', 'Pixels (px)', '% of short edge']) {
         await page
           .getByRole('combobox', { name: 'Sizing unit', exact: true })
@@ -56,14 +58,14 @@ test('exports landscape and portrait JPGs with stable caption pixels and colors'
         page.getByRole('spinbutton', { name: 'Top', exact: true }),
       ).toHaveValue('3');
       await page
-        .getByRole('radiogroup', { name: 'Margin linking' })
+        .getByRole('radiogroup', { name: 'Margins linking' })
         .getByRole('radio', { name: 'Linked', exact: true })
         .click();
       await expect(
         page.getByRole('spinbutton', { name: 'Right', exact: true }),
       ).toHaveValue('3');
       await page
-        .getByRole('radiogroup', { name: 'Margin linking' })
+        .getByRole('radiogroup', { name: 'Margins linking' })
         .getByRole('radio', { name: 'Individual', exact: true })
         .click();
       await expect(

@@ -85,14 +85,14 @@ test('Photo export / Helicon stack / Macro', async ({ page }, testInfo) => {
     '{heliconStack}',
   );
   const tags = page.getByRole('button', {
-    name: 'Browse available tags',
+    name: 'Add content',
     exact: true,
   });
   await tags.click();
-  await expect(
-    page.getByRole('dialog', { name: 'Available tags' }),
-  ).toContainText('Focus stack · 15 images · Method A · R=8 · S=4');
-  await page.getByRole('button', { name: 'Close available tags' }).click();
+  await expect(page.getByRole('dialog', { name: 'Add content' })).toContainText(
+    'Focus stack · 15 images · Method A · R=8 · S=4',
+  );
+  await page.getByRole('button', { name: 'Close add content' }).click();
   await comparePhotoExport(
     page,
     testInfo,

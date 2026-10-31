@@ -22,7 +22,9 @@ it('starts a browser download and revokes its object URL after delivery', async 
     createObjectURL: () => 'blob:output',
     revokeObjectURL,
   });
-  await browserPlatform.saveFile(new Blob(['photo']), 'photo.jpg');
+  expect(await browserPlatform.saveFile(new Blob(['photo']), 'photo.jpg')).toBe(
+    'download-started',
+  );
   expect(link.download).toBe('photo.jpg');
   expect(link.click).toHaveBeenCalledOnce();
   expect(revokeObjectURL).not.toHaveBeenCalled();

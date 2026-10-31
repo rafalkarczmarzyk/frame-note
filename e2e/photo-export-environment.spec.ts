@@ -1,3 +1,4 @@
+import { replaceCaption } from './caption-helpers.js';
 import { openSidebarSection } from './sidebar-helpers.js';
 import { readFile } from 'node:fs/promises';
 import { expect, test, type Browser, type Page } from '@playwright/test';
@@ -74,13 +75,11 @@ test('Photo export / waits for Advercase Bold before enabling download', async (
     mimeType: 'image/jpeg',
     buffer: Buffer.from(source, 'base64'),
   });
-  await page
-    .getByLabel('Caption', { exact: true })
-    .fill('FrameNote 0123\nŻółw © · ×');
+  await replaceCaption(page, 'FrameNote 0123\nŻółw © · ×');
   await page.getByRole('button', { name: 'Font', exact: true }).click();
   await page.getByRole('button', { name: /Advercase/ }).click();
   await page.getByRole('button', { name: 'Bold', exact: true }).click();
-  await openSidebarSection(page, 'Sizing & Margins');
+  await openSidebarSection(page, 'Units & Margins');
   await page
     .getByRole('combobox', { name: 'Sizing unit', exact: true })
     .click();

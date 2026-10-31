@@ -237,7 +237,7 @@ test('glass renders lower content with blur and matches its exported JPG', async
   }, bytes.toString('base64'));
   expect(difference).toBeLessThan(8);
   const blur = page.getByRole('spinbutton', {
-    name: 'Glass blur',
+    name: 'Glass blur value',
     exact: true,
   });
   await blur.fill('0');

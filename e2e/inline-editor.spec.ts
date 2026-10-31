@@ -40,15 +40,14 @@ test('uploads SVG, edits atomic tokens, round-trips the clipboard and exports a 
   await editor.press('Meta+a');
   await editor.press('Backspace');
   await expect(editor).toHaveAttribute('data-template', '');
-  await page
-    .getByRole('button', { name: 'Browse graphics', exact: true })
-    .click();
-  const panel = page.getByRole('dialog', { name: 'Graphics', exact: true });
+  await page.getByRole('button', { name: 'Add content', exact: true }).click();
+  const panel = page.getByRole('dialog', { name: 'Add content', exact: true });
+  await panel.getByRole('button', { name: 'Icons', exact: true }).click();
   await expect(panel.getByLabel('Upload SVG icon')).toHaveCount(0);
   await expect(
     panel.getByRole('button', { name: 'Back to caption' }),
   ).toHaveCount(0);
-  await page.getByRole('button', { name: /camera.*icon:camera/ }).click();
+  await page.getByRole('button', { name: 'camera', exact: true }).click();
   await expect(editor.locator('[data-token="icon:camera"]')).toHaveCount(1);
   await page.keyboard.press('Escape');
   const upload = page.getByLabel('Upload image', { exact: true });
@@ -75,7 +74,12 @@ test('uploads SVG, edits atomic tokens, round-trips the clipboard and exports a 
   const imageToken = editor.locator('[data-token^="image:"]');
   await expect(imageToken).toHaveCount(1);
   await imageToken.click();
-  await page.getByLabel('Layer color', { exact: true }).click();
+  const layerColor = page.getByRole('radio', {
+    name: 'Layer color',
+    exact: true,
+  });
+  await layerColor.focus();
+  await layerColor.press('Space');
   const imageTemplate = await editor.getAttribute('data-template');
   await editor.click();
   await editor.press('Meta+a');

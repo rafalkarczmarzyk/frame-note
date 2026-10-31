@@ -117,13 +117,11 @@ test('offers built-in Default and Macro and resolves the Helicon fixture', async
   await expect(
     page.getByRole('button', { name: 'Update preset', exact: true }),
   ).toHaveCount(0);
-  await page
-    .getByRole('button', { name: 'Browse available tags', exact: true })
-    .click();
-  await expect(
-    page.getByRole('dialog', { name: 'Available tags' }),
-  ).toContainText('Focus stack · 15 images · Method A · R=8 · S=4');
-  await page.getByRole('button', { name: 'Close available tags' }).click();
+  await page.getByRole('button', { name: 'Add content', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'Add content' })).toContainText(
+    'Focus stack · 15 images · Method A · R=8 · S=4',
+  );
+  await page.getByRole('button', { name: 'Close add content' }).click();
   await page
     .getByRole('button', { name: 'Preset actions', exact: true })
     .click();

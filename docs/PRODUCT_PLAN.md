@@ -439,3 +439,19 @@ należą do jaśniejszego inspektora; Layers zwija całość. Przypadki produkcy
 są w Storybooku Screens/TestPhotos. Szczegóły w sekcji o tle warstw poniżej.
 Separatory poziome są odłożone jako NTH-004. Nie zmieniono wersji ani nie
 przygotowano wydania.
+
+### Web i macOS — rozpoczęta realizacja 2026-10-30
+
+Na polecenie użytkownika kolejne etapy mają testy i commit, bez zatrzymywania
+między etapami. Aktualny podział to apps/web, apps/desktop, packages/editor
+oraz packages/core. Powłoka macOS korzysta z Electron; podstawowy katalog fontów
+jest wspólny i lokalny. Szczegóły, rzeczywiste wyniki i pozostałe zależności:
+[plan](DESKTOP_PREPARATION_PLAN.md), [postęp](DESKTOP_PROGRESS.md),
+[uruchamianie desktopu](DESKTOP.md). Starsze opisy etapów i ścieżek powyżej
+są historyczne; nie oznaczają braku funkcji obecnych w nowszym kodzie.
+
+Etap 7 zakończono 2026-10-31 dla lokalnego macOS Apple Silicon na Electron.
+Weryfikacja obejmuje web, aplikację zainstalowaną poza repozytorium, offline,
+JPG i siedmiozdjęciowy ZIP oraz presety i jakość JPG po restarcie. Pełne wyniki
+(w tym ponowienia E2E) zawiera DESKTOP_PROGRESS.md. Powstał lokalny, niepodpisany
+DMG; publikacja Netlify, podpisywanie i notaryzacja nie zostały wykonane.

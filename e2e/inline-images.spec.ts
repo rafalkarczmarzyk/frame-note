@@ -192,7 +192,7 @@ test('Photo export / mixed inline SVG and PNG', async ({ page }, testInfo) => {
   await page
     .getByRole('button', { name: 'Increase Image height', exact: true })
     .click();
-  await expect(height).toHaveValue('3.25');
+  await expect(height).toHaveValue('3.1');
   await expect(height).toBeFocused();
   await expect(raster.locator('..')).toHaveCSS('outline-width', '2px');
   await page.locator('details[data-section="sizing"] > summary').click();

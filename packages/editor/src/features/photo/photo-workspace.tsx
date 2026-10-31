@@ -1,3 +1,7 @@
+import {
+  readExportQuality,
+  storeExportQuality,
+} from '@/lib/export-preferences';
 import { platform } from '@/lib/platform';
 import { separatorToken } from '../../../../core/src/inline-separator';
 import type { SeparatorColorActions } from '../caption/editor/caption-editor';
@@ -345,7 +349,8 @@ function PhotoWorkspaceContent({
   };
   const [singleExporting, setExporting] = useState(false);
   const exporting = singleExporting || batchBusy;
-  const [quality, setQuality] = useState(95);
+  const [quality, setQuality] = useState(readExportQuality);
+  useEffect(() => storeExportQuality(quality), [quality]);
   const [metadataOptions, setMetadataOptions] = useState(defaultExportMetadata);
   const [loadedFont, setLoadedFont] = useState('');
   const [fontFailure, setFontFailure] = useState<{

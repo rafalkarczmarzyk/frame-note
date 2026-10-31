@@ -1,3 +1,4 @@
+import { replaceCaption } from './caption-helpers.js';
 import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
 import { wildlifeFixture } from '../tests/fixtures.ts';
@@ -10,7 +11,7 @@ test('drags a caption without a jump and exports Custom independently of margins
     .getByLabel('Choose JPG or PNG photo')
     .setInputFiles(wildlifeFixture.path);
   await page.locator('details[data-section="sizing"] > summary').click();
-  await page.getByLabel('Caption', { exact: true }).fill('Custom position');
+  await replaceCaption(page, 'Custom position');
   const exportButton = page.getByRole('button', {
     name: 'Export JPG',
     exact: true,

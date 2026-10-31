@@ -1,3 +1,4 @@
+import { replaceCaption } from './caption-helpers.js';
 import { expect, test } from '@playwright/test';
 import { xmpPortraitFixture, wildlifeFixture } from '../tests/fixtures.ts';
 
@@ -12,8 +13,8 @@ test('shows helpers first, keeps original namespaces and resolves a portable tem
     'data-template',
     '{author}\n{lens}\n{exposure}',
   );
-  await page.getByRole('button', { name: 'Browse available tags' }).click();
-  const panel = page.getByRole('dialog', { name: 'Available tags' });
+  await page.getByRole('button', { name: 'Add content' }).click();
+  const panel = page.getByRole('dialog', { name: 'Add content' });
   await expect(panel.locator('h3').first()).toHaveText('FrameNote');
   await expect(
     panel
@@ -32,8 +33,8 @@ test('shows helpers first, keeps original namespaces and resolves a portable tem
   await expect(
     panel.getByRole('button', { name: /^xmp:creator\b/ }),
   ).toBeVisible();
-  await panel.getByRole('button', { name: 'Close available tags' }).click();
-  await caption.fill('{author}\n{lens}\n{date}');
+  await panel.getByRole('button', { name: 'Close add content' }).click();
+  await replaceCaption(page, '{author}\n{lens}\n{date}');
   await expect(page.getByRole('alert')).toHaveCount(0);
   await expect(
     page.getByRole('button', { name: 'Export JPG', exact: true }),
@@ -43,7 +44,7 @@ test('shows helpers first, keeps original namespaces and resolves a portable tem
     'data-template',
     '{author}\n{lens}\n{date}',
   );
-  await page.getByRole('button', { name: 'Browse available tags' }).click();
+  await page.getByRole('button', { name: 'Add content' }).click();
   await search.fill('iso');
   await expect(panel.getByRole('button', { name: /^iso\b/ })).toContainText(
     'ISO 20000',

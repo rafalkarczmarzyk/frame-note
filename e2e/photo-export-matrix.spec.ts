@@ -1,3 +1,4 @@
+import { replaceCaption } from './caption-helpers.js';
 import { openSidebarSection } from './sidebar-helpers.js';
 import { readFile } from 'node:fs/promises';
 import { expect, test, type Page } from '@playwright/test';
@@ -322,16 +323,14 @@ for (const font of fonts) {
       mimeType: 'image/jpeg',
       buffer: Buffer.from(source, 'base64'),
     });
-    await page
-      .getByLabel('Caption', { exact: true })
-      .fill('FrameNote 0123\nŻółw © · ×');
+    await replaceCaption(page, 'FrameNote 0123\nŻółw © · ×');
     await page.getByRole('button', { name: 'Font', exact: true }).click();
     if (font.label === 'Advercase')
       await page.getByRole('button', { name: /Advercase/ }).click();
     else await page.getByRole('button', { name: /Montserrat/ }).click();
     if (font.bold)
       await page.getByRole('button', { name: 'Bold', exact: true }).click();
-    await openSidebarSection(page, 'Sizing & Margins');
+    await openSidebarSection(page, 'Units & Margins');
     await page
       .getByRole('combobox', { name: 'Sizing unit', exact: true })
       .click();

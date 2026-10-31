@@ -9,8 +9,11 @@ when explicitly requested; a commit does not automatically create a release.
 
 ### Added
 
-- A macOS Electron application sharing the web editor, bundled local assets and
-  isolated system integration. Desktop support is under verification.
+- A local Apple Silicon macOS application sharing the web editor, bundled fonts
+  and presets. Includes native output dialogs, file/menu shortcuts, session-close
+  confirmation, persistent JPG quality, offline rendering and an unsigned app/DMG
+  build. Add content restores keyboard focus when its panel closes. Web builds use
+  the shared pnpm workspace, with Netlify configured for `apps/web/dist`.
 
 - Inline horizontal separators with Fixed or Flex width, relative or document-unit
   height, independent line thickness, color and opacity. Flex fills the remaining

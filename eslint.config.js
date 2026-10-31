@@ -16,6 +16,7 @@ export default defineConfig([
     'storybook-static',
     'playwright-visual-report',
     'visual-test-results',
+    'glass-test-results',
     '**/renderer/**',
     'release',
   ]),

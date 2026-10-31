@@ -5,8 +5,8 @@
 - Host: macOS 27.0.1, Apple Silicon (arm64), Node 22.15.1, pnpm 11.21.0.
 - Corrected existing DESIGN_SYSTEM formatting and excluded generated visual reports
   from lint. Initial browser runs needed permission to bind local test ports.
-- Unit baseline: 326 tests / 44 files passed. Full browser regression is running;
-  async-images cancellation scenario has timed out and needs investigation.
+- Unit baseline: 326 tests / 44 files passed. Initial browser checks exposed
+  stale or unstable UI test steps; final verification is recorded in stage 7.
 - Initial target: local arm64 application, current bundled fonts and ZIP batch
   output. Public signing/notarization and Netlify production access remain external
   dependencies, not assumed permissions or completed work.
@@ -15,7 +15,8 @@
 
 - Electron 45.1.0 selected: reuse Chromium rendering and JavaScript tooling.
   Tauri would require verification against the system WebKit and an additional
-  Rust build toolchain. Size tradeoff accepted for the first local build.
+  Rust build toolchain. This initial agent choice was discussed with the user;
+  on 2026-10-31 the user authorized finishing stage 7 on the current Electron build.
 - Sandboxed renderer with context isolation successfully loaded the existing
   production editor. JPEG Canvas encoding passed. No Node require in renderer.
 - References: https://www.electronjs.org/docs/latest/tutorial/security and
@@ -54,3 +55,50 @@
   redistribution-license limitations remain as documented in FONT_LIBRARY.md.
 - System fonts are not implemented in this first local build. Preset format and
   font identifiers remain shared; no migration subsystem was added.
+
+## Stage 7 — local packaging and regression
+
+Status: complete for the local Apple Silicon build, 2026-10-31.
+
+- 330 unit tests passed. Desktop smoke test passed offline import, JPG output,
+  cancellation without modifying the previous output, invalid filename rejection,
+  seven-photo ZIP, source dimensions, metadata removal, preset persistence and
+  JPG quality persistence across restart.
+  Tests use an isolated temporary user profile and automated native dialog responses.
+- Seven original fixtures produced a 22,487,321-byte ZIP with seven entries.
+  Packaged-app post-export memory sample (KiB working set / peak): Browser
+  278608 / 328816, GPU 789280 / 864464, Utility 49776 / 49824, renderer
+  1114144 / 1410944.
+  These process values can include shared pages and are not an additive total or
+  a memory guarantee for larger rolls. No Tauri performance comparison was made.
+- Current unsigned arm64 .app and DMG built; hdiutil integrity verification passed.
+  A copy installed outside the repository passed the complete desktop test without
+  a dev server. Its previously nonexistent data directory was created on first
+  launch; preset and quality persistence passed after restarting that executable.
+- Existing web tests now use atom-safe caption replacement, current UI labels,
+  explicit export quality for image baselines, and current Glass Storybook IDs.
+  Add content restores focus to its trigger when closing or switching panels.
+- Reviewed all 11 stale UI references (5 compact Chromium, 6 WebKit) against
+  expected/actual/diff and promoted only the known earlier unified Add toolbar
+  change. Reviewed their Git image differences again. Export JPG references and
+  the current primary Chromium UI references were not modified.
+- Final verification: 330 unit tests; all 180 E2E cases verified across Chromium
+  and WebKit; 18/18 visual UI scenes; 12/12 Glass rendering/export tests; web,
+  desktop and Storybook production builds; formatting, tokens, lint and typecheck.
+- The full pnpm check invocation initially returned nonzero for four Chromium E2E
+  cases (176 passed). After stabilizing chooser/radio keyboard activation and
+  asserting the caret position before a drop, all four passed on targeted rerun.
+  The affected editor cases also passed separately in WebKit. No JPG pixel
+  assertions or export reference images were relaxed or changed. This was not
+  reported as a single clean pnpm check run.
+- Glass has its own output directory so running it preserves E2E failure reports.
+  Static checks were repeated after the final changes and passed.
+- FontTools audit passed and 98 bundled font/license files matched shared assets.
+  Python audit dependencies remain temporary tooling, not application dependencies.
+
+## Stage 8 — external dependencies
+
+Netlify preview/production access is unavailable through connected tools or a
+local CLI/site binding. No remote deployment or push was performed. Public macOS
+signing/notarization is not configured. These are uncompleted external steps;
+the local application and build configuration do not imply published releases.

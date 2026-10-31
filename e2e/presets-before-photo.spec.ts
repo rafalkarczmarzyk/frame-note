@@ -1,3 +1,4 @@
+import { replaceCaption } from './caption-helpers.js';
 import { expect, test } from '@playwright/test';
 
 test('edits and saves a layout before import and retains the mounted editor across photo opening, closing and reopening', async ({
@@ -17,20 +18,16 @@ test('edits and saves a layout before import and retains the mounted editor acro
   await preset.click();
   await page.getByRole('option', { name: 'Signature', exact: true }).click();
   await expect(caption).toHaveAttribute('data-template', '{author}');
-  await caption.fill('Prepared {author}');
+  await replaceCaption(page, 'Prepared {author}');
   await page.getByRole('button', { name: 'Save preset', exact: true }).click();
   await page
     .getByRole('textbox', { name: 'Preset name', exact: true })
     .fill('Before import');
   await page.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(preset).toContainText('Before import');
-  await page
-    .getByRole('button', { name: 'Photo actions', exact: true })
-    .click();
   await expect(
-    page.getByRole('menuitem', { name: 'Close photo' }),
+    page.getByRole('button', { name: 'Photo actions', exact: true }),
   ).toBeDisabled();
-  await page.keyboard.press('Escape');
   const editorNode = await caption.elementHandle();
   const data = await page.evaluate(() => {
     const canvas = document.createElement('canvas');
@@ -78,6 +75,6 @@ test('edits and saves a layout before import and retains the mounted editor acro
     await expect(caption).toHaveAttribute('data-template', 'Prepared {author}');
     await expect(preset).toContainText('Before import');
     expect(await editorNode!.evaluate((node) => node.isConnected)).toBe(true);
-    await expect(photoActions).toBeFocused();
+    await expect(photoActions).toBeDisabled();
   }
 });

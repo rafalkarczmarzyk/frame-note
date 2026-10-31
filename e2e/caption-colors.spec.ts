@@ -1,3 +1,4 @@
+import { replaceCaption } from './caption-helpers.js';
 import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
 
@@ -19,7 +20,7 @@ test('chooses presets, validates custom HEX and exports the chosen color', async
     mimeType: 'image/jpeg',
     buffer: Buffer.from(fixture, 'base64'),
   });
-  await page.getByLabel('Caption', { exact: true }).fill('MMMMMM');
+  await replaceCaption(page, 'MMMMMM');
   await page
     .getByRole('spinbutton', { name: 'Font size', exact: true })
     .fill('8');
