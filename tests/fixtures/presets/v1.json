@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "id": "v1-example",
+  "name": "Format v1 example",
+  "layout": {
+    "sizingUnit": "short-edge",
+    "margins": { "top": 3, "right": 3, "bottom": 3, "left": 3 },
+    "marginLinkMode": "none",
+    "containers": [
+      {
+        "id": "caption-1",
+        "template": "{author}\n{image:signature:2:font:original}",
+        "style": {
+          "fontFamily": "Montserrat Variable",
+          "fontWeight": 400,
+          "fontSize": 2,
+          "color": "porcelain",
+          "opacity": 1,
+          "lineHeight": 1.4,
+          "textAlign": "auto"
+        },
+        "position": { "anchor": "bottom-left" },
+        "images": [
+          {
+            "id": "signature",
+            "name": "Signature.svg",
+            "format": "svg",
+            "source": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 2 1\"><path d=\"M0 0h2v1H0z\"/></svg>",
+            "width": 2,
+            "height": 1
+          }
+        ]
+      }
+    ],
+    "activeId": "caption-1"
+  },
+  "icons": []
+}
