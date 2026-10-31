@@ -1,7 +1,7 @@
 {
   "name": "@framenote/web",
   "private": true,
-  "version": "1.0.0-alpha.1",
+  "version": "0.0.3-alpha",
   "type": "module",
   "scripts": {
     "build": "vite build --config ../../vite.config.ts"

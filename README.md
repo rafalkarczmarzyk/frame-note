@@ -47,14 +47,27 @@ Product milestones and review status live in the
 
 ## Versioning
 
-The current numbered version is **1.0.0-alpha.1**. Subsequent development commits
-accumulate in the changelog's **Unreleased** section without changing the version.
-Version numbers change only on an explicit request to prepare a numbered version;
-committing does not automatically create a release, Git tag, or publication.
+The current numbered version is **0.0.3-alpha**, normalized from the previous
+`1.0.0-alpha.1` designation. The first beta targets **0.1.0-beta** after the
+[preset and beta requirements](docs/PRESET_VERSIONING_PLAN.md) are met.
+**1.0.0** is the first finished stable version, not a version reset.
 
-The intended [SemVer](https://semver.org/) progression is
-`1.0.0-alpha.1` → `1.0.0-alpha.2` → `1.0.0-beta.1` → `1.0.0-rc.1` → `1.0.0`.
-Each suffix number identifies a deliberately prepared prerelease, not a commit.
+During beta, compatible fixes increment PATCH (`0.1.0-beta` → `0.1.1-beta`);
+features and incompatible changes increment MINOR (`0.1.1-beta` → `0.2.0-beta`),
+resetting PATCH. Mixed tasks use the highest required increment. Channel labels
+have no extra counter: use `-alpha`, `-beta` and `-rc`. This is our
+[SemVer](https://semver.org/) prerelease convention; incompatible changes before
+1.0 still require migration and changelog coverage.
+
+An authorized commit or merge of a completed application task into `master`
+includes one version increment, dated changelog section and local tag.
+Development branch commits do not bump versions. See
+[maintain-versioning](.agents/skills/maintain-versioning/SKILL.md).
+Historical milestones map pre-MVP to `v0.0.1-alpha` and MVP to `v0.0.2-alpha`;
+their target commits are unchanged. Historical manifests are not rewritten.
+
+Betas are source-only: users build the application themselves. No downloadable
+builds or installers are published. A local tag does not itself publish anything.
 
 ## Features
 

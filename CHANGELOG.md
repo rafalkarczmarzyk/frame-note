@@ -1,9 +1,13 @@
 # Changelog
 
 Notable user-facing changes in FrameNote. The project is currently in alpha.
-Pre-MVP and MVP are historical development milestones, not numbered releases.
-Development changes accumulate under Unreleased. Version numbers change only
-when explicitly requested; a commit does not automatically create a release.
+Historical pre-MVP and MVP milestones map to `v0.0.1-alpha` and
+`v0.0.2-alpha`. The previous `1.0.0-alpha.1` designation is normalized below
+to `0.0.3-alpha`; historical commits are unchanged. The first beta targets
+`0.1.0-beta`, with `1.0.0` reserved for the first finished stable product.
+Development changes accumulate under Unreleased. Completed application tasks
+entering master receive a version, dated section and local tag according to
+[the versioning skill](.agents/skills/maintain-versioning/SKILL.md).
 
 ## Unreleased
 
@@ -246,7 +250,7 @@ when explicitly requested; a commit does not automatically create a release.
 - Warning notices, including overlapping layers, now use yellow instead of
   the green primary-action accent.
 
-## 1.0.0-alpha.1 — 2026-10-26
+## 0.0.3-alpha — 2026-10-26
 
 ### Added
 
@@ -284,7 +288,7 @@ when explicitly requested; a commit does not automatically create a release.
 - Improved keyboard focus entry and return in floating panels.
 - Restored the Canon photographic sensitivity metadata helper.
 
-## MVP
+## MVP — 0.0.2-alpha
 
 ### Added
 
@@ -311,7 +315,7 @@ when explicitly requested; a commit does not automatically create a release.
 - Allowed preset identifiers to be generated when using the app over HTTP on
   a local network.
 
-## Pre-MVP
+## Pre-MVP — 0.0.1-alpha
 
 ### Added
 
