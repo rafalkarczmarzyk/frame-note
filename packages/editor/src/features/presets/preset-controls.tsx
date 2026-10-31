@@ -62,6 +62,7 @@ export function PresetControls({
   onBrowse: () => void;
   onClose: () => void;
 }) {
+  const actionHost = toolbarHost ?? document.getElementById('preset-actions');
   const importInput = useRef<HTMLInputElement>(null);
   const [error, setError] = useState('');
   const [query, setQuery] = useState('');
@@ -249,7 +250,7 @@ export function PresetControls({
   );
   return (
     <>
-      {toolbarHost &&
+      {actionHost &&
         createPortal(
           <PresetToolbar
             live
@@ -337,7 +338,7 @@ export function PresetControls({
               ) : undefined
             }
           />,
-          toolbarHost,
+          actionHost,
         )}
       {panelHost &&
         createPortal(
