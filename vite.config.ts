@@ -1,3 +1,5 @@
+// @ts-expect-error Build metadata helper is plain JavaScript.
+import { buildInfo } from './scripts/build-info.mjs';
 import { fileURLToPath, URL } from 'node:url';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
@@ -10,6 +12,7 @@ export default defineConfig(({ mode }) => ({
       import.meta.url,
     ),
   ),
+  define: { __FRAMENOTE_BUILD__: JSON.stringify(buildInfo()) },
   publicDir: fileURLToPath(new URL('./public', import.meta.url)),
   build: {
     outDir: mode === 'desktop' ? 'renderer' : 'dist',

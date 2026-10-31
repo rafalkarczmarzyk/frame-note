@@ -59,6 +59,12 @@ have no extra counter: use `-alpha`, `-beta` and `-rc`. This is our
 [SemVer](https://semver.org/) prerelease convention; incompatible changes before
 1.0 still require migration and changelog coverage.
 
+About displays the product version, build commit and `dirty` for local changes.
+Source archives without Git metadata show `unknown`. To prepare a version, run
+`pnpm version:set <version>`, add its changelog section, then run
+`pnpm check:version --base=<previous-version-commit>`. The regular `pnpm check`
+includes manifest and changelog consistency checks.
+
 An authorized commit or merge of a completed application task into `master`
 includes one version increment, dated changelog section and local tag.
 Development branch commits do not bump versions. See

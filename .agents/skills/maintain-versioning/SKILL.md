@@ -64,15 +64,15 @@ by their actual effect on the application. Never add filler entries.
   formats and application capabilities. An internal API or visual redesign alone
   is not automatically a MAJOR change. Define the stable compatibility contract
   before promoting to 1.0; do not invent data migration guarantees.
-- Before the first beta, implement the versioned Zod preset schemas and migration
-  pipeline required by NTH-002 and `docs/PRESET_VERSIONING_PLAN.md`. This replaces
-  the earlier decision to defer compatibility. Do not declare this prerequisite
-  complete until implemented and verified. Schema versions are independent of
-  application SemVer: every new persisted format version requires its own Zod
-  parser, an explicit migration from the previous supported format, and tests.
-  Preserve source data when conversion is unsupported or lossy; describe
-  compatibility implications in the changelog. Forward conversion is the default;
-  reverse conversion is not automatically guaranteed.
+- The first official preset format is v1, shared by web and desktop. Earlier
+  development JSON and storage are unsupported: do not add legacy parsers,
+  cleanup or migration of pre-v1 data. Do not change the web storage key for
+  this purpose. Preset schema versions are independent of application SemVer.
+  Every future format requires a separate frozen Zod schema, migration from the
+  previous supported version, a file-conversion script sharing that code, and
+  fixture tests. There is no migration or conversion script for initial v1.
+  Preserve originals during future conversions; report unsupported/lossy changes.
+  Forward conversion is the default; reverse conversion is not guaranteed.
 - Use one product version for root, web, desktop, editor and core manifests.
   Root `package.json` is authoritative. Synchronize the other workspace manifests
   and affected lockfile metadata; inspect actual files rather than assuming a
@@ -112,9 +112,11 @@ precedence; a commit hash identifies code, not release ordering.
    and prepare its changelog section in the same logical commit as the task.
    For squash merges, include these changes before finalizing the squash commit.
 3. Verify matching valid SemVer across manifests, the expected increment and
-   changelog coverage. Use a repository checker if one exists; otherwise inspect
-   them directly and report that verification is manual. A skill is agent
-   guidance, not a Git hook or CI enforcement mechanism.
+   changelog coverage with `pnpm check:version`. Use `pnpm version:set <version>`
+   to synchronize manifests; prepare the matching changelog entry separately.
+   Before committing a version boundary, run `pnpm check:version --base=<ref>`
+   against the previous version commit to check increase and tag availability.
+   A skill is agent guidance, not a Git hook or CI enforcement mechanism.
 4. Only after the authorized commit on `master` succeeds, create an annotated
    local tag `v<version>` on that commit. Check its target and version contents.
    Never tag a task branch commit as a completed version. If tagging fails,
@@ -132,6 +134,7 @@ make a build dirty. If commit identity is unavailable, label it unknown rather
 than inventing a hash. Keep package SemVer separate from display metadata and
 native platform build-number constraints.
 
-Do not implement build identity or build counters merely by invoking this skill;
-that application change needs its own authorized scope. Until implemented, do
-not claim that About distinguishes builds of the same version.
+Build identity is injected by Vite at build time and displayed in About.
+Without Git metadata it reads unknown; no separate build counter is maintained.
+Betas are source-only: no downloadable builds, installers, remote publishing or
+automatic deployments follow from a local version commit and tag.
