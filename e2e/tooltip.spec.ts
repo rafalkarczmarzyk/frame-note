@@ -1,3 +1,4 @@
+import { replaceCaption } from './caption-helpers.js';
 import { expect, test } from '@playwright/test';
 
 test('color help supports hover, keyboard, dismissal and viewport edges', async ({
@@ -60,7 +61,7 @@ test('typography and margin help preserves editing and explains unavailable styl
   await expect(size).toHaveAttribute('title', '');
   await size.fill('2.3');
   await size.press('ArrowUp');
-  await expect(size).toHaveValue('2.55');
+  await expect(size).toHaveValue('2.4');
   await size.press('Escape');
   await expect(size).toBeFocused();
   const spacing = page.getByRole('spinbutton', {
@@ -90,7 +91,7 @@ test('typography and margin help preserves editing and explains unavailable styl
   await expect(italic).toHaveAttribute('aria-disabled', 'true');
   await italic.press('Enter');
   await expect(italic).toHaveAttribute('aria-pressed', 'false');
-  await page.getByText('Sizing & Margins', { exact: true }).click();
+  await page.getByText('Units & Margins', { exact: true }).click();
   await expect(
     page.getByText('Open a photo to change document units.'),
   ).toBeVisible();
@@ -126,19 +127,9 @@ test('remaining help explains position, disabled actions and token values withou
     .locator('..')
     .focus();
   await expect(help).toHaveText('Open a photo to export a JPG');
-  await page
-    .getByRole('button', { name: 'Photo actions', exact: true })
-    .click();
-  const closePhoto = page.getByRole('menuitem', {
-    name: 'Close photo',
-    exact: true,
-  });
-  await closePhoto.locator('..').hover();
-  await expect(help).toHaveText('No photo is open');
-  await page.keyboard.press('Escape');
-  await expect(page.getByRole('menu')).toBeVisible();
-  await page.keyboard.press('Escape');
-  await expect(page.getByRole('menu')).toHaveCount(0);
+  await expect(
+    page.getByRole('button', { name: 'Photo actions', exact: true }),
+  ).toBeDisabled();
   const topLeft = page.getByRole('button', { name: 'top-left', exact: true });
   await topLeft.hover();
   await expect(help).toHaveText('Top left');
@@ -159,9 +150,9 @@ test('remaining help explains position, disabled actions and token values withou
     .focus();
   await expect(help).toHaveText('Switch to Anchor to use the position grid');
   await page.locator('[data-token="author"]').hover();
-  await expect(help).toContainText('author');
+  await expect(help).toHaveText('Open a photo to preview this value');
   const editor = page.getByLabel('Caption', { exact: true });
-  await editor.fill('Tooltip test {author}');
+  await replaceCaption(page, 'Tooltip test {author}');
   await expect(editor).toHaveAttribute(
     'data-template',
     'Tooltip test {author}',

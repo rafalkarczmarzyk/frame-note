@@ -7,10 +7,16 @@ const {
   dialog,
   Menu,
   ipcMain,
+  shell,
 } = require('electron');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const fs = require('node:fs');
+app.setName('FrameNote');
+const profile = app.commandLine.getSwitchValue('user-data-dir');
+const userData = profile || path.join(app.getPath('appData'), 'FrameNote');
+fs.mkdirSync(userData, { recursive: true });
+app.setPath('userData', userData);
 const rendererRoot = path.join(__dirname, 'renderer');
 protocol.registerSchemesAsPrivileged([
   {
@@ -93,7 +99,18 @@ app.whenReady().then(async () => {
       nodeIntegration: false,
     },
   });
-  window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+  const openProjectLink = (url) => {
+    if (
+      url === 'https://github.com/rafalkarczmarzyk/frame-note' ||
+      url ===
+        'https://github.com/rafalkarczmarzyk/frame-note/blob/master/CHANGELOG.md'
+    )
+      void shell.openExternal(url);
+  };
+  window.webContents.setWindowOpenHandler(({ url }) => {
+    openProjectLink(url);
+    return { action: 'deny' };
+  });
   window.webContents.on('will-navigate', (event, url) => {
     if (!url.startsWith('framenote://app/')) event.preventDefault();
   });

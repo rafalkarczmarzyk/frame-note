@@ -1,3 +1,4 @@
+import { replaceCaption } from './caption-helpers.js';
 import { expect, test, type Page } from '@playwright/test';
 async function openPhoto(page: Page) {
   await page.goto('/');
@@ -20,7 +21,7 @@ test('cancels delayed insertion after content changes or the target layer disapp
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   const caption = page.getByLabel('Caption', { exact: true });
-  await caption.fill('Original text');
+  await replaceCaption(page, 'Original text');
   await page.evaluate(() => {
     const original = File.prototype.arrayBuffer;
     File.prototype.arrayBuffer = async function () {
@@ -40,7 +41,7 @@ test('cancels delayed insertion after content changes or the target layer disapp
     'data-import-pending',
     'yes',
   );
-  await caption.fill('Keep this edited text');
+  await replaceCaption(page, 'Keep this edited text');
   await page.evaluate(() => window.dispatchEvent(new Event('release-import')));
   await expect(page.getByRole('alert')).toContainText('Content changed');
   await expect(caption).toHaveAttribute(
@@ -208,9 +209,12 @@ test('reports cancellation when an image being replaced is removed during decodi
     };
   });
   const pending = page.waitForEvent('filechooser');
-  await page
-    .getByRole('button', { name: 'Replace image', exact: true })
-    .click();
+  const replace = page.getByRole('button', {
+    name: 'Replace graphic',
+    exact: true,
+  });
+  await replace.focus();
+  await replace.press('Enter');
   await (await pending).setFiles('tests/fixtures/logos/rt.png');
   await expect(page.locator('body')).toHaveAttribute(
     'data-import-pending',

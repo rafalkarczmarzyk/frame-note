@@ -1,3 +1,4 @@
+import { replaceCaption } from './caption-helpers.js';
 import { expect, test } from '@playwright/test';
 test('selection and hover reuse the prepared JPG while content changes encode again', async ({
   page,
@@ -23,9 +24,9 @@ test('selection and hover reuse the prepared JPG while content changes encode ag
     mimeType: 'image/jpeg',
     buffer: Buffer.from(data, 'base64'),
   });
-  await page.getByLabel('Caption', { exact: true }).fill('First layer');
+  await replaceCaption(page, 'First layer');
   await page.getByRole('button', { name: 'Add layer', exact: true }).click();
-  await page.getByLabel('Caption', { exact: true }).fill('Second layer');
+  await replaceCaption(page, 'Second layer');
   const ready = page.getByRole('button', { name: 'Export JPG', exact: true });
   await expect(ready).toBeEnabled();
   const before = await page.locator('body').getAttribute('data-jpeg-encodes');
@@ -49,7 +50,7 @@ test('selection and hover reuse the prepared JPG while content changes encode ag
     'data-export-disabled',
     'no',
   );
-  await page.getByLabel('Caption', { exact: true }).fill('Changed layer');
+  await replaceCaption(page, 'Changed layer');
   await expect
     .poll(async () =>
       Number(await page.locator('body').getAttribute('data-jpeg-encodes')),

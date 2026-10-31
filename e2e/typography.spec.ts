@@ -1,3 +1,4 @@
+import { replaceCaption } from './caption-helpers.js';
 import { expect, test } from '@playwright/test';
 import { wildlifeFixture } from '../tests/fixtures.ts';
 
@@ -15,9 +16,9 @@ test('renders true italic, exports it and disables unavailable font variants', a
   await page
     .getByRole('button', { name: 'Increase Font size', exact: true })
     .click();
-  await expect(fontSize).toHaveValue('2.25');
+  await expect(fontSize).toHaveValue('2.1');
   await fontSize.press('ArrowUp');
-  await expect(fontSize).toHaveValue('2.5');
+  await expect(fontSize).toHaveValue('2.2');
   const lineSpacing = page.getByRole('spinbutton', {
     name: 'Line spacing',
     exact: true,
@@ -28,9 +29,7 @@ test('renders true italic, exports it and disables unavailable font variants', a
   await expect(lineSpacing).toHaveValue('1.5');
   await lineSpacing.press('ArrowDown');
   await expect(lineSpacing).toHaveValue('1.4');
-  await page
-    .getByLabel('Caption', { exact: true })
-    .fill('Italic Łódź\nBold italic');
+  await replaceCaption(page, 'Italic Łódź\nBold italic');
   const italic = page.getByRole('button', { name: 'Italic', exact: true });
   await italic.click();
   await page.getByRole('button', { name: 'Bold', exact: true }).click();

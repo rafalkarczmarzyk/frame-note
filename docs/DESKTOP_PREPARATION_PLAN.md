@@ -1,8 +1,10 @@
 # FrameNote — monorepo, web i desktop na macOS
 
-Data: 2026-10-30. Status: propozycja etapów do uzgodnienia.
-Prośba o plan nie oznacza zgody na implementację, commit ani publikację.
-Każdy etap kończy się oceną użytkownika i potwierdzeniem przejścia dalej.
+Plan: 2026-10-30. Aktualizacja: 2026-10-31. Etapy 1–7 ukończone dla lokalnej
+wersji macOS Apple Silicon na Electron. Etap 8 pozostaje nieuruchomiony.
+Użytkownik zlecił implementację, testy i commit po każdym etapie oraz przechodzenie
+dalej bez zatrzymywania. Rzeczywiste wyniki i pozostały zakres opisuje
+[DESKTOP_PROGRESS.md](DESKTOP_PROGRESS.md). Commit nie oznacza wydania.
 
 ## Cel końcowy i proponowany zakres
 

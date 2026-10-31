@@ -6,13 +6,13 @@ pokazuje jak używać komponentów, łączyć je i sprawdzać ich stany.
 
 ## Zanim dodasz element UI
 
-1. Znajdź podobne zastosowanie w Storybooku i `src/components/ui` lub
-   `src/components/layout`.
+1. Znajdź podobne zastosowanie w Storybooku i `packages/editor/src/components/ui` lub
+   `packages/editor/src/components/layout`.
 2. Sprawdź, czy istniejący komponent można rozszerzyć przez props, wariant lub
    kompozycję. Nie przepisuj jego klas Tailwinda do feature.
-3. Kod specyficzny dla funkcji umieść w `src/features/<feature>`; współdzielony
-   i niezależny od domeny komponent należy do `src/components/ui` albo
-   `src/components/layout`.
+3. Kod specyficzny dla funkcji umieść w `packages/editor/src/features/<feature>`; współdzielony
+   i niezależny od domeny komponent należy do `packages/editor/src/components/ui` albo
+   `packages/editor/src/components/layout`.
 4. Gdy dodajesz nowy wspólny komponent, dodaj API z uzasadnionymi wariantami,
    dostępne nazwy i stany oraz stronę Storybooka z użyciem i interakcją.
 5. Aktualizuj najbliższy przykład kompozycji. Nie twórz podobnej kontrolki tylko
@@ -45,7 +45,7 @@ przy komponencie.
 
 ## Tokeny, style i wymiary
 
-Kolory oraz semantyczne role są definiowane w `src/index.css`. W komponencie
+Kolory oraz semantyczne role są definiowane w `packages/editor/src/index.css`. W komponencie
 używaj nazw ról (`bg-input-base`, `text-content-secondary` itd.), nie surowych
 wartości HEX, arbitralnych opacity ani mieszanych lokalnie kolorów. Dodaj nową
 rolę do CSS, gdy reprezentuje odrębne zastosowanie, a nie pojedynczy przypadek.
@@ -97,7 +97,7 @@ jaśniejsze tło identyfikuje wybraną warstwę, a powiązany panel poniżej pok
 zwykłych sekcji dokumentu i powierzchnią ustawień wybranej warstwy. Nie koduj
 zaznaczenia samym kolorem tekstu ani nie powielaj osobnej palety w feature.
 
-Przykłady: `src/features/layers/layer-list.tsx`, `src/components/ui/picker-list.tsx`
+Przykłady: `packages/editor/src/features/layers/layer-list.tsx`, `packages/editor/src/components/ui/picker-list.tsx`
 i kompozycje `Screens/TestPhotos`.
 
 ### Film roll i sesja zdjęć
@@ -108,8 +108,8 @@ Zachowaj proporcje zdjęć, widoczne zaznaczenie, przewijanie i obsługę klawia
 Podczas importu i eksportu akcje niedostępne są blokowane, a bieżący postęp
 pokazuje nakładka w obszarze pracy.
 
-Komponenty: `src/components/ui/film-roll.tsx`, `src/components/brand/film-roll-*`
-i `src/features/photo`. Przykłady: Storybook → Photo session.
+Komponenty: `packages/editor/src/components/ui/film-roll.tsx`, `packages/editor/src/components/brand/film-roll-*`
+i `packages/editor/src/features/photo`. Przykłady: Storybook → Photo session.
 
 ## Storybook jako dokumentacja i playground
 

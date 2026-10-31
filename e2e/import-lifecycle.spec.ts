@@ -1,3 +1,4 @@
+import { replaceCaption } from './caption-helpers.js';
 import { expect, test } from '@playwright/test';
 import { portraitFixture, wildlifeFixture } from '../tests/fixtures.ts';
 
@@ -139,9 +140,7 @@ test('keeps caption settings when closing and reopening landscape and portrait p
   await expect(
     page.getByRole('button', { name: 'Add photos', exact: true }),
   ).toBeEnabled();
-  await page
-    .getByLabel('Caption', { exact: true })
-    .fill('My caption\n{exif:Artist}');
+  await replaceCaption(page, 'My caption\n{exif:Artist}');
   await page.getByRole('button', { name: 'Font', exact: true }).click();
   await page
     .getByRole('dialog', { name: 'Choose a font' })
@@ -169,14 +168,14 @@ test('keeps caption settings when closing and reopening landscape and portrait p
     .getByRole('radiogroup', { name: 'Text align' })
     .getByRole('radio', { name: 'Align right' })
     .click();
-  await page.getByText('Sizing & Margins', { exact: true }).click();
+  await page.getByText('Units & Margins', { exact: true }).click();
   await page
-    .getByRole('radiogroup', { name: 'Margin linking' })
+    .getByRole('radiogroup', { name: 'Margins linking' })
     .getByRole('radio', { name: 'Paired', exact: true })
     .click();
   await page.getByRole('spinbutton', { name: 'Top', exact: true }).fill('5');
   await page.getByRole('spinbutton', { name: 'Left', exact: true }).fill('7');
-  await page.getByText('Export', { exact: true }).click();
+  await page.getByText('Export settings', { exact: true }).click();
   await page.getByRole('radio', { name: 'Balanced', exact: true }).click();
   for (const fixture of [portraitFixture, wildlifeFixture]) {
     await expect(

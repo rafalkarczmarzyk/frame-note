@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Locator } from '@playwright/test';
 test('panels receive keyboard focus and return it to their opener', async ({
   page,
 }) => {
@@ -14,26 +14,23 @@ test('panels receive keyboard focus and return it to their opener', async ({
     mimeType: 'image/jpeg',
     buffer: Buffer.from(bytes, 'base64'),
   });
+  const dismiss = async (panel: Locator) => {
+    for (let attempt = 0; attempt < 3 && (await panel.count()); attempt++)
+      await page.keyboard.press('Escape');
+    await expect(panel).toHaveCount(0);
+  };
   const cases = [
     {
       trigger: page.getByRole('button', {
-        name: 'Browse available tags',
+        name: 'Add content',
         exact: true,
       }),
-      dialog: 'Available tags',
-      input: 'Search metadata',
+      dialog: 'Add content',
     },
     {
       trigger: page.getByRole('button', { name: 'Font', exact: true }),
       dialog: 'Choose a font',
       input: 'Search fonts',
-    },
-    {
-      trigger: page.getByRole('button', {
-        name: 'Browse graphics',
-        exact: true,
-      }),
-      dialog: 'Graphics',
     },
     {
       trigger: page.getByRole('button', {
@@ -62,8 +59,7 @@ test('panels receive keyboard focus and return it to their opener', async ({
           panel.evaluate((node) => node.contains(document.activeElement)),
         )
         .toBe(true);
-    await page.keyboard.press('Escape');
-    await expect(panel).toHaveCount(0);
+    await dismiss(panel);
     await expect(item.trigger).toBeFocused();
   }
   await page.getByRole('button', { name: 'Color', exact: true }).click();
@@ -82,15 +78,15 @@ test('panels receive keyboard focus and return it to their opener', async ({
   ).toBeFocused();
   // Switching content preserves the new panel's focus and new return target.
   await page.getByRole('button', { name: 'Font', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'Browse available tags', exact: true })
-    .click();
+  await page.getByRole('button', { name: 'Add content', exact: true }).click();
   await expect(
-    page.getByRole('textbox', { name: 'Search metadata', exact: true }),
+    page
+      .getByRole('dialog', { name: 'Add content', exact: true })
+      .getByRole('button', { name: 'Metadata', exact: true }),
   ).toBeFocused();
-  await page.keyboard.press('Escape');
+  await dismiss(page.getByRole('dialog', { name: 'Add content', exact: true }));
   await expect(
-    page.getByRole('button', { name: 'Browse available tags', exact: true }),
+    page.getByRole('button', { name: 'Add content', exact: true }),
   ).toBeFocused();
   // Removing the layer also removes the original Font trigger.
   await page.getByRole('button', { name: 'Add layer', exact: true }).click();

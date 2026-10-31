@@ -1,3 +1,4 @@
+import { replaceCaption } from './caption-helpers.js';
 import { expect, test } from '@playwright/test';
 import { wildlifeFixture } from '../tests/fixtures.ts';
 
@@ -13,7 +14,7 @@ test('keeps category controls fixed and waits for an on-demand font before expor
   await page
     .getByLabel('Choose JPG or PNG photo')
     .setInputFiles(wildlifeFixture.path);
-  await page.getByLabel('Caption', { exact: true }).fill('Leave your mark.');
+  await replaceCaption(page, 'Leave your mark.');
   const exportButton = page.getByRole('button', {
     name: 'Export JPG',
     exact: true,

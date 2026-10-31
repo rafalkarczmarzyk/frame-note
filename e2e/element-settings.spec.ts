@@ -70,8 +70,12 @@ test('keeps icon artwork visible on the photo after resizing', async ({
   await editor.click();
   await editor.press('Meta+a');
   await editor.pressSequentially('{icon:camera}');
-  await page.getByLabel('Font size', { exact: true }).fill('10');
-  await page.getByLabel('Font size', { exact: true }).press('Tab');
+  await page
+    .getByRole('spinbutton', { name: 'Font size', exact: true })
+    .fill('10');
+  await page
+    .getByRole('spinbutton', { name: 'Font size', exact: true })
+    .press('Tab');
   const canvas = page.locator('[data-photo-canvas] canvas').first();
   const brightPixels = () =>
     canvas.evaluate((node: HTMLCanvasElement) => {
@@ -124,8 +128,12 @@ test('top and bottom alignment visibly move text relative to a larger icon', asy
   await editor.click();
   await editor.press('Meta+a');
   await editor.pressSequentially('Photo {icon:camera:3:font:top}');
-  await page.getByLabel('Font size', { exact: true }).fill('8');
-  await page.getByLabel('Font size', { exact: true }).press('Tab');
+  await page
+    .getByRole('spinbutton', { name: 'Font size', exact: true })
+    .fill('8');
+  await page
+    .getByRole('spinbutton', { name: 'Font size', exact: true })
+    .press('Tab');
   await editor.locator('[data-token="icon:camera:3:font:top"]').click();
   const canvas = page.locator('[data-photo-canvas] canvas').first();
   const snapshot = () =>

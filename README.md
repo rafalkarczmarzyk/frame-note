@@ -230,7 +230,8 @@ paths before importing. The editor limits active image content to 100 images.
   and batch export do not reread the original disk files. These copies last until
   the photos are closed or the page is refreshed and can increase memory/storage
   use for large rolls. Large-series memory budgets still need measurement.
-- Zoom/pan and a desktop application remain outside the current scope.
+- Zoom/pan remains outside the current scope. A local macOS Apple Silicon desktop
+  build is available; see [desktop setup and packaging](docs/DESKTOP.md).
 
 ## Development
 
@@ -282,7 +283,7 @@ Stories are grouped into **Design**, **Components** (UI, Layout, Brand), and
 **Screens**. `Screens/TestPhotos` exercises the real editor with original photo
 fixtures. Application and stories share components and CSS.
 
-UI colors are defined in `src/index.css` and consumed through semantic tokens.
+UI colors are defined in `packages/editor/src/index.css` and consumed through semantic tokens.
 `pnpm check:tokens` checks this convention. The accessibility addon supports
 component review; it is not a complete accessibility audit.
 
@@ -295,9 +296,11 @@ license file, so its licensing needs review before distribution.
 ### Repository structure
 
 ```text
-src/
+apps/web/           Browser entry point
+apps/desktop/       Electron main/preload and macOS entry point
+packages/core/src/  Photo, document, metadata, and preset models
+packages/editor/src/
   components/       Shared UI, layout, and brand components
-  domain/           Photo, document, metadata, and preset models
   features/
     caption/        Content editor, geometry, rendering, and export
     photo/          Import, metadata, and workspace composition
@@ -345,3 +348,11 @@ pnpm test:visual --all-projects
 Additional projects: `chromium-compact` and `webkit-desktop`.
 References are specific to the project and operating system.
 See [the scenario catalog and workflow](docs/UI_VISUAL_REGRESSION_PLAN.md).
+
+### Web and macOS workspace
+
+The project uses a pnpm workspace with `apps/web`, `apps/desktop`,
+`packages/editor` and `packages/core`. Web output is `apps/web/dist`; Netlify
+build configuration lives in `netlify.toml`. Run `pnpm desktop` to launch macOS
+or `pnpm desktop:package` to package a local Apple Silicon application. See
+[desktop instructions and limitations](docs/DESKTOP.md).

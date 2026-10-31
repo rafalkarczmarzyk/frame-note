@@ -13,4 +13,5 @@ minimumReleaseAgeExclude:
 # The published browser bundle is used; no dependency build is required.
 allowBuilds:
   esbuild: true
+  electron: true
   exifreader: false

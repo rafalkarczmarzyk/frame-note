@@ -18,7 +18,7 @@ if (desktop) {
   configurePlatform({
     ...browserPlatform,
     async saveFile(blob, name) {
-      await desktop.saveFile(name, new Uint8Array(await blob.arrayBuffer()));
+      return desktop.saveFile(name, new Uint8Array(await blob.arrayBuffer()));
     },
   });
   desktop.onCommand((command) => {

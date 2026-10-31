@@ -6,7 +6,7 @@ for (const story of ['glass', 'overlap', 'photo-edge']) {
     page,
   }, testInfo) => {
     await page.goto(
-      `/iframe.html?id=screens-layerbackground-canvastrial--${story}&viewMode=story`,
+      `/iframe.html?id=proposals-canvasglasstrial--${story}&viewMode=story`,
     );
     const exportButton = page.getByRole('button', { name: 'Export trial JPG' });
     await expect(exportButton).toBeEnabled({ timeout: 30000 });

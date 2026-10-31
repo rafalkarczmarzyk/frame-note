@@ -1,3 +1,4 @@
+import { replaceCaption } from './caption-helpers.js';
 import { expect, test, type Page } from '@playwright/test';
 async function sendFile(
   page: Page,
@@ -39,7 +40,7 @@ test('drops SVG and PNG at the retained cursor in Content without replacing the 
     buffer: Buffer.from(bytes, 'base64'),
   });
   const caption = page.getByLabel('Caption', { exact: true });
-  await caption.fill('BeforeAfter');
+  await replaceCaption(page, 'BeforeAfter');
   for (let i = 0; i < 5; i++) await caption.press('ArrowLeft');
   const svg = {
     name: 'mark.svg',
@@ -57,10 +58,23 @@ test('drops SVG and PNG at the retained cursor in Content without replacing the 
     /^Before\{image:[^}]+\}After$/,
   );
   await expect(page.getByText('Drop an image', { exact: true })).toHaveCount(0);
-  // Collapse a whole-document selection at the end, independent of how the
-  // browser moves through the newly inserted atomic image.
-  await caption.press('ControlOrMeta+a');
-  await caption.press('ArrowRight');
+  // Move to the document end and verify the caret before the next drop;
+  // clicking near an atom alone can leave the cursor before trailing text.
+  await caption.click();
+  await caption.press('ControlOrMeta+ArrowDown');
+  await expect
+    .poll(() =>
+      caption.evaluate((node) => {
+        const selection = window.getSelection();
+        if (!selection?.anchorNode || !node.contains(selection.anchorNode))
+          return false;
+        const remaining = document.createRange();
+        remaining.selectNodeContents(node);
+        remaining.setStart(selection.anchorNode, selection.anchorOffset);
+        return selection.isCollapsed && remaining.toString() === '';
+      }),
+    )
+    .toBe(true);
   await sendFile(page, content, 'drop', {
     name: 'mark.png',
     type: 'image/png',

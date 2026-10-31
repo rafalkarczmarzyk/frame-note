@@ -1,3 +1,4 @@
+import { replaceCaption } from './caption-helpers.js';
 import { openSidebarSection } from './sidebar-helpers.js';
 import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
@@ -11,10 +12,10 @@ test('edits independent containers, selects on canvas and exports the whole layo
     .getByLabel('Choose JPG or PNG photo')
     .setInputFiles(wildlifeFixture.path);
   const caption = page.getByLabel('Caption', { exact: true });
-  await caption.fill('First caption');
+  await replaceCaption(page, 'First caption');
   await page.getByRole('button', { name: 'Add layer', exact: true }).click();
   await expect(caption).toHaveAttribute('data-template', '');
-  await caption.fill('Second caption');
+  await replaceCaption(page, 'Second caption');
   await page.getByRole('button', { name: 'top-right', exact: true }).click();
   await page
     .getByRole('spinbutton', { name: 'Font size', exact: true })
@@ -24,7 +25,7 @@ test('edits independent containers, selects on canvas and exports the whole layo
   await expect(
     page.getByRole('spinbutton', { name: 'Font size', exact: true }),
   ).toHaveValue('2');
-  await openSidebarSection(page, 'Sizing & Margins');
+  await openSidebarSection(page, 'Units & Margins');
   await page
     .getByRole('combobox', { name: 'Sizing unit', exact: true })
     .click();

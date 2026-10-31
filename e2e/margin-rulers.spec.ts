@@ -15,7 +15,7 @@ test('drags large labeled margin handles with linked edges, cancellation and key
     page.getByRole('spinbutton', { name, exact: true });
   const mode = (name: string) =>
     page
-      .getByRole('radiogroup', { name: 'Margin linking' })
+      .getByRole('radiogroup', { name: 'Margins linking' })
       .getByRole('radio', { name, exact: true });
   await left.hover();
   await expect(page.getByRole('tooltip')).toHaveCount(0);

@@ -8,6 +8,8 @@ const suites = [
   ['Visual UI (all projects)', ['test:visual', '--all-projects']],
   ['Glass (Chromium and WebKit)', ['test:glass-trial']],
 ];
+// Desktop tests require a graphical macOS session and a built renderer; run
+// explicitly with pnpm desktop:build && pnpm test:desktop.
 const failed = [];
 
 for (const [name, args] of suites) {

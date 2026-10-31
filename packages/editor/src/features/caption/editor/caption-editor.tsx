@@ -692,7 +692,10 @@ export function CaptionEditor({
                 aria-expanded={contentOpen}
                 aria-controls="auxiliary-panel"
                 onMouseDown={(event) => event.preventDefault()}
-                onClick={onBrowseContent}
+                onClick={(event) => {
+                  event.currentTarget.focus({ preventScroll: true });
+                  onBrowseContent?.();
+                }}
               >
                 <Plus aria-hidden="true" />
                 Add

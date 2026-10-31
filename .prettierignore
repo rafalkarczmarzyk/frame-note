@@ -13,3 +13,5 @@ apps/desktop/renderer/
 release/
 playwright-visual-report/
 visual-test-results/
+
+glass-test-results/

@@ -2,6 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: '.',
+  outputDir: '../../glass-test-results',
   testMatch: 'canvas-glass.spec.ts',
   timeout: 90000,
   workers: 1,

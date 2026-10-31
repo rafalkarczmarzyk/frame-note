@@ -8,5 +8,6 @@
   },
   "dependencies": {
     "@framenote/editor": "workspace:*"
-  }
+  },
+  "productName": "FrameNote"
 }
