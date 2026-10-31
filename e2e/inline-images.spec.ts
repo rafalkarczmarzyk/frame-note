@@ -41,7 +41,7 @@ test('Photo export / tomato raster preserves its preset size and position', asyn
     height: assetHeight,
   };
   const preset = {
-    version: 2,
+    version: 1,
     id: 'tomato-raster-geometry',
     name: 'Tomato raster geometry',
     icons: [],

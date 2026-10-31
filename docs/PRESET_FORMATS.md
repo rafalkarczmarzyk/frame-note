@@ -1,27 +1,23 @@
-# Preset format compatibility
+# Preset format v1
 
-Audit: 2026-10-31. Application SemVer and preset format versions are independent.
+The first supported preset format is **v1**, introduced with `0.1.0-beta`.
+Previous development JSON and storage are unsupported. No legacy parsers,
+converters or transfer of old libraries are provided.
 
-| Format | Historical source                                | Contract and conversion                                                                                                                               |
-| ------ | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1      | `a60aa97:src/domain/presets.ts`                  | Text, icons, optional standalone SVG logo. Convert logo to an inline image using the existing geometry-preserving conversion.                         |
-| 2      | `0ad9790:src/domain/presets.ts`, later `bab5a30` | Inline SVG/PNG; later optional visibility, italic and layer background fields. Preserve all recognized variants.                                      |
-| 3      | First beta                                       | Freeze the currently supported fields, remove standalone logos through migration, reject unknown persisted fields rather than silently dropping them. |
+`packages/core/src/preset-formats/v1.ts` defines the Zod contract. All imports,
+stored presets and exports pass this schema and SVG/PNG validation. Unknown
+versions or fields are rejected rather than silently losing data. The preset
+version is independent of application SemVer and is not a revision counter for
+user edits. New files and exports have `version: 1`.
 
-The v1/v2 fixture files in `tests/fixtures/presets` are reconstructed examples
-of the audited historical contracts (not recovered user files). They retain
-historical defaults and exercise standalone-logo and inline-image conversion.
-Existing domain/export fixtures provide background, PNG and separator coverage.
+From now on, every new format version requires:
 
-Each version has its own Zod parser. Historical v1/v2 retain optional additions
-that the old shared parser accepted; v3 is a separate frozen schema, not an alias
-for the runtime model. Schema definitions shared by versions must be frozen too.
-A new persisted field or changed meaning requires a new format version, schema,
-migration and fixture, not an in-place relaxation of an old schema.
+- Its own frozen Zod schema and parser; do not change v1 to accept a new format.
+- An explicit sequential migration from the previous supported version.
+- A file conversion script using the same migration code as the application.
+- Tests with fixtures from each supported format, including full-chain migration.
+- Preservation of originals before persistent conversion, with clear errors for
+  unsupported or lossy conversions. No automatic downgrade guarantee.
 
-Read path: validate source version → migrate 1 to 2 → migrate 2 to 3 → validate
-v3 → validate embedded SVG/PNG → application data. Current writes use v3.
-Unsupported future versions, unknown fields and invalid data are rejected with
-original bytes retained for recovery. No downgrade guarantee is provided.
-Defaults may only be added when their historical meaning is known; unsupported
-lossy conversions must fail, preserving the source. No silent best-effort drop.
+There are no migrations or migration scripts for v1: there is no previous
+supported format. They are added when v2 is introduced.

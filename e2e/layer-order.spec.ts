@@ -45,7 +45,7 @@ test('reorders overlapping layers by dragging and keyboard and hides them from e
     position: { anchor: 'center' },
   }));
   const preset = {
-    version: 2,
+    version: 1,
     id: 'stack',
     name: 'Stack',
     icons: [],

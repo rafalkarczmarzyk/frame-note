@@ -4,5 +4,7 @@
   "version": "0.0.3-alpha",
   "type": "module",
   "scripts": {},
-  "dependencies": {}
+  "dependencies": {
+    "zod": "^4.6.7"
+  }
 }

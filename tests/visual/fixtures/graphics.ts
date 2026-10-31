@@ -35,7 +35,7 @@ export async function graphicPreset(
       ? `icon:camera:${height}:${unit}:${alignment}`
       : `image:${id}:${height}:${unit}:${color}:${alignment}`;
   return {
-    version: 2,
+    version: 1,
     id: 'visual-graphics',
     name: 'Visual graphics',
     icons: [],

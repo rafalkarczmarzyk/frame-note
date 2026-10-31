@@ -130,7 +130,7 @@ test('Photo export / preview geometry matches the saved marker position', async 
     buffer: Buffer.from(source, 'base64'),
   });
   const preset = {
-    version: 2,
+    version: 1,
     id: 'preview-marker',
     name: 'Preview marker',
     icons: [],
