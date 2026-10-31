@@ -2,6 +2,7 @@ import type { ImageAsset } from '../../../../core/src/inline-image';
 import canonSource from '@/assets/canon.svg?raw';
 import { svgIcon } from './svg-icons';
 import { brandIcons } from './brand-icons';
+import frameNoteAppIcon from '@/assets/graphics/framenote-app-icon.png?inline';
 
 const frameNote = brandIcons.find((icon) => icon.name === 'framenote-logo')!;
 
@@ -24,5 +25,13 @@ export const builtinGraphics: readonly ImageAsset[] = [
     source: canon.svg,
     width: canon.aspect,
     height: 1,
+  },
+  {
+    id: 'framenote-app-icon',
+    name: 'FrameNote app icon',
+    format: 'png',
+    source: frameNoteAppIcon,
+    width: 1024,
+    height: 1024,
   },
 ];
