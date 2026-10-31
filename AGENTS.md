@@ -16,16 +16,33 @@ Przed zmianą lub dodaniem UI sprawdź [instrukcję FrameNote UI](docs/DESIGN_SY
 i aktualne komponenty/stories. Rozszerzaj wspólne komponenty zamiast kopiować ich
 style Tailwind do feature; nowy wspólny komponent dokumentuj w Storybooku.
 
-## Prowadzenie changeloga
+## Branche, wersje i changelog
 
-Przy commicie ukończonego zadania lub rozwiązania dopracowanego w iteracjach
-zastosuj projektowy skill
-[maintain-changelog](.agents/skills/maintain-changelog/SKILL.md).
-Aktualizuj `CHANGELOG.md` bez dodatkowego potwierdzenia, uwzględniając istotne
-zmiany i scalając wpisy dotyczące tego samego wyniku. Pomijaj zapisy pośrednie
-oraz rutynowe zmiany dokumentacji, konfiguracji i samego skilla. Respektuj
-wyraźne polecenie pominięcia aktualizacji. Commit nie oznacza akceptacji etapu
-ani wydania; zmiana wersji i publikowanie wymagają osobnego polecenia.
+Przy przygotowaniu commita, merge'a oraz zmian wersji lub changeloga zastosuj
+projektowy skill
+[maintain-versioning](.agents/skills/maintain-versioning/SKILL.md).
+Małe poprawki mogą trafiać bezpośrednio do `master`; nowe funkcje, większe zmiany
+UI i refaktory prowadź na branchach `codex/`. PR jest opcjonalny, zalecany dla
+dużych lub ryzykownych zmian. Preferuj squash merge ukończonego zadania.
+Nie wprowadzaj osobnego, stałego brancha `develop`.
+
+Polecenie commita ukończonej zmiany aplikacji na `master` lub merge'a
+zaakceptowanego zadania obejmuje podbicie wersji, changelog i lokalny tag bez
+dodatkowego potwierdzenia. Commity robocze na branchach nie podbijają wersji.
+Beta zaczyna się od `0.1.0-beta`. Poprawki zwiększają PATCH, funkcje i zmiany
+niezgodne zwiększają MINOR i zerują PATCH. Nie dodajemy licznika po `-beta`
+ani `-alpha`. Jedno ukończone zadanie wprowadzane do `master` oznacza jedno
+podbicie wersji bazowej. `1.0.0` oznacza pierwszą ukończoną stabilną wersję.
+Pierwsze przejście z alphy do bety, przejście do RC i
+stabilnego wydania wymagają wyraźnego polecenia. Zmiany wyłącznie dokumentacji,
+testów, narzędzi i skilla nie wymagają podbicia ani wpisu wydania. Konfigurację
+oceniaj według wpływu na działanie lub paczkowanie aplikacji.
+
+Zachowuj wspólną wersję produktu we wszystkich manifestach workspace.
+Changelog prowadź po angielsku, z datowanymi sekcjami wersji i Unreleased dla
+zmian oczekujących. Respektuj jawne wyjątki użytkownika. Commit na branchu nie
+oznacza akceptacji ani zgody na merge. Lokalny tag nie oznacza publikacji;
+push, publikacja, podpisywanie i dystrybucja wymagają osobnego polecenia.
 
 ## Pomysły na później
 

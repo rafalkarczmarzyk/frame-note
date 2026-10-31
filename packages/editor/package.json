@@ -1,7 +1,7 @@
 {
   "name": "@framenote/editor",
   "private": true,
-  "version": "1.0.0-alpha.1",
+  "version": "0.0.3-alpha",
   "type": "module",
   "scripts": {},
   "dependencies": {
