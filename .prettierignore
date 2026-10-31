@@ -15,3 +15,6 @@ playwright-visual-report/
 visual-test-results/
 
 glass-test-results/
+
+# Icon Composer owns the formatting of its native source.
+apps/desktop/FrameNoteComposer.icon/icon.json

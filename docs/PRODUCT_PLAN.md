@@ -455,3 +455,17 @@ Weryfikacja obejmuje web, aplikację zainstalowaną poza repozytorium, offline,
 JPG i siedmiozdjęciowy ZIP oraz presety i jakość JPG po restarcie. Pełne wyniki
 (w tym ponowienia E2E) zawiera DESKTOP_PROGRESS.md. Powstał lokalny, niepodpisany
 DMG; publikacja Netlify, podpisywanie i notaryzacja nie zostały wykonane.
+
+### Pierwsza beta źródłowa — 2026-10-31
+
+Na polecenie użytkownika wdrożono `0.1.0-beta`: pierwszy oficjalny format
+presetów v1 z parserem Zod, identyczny dla webu i macOS. Web zachowuje obecny
+localStorage; macOS zapisuje osobne JSON-y w `~/FrameNote/presets`. Nie wspieramy
+ani nie przenosimy wcześniejszych danych. Przyszła zmiana formatu wymaga nowego
+schematu, migracji z poprzedniej wspieranej wersji, skryptu i testów.
+
+About pokazuje wersję i identyfikator buildu; manifesty i changelog mają wspólną
+kontrolę wersjonowania. Użytkownik sam buduje aplikację; nie publikujemy gotowych
+buildów. Szczegóły i rzeczywiste wyniki (w tym powtórzenia timeoutów i znana
+wcześniejsza różnica hovera) są w [planie bety](PRESET_VERSIONING_PLAN.md).
+Lokalny commit/tag nie oznaczają wykonania push ani zdalnej publikacji.

@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/status-alpha-14CC60?style=for-the-badge" alt="Status: alpha" /></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/status-beta-14CC60?style=for-the-badge" alt="Status: beta" /></a>
   <img src="https://img.shields.io/badge/photo%20processing-local-00BFB3?style=for-the-badge" alt="Photo processing: local in your browser" />
 </p>
 
@@ -39,7 +39,7 @@ compose a layout with text and graphics, preview your changes, and download a JP
 with the finished design rendered into its pixels. No account or backend is
 required for this workflow; photo processing happens in your browser.
 
-The project is currently in **alpha** and under active development. Features
+The project is currently in **beta** and under active development. Features
 and preset formats may change. The pre-MVP has been completed and accepted;
 implemented MVP features and subsequent improvements are documented below.
 Product milestones and review status live in the
@@ -47,10 +47,14 @@ Product milestones and review status live in the
 
 ## Versioning
 
-The current numbered version is **0.0.3-alpha**, normalized from the previous
-`1.0.0-alpha.1` designation. The first beta targets **0.1.0-beta** after the
-[preset and beta requirements](docs/PRESET_VERSIONING_PLAN.md) are met.
-**1.0.0** is the first finished stable version, not a version reset.
+The current version is **0.1.0-beta**. **1.0.0** is reserved for the first
+finished stable version. The previous alpha designation `1.0.0-alpha.1` was
+normalized to `0.0.3-alpha`; historical commit contents are unchanged.
+
+To build this beta from source, check out `v0.1.0-beta`, then follow Quick start
+for web or run `pnpm desktop` / `pnpm desktop:package` for macOS.
+User presets use the same v1 JSON and Zod schema on both platforms. Web keeps
+localStorage; macOS uses `~/FrameNote/presets`. No old preset migration is provided.
 
 During beta, compatible fixes increment PATCH (`0.1.0-beta` → `0.1.1-beta`);
 features and incompatible changes increment MINOR (`0.1.1-beta` → `0.2.0-beta`),

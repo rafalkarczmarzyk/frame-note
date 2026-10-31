@@ -58,15 +58,40 @@ formatów i v3 są **wycofane**; nie stanowią obowiązującego zakresu.
 
 ## Kryteria zakończenia
 
-- [ ] Brak parserów legacy i migracji historycznych danych.
-- [ ] Presety v1 mają schemat Zod, walidację zasobów i testy.
-- [ ] Zapis, edycja, usuwanie i ponowne odczytanie presetów działa na macOS.
-- [ ] Złe/nowsze pliki i nieudany zapis nie niszczą biblioteki.
-- [ ] About identyfikuje wersję i build webu oraz desktopu.
-- [ ] Narzędzia synchronizacji i kontroli wersji/changeloga są podłączone.
-- [ ] Testy projektu oraz wymagane kontrole wizualne i desktopowe zakończone.
-- [ ] Lokalny commit i tag v0.1.0-beta odpowiadają zweryfikowanemu kodowi.
+- [x] Brak parserów legacy i migracji historycznych danych.
+- [x] Presety v1 mają schemat Zod, walidację zasobów i testy.
+- [x] Zapis, edycja, usuwanie i ponowne odczytanie presetów działa na macOS.
+- [x] Złe/nowsze pliki i nieudany zapis nie niszczą biblioteki.
+- [x] About identyfikuje wersję i build webu oraz desktopu.
+- [x] Narzędzia synchronizacji i kontroli wersji/changeloga są podłączone.
+- [x] Testy projektu oraz wymagane kontrole wizualne i desktopowe zakończone (wyniki i wcześniejsza różnica poniżej).
+- [x] Lokalny commit i tag v0.1.0-beta odpowiadają zweryfikowanemu kodowi.
 
 Wersje aplikacji: `0.x.y-alpha`, następnie `0.x.y-beta`, bez dodatkowych liczników.
 Poprawki zwiększają PATCH, funkcje i zmiany niezgodne — MINOR i zerują PATCH.
 Pierwsze stabilne, ukończone wydanie to `1.0.0`.
+
+## Wyniki weryfikacji
+
+- Testy jednostkowe: 352/352; TypeScript, lint, formatowanie, tokeny kolorów
+  i kontrola wersji/changeloga przechodzą.
+- Desktop na izolowanym profilu: zapis rzeczywistego pliku JSON v1, identyczność
+  danych przez API, restart z zachowaniem presetu, offline, JPG i ZIP przechodzą.
+- Różnice wzorców pustego edytora obejrzano w trzech profilach; dotyczą wyłącznie
+  świadomej zmiany numeru wersji. Tylko te wzorce są aktualizowane.
+- Znana wcześniejsza różnica: Chromium desktop / left margin hover, materiał
+  etykiety (4810 pikseli). Odtworzona identycznie na niezmienionym `083aa25`
+  w osobnym katalogu testowym. To nie regresja tego zadania; wzorzec pozostaje
+  niezmieniony. Z tego powodu pełny test wizualny nie jest całkowicie zielony.
+- Pełne E2E: 178/180 w jednym przebiegu; dwa timeouty WebKit powtórzono
+  osobno bez zmian kodu: 2/2 zaliczone. Wszystkie 180 scenariuszy zweryfikowane.
+- Końcowa regresja wizualna: domyślna 5/6; wszystkie profile 16/18. Jeden błąd
+  to powyższy, potwierdzony wcześniej hover; drugi to timeout WebKit w scenie
+  three layers: po osobnym powtórzeniu zaliczony (1/1). Trzy wzorce pustego edytora z numerem bety
+  zapisano po obejrzeniu expected/actual/diff.
+- Storybook oraz Glass: build poprawny, 12/12 testów Chromium/WebKit zaliczonych.
+- Finalna paczka macOS: zbudowana i przetestowana w izolowanym profilu.
+  Potwierdzono zapis JSON v1 na dysku, zgodność danych przez API, restart,
+  offline, natywny JPG i siedmiozdjęciowy ZIP. Artefakty służą wyłącznie lokalnym
+  testom i nie są publikowane.
+- Realizacja lokalna zakończona jako `0.1.0-beta`; publikacji zdalnej nie wykonano.
