@@ -1,4 +1,5 @@
 import { verifyWindowChrome } from './desktop-window-chrome.mjs';
+import { verifyTooltipMaterial } from './desktop-tooltip-material.mjs';
 import ExifReader from 'exifreader';
 import { _electron as electron, expect } from '@playwright/test';
 import { createRequire } from 'node:module';
@@ -28,6 +29,7 @@ try {
   page.on('pageerror', (error) => errors.push(error.message));
   await page.waitForLoadState('networkidle');
   await expect(page.getByLabel('Choose JPG or PNG photo')).toBeAttached();
+  await verifyTooltipMaterial(page);
   await verifyWindowChrome(app, page);
   if (!process.argv.includes('--chrome-only')) {
     await page.context().setOffline(true);
