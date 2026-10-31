@@ -17,6 +17,8 @@ when explicitly requested; a commit does not automatically create a release.
   The macOS title bar matches the toolbar background, with a centered app name
   and native window controls. The desktop toolbar starts with Add photos, uses
   equal 6 px padding on all sides and opens About from the FrameNote menu.
+  Packaged macOS builds use the FrameNote app icon, with an Icon Composer source
+  for builds with Xcode and a static icon for builds without it.
 
 - Inline horizontal separators with Fixed or Flex width, relative or document-unit
   height, independent line thickness, color and opacity. Flex fills the remaining
