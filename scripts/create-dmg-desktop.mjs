@@ -1,3 +1,4 @@
+import { applyFinderLayout } from './finder-layout.mjs';
 import { execFileSync } from 'node:child_process';
 import { cp, mkdir, mkdtemp, rename, rm, symlink } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -52,9 +53,12 @@ export async function createDesktopDmg(appDirectory) {
     ]);
     mounted = true;
     // Pass the path as an argument, never interpolate it into AppleScript.
-    run('osascript', [
-      '-e',
-      `
+    await applyFinderLayout(() =>
+      execFileSync(
+        'osascript',
+        [
+          '-e',
+          `
 on run argv
   set volumeFolder to POSIX file (item 1 of argv) as alias
   tell application "Finder"
@@ -77,8 +81,11 @@ on run argv
     close installerWindow
   end tell
 end run`,
-      mount,
-    ]);
+          mount,
+        ],
+        { stdio: ['ignore', 'inherit', 'pipe'], timeout: 30_000 },
+      ),
+    );
     run('sync', []);
     run('hdiutil', ['detach', mount]);
     mounted = false;

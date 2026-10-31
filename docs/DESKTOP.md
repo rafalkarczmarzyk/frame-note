@@ -154,3 +154,7 @@ If macOS reports `this identity cannot be used for signing code`, the selected
 certificate/key is not usable for this operation even if `security find-identity`
 lists it. Resolve the certificate/key setup before retrying; the packaging command
 does not weaken certificate validation or change keychain trust settings.
+
+DMG layout setup retries Finder’s transient busy error (`-15260`) up to five
+times with short backoff. Each AppleScript invocation has a 30-second timeout;
+permission and other errors are reported immediately.
