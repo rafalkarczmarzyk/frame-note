@@ -3,6 +3,13 @@ import { execFileSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { packager } from '@electron/packager';
 import { cp, mkdir, rm } from 'node:fs/promises';
+const icon = ['apps/desktop/FrameNote.icns'];
+try {
+  execFileSync('actool', ['--version'], { stdio: 'ignore' });
+  icon.push('apps/desktop/FrameNoteComposer.icon');
+} catch {
+  console.warn('Full Xcode is unavailable; packaging with the .icns icon only.');
+}
 const stage = 'release/staging';
 await rm(stage, { recursive: true, force: true });
 await mkdir(stage, { recursive: true });
@@ -21,7 +28,8 @@ const result = await packager({
   prune: false,
   electronVersion: createRequire(import.meta.url)('electron/package.json')
     .version,
-  icon: 'apps/desktop/FrameNote.icns',
+  electronZipDir: process.env.FRAMENOTE_ELECTRON_ZIP_DIR,
+  icon,
   osxSign: false,
   osxNotarize: false,
 });
