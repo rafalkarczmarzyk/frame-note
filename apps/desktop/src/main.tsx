@@ -7,9 +7,12 @@ import { mountEditor } from '../../../packages/editor/src/mount';
 declare global {
   interface Window {
     frameNoteDesktop?: {
+      platform: string;
       saveFile(name: string, bytes: Uint8Array): Promise<'saved' | 'cancelled'>;
       setSessionOpen(value: boolean): void;
-      onCommand(callback: (command: 'open' | 'export') => void): () => void;
+      onCommand(
+        callback: (command: 'open' | 'export' | 'about') => void,
+      ): () => void;
     };
   }
 }
@@ -20,8 +23,13 @@ if (desktop) {
     async saveFile(blob, name) {
       return desktop.saveFile(name, new Uint8Array(await blob.arrayBuffer()));
     },
+    onAbout: (show) =>
+      desktop.onCommand((command) => {
+        if (command === 'about') show();
+      }),
   });
   desktop.onCommand((command) => {
+    if (command === 'about') return;
     const selector =
       command === 'open'
         ? 'input[aria-label="Choose JPG or PNG photo"]'
@@ -46,4 +54,6 @@ if (desktop) {
   }).observe(document.documentElement, { subtree: true, childList: true });
 }
 
-mountEditor();
+mountEditor({
+  windowChrome: desktop?.platform === 'darwin' ? 'macos-titlebar' : 'standard',
+});

@@ -3,12 +3,18 @@ import { PhotoActions } from '@/features/photo/photo-actions';
 import { expect, userEvent, within } from 'storybook/test';
 import { useCallback, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { AppHeader } from './app-header';
+import { AppHeader, type WindowChrome } from './app-header';
 import { Button } from '../ui/button';
 import { PresetControls } from '@/features/presets/preset-controls';
 import { builtinPresets } from '@/domain/builtin-presets';
 
-function HeaderPreview({ width = 1100 }: { width?: number }) {
+function HeaderPreview({
+  width = 1100,
+  windowChrome = 'standard',
+}: {
+  width?: number;
+  windowChrome?: WindowChrome;
+}) {
   const [toolbarHost, setToolbarHost] = useState<HTMLElement | null>(null);
   const [panelHost, setPanelHost] = useState<HTMLDivElement | null>(null);
   const [hasPhoto, setHasPhoto] = useState(true);
@@ -26,6 +32,7 @@ function HeaderPreview({ width = 1100 }: { width?: number }) {
       ref={attach}
     >
       <AppHeader
+        windowChrome={windowChrome}
         photoAction={
           <PhotoActions
             hasPhoto={hasPhoto}
@@ -71,6 +78,13 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Presets: Story = {};
+/** No toolbar logo; About is opened from the native FrameNote menu in Electron. */
+export const MacOS: Story = {
+  args: { width: 1440, windowChrome: 'macos-titlebar' },
+};
+export const MacOSMinimum: Story = {
+  args: { width: 800, windowChrome: 'macos-titlebar' },
+};
 export const Narrow: Story = { args: { width: 640 } };
 
 export const LongNameAndModified: Story = {

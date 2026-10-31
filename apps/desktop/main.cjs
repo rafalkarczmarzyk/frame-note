@@ -92,6 +92,8 @@ app.whenReady().then(async () => {
     minWidth: 800,
     minHeight: 600,
     title: 'FrameNote',
+    show: false,
+    ...(process.platform === 'darwin' ? { titleBarStyle: 'hidden' } : {}),
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
       sandbox: true,
@@ -99,6 +101,7 @@ app.whenReady().then(async () => {
       nodeIntegration: false,
     },
   });
+  window.once('ready-to-show', () => window.show());
   const openProjectLink = (url) => {
     if (
       url === 'https://github.com/rafalkarczmarzyk/frame-note' ||
@@ -144,7 +147,20 @@ app.whenReady().then(async () => {
   const command = (name) => window?.webContents.send('menu-command', name);
   Menu.setApplicationMenu(
     Menu.buildFromTemplate([
-      { role: 'appMenu' },
+      {
+        label: app.getName(),
+        submenu: [
+          { label: 'About FrameNote', click: () => command('about') },
+          { type: 'separator' },
+          { role: 'services' },
+          { type: 'separator' },
+          { role: 'hide' },
+          { role: 'hideOthers' },
+          { role: 'unhide' },
+          { type: 'separator' },
+          { role: 'quit' },
+        ],
+      },
       {
         label: 'File',
         submenu: [

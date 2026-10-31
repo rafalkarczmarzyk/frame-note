@@ -5,6 +5,15 @@ same editor, image renderer, presets and bundled fonts as the web application.
 It runs locally without a development server or an internet connection.
 Intel Macs and older macOS releases have not been verified.
 
+On macOS a compact 28 px title bar sits above the editor toolbar.
+The toolbar has equal 6 px padding on all four sides (49 px total height,
+including its bottom border).
+It uses the toolbar background, a centered FrameNote label and native macOS window
+controls. Dragging and double-clicking the title bar use the system's window
+behavior. The toolbar starts with Add photos, without a duplicate logo. Open the
+About screen from FrameNote → About FrameNote in the macOS menu bar.
+The web application has no extra title bar and keeps its clickable logo.
+
 ## Development and packaging
 
 From the repository root, install with `pnpm install`. If installation policy
@@ -24,6 +33,9 @@ through automated native dialog responses, checks cancellation and validates
 renderer isolation. It restarts the application to verify saved presets and JPG
 quality. Each run starts with a missing user-data directory inside an isolated
 temporary profile, checking first-launch initialization.
+It also checks the title bar, toolbar layout at 1440 and 800 px, menus,
+minimize/restore and full-screen transitions. `pnpm test:desktop --chrome-only`
+runs only these window checks.
 It can target a packaged executable through the `FRAMENOTE_PACKAGED` environment
 variable. It requires a macOS graphical session. Run desktop and web tests
 sequentially to avoid competing for application focus.
