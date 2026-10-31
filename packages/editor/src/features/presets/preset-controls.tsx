@@ -1,11 +1,11 @@
 import { platform } from '@/lib/platform';
-import { PresetStore } from './preset-store';
+import { AsyncPresetStore } from './async-preset-store';
 import { createId } from '@/lib/create-id';
 import { PresetToolbar } from './preset-toolbar';
 import { CategoryFilter } from '@/components/ui/category-filter';
 import { PickerList } from '@/components/ui/picker-list';
 import { builtinPresets } from '@/domain/builtin-presets';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Download,
   Upload,
@@ -29,6 +29,7 @@ import {
   parsePreset,
   copyPresetName,
   presetNameLimit,
+  presetStorageKey,
   type LayoutPreset,
 } from '../../../../core/src/presets';
 import { prepareImageAssets } from '../caption/image-assets';
@@ -38,7 +39,7 @@ export function PresetControls({
   layout,
   icons,
   onApply,
-  disabled = false,
+  disabled: disabledProp = false,
   persist = true,
   panelHost,
   toolbarHost,
@@ -71,17 +72,39 @@ export function PresetControls({
   };
   const [collection] = useState(
     () =>
-      new PresetStore(
+      new AsyncPresetStore(
         persist
-          ? {
-              getItem: (key) => platform().storage.getItem(key),
-              setItem: (key, value) => platform().storage.setItem(key, value),
-            }
-          : null,
+          ? (platform().presets ?? {
+              read: async () =>
+                platform().storage.getItem(presetStorageKey) ?? '[]',
+              write: async (source) => {
+                platform().storage.setItem(presetStorageKey, source);
+              },
+            })
+          : { read: async () => '[]', write: async () => {} },
         svgIcon,
       ),
   );
   const [presets, setPresets] = useState(collection.presets);
+  const [loaded, setLoaded] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const disabled = disabledProp || !loaded || saving;
+  useEffect(() => {
+    let active = true;
+    collection.ready
+      .then(() => {
+        if (active) {
+          setPresets(collection.presets);
+          setLoaded(true);
+        }
+      })
+      .catch((cause) => {
+        if (active) setError(String(cause));
+      });
+    return () => {
+      active = false;
+    };
+  }, [collection]);
   const [localSelected, setLocalSelected] = useState(initialPresetId);
   const selected = selectedPresetId ?? localSelected;
   const setSelected = (id: string) => {
@@ -123,9 +146,10 @@ export function PresetControls({
     setNaming(true);
     onBrowse();
   };
-  const store = (update: (current: LayoutPreset[]) => LayoutPreset[]) => {
+  const store = async (update: (current: LayoutPreset[]) => LayoutPreset[]) => {
     try {
-      setPresets(collection.commit(update));
+      setSaving(true);
+      setPresets(await collection.commit(update));
       setError('');
       return true;
     } catch (cause) {
@@ -133,9 +157,11 @@ export function PresetControls({
         cause instanceof Error ? cause.message : 'Could not save presets.',
       );
       return false;
+    } finally {
+      setSaving(false);
     }
   };
-  const save = (replace: boolean) => {
+  const save = async (replace: boolean) => {
     const title = replace && current ? current.name : name.trim();
     if (!title) {
       setError('Enter a preset name.');
@@ -151,7 +177,7 @@ export function PresetControls({
       replace && current && !builtin
         ? latest.map((item) => (item.id === current.id ? preset : item))
         : [...latest, preset];
-    if (store(next)) {
+    if (await store(next)) {
       setSelected(preset.id);
       setNaming(false);
       if (!replace) revealPresets();
@@ -167,7 +193,7 @@ export function PresetControls({
   const form = naming && (
     <form
       className="space-y-2"
-      onSubmit={(event) => {
+      onSubmit={async (event) => {
         event.preventDefault();
         if (renameId) {
           if (!name.trim()) {
@@ -175,7 +201,7 @@ export function PresetControls({
             return;
           }
           if (
-            store((latest) =>
+            await store((latest) =>
               latest.map((p) =>
                 p.id === renameId ? { ...p, name: name.trim() } : p,
               ),
@@ -254,14 +280,14 @@ export function PresetControls({
                   : undefined,
                 icon: <Copy />,
                 disabled: disabled || !current,
-                onSelect: () => {
+                onSelect: async () => {
                   if (!current) return;
                   const copy = {
                     ...structuredClone(current),
                     id: createId(),
                     name: copyPresetName(current.name),
                   };
-                  if (store((latest) => [...latest, copy])) {
+                  if (await store((latest) => [...latest, copy])) {
                     revealPresets();
                     setRenameId(copy.id);
                     setName(copy.name);
@@ -455,13 +481,13 @@ export function PresetControls({
                         <IconButton
                           label={`Duplicate ${preset.name}`}
                           disabled={disabled}
-                          onClick={() => {
+                          onClick={async () => {
                             const copy = {
                               ...structuredClone(preset),
                               id: createId(),
                               name: copyPresetName(preset.name),
                             };
-                            if (store((latest) => [...latest, copy])) {
+                            if (await store((latest) => [...latest, copy])) {
                               revealPresets();
                               setRenameId(copy.id);
                               setName(copy.name);
@@ -488,9 +514,9 @@ export function PresetControls({
                             <IconButton
                               label={`Delete ${preset.name}`}
                               disabled={disabled}
-                              onClick={() => {
+                              onClick={async () => {
                                 if (
-                                  store((latest) =>
+                                  await store((latest) =>
                                     latest.filter((p) => p.id !== preset.id),
                                   )
                                 ) {
@@ -538,7 +564,7 @@ export function PresetControls({
                 prepareImageAssets(container.images),
               ),
             );
-            if (store((latest) => [...latest, preset])) {
+            if (await store((latest) => [...latest, preset])) {
               revealPresets();
               apply(preset);
             }

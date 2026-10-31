@@ -48,11 +48,23 @@ or transferred builds has not been certified. This is not a public release.
 Do not disable system protections. Public distribution requires Apple signing,
 notarization and resolution of the Advercase redistribution license.
 
-To update manually, quit FrameNote and replace the app bundle. Saved presets and JPG quality preferences are
-stored in Electron's user-data directory (normally
-`~/Library/Application Support/FrameNote/Local Storage`). Web and desktop have
-separate stores. Metadata removal starts enabled in each new session. Use preset export/import to transfer layouts; no cloud sync or
-session recovery is provided. Keep exported preset files as backups.
+To update manually, quit FrameNote and replace the app bundle. Starting with
+`0.1.0-beta`, user presets are individual v1 JSON files in
+`~/FrameNote/presets/<preset-id>.json`. The application creates this directory on
+first use, reads it at startup and persists edits immediately. Restart to pick up
+manual file edits. Delete removes the file permanently; there is no revision
+history or trash. A failed save reports an error and does not appear as saved.
+
+Web uses the existing localStorage key `framenote.presets.v1`. Both platforms
+share the exact same v1 preset JSON and Zod parser. Use preset export/import to
+transfer layouts. Pre-beta data is unsupported; no cleanup or migration is
+performed. Users can clear obsolete browser data themselves if necessary.
+
+JPG quality stays in the Chromium profile (normally
+`~/Library/Application Support/FrameNote/Local Storage`). Metadata removal starts
+enabled each session. Configuration files and cloud sync are not implemented.
+Tests launched with `--user-data-dir` put presets under that isolated profile's
+`FrameNote/presets` directory, leaving the real home directory untouched.
 
 Open photos and unsaved per-photo edits are session-only. Closing an open session
 asks for confirmation, including sessions whose images have already been exported.

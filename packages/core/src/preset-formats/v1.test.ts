@@ -9,7 +9,13 @@ describe('first official preset format', () => {
   it('writes and reads v1 without conversion', () => {
     const value = preset();
     expect(value.version).toBe(1);
-    expect(readPreset(JSON.stringify(value))).toEqual(value);
+    const parsed = readPreset(JSON.stringify(value));
+    expect(parsed).toEqual(value);
+    expect(
+      JSON.stringify(
+        createPreset(parsed.id, parsed.name, parsed.layout, parsed.icons),
+      ),
+    ).toBe(JSON.stringify(parsed));
   });
   it('rejects unknown versions and fields without silently dropping data', () => {
     expect(() =>

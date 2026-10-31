@@ -17,6 +17,11 @@ const profile = app.commandLine.getSwitchValue('user-data-dir');
 const userData = profile || path.join(app.getPath('appData'), 'FrameNote');
 fs.mkdirSync(userData, { recursive: true });
 app.setPath('userData', userData);
+const { PresetFiles } = require('./preset-files.cjs');
+const dataDirectory = profile
+  ? path.join(userData, 'FrameNote')
+  : path.join(app.getPath('home'), 'FrameNote');
+const presetFiles = new PresetFiles(dataDirectory);
 const rendererRoot = path.join(__dirname, 'renderer');
 protocol.registerSchemesAsPrivileged([
   {
@@ -60,6 +65,19 @@ app.whenReady().then(async () => {
   );
   ipcMain.on('session-state', (event, value) => {
     if (trusted(event) && typeof value === 'boolean') hasWork = value;
+  });
+  ipcMain.handle('presets-read', (event) => {
+    if (!trusted(event)) throw Error('Untrusted preset request.');
+    return presetFiles.read();
+  });
+  ipcMain.handle('presets-write', (event, source) => {
+    if (
+      !trusted(event) ||
+      typeof source !== 'string' ||
+      source.length > 100_000_000
+    )
+      throw Error('Invalid preset request.');
+    return presetFiles.write(source);
   });
   ipcMain.handle('save-output', async (event, name, bytes) => {
     if (

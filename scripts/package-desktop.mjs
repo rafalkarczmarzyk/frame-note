@@ -42,7 +42,13 @@ try {
 const stage = 'release/staging';
 await rm(stage, { recursive: true, force: true });
 await mkdir(stage, { recursive: true });
-for (const name of ['main.cjs', 'preload.cjs', 'package.json', 'renderer'])
+for (const name of [
+  'main.cjs',
+  'preload.cjs',
+  'preset-files.cjs',
+  'package.json',
+  'renderer',
+])
   await cp(`apps/desktop/${name}`, `${stage}/${name}`, { recursive: true });
 const result = await packager({
   dir: stage,
@@ -52,6 +58,12 @@ const result = await packager({
   platform: 'darwin',
   arch: 'arm64',
   appBundleId: 'com.framenote.desktop',
+  appVersion: createRequire(import.meta.url)('../package.json').version.split(
+    '-',
+  )[0],
+  buildVersion: createRequire(import.meta.url)('../package.json').version.split(
+    '-',
+  )[0],
   appCategoryType: 'public.app-category.photography',
   overwrite: true,
   prune: false,

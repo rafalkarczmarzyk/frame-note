@@ -38,3 +38,5 @@ apps/desktop/renderer/
 release/
 
 glass-test-results/
+
+apps/desktop/preset-files.cjs

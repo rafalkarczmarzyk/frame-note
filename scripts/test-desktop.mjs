@@ -3,7 +3,7 @@ import { verifyTooltipMaterial } from './desktop-tooltip-material.mjs';
 import ExifReader from 'exifreader';
 import { _electron as electron, expect } from '@playwright/test';
 import { createRequire } from 'node:module';
-import { readFile, mkdtemp, rm } from 'node:fs/promises';
+import { readFile, readdir, mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 const require = createRequire(import.meta.url);
@@ -152,6 +152,25 @@ try {
     await expect(
       page.getByRole('combobox', { name: 'Saved preset' }),
     ).toContainText('Desktop persistence test');
+    const presetDirectory = resolve(profile, 'FrameNote/presets');
+    const presetNames = (await readdir(presetDirectory)).filter((name) =>
+      name.endsWith('.json'),
+    );
+    if (presetNames.length !== 1)
+      throw Error('Expected one preset JSON on disk');
+    const storedPreset = JSON.parse(
+      await readFile(resolve(presetDirectory, presetNames[0]), 'utf8'),
+    );
+    if (
+      storedPreset.version !== 1 ||
+      storedPreset.name !== 'Desktop persistence test'
+    )
+      throw Error('Disk preset must use shared format v1');
+    const bridgePreset = JSON.parse(
+      await page.evaluate(() => window.frameNoteDesktop.readPresets()),
+    );
+    if (JSON.stringify(bridgePreset) !== JSON.stringify([storedPreset]))
+      throw Error('Renderer and file preset JSON differ');
     await page.locator('details[data-section="export"] > summary').click();
     await page.getByRole('radio', { name: 'Balanced', exact: true }).click();
     await expect(button).toBeEnabled({ timeout: 30_000 });

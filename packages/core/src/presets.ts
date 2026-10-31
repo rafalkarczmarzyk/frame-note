@@ -65,8 +65,9 @@ export function parsePreset(
   }
   const icons = data.icons.map((icon) => validateSvg(icon.name, icon.svg));
   return {
-    ...data,
-    icons,
+    version: 1,
+    id: data.id,
+    name: data.name,
     layout: {
       ...data.layout,
       activeId:
@@ -74,6 +75,7 @@ export function parsePreset(
           ? data.layout.activeId
           : (data.layout.containers[0]?.id ?? null),
     },
+    icons,
   };
 }
 

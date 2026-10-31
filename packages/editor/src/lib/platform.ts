@@ -1,3 +1,4 @@
+import type { PresetRepository } from '../features/presets/async-preset-store';
 /** Platform services are installed once by the application entry point. */
 export interface PlatformServices {
   saveFile(
@@ -5,6 +6,7 @@ export interface PlatformServices {
     name: string,
   ): Promise<'download-started' | 'saved' | 'cancelled'>;
   storage: Pick<Storage, 'getItem' | 'setItem'>;
+  presets?: PresetRepository;
   /** Subscribe to an About action supplied by a native application menu. */
   onAbout?: (show: () => void) => () => void;
 }
