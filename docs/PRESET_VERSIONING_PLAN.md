@@ -49,6 +49,13 @@ Na origin pozostają stare nazwy tagów; żadnych tagów zdalnych nie zmieniano.
 Historia commitów nie jest przepisywana. Wcześniejsze propozycje obsługi starych
 formatów i v3 są **wycofane**; nie stanowią obowiązującego zakresu.
 
+## Proste zachowanie pierwszej bety
+
+- Pliki odczytujemy przy starcie, bez obserwowania folderu na żywo.
+- Usunięcie presetu usuwa plik, bez kosza i historii zmian.
+- Błąd zapisu pokazuje komunikat i nie oznacza operacji jako zapisanej.
+- About pokazuje skrót commita i `dirty`; bez licznika buildów.
+
 ## Kryteria zakończenia
 
 - [ ] Brak parserów legacy i migracji historycznych danych.

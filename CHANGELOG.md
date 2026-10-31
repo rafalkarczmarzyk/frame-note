@@ -13,6 +13,9 @@ entering master receive a version, dated section and local tag according to
 
 ### Added
 
+- About shows the product version and build commit on web and macOS, including
+  a dirty marker for uncommitted changes. Shared version commands synchronize
+  workspace manifests and check changelog coverage.
 - macOS presets are individual JSON files in `~/FrameNote/presets`, loaded at
   startup. Saves and deletions persist across restarts; failed saves report an
   error. Web keeps its existing localStorage key and uses the identical v1 JSON.

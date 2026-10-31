@@ -18,6 +18,7 @@ export default defineConfig([
     'visual-test-results',
     'glass-test-results',
     '**/renderer/**',
+    'apps/desktop/preset-files.cjs',
     'release',
   ]),
   js.configs.recommended,

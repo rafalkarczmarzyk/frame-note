@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { PhotoDropOverlay } from './photo-drop-overlay';
 import { PhotoLoadingIndicator } from './photo-loading-indicator';
-import { version } from '../../../../../package.json';
+import { appVersion as version } from '@/lib/build-info';
 import { PhotoIcon } from '@/components/icons/photo-icon';
 import {
   EditorWorkspace,

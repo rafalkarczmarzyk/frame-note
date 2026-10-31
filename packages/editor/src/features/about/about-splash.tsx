@@ -1,6 +1,6 @@
 import { useId, useLayoutEffect, useRef } from 'react';
 import { ExternalLink, LockKeyhole, X } from 'lucide-react';
-import { version } from '../../../../../package.json';
+import { appVersion as version, appBuild } from '@/lib/build-info';
 import { FrameNoteLogo } from '@/components/brand/frame-note-logo';
 import { Button } from '@/components/ui/button';
 import { IconButton } from '@/components/ui/icon-button';
@@ -80,7 +80,9 @@ export function AboutSplash({ onClose }: { onClose: () => void }) {
         </section>
         <footer className="mx-auto mb-5 flex max-w-full shrink-0 flex-wrap items-center justify-center gap-x-4 gap-y-2 rounded-xl bg-header-base px-5 py-3 text-xs">
           <span>© {new Date().getFullYear()} FrameNote</span>
-          <span>v{version}</span>
+          <span>
+            v{version} · build {appBuild}
+          </span>
           <a
             href="https://github.com/rafalkarczmarzyk/frame-note"
             target="_blank"
