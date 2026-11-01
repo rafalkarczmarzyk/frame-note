@@ -1,6 +1,8 @@
 import type { PresetRepository } from '../features/presets/async-preset-store';
 /** Platform services are installed once by the application entry point. */
 export interface PlatformServices {
+  systemFonts?: boolean;
+  systemFontsError?: string;
   saveFile(
     blob: Blob,
     name: string,

@@ -7,12 +7,22 @@ export type FontSelection = Pick<
 >;
 type FontCaption = { style: FontSelection };
 
-export function supportsItalic(family: Caption['style']['fontFamily']) {
-  return captionFont(family).italic;
+export function supportsItalic(
+  family: Caption['style']['fontFamily'],
+  weight: 400 | 700 = 400,
+) {
+  const font = captionFont(family);
+  return font.faces
+    ? font.faces.some(
+        (face) => face.style === 'italic' && face.weight === weight,
+      )
+    : font.italic;
 }
 export function effectiveFontStyle(caption: FontCaption): 'normal' | 'italic' {
-  return supportsItalic(caption.style.fontFamily) &&
-    caption.style.fontStyle === 'italic'
+  return supportsItalic(
+    caption.style.fontFamily,
+    effectiveFontWeight(caption),
+  ) && caption.style.fontStyle === 'italic'
     ? 'italic'
     : 'normal';
 }

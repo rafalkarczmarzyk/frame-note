@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { PickerList } from '@/components/ui/picker-list';
 import {
-  captionFont,
-  captionFonts,
+  availableFonts,
+  isFontAvailable,
   type CaptionFont,
   type FontFamily,
 } from '../../../../core/src/fonts';
@@ -24,7 +24,7 @@ function FontPreview({ font }: { font: CaptionFont }) {
         sample,
       )
         .then(() => {
-          if (active) setStatus('ready');
+          if (active) setStatus(isFontAvailable(font.id) ? 'ready' : 'error');
         })
         .catch(() => {
           if (active) setStatus('error');
@@ -48,9 +48,7 @@ function FontPreview({ font }: { font: CaptionFont }) {
         sample
       ) : (
         <span className="text-xs text-content-muted">
-          {status === 'error'
-            ? 'Preview unavailable. Reopen to retry.'
-            : 'Loading preview…'}
+          {status === 'error' ? 'Preview unavailable.' : 'Loading preview…'}
         </span>
       )}
     </span>
@@ -68,7 +66,7 @@ export function FontPicker({
   onChoose: (id: FontFamily) => void;
 }) {
   const fonts = filterByCategory(
-    captionFonts,
+    availableFonts(),
     category,
     (font) => [font.category],
     query,
@@ -84,7 +82,7 @@ export function FontPicker({
           selected: font.id === value,
           preview: <FontPreview font={font} />,
         }))}
-        onChoose={(id) => onChoose(captionFont(id).id)}
+        onChoose={onChoose}
         emptyText="No matching fonts."
       />
     </div>

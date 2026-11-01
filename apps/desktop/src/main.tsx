@@ -1,3 +1,5 @@
+import { registerSystemFonts } from './system-fonts';
+import type { SystemFontFace } from '../../../packages/core/src/system-fonts';
 import {
   browserPlatform,
   configurePlatform,
@@ -9,8 +11,12 @@ declare global {
   interface Window {
     frameNoteDesktop?: {
       platform: string;
+      readSystemFonts(): Promise<SystemFontFace[]>;
       readPresets(): Promise<string>;
-      writePresets(source: string): Promise<void>;
+      writePresets(
+        source: string,
+        touchedIds?: readonly string[],
+      ): Promise<void>;
       saveFile(name: string, bytes: Uint8Array): Promise<'saved' | 'cancelled'>;
       setSessionOpen(value: boolean): void;
       onCommand(
@@ -21,11 +27,20 @@ declare global {
 }
 const desktop = window.frameNoteDesktop;
 if (!desktop) throw new Error('FrameNote desktop bridge is unavailable');
+let systemFontsError: string | undefined;
+try {
+  registerSystemFonts(await desktop.readSystemFonts());
+} catch {
+  systemFontsError =
+    'System fonts could not be read. Restart FrameNote to retry.';
+}
 configurePlatform({
+  systemFonts: true,
+  systemFontsError,
   ...browserPlatform,
   presets: {
     read: () => desktop.readPresets(),
-    write: (source) => desktop.writePresets(source),
+    write: (source, touchedIds) => desktop.writePresets(source, touchedIds),
   },
   async saveFile(blob, name) {
     return desktop.saveFile(name, new Uint8Array(await blob.arrayBuffer()));

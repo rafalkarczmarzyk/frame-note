@@ -29,3 +29,14 @@ it('uses only supplied weights and styles', () => {
   expect(supportsItalic('Inter')).toBe(true);
   expect(supportsItalic('Manrope')).toBe(false);
 });
+
+it('preserves an unknown font in v1 without replacing its saved name', () => {
+  const layout = createCaptionLayout();
+  layout.containers[0]!.style.fontFamily = 'Missing Studio Font';
+  const preset = createPreset('unknown', 'Unknown', layout, []);
+  const parsed = parsePreset(JSON.stringify(preset), () => {
+    throw Error('Unexpected asset');
+  });
+  expect(parsed).toEqual(preset);
+  expect(parsed.version).toBe(1);
+});

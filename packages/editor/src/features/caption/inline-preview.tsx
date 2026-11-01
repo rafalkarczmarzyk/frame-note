@@ -1,3 +1,4 @@
+import { resolvedFontFamily } from '../../../../core/src/fonts';
 import { resolvedColor } from './resolve-color';
 import { canvasFontStyle } from '../../../../core/src/font-style';
 import { Text, Rect, Image as CanvasImage } from 'react-konva';
@@ -62,7 +63,7 @@ export function InlinePreview({
             y={run.y}
             text={run.text}
             fontSize={scene.fontSize}
-            fontFamily={caption.style.fontFamily}
+            fontFamily={resolvedFontFamily(caption.style.fontFamily)}
             fontStyle={canvasFontStyle(caption)}
             lineHeight={caption.style.lineHeight}
             fill={color}

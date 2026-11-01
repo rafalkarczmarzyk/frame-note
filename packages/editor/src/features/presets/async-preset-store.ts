@@ -4,7 +4,7 @@ import { PresetStore } from './preset-store';
 
 export interface PresetRepository {
   read(): Promise<string>;
-  write(source: string): Promise<void>;
+  write(source: string, touchedIds?: readonly string[]): Promise<void>;
 }
 /** Queue mutations so a slow disk write cannot overwrite a newer edit. */
 export class AsyncPresetStore {
@@ -42,8 +42,14 @@ export class AsyncPresetStore {
           validate,
         );
         if (this.warning) throw Error(this.warning);
+        const before = new Map(
+          candidate.presets.map((preset) => [preset.id, preset]),
+        );
         const next = candidate.commit(update);
-        await repository.write(source);
+        const touchedIds = next
+          .filter((preset) => before.get(preset.id) !== preset)
+          .map((preset) => preset.id);
+        await repository.write(source, touchedIds);
         this.presets = next;
         return next;
       });

@@ -5,6 +5,11 @@ same editor, image renderer, presets and bundled fonts as the web application.
 It runs locally without a development server or an internet connection.
 Intel Macs and older macOS releases have not been verified.
 
+The initial window targets 2240 × 1560 logical units, centered in the available
+work area of the display containing the pointer. Each dimension is capped to
+that work area so the window fits around the menu bar and Dock. Window size and
+position are not restored between launches.
+
 On macOS a compact 28 px title bar sits above the editor toolbar.
 The toolbar has equal 6 px padding on all four sides (49 px total height,
 including its bottom border).
@@ -43,7 +48,9 @@ quality. Each run starts with a missing user-data directory inside an isolated
 temporary profile, checking first-launch initialization.
 It also checks the title bar, toolbar layout at 1440 and 800 px, menus,
 minimize/restore and full-screen transitions. `pnpm test:desktop --chrome-only`
-runs only these window checks.
+runs only these window checks. `--skip-native-transitions` explicitly omits
+minimize/restore/fullscreen checks when the graphical session cannot focus the
+app; it does not count those checks as verified.
 It can target a packaged executable through the `FRAMENOTE_PACKAGED` environment
 variable. It requires a macOS graphical session. Run desktop and web tests
 sequentially to avoid competing for application focus.
@@ -62,7 +69,14 @@ notarization and resolution of the RetiredDisplay redistribution license.
 
 To update manually, quit FrameNote and replace the app bundle. Starting with
 `0.1.0-beta`, user presets are individual v1 JSON files in
-`~/FrameNote/presets/<preset-id>.json`. The application creates this directory on
+`~/FrameNote/presets/<preset-name-in-kebab-case>.json`. The original name and stable ID stay inside each JSON. Filenames use ASCII
+kebab-case, with Polish/Latin accents simplified, unsafe characters replaced by
+hyphens, a 180-character base limit and case-insensitive collision suffixes
+(`-2`, `-3`). Reserved system names receive a `preset-` prefix. Older ID filenames
+are read unchanged and renamed only when that particular preset is saved.
+Name changes rename the file; failed writes restore prior files. External changes
+to a file being updated require a restart before saving again.
+The application creates this directory on
 first use, reads it at startup and persists edits immediately. Restart to pick up
 manual file edits. Delete removes the file permanently; there is no revision
 history or trash. A failed save reports an error and does not appear as saved.
@@ -80,8 +94,11 @@ Tests launched with `--user-data-dir` put presets under that isolated profile's
 
 Open photos and unsaved per-photo edits are session-only. Closing an open session
 asks for confirmation, including sessions whose images have already been exported.
-The built-in font catalog is available offline. System font enumeration is not
-part of this first build.
+The built-in font catalog is available offline. Installed font families are listed in the System category. On macOS the
+application reads the native AppKit font catalog once at startup, then loads
+visible previews and selected faces locally. Restart after installing fonts.
+Bundled families take priority when names match; unavailable faces fall back to
+Montserrat while the selector retains the preset name and shows Unavailable.
 
 ## Web deployment
 

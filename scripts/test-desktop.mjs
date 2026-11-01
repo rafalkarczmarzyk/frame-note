@@ -29,8 +29,39 @@ try {
   page.on('pageerror', (error) => errors.push(error.message));
   await page.waitForLoadState('networkidle');
   await expect(page.getByLabel('Choose JPG or PNG photo')).toBeAttached();
+  const nativeFonts = await page.evaluate(() =>
+    window.frameNoteDesktop.readSystemFonts(),
+  );
+  expect(nativeFonts.length).toBeGreaterThan(0);
+  await expect(
+    page.getByText('System fonts could not be read.', { exact: false }),
+  ).toHaveCount(0);
+  await page.getByRole('button', { name: 'Font', exact: true }).click();
+  const fontPanel = page.getByRole('dialog', { name: 'Choose a font' });
+  await fontPanel.getByRole('radio', { name: 'System', exact: true }).click();
+  await fontPanel
+    .getByRole('textbox', { name: 'Search fonts' })
+    .fill('Helvetica');
+  await expect(
+    fontPanel.locator('[data-font-preview="Helvetica"]'),
+  ).toHaveAttribute('data-font-preview-status', 'ready');
+  await fontPanel
+    .getByRole('button', { name: /^Helvetica\b/ })
+    .first()
+    .click();
+  await expect(
+    page.getByRole('button', { name: 'Font', exact: true }),
+  ).toContainText('Helvetica');
+  await expect(
+    page
+      .getByRole('button', { name: 'Font', exact: true })
+      .getByText('Unavailable'),
+  ).toHaveCount(0);
+  await page.keyboard.press('Escape');
   await verifyTooltipMaterial(page);
-  await verifyWindowChrome(app, page);
+  await verifyWindowChrome(app, page, {
+    nativeTransitions: !process.argv.includes('--skip-native-transitions'),
+  });
   if (!process.argv.includes('--chrome-only')) {
     await page.context().setOffline(true);
     const temp = await mkdtemp(resolve(tmpdir(), 'framenote-desktop-'));
@@ -158,6 +189,7 @@ try {
     );
     if (presetNames.length !== 1)
       throw Error('Expected one preset JSON on disk');
+    expect(presetNames[0]).toBe('desktop-persistence-test.json');
     const storedPreset = JSON.parse(
       await readFile(resolve(presetDirectory, presetNames[0]), 'utf8'),
     );

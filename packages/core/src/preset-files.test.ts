@@ -32,11 +32,11 @@ describe('macOS preset files', () => {
     const value = preset();
     await files.write(JSON.stringify([value]));
     expect(
-      JSON.parse(await readFile(join(root, 'presets/test.json'), 'utf8')),
+      JSON.parse(await readFile(join(root, 'presets/name.json'), 'utf8')),
     ).toEqual(value);
     expect(JSON.parse(await new PresetFiles(root).read())).toEqual([value]);
     await files.write(JSON.stringify([{ ...value, name: 'Renamed' }]));
-    expect(await readdir(join(root, 'presets'))).toEqual(['test.json']);
+    expect(await readdir(join(root, 'presets'))).toEqual(['renamed.json']);
     await files.write('[]');
     expect(await readdir(join(root, 'presets'))).toEqual([]);
   });
@@ -44,14 +44,14 @@ describe('macOS preset files', () => {
     const { root, files } = await setup();
     await files.read();
     await files.write(JSON.stringify([preset()]));
-    const before = await readFile(join(root, 'presets/test.json'), 'utf8');
+    const before = await readFile(join(root, 'presets/name.json'), 'utf8');
     for (const input of [
       [preset('../escape')],
       [preset(), preset()],
       [{ ...preset(), version: 2 }],
     ])
       await expect(files.write(JSON.stringify(input))).rejects.toThrow();
-    expect(await readFile(join(root, 'presets/test.json'), 'utf8')).toBe(
+    expect(await readFile(join(root, 'presets/name.json'), 'utf8')).toBe(
       before,
     );
   });
@@ -63,17 +63,72 @@ describe('macOS preset files', () => {
     await expect(new PresetFiles(root).read()).rejects.toThrow();
     expect(await readFile(name, 'utf8')).toBe('{broken');
   });
-  it('reports a failed write without marking it saved, and can retry', async () => {
+  it('does not overwrite an unrelated directory and allocates a collision suffix', async () => {
     const { root, files } = await setup();
     await files.read();
-    const collision = join(root, 'presets/test.json');
-    await mkdir(collision);
-    await expect(files.write(JSON.stringify([preset()]))).rejects.toThrow();
-    expect(
-      (await readdir(join(root, 'presets'))).filter((f) => f.endsWith('.tmp')),
-    ).toEqual([]);
-    await rm(collision, { recursive: true });
+    await mkdir(join(root, 'presets/name.json'));
     await files.write(JSON.stringify([preset()]));
-    expect(JSON.parse(await new PresetFiles(root).read())).toEqual([preset()]);
+    expect(await readdir(join(root, 'presets'))).toEqual([
+      'name-2.json',
+      'name.json',
+    ]);
+    expect(
+      JSON.parse(await readFile(join(root, 'presets/name-2.json'), 'utf8')),
+    ).toEqual(preset());
   });
+});
+
+it('renames only the explicitly saved legacy preset, even when its JSON is unchanged', async () => {
+  const { root, files } = await setup();
+  await mkdir(join(root, 'presets'), { recursive: true });
+  const one = preset('one');
+  const two = preset('two');
+  await writeFile(join(root, 'presets/one.json'), JSON.stringify(one));
+  await writeFile(join(root, 'presets/two.json'), JSON.stringify(two));
+  await files.read();
+  await files.write(JSON.stringify([one, two]), ['one']);
+  expect((await readdir(join(root, 'presets'))).sort()).toEqual([
+    'name.json',
+    'two.json',
+  ]);
+  await files.write(JSON.stringify([one, two]), ['one']);
+  expect((await readdir(join(root, 'presets'))).sort()).toEqual([
+    'name.json',
+    'two.json',
+  ]);
+});
+it('keeps duplicate names separate across restart, update, rename and deletion', async () => {
+  const { root, files } = await setup();
+  await files.read();
+  const one = preset('one');
+  const two = preset('two');
+  await files.write(JSON.stringify([one, two]));
+  expect((await readdir(join(root, 'presets'))).sort()).toEqual([
+    'name-2.json',
+    'name.json',
+  ]);
+  const restarted = new PresetFiles(root);
+  await restarted.read();
+  two.layout.containers[0]!.template = 'Changed';
+  await restarted.write(JSON.stringify([one, two]));
+  expect((await readdir(join(root, 'presets'))).sort()).toEqual([
+    'name-2.json',
+    'name.json',
+  ]);
+  await restarted.write(JSON.stringify([two]));
+  expect(await readdir(join(root, 'presets'))).toEqual(['name-2.json']);
+});
+it('rejects external modifications instead of overwriting them', async () => {
+  const { root, files } = await setup();
+  await files.read();
+  const value = preset();
+  await files.write(JSON.stringify([value]));
+  const external = { ...value, name: 'External change' };
+  await writeFile(join(root, 'presets/name.json'), JSON.stringify(external));
+  await expect(
+    files.write(JSON.stringify([{ ...value, name: 'Overwrite' }])),
+  ).rejects.toThrow('changed on disk');
+  expect(
+    JSON.parse(await readFile(join(root, 'presets/name.json'), 'utf8')),
+  ).toEqual(external);
 });

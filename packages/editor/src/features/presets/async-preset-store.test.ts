@@ -5,6 +5,25 @@ import { createCaptionLayout } from '../../../../core/src/caption-layout';
 const make = (id: string) => createPreset(id, id, createCaptionLayout(), []);
 const validate = (name: string, svg: string) => ({ name, svg, aspect: 1 });
 describe('async preset persistence', () => {
+  it('identifies an explicit save with unchanged JSON without touching other presets', async () => {
+    let touched: readonly string[] | undefined;
+    const store = new AsyncPresetStore(
+      {
+        read: async () => JSON.stringify([make('one'), make('two')]),
+        write: async (_source, ids) => {
+          touched = ids;
+        },
+      },
+      validate,
+    );
+    await store.ready;
+    await store.commit((current) =>
+      current.map((preset) =>
+        preset.id === 'one' ? structuredClone(preset) : preset,
+      ),
+    );
+    expect(touched).toEqual(['one']);
+  });
   it('serializes overlapping saves against the latest committed collection', async () => {
     let source = '[]';
     const store = new AsyncPresetStore(

@@ -29,7 +29,7 @@ export const fontIds = [
   'Cinzel',
   'RetiredDisplay',
 ] as const;
-export type FontFamily = (typeof fontIds)[number];
+export type FontFamily = string;
 
 export const fontCategories = [
   'Sans-serif',
@@ -38,6 +38,7 @@ export const fontCategories = [
   'Display',
 ] as const;
 export interface CaptionFont {
+  faces?: readonly { weight: 400 | 700; style: 'normal' | 'italic' }[];
   id: FontFamily;
   label: string;
   category: string;
@@ -78,7 +79,51 @@ export const captionFonts: readonly CaptionFont[] = [
   },
 ];
 export function captionFont(id: string) {
-  const font = captionFonts.find((font) => font.id === id);
-  if (!font) throw new Error(`Unknown caption font: ${id}`);
-  return font;
+  return (
+    (unavailable.has(id)
+      ? undefined
+      : availableFonts().find((font) => font.id === id)) ?? captionFonts[0]!
+  );
+}
+
+let systemFonts: readonly CaptionFont[] = [];
+const unavailable = new Set<string>();
+const listeners = new Set<() => void>();
+let revision = 0;
+export function subscribeFonts(listener: () => void) {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+export const fontRevision = () => revision;
+function notify() {
+  revision++;
+  listeners.forEach((listener) => listener());
+}
+export function setSystemFonts(fonts: readonly CaptionFont[]) {
+  systemFonts = fonts.filter(
+    (font) => !captionFonts.some((builtIn) => builtIn.id === font.id),
+  );
+  notify();
+}
+export function availableFonts() {
+  return [...captionFonts, ...systemFonts];
+}
+export function fontLabel(id: string) {
+  return availableFonts().find((font) => font.id === id)?.label ?? id;
+}
+export function isFontAvailable(id: string) {
+  return (
+    !unavailable.has(id) && availableFonts().some((font) => font.id === id)
+  );
+}
+export function markFontUnavailable(id: string) {
+  if (!unavailable.has(id)) {
+    unavailable.add(id);
+    notify();
+  }
+}
+export function resolvedFontFamily(id: string) {
+  return isFontAvailable(id) ? id : 'Montserrat Variable';
 }

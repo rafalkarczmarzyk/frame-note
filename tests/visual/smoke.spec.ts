@@ -58,3 +58,25 @@ test('photo roll', async ({ page }) => {
   ).toBeVisible();
   await shot(page, 'window');
 });
+
+test('unavailable font inside selector', async ({ page }) => {
+  await openPhoto(page);
+  const preset = await graphicPreset('svg', 'font', 'center');
+  preset.layout.containers[0]!.style.fontFamily = 'Missing Studio Font';
+  await page.getByLabel('Import preset file').setInputFiles({
+    name: 'unavailable-font.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify(preset)),
+  });
+  const font = page.getByRole('button', { name: 'Font', exact: true });
+  await expect(font.getByText('Unavailable')).toBeVisible();
+  await font.scrollIntoViewIfNeeded();
+  await ready(page);
+  await page.mouse.move(0, 0);
+  await page.screenshot({
+    path: test.info().outputPath('candidate.png'),
+    animations: 'disabled',
+    caret: 'hide',
+  });
+  await shot(page, 'window');
+});

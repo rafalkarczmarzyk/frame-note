@@ -1,3 +1,4 @@
+import { resolvedFontFamily } from '../../../../core/src/fonts';
 import { resolvedColor } from './resolve-color';
 import { renderBackgroundTile } from './background-render';
 import { ensureCaptionFont } from './font-loading';
@@ -46,7 +47,7 @@ export function captionConfig(
   const metrics = new Konva.Text({
     text,
     fontSize,
-    fontFamily: caption.style.fontFamily,
+    fontFamily: resolvedFontFamily(caption.style.fontFamily),
     fontStyle: canvasFontStyle(caption),
     lineHeight: caption.style.lineHeight,
     wrap: 'none',
@@ -66,7 +67,7 @@ export function captionConfig(
     ...position,
     width: block.width,
     fontSize,
-    fontFamily: caption.style.fontFamily,
+    fontFamily: resolvedFontFamily(caption.style.fontFamily),
     fontStyle: canvasFontStyle(caption),
     lineHeight: caption.style.lineHeight,
     align: resolvedTextAlign(caption),
@@ -293,7 +294,7 @@ async function withPhotoStage<T>(
               y: run.y,
               text: run.text,
               fontSize: scene.fontSize,
-              fontFamily: caption.style.fontFamily,
+              fontFamily: resolvedFontFamily(caption.style.fontFamily),
               fontStyle: canvasFontStyle(caption),
               lineHeight: caption.style.lineHeight,
               fill: color,

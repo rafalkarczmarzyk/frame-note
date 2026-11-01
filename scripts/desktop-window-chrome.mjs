@@ -2,7 +2,31 @@ import { expect } from '@playwright/test';
 import console from 'node:console';
 
 /** Layout and interaction checks run in the real Electron renderer. */
-export async function verifyWindowChrome(app, page) {
+export async function verifyWindowChrome(
+  app,
+  page,
+  { nativeTransitions = true } = {},
+) {
+  const initial = await app.evaluate(({ BrowserWindow, screen }) => {
+    const window = BrowserWindow.getAllWindows()[0];
+    const bounds = window.getBounds();
+    return { bounds, workArea: screen.getDisplayMatching(bounds).workArea };
+  });
+  const { bounds: initialBounds, workArea } = initial;
+  expect(initialBounds.width).toBe(Math.min(2240, workArea.width));
+  expect(initialBounds.height).toBe(Math.min(1560, workArea.height));
+  expect(initialBounds.x).toBeCloseTo(
+    workArea.x + Math.floor((workArea.width - initialBounds.width) / 2),
+    0,
+  );
+  expect(initialBounds.y).toBeCloseTo(
+    workArea.y + Math.floor((workArea.height - initialBounds.height) / 2),
+    0,
+  );
+  console.log(
+    'Startup window fits and is centered within the display work area.',
+    initial,
+  );
   const header = page.getByRole('banner');
   const titlebar = page.locator('[data-window-titlebar]');
   await expect(titlebar).toHaveText('FrameNote');
@@ -101,6 +125,12 @@ export async function verifyWindowChrome(app, page) {
   await app.evaluate(({ BrowserWindow }) =>
     BrowserWindow.getAllWindows()[0].setSize(1440, 960),
   );
+  if (!nativeTransitions) {
+    console.log(
+      'Window geometry and toolbar passed; native minimize/fullscreen checks explicitly skipped.',
+    );
+    return;
+  }
   await app.evaluate(({ BrowserWindow }) =>
     BrowserWindow.getAllWindows()[0].minimize(),
   );
@@ -121,8 +151,31 @@ export async function verifyWindowChrome(app, page) {
       ),
     )
     .toBe(false);
-  await app.evaluate(({ BrowserWindow }) =>
-    BrowserWindow.getAllWindows()[0].setFullScreen(true),
+  await app.evaluate(({ app, BrowserWindow }) => {
+    app.focus({ steal: true });
+    BrowserWindow.getAllWindows()[0].focus();
+  });
+  await expect
+    .poll(() =>
+      app.evaluate(({ BrowserWindow }) =>
+        BrowserWindow.getAllWindows()[0].isFocused(),
+      ),
+    )
+    .toBe(true);
+  await app.evaluate(
+    ({ BrowserWindow }) =>
+      new Promise((resolve, reject) => {
+        const window = BrowserWindow.getAllWindows()[0];
+        const timer = globalThis.setTimeout(
+          () => reject(new Error('Timed out entering native fullscreen')),
+          15000,
+        );
+        window.once('enter-full-screen', () => {
+          globalThis.clearTimeout(timer);
+          resolve();
+        });
+        window.setFullScreen(true);
+      }),
   );
   await expect
     .poll(
@@ -135,9 +188,16 @@ export async function verifyWindowChrome(app, page) {
     .toBe(true);
   await app.evaluate(
     ({ BrowserWindow }) =>
-      new Promise((resolve) => {
+      new Promise((resolve, reject) => {
         const window = BrowserWindow.getAllWindows()[0];
-        window.once('leave-full-screen', resolve);
+        const timer = globalThis.setTimeout(
+          () => reject(new Error('Timed out leaving native fullscreen')),
+          15000,
+        );
+        window.once('leave-full-screen', () => {
+          globalThis.clearTimeout(timer);
+          resolve();
+        });
         window.setFullScreen(false);
       }),
   );

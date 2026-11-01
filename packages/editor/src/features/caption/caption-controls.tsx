@@ -1,3 +1,11 @@
+import { useSyncExternalStore } from 'react';
+import {
+  isFontAvailable,
+  fontLabel,
+  subscribeFonts,
+  fontRevision,
+} from '../../../../core/src/fonts';
+import { Badge } from '@/components/ui/badge';
 import { Tooltip } from '@/components/ui/tooltip';
 import type { ColorSelectionSource } from '../../../../core/src/caption-colors';
 import {
@@ -84,6 +92,7 @@ export function CaptionControls({
   const factor = pixelsPerUnit(caption.sizingUnit, dimensions);
   const opacity = Math.round(caption.style.opacity * 100);
 
+  useSyncExternalStore(subscribeFonts, fontRevision, fontRevision);
   return (
     <>
       {scope !== 'local' && (
@@ -166,7 +175,14 @@ export function CaptionControls({
                           className="control-field control-height flex w-full items-center justify-between px-3 text-xs"
                         >
                           <span className="flex min-w-0 items-center gap-2">
-                            {caption.style.fontFamily.replace(' Variable', '')}
+                            <span className="truncate">
+                              {fontLabel(caption.style.fontFamily)}
+                            </span>
+                            {!isFontAvailable(caption.style.fontFamily) && (
+                              <Badge tone="warning" className="shrink-0">
+                                Unavailable
+                              </Badge>
+                            )}
                           </span>
                           <ChevronRight
                             className="size-3.5"
@@ -299,7 +315,10 @@ export function CaptionControls({
                     </Tooltip>
                     <Tooltip
                       content={
-                        supportsItalic(caption.style.fontFamily)
+                        supportsItalic(
+                          caption.style.fontFamily,
+                          caption.style.fontWeight,
+                        )
                           ? 'Italic'
                           : 'Italic is unavailable for this font'
                       }
@@ -308,13 +327,22 @@ export function CaptionControls({
                         label="Italic"
                         disabled={disabled}
                         aria-disabled={
-                          !supportsItalic(caption.style.fontFamily)
+                          !supportsItalic(
+                            caption.style.fontFamily,
+                            caption.style.fontWeight,
+                          )
                         }
                         title=""
                         aria-pressed={effectiveFontStyle(caption) === 'italic'}
                         className={`control-segment h-full w-full aria-disabled:opacity-40 aria-disabled:cursor-default ${effectiveFontStyle(caption) === 'italic' ? 'control-selected' : ''}`}
                         onClick={() => {
-                          if (!supportsItalic(caption.style.fontFamily)) return;
+                          if (
+                            !supportsItalic(
+                              caption.style.fontFamily,
+                              caption.style.fontWeight,
+                            )
+                          )
+                            return;
                           style({
                             fontStyle:
                               effectiveFontStyle(caption) === 'italic'

@@ -1,8 +1,10 @@
 const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('frameNoteDesktop', {
   platform: process.platform,
+  readSystemFonts: () => ipcRenderer.invoke('system-fonts-read'),
   readPresets: () => ipcRenderer.invoke('presets-read'),
-  writePresets: (source) => ipcRenderer.invoke('presets-write', source),
+  writePresets: (source, touchedIds) =>
+    ipcRenderer.invoke('presets-write', source, touchedIds),
   saveFile: (name, bytes) => ipcRenderer.invoke('save-output', name, bytes),
   setSessionOpen: (value) => {
     if (typeof value === 'boolean') ipcRenderer.send('session-state', value);

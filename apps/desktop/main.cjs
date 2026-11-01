@@ -8,10 +8,14 @@ const {
   Menu,
   ipcMain,
   shell,
+  screen,
 } = require('electron');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const fs = require('node:fs');
+const { execFile } = require('node:child_process');
+const runFile = require('node:util').promisify(execFile);
+let systemFonts;
 app.setName('FrameNote');
 const profile = app.commandLine.getSwitchValue('user-data-dir');
 const userData = profile || path.join(app.getPath('appData'), 'FrameNote');
@@ -51,7 +55,19 @@ app.whenReady().then(async () => {
     return net.fetch(pathToFileURL(file).toString());
   });
   session.defaultSession.setPermissionRequestHandler(
-    (_contents, _permission, callback) => callback(false),
+    (contents, permission, callback, details) =>
+      callback(
+        permission === 'local-fonts' &&
+          contents === window?.webContents &&
+          details.isMainFrame &&
+          details.requestingUrl.startsWith('framenote://app/'),
+      ),
+  );
+  session.defaultSession.setPermissionCheckHandler(
+    (contents, permission, origin) =>
+      permission === 'local-fonts' &&
+      contents === window?.webContents &&
+      origin === 'framenote://app',
   );
   session.defaultSession.webRequest.onHeadersReceived((details, callback) =>
     callback({
@@ -70,14 +86,52 @@ app.whenReady().then(async () => {
     if (!trusted(event)) throw Error('Untrusted preset request.');
     return presetFiles.read();
   });
-  ipcMain.handle('presets-write', (event, source) => {
+  ipcMain.handle('system-fonts-read', async (event) => {
+    if (!trusted(event)) throw Error('Untrusted font request.');
+    if (process.platform === 'darwin') {
+      systemFonts ??= runFile(
+        '/usr/bin/osascript',
+        [
+          '-l',
+          'JavaScript',
+          '-e',
+          `
+        ObjC.import('AppKit');
+        var manager = $.NSFontManager.sharedFontManager;
+        var result = [];
+        ObjC.deepUnwrap(manager.availableFontFamilies).forEach(function(family) {
+          (ObjC.deepUnwrap(manager.availableMembersOfFontFamily(family)) || []).forEach(function(member) {
+            result.push({ family: family, postscriptName: member[0], style: member[1],
+              nativeWeight: member[2], bold: !!(member[3] & 2), italic: !!(member[3] & 1) });
+          });
+        });
+        JSON.stringify(result);
+      `,
+        ],
+        { timeout: 15000, maxBuffer: 5 * 1024 * 1024 },
+      ).then(({ stdout }) => JSON.parse(stdout));
+      return systemFonts;
+    }
+    return window.webContents.executeJavaScript(
+      `window.queryLocalFonts().then(fonts => fonts.map(({ family, style, postscriptName }) => ({ family, style, postscriptName })))`,
+      true,
+    );
+  });
+  ipcMain.handle('presets-write', (event, source, touchedIds) => {
     if (
       !trusted(event) ||
       typeof source !== 'string' ||
-      source.length > 100_000_000
+      source.length > 100_000_000 ||
+      (touchedIds !== undefined &&
+        (!Array.isArray(touchedIds) ||
+          touchedIds.length > 10000 ||
+          touchedIds.some(
+            (id) =>
+              typeof id !== 'string' || !/^[a-zA-Z0-9-]{1,100}$/u.test(id),
+          )))
     )
       throw Error('Invalid preset request.');
-    return presetFiles.write(source);
+    return presetFiles.write(source, touchedIds);
   });
   ipcMain.handle('save-output', async (event, name, bytes) => {
     if (
@@ -104,11 +158,18 @@ app.whenReady().then(async () => {
       await fs.promises.rm(temporary, { force: true }).catch(() => {});
     }
   });
+  const { workArea } = screen.getDisplayNearestPoint(
+    screen.getCursorScreenPoint(),
+  );
+  const width = Math.min(2240, workArea.width);
+  const height = Math.min(1560, workArea.height);
   window = new BrowserWindow({
-    width: 1440,
-    height: 960,
-    minWidth: 800,
-    minHeight: 600,
+    width,
+    height,
+    x: workArea.x + Math.floor((workArea.width - width) / 2),
+    y: workArea.y + Math.floor((workArea.height - height) / 2),
+    minWidth: Math.min(800, width),
+    minHeight: Math.min(600, height),
     title: 'FrameNote',
     show: false,
     ...(process.platform === 'darwin' ? { titleBarStyle: 'hidden' } : {}),

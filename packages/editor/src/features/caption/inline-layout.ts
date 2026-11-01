@@ -1,3 +1,4 @@
+import { resolvedFontFamily } from '../../../../core/src/fonts';
 import { canvasFontStyle } from '../../../../core/src/font-style';
 import { resolvedTextAlign } from '../../../../core/src/document';
 import Konva from 'konva';
@@ -41,7 +42,7 @@ export function inlineLayout(
           ? new Konva.Text({
               text: run.text,
               fontSize,
-              fontFamily: caption.style.fontFamily,
+              fontFamily: resolvedFontFamily(caption.style.fontFamily),
               fontStyle: canvasFontStyle(caption),
               wrap: 'none',
             })

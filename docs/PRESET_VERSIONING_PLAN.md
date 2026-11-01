@@ -21,8 +21,11 @@ z weryfikacją i commitem po etapie, bez zatrzymywania między etapami.
 
 ## Zapis presetów
 
-- macOS: `~/FrameNote/presets/<preset-id>.json`, katalog tworzony automatycznie
-  od pierwszego uruchomienia bety. Nazwa presetu jest w JSON, nie wyznacza ścieżki.
+- macOS: `~/FrameNote/presets/<nazwa-kebab-case>.json`, katalog tworzony automatycznie
+  od pierwszego uruchomienia bety. ID i oryginalna nazwa pozostają w JSON. Nazwa pliku jest przenośnym kebab-case
+  z sufiksami kolizji; stare nazwy z ID zmieniamy przy zapisie danego presetu.
+  Rozszerzenie fontFamily o dowolne niepuste nazwy pozostaje w v1 na wyraźne
+  polecenie użytkownika z 2026-11-01; starsze czytniki mogą je odrzucać.
 - Operacje dyskowe wykonuje proces główny Electrona przez ograniczone API;
   wspólny edytor korzysta z asynchronicznego repozytorium presetów.
 - Zapis przez plik tymczasowy i podmianę; nieudany zapis nie zmienia stanu UI.

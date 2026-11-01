@@ -3,7 +3,11 @@
 The picker includes the 25 requested Google Fonts families and the existing
 RetiredDisplay. Stable family identifiers live in `src/domain/fonts.ts`; presets never
 store font delivery URLs. `Montserrat Variable` and `RetiredDisplay` retain their
-existing identifiers. Unknown families remain rejected by preset validation.
+existing identifiers. Preset v1 now accepts arbitrary nonempty family names by explicit product
+decision. Unknown/unloadable families retain their saved name, show Unavailable
+inside the font selector, and render using Montserrat. Explicit selection changes
+the saved family; loading and saving alone preserve it. Older readers may reject
+these names.
 
 ## Delivery and variants
 
@@ -24,7 +28,8 @@ and load only when their row becomes visible. Preview text is “Leave your mark
 for every family. While loading or on failure, the row shows explicit status text
 rather than a preview in the wrong font. Choosing a font loads its actual selected
 variant and caption text. Both the preview renderer and image exporter await font
-readiness. A failed font download prevents exporting with an accidental fallback.
+readiness. An unavailable or failed font resolves explicitly to Montserrat in both preview
+and export, with its original name and Unavailable badge retained in the selector.
 
 Only real supplied 400/700 and italic variants are offered. Variable font weight
 ranges supply both weights where supported. Families without Bold or Italic disable
@@ -62,7 +67,11 @@ supports arrow navigation, Space/Enter and visible focus. `filterByCategory` hol
 the domain-independent category/search predicate.
 
 Filters and search belong to FloatingPanel's fixed toolbar, outside its scrolling
-content. Font categories are All, Sans-serif, Serif, Monospace and Display. Tag
+content. Font categories are All, Sans-serif, Serif, Monospace and Display. Desktop also
+provides System; All includes those families. The native macOS catalog is read at
+startup and registered with local PostScript face sources. Only installed variants
+are used, including the bold/italic combination; restart to refresh the catalog.
+Web does not enumerate local fonts or request font permissions. Tag
 categories follow the real metadata namespaces plus FrameNote helpers; no Custom
 tag model is invented. Colors retain their exact values and the existing Neutrals
 and Soft colors groups. Switching filters never updates the selected domain value.

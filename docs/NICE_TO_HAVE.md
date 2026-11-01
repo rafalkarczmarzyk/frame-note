@@ -38,3 +38,14 @@ polecenia. Nowe decyzje dopisujemy lub aktualizujemy w istniejącym wpisie.
 - **Przy powrocie:** ustalić zakres ustawień, wersjonowanie konfiguracji i sposób
   przeniesienia obecnych preferencji. Układ katalogu opisuje
   [PRESET_VERSIONING_PLAN.md](PRESET_VERSIONING_PLAN.md).
+
+## NTH-006 — Zapamiętywanie rozmiaru i położenia okna desktopowego
+
+- **Status:** odłożone.
+- **Data decyzji:** 2026-11-01.
+- **Źródło:** plan fontów systemowych i większego okna desktopowego.
+- **Pomysł:** przywracanie ostatniego rozmiaru i położenia okna.
+- **Decyzja na teraz:** stały rozmiar startowy, ograniczony dostępnym obszarem
+  ekranu; bez zapamiętywania geometrii.
+- **Przy powrocie:** ustalić przechowywanie i zachowanie po zmianie monitorów.
+- **Plan:** [system-fonts-and-preset-files.md](plans/system-fonts-and-preset-files.md).

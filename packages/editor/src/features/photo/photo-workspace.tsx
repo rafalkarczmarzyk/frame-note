@@ -1001,7 +1001,10 @@ function PhotoWorkspaceContent({
                 className="mt-2 -mb-3"
                 value={fontCategory}
                 onValueChange={setFontCategory}
-                categories={fontCategories.map((value) => ({
+                categories={[
+                  ...fontCategories,
+                  ...(platform().systemFonts ? ['System'] : []),
+                ].map((value) => ({
                   value,
                   label: value,
                 }))}
@@ -1009,6 +1012,11 @@ function PhotoWorkspaceContent({
             </>
           }
         >
+          {platform().systemFontsError && (
+            <InlineNotice tone="warning">
+              {platform().systemFontsError}
+            </InlineNotice>
+          )}
           <FontPicker
             category={fontCategory}
             value={settings.style.fontFamily}

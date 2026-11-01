@@ -19,34 +19,12 @@ export const image = z.strictObject({
   height: z.number().positive().max(16384),
 });
 export const style = z.strictObject({
-  fontFamily: z.enum([
-    'Montserrat Variable',
-    'Inter',
-    'DM Sans',
-    'Manrope',
-    'Poppins',
-    'Raleway',
-    'Outfit',
-    'Work Sans',
-    'Playfair Display',
-    'Cormorant Garamond',
-    'DM Serif Display',
-    'Libre Baskerville',
-    'Lora',
-    'Bodoni Moda',
-    'Fraunces',
-    'Prata',
-    'JetBrains Mono',
-    'IBM Plex Mono',
-    'Space Mono',
-    'Roboto Mono',
-    'DM Mono',
-    'Bebas Neue',
-    'Oswald',
-    'Archivo Black',
-    'Cinzel',
-    'RetiredDisplay',
-  ]),
+  // Explicit v1 extension: preserve unknown names and resolve at runtime.
+  fontFamily: z
+    .string()
+    .min(1)
+    .max(1024)
+    .refine((value) => value.trim().length > 0),
   fontWeight: z.union([z.literal(400), z.literal(700)]),
   fontStyle: z.enum(['normal', 'italic']).optional(),
   fontSize: nonnegative,

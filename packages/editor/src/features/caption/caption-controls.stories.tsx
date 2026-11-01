@@ -136,3 +136,19 @@ export const UnavailableFontStyles: Story = {
     },
   },
 };
+
+export const UnavailableFont: Story = {
+  args: {
+    scope: 'local',
+    caption: {
+      ...createCaption(),
+      style: { ...createCaption().style, fontFamily: 'Missing Studio Font' },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    const font = c.getByRole('button', { name: 'Font' });
+    await expect(within(font).getByText('Missing Studio Font')).toBeVisible();
+    await expect(within(font).getByText('Unavailable')).toBeVisible();
+  },
+};

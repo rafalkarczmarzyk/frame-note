@@ -16,6 +16,19 @@ Przed zmianą lub dodaniem UI sprawdź [instrukcję FrameNote UI](docs/DESIGN_SY
 i aktualne komponenty/stories. Rozszerzaj wspólne komponenty zamiast kopiować ich
 style Tailwind do feature; nowy wspólny komponent dokumentuj w Storybooku.
 
+## Planowanie i wdrażanie zmian
+
+Przy planowaniu i realizacji zmian aplikacji desktopowej, webowej lub wspólnych
+modeli stosuj projektowy skill
+[change-workflow](.agents/skills/change-workflow/SKILL.md).
+Dotyczy to również kontynuacji etapów, poprawek po ocenie i przygotowania wydania.
+Skill prowadzi zapisany plan, kryteria akceptacji (AC), prognozę wersji,
+weryfikację automatyczną i ocenę użytkownika. Drobne poprawki mają skrócony proces;
+zwykłe pytania o kod oraz zmiany wyłącznie dokumentacji, testów, narzędzi lub
+skilli nie wymagają pełnego procesu zmian aplikacji.
+Akceptacja działania nie jest poleceniem commita ani pushowania; użytkownik może
+połączyć te zgody w jednym poleceniu. Nie pytaj ponownie o udzieloną zgodę.
+
 ## Branche, wersje i changelog
 
 Przy przygotowaniu commita, merge'a oraz zmian wersji lub changeloga zastosuj

@@ -11,6 +11,28 @@ entering master receive a version, dated section and local tag according to
 
 ## Unreleased
 
+## [0.2.0-beta] - 2026-11-01
+
+### Added
+
+- Desktop lists locally installed font families under System, with lazy previews
+  and available Bold/Italic faces. Bundled fonts take priority over namesakes.
+
+### Changed
+
+- Desktop preset files use readable kebab-case names, with safe collision suffixes
+  and renaming when the preset name changes. Existing ID filenames are retained
+  until that preset is saved. Failed operations restore the previous files.
+
+- Preset v1 accepts arbitrary font names. Missing fonts retain their name and an
+  Unavailable badge inside the font selector while preview and JPG use Montserrat.
+  The format remains v1; older applications may reject these font names and
+  readable filenames.
+
+- Desktop starts with a larger 2240 × 1560 window, centered on the display
+  containing the pointer and limited to the space available around the menu bar
+  and Dock. Window size and position are not persisted between launches.
+
 ## [0.1.2-beta] - 2026-10-31
 
 ### Fixed
