@@ -1,3 +1,4 @@
+import { verifyDesktopApp } from './tools-desktop.mjs';
 import { applyFinderLayout } from './finder-layout.mjs';
 import { execFileSync } from 'node:child_process';
 import { cp, mkdir, mkdtemp, rename, rm, symlink } from 'node:fs/promises';
@@ -19,13 +20,15 @@ export async function createDesktopDmg(appDirectory) {
   try {
     await mkdir(join(source, '.background'), { recursive: true });
     await mkdir(mount);
-    await cp(
+    // ditto preserves relative framework symlinks; fs.cp resolves them to
+    // absolute paths by default. Do not carry host-specific extended attributes.
+    run('ditto', [
+      '--norsrc',
+      '--noextattr',
       join(appDirectory, 'FrameNote.app'),
       join(source, 'FrameNote.app'),
-      {
-        recursive: true,
-      },
-    );
+    ]);
+    verifyDesktopApp(join(source, 'FrameNote.app'));
     await symlink('/Applications', join(source, 'Applications'));
     await cp(
       'apps/desktop/installer/background.png',
@@ -91,6 +94,20 @@ end run`,
     mounted = false;
     run('hdiutil', ['convert', writable, '-format', 'UDZO', '-o', pending]);
     run('hdiutil', ['verify', pending]);
+    // Verify the actual app delivered by the compressed image, not just its source.
+    run('hdiutil', [
+      'attach',
+      '-readonly',
+      '-nobrowse',
+      '-noautoopen',
+      '-mountpoint',
+      mount,
+      pending,
+    ]);
+    mounted = true;
+    verifyDesktopApp(join(mount, 'FrameNote.app'));
+    run('hdiutil', ['detach', mount]);
+    mounted = false;
     await rename(pending, output);
     console.log(`Created ${output}`);
   } finally {

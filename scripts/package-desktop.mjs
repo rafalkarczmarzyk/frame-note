@@ -1,3 +1,4 @@
+import { configureDesktopTools, verifyDesktopApp } from './tools-desktop.mjs';
 import { createRequire } from 'node:module';
 import { execFileSync } from 'node:child_process';
 import { createDesktopDmg } from './create-dmg-desktop.mjs';
@@ -31,14 +32,8 @@ if (signed) {
   );
 }
 const icon = ['apps/desktop/FrameNote.icns'];
-try {
-  execFileSync('actool', ['--version'], { stdio: 'ignore' });
+if (await configureDesktopTools())
   icon.push('apps/desktop/FrameNoteComposer.icon');
-} catch {
-  console.warn(
-    'Full Xcode is unavailable; packaging with the .icns icon only.',
-  );
-}
 const stage = 'release/staging';
 await rm(stage, { recursive: true, force: true });
 await mkdir(stage, { recursive: true });
@@ -71,33 +66,28 @@ const result = await packager({
     .version,
   electronZipDir: process.env.FRAMENOTE_ELECTRON_ZIP_DIR,
   icon,
-  osxSign: signed
-    ? {
-        identity,
-        continueOnError: false,
-        type: 'distribution',
-        preAutoEntitlements: false,
-        optionsForFile: () => ({
-          hardenedRuntime: true,
-          entitlements: 'apps/desktop/entitlements.plist',
-        }),
-      }
-    : false,
+  osxSign: {
+    identity: signed ? identity : '-',
+    identityValidation: signed,
+    ...(signed ? {} : { timestamp: 'none' }),
+    continueOnError: false,
+    type: 'distribution',
+    preAutoEntitlements: false,
+    optionsForFile: () => ({
+      // Ad hoc signatures have no Team ID for Hardened Runtime library validation.
+      hardenedRuntime: signed,
+      entitlements: 'apps/desktop/entitlements.plist',
+    }),
+  },
   osxNotarize: false,
 });
 console.log(result.join('\n'));
 await rm(stage, { recursive: true, force: true });
 
-if (signed)
-  execFileSync(
-    'codesign',
-    [
-      '--verify',
-      '--deep',
-      '--strict',
-      '--verbose=2',
-      `${result[0]}/FrameNote.app`,
-    ],
-    { stdio: 'inherit' },
-  );
+verifyDesktopApp(`${result[0]}/FrameNote.app`);
+console.log(
+  signed
+    ? 'Developer signature verified (not notarized).'
+    : 'Ad hoc signature verified (not notarized; downloaded apps may require Open Anyway).',
+);
 await createDesktopDmg(result[0]);

@@ -51,8 +51,12 @@ sequentially to avoid competing for application focus.
 ## Installing the local build
 
 Copy FrameNote.app to a user-writable Applications folder, then open it normally.
-The local build is unsigned and not notarized; Gatekeeper behavior for downloaded
-or transferred builds has not been certified. This is not a public release.
+The local build is ad hoc signed and not notarized. It is intended to run on
+other Apple Silicon Macs as well as the build machine. Downloaded or transferred
+builds may require approval in System Settings → Privacy & Security → Open Anyway
+after the first launch attempt. This is not Apple Developer ID trust; do not
+interpret a Gatekeeper rejection as a failed integrity check. Cross-machine launch
+must still be tested before declaring a build verified for distribution.
 Do not disable system protections. Public distribution requires Apple signing,
 notarization and resolution of the RetiredDisplay redistribution license.
 
@@ -120,7 +124,9 @@ The committed background PNG can be regenerated from `apps/desktop/installer/bac
 resolution using system fonts with Swift command-line tools. `scripts/create-dmg-desktop.mjs` stages an HFS+
 image, saves its Finder layout and verifies the
 compressed read-only image before replacing the previous DMG. Temporary images
-are detached and removed after packaging. This does not sign or notarize the app.
+are detached and removed after packaging. The app is signed before packaging and
+verified again from the final read-only DMG before it replaces the output file.
+The DMG is not notarized.
 
 Manual packaging acceptance checks:
 
@@ -128,6 +134,20 @@ Manual packaging acceptance checks:
 2. Check that Applications points to `/Applications` and the image is read-only.
 3. Copy the app to Applications, eject the image and launch the installed copy.
 4. Quit the app, replace it with a new build and verify saved presets remain.
+5. Transfer/download the DMG on a different Apple Silicon Mac, install and launch
+   the app. If Gatekeeper blocks an unidentified developer, use the per-app Open
+   Anyway approval in Privacy & Security. Do not disable Gatekeeper or re-sign the
+   installed copy. Record the macOS version and outcome. A damaged-app error or a
+   failed `codesign --verify --deep --strict` is a packaging failure, not acceptance.
+
+## Xcode detection
+
+Packaging respects an explicit `DEVELOPER_DIR` and reports errors for that choice.
+Otherwise it tries the active developer directory, then Xcode installations in
+`/Applications` and `~/Applications`. It resolves tools with `xcrun` and exposes
+the selected `actool` to Electron Packager without changing global `xcode-select`.
+Icon Composer requires macOS 26 and actool 26 or newer; older or missing tools
+use the existing `.icns` icon. A failure compiling the chosen icon fails the build.
 
 ## Code signing
 
@@ -141,13 +161,15 @@ pnpm desktop:package:signed
 
 The signed command requires an exact, valid identity with its private key in the
 macOS keychain. It fails rather than falling back to an unsigned or ad hoc build.
-The ordinary `pnpm desktop:package` command keeps its local unsigned behavior,
-even when `DEVELOPER_ID` is set. Both commands write the same app and DMG paths;
-the most recent successful build determines their signing state.
+The ordinary `pnpm desktop:package` command signs ad hoc without a certificate,
+Apple account or timestamp service, even when `DEVELOPER_ID` is set. Both commands
+write the same app and DMG paths; the most recent successful build determines their
+signing state.
 
-Electron Packager signs nested code before the app bundle, with a secure timestamp,
-Hardened Runtime and the JIT entitlement needed by V8. The build verifies the whole
-app with `codesign --verify --deep --strict` before creating the DMG. The DMG itself
+The certificate mode uses a secure timestamp and Hardened Runtime. The ad hoc mode
+leaves Hardened Runtime disabled because its library validation requires a Team ID
+that ad hoc signatures do not have. Both modes use the JIT entitlement needed by
+V8 and sign nested code before the app bundle. The build verifies the whole app with `codesign --verify --deep --strict` before creating the DMG. The DMG itself
 is not signed. The entitlement source is `apps/desktop/entitlements.plist`.
 No certificate, private key or password is stored in the repository. macOS may ask
 for permission to use the signing key during packaging.
