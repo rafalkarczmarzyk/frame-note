@@ -1,26 +1,17 @@
 <p align="center">
-  <img src="docs/assets/framenote-logo.svg" alt="FrameNote" width="360" />
+  <img src="packages/editor/src/assets/graphics/framenote-app-icon.png" alt="FrameNote app icon" width="160" height="160" />
 </p>
 
-<h1 align="center">Your photos. Their story.</h1>
+<h1 align="center">FrameNote</h1>
+<h2 align="center">Leave your mark.</h2>
 
 <p align="center">
-  Turn photo metadata into beautifully styled captions, logos, and reusable layouts.<br />
-  Process your photos locally in your browser.
-</p>
-
-<p align="center">
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/status-beta-14CC60?style=for-the-badge" alt="Status: beta" /></a>
-  <img src="https://img.shields.io/badge/photo%20processing-local-00BFB3?style=for-the-badge" alt="Photo processing: local in your browser" />
+  Add a watermark, logo, or photo details.<br />
+  Photos stay on your device — in your browser or the desktop app.
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/package-json/v/rafalkarczmarzyk/frame-note?style=for-the-badge&label=FrameNote&color=14CC60" alt="FrameNote package version" />
-  <img src="https://img.shields.io/github/package-json/dependency-version/rafalkarczmarzyk/frame-note/react?style=for-the-badge&logo=react&logoColor=white&color=149ECA" alt="React version range" />
-  <img src="https://img.shields.io/github/package-json/dependency-version/rafalkarczmarzyk/frame-note/dev/typescript?style=for-the-badge&logo=typescript&logoColor=white&color=3178C6" alt="TypeScript version range" />
-  <img src="https://img.shields.io/github/package-json/dependency-version/rafalkarczmarzyk/frame-note/dev/vite?style=for-the-badge&logo=vite&logoColor=white&color=646CFF" alt="Vite version range" />
-  <img src="https://img.shields.io/github/package-json/dependency-version/rafalkarczmarzyk/frame-note/tailwindcss?style=for-the-badge&logo=tailwindcss&logoColor=white&color=06B6D4" alt="Tailwind CSS version range" />
-  <img src="https://img.shields.io/github/package-json/dependency-version/rafalkarczmarzyk/frame-note/dev/storybook?style=for-the-badge&logo=storybook&logoColor=white&color=FF4785" alt="Storybook version range" />
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/github/package-json/v/rafalkarczmarzyk/frame-note?style=for-the-badge&label=version&color=14CC60" alt="FrameNote version" /></a>
 </p>
 
 <p align="center">
@@ -33,11 +24,11 @@
 
 ---
 
-FrameNote is a browser-based photo caption editor built for photographers who
+FrameNote is a photo caption editor for web and desktop, built for photographers who
 want more control over how metadata appears on their images. Import a photo,
 compose a layout with text and graphics, preview your changes, and download a JPG
 with the finished design rendered into its pixels. No account or backend is
-required for this workflow; photo processing happens in your browser.
+required for this workflow; photo processing happens locally on your device.
 
 The project is currently in **beta** and under active development. Features
 and preset formats may change. The pre-MVP has been completed and accepted;
@@ -47,11 +38,11 @@ Product milestones and review status live in the
 
 ## Versioning
 
-The current version is **0.1.2-beta**. **1.0.0** is reserved for the first
+The current version is **0.3.1-beta**. **1.0.0** is reserved for the first
 finished stable version. The previous alpha designation `1.0.0-alpha.1` was
 normalized to `0.0.3-alpha`; historical commit contents are unchanged.
 
-To build this beta from source, check out `v0.1.2-beta`, then follow Quick start
+To build this beta from source, check out `v0.3.1-beta`, then follow Quick start
 for web or run `pnpm desktop` / `pnpm desktop:package` for macOS.
 User presets use the same v1 JSON and Zod schema on both platforms. Web keeps
 localStorage; macOS uses `~/FrameNote/presets`. No old preset migration is provided.
