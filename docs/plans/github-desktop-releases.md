@@ -243,3 +243,16 @@
   basename(destination), bez zmiany kodu aplikacji. Trzy testy pliku lokalnie PASS.
 - Kontynuacja autoryzowanej naprawy CI: test-only commit/push i kolejny próbny
   workflow, bez podbijania wersji i bez przesuwania istniejącego tagu.
+
+### Potwierdzony wynik próbnego workflow
+
+- Run 41485878143, commit 58ad0f5, workflow_dispatch na master: SUCCESS.
+- Każdy z trzech celów przeszedł instalację, testy jednostkowe, build, weryfikację
+  zasobów, pakowanie, uruchomienie gotowej aplikacji i eksport JPG offline.
+- Artefakty desktop-mac-arm64, desktop-windows-x64 i desktop-linux-x64 dostępne
+  w Actions przez 7 dni. To próbne paczki wersji 0.3.1-beta z commita 58ad0f5,
+  nie build historycznego tagu v0.3.1-beta (4a61f9d).
+- Nie utworzono szkicu release: ręczne uruchomienie celowo pomija zadanie release.
+  Dalsza dystrybucja wymaga nowego zgodnego tagu po ustaleniu wersji; istniejącego
+  v0.3.1-beta nie przesunięto. Manualna instalacja, ZIP i restart presetów na
+  Windows/Linux oraz drugi Mac nadal do odbioru.
