@@ -95,3 +95,17 @@
   wymagają przebiegu Windows Actions; ręczny restart presetów/SAC nadal do odbioru.
 - Wydanie 0.3.3-beta — PATCH za zmianę pakowania. Zgodnie z poleceniem użytkownika
   commit/tag i push uruchamiają buildy oraz automatyczną publiczną publikację Latest.
+
+## Wyniki zdalne — run 41514700643
+
+- Commit f7f8081, tag v0.3.3-beta wysłane na origin/master (atomic push).
+- Windows: SUCCESS — build portable, smoke unpacked z eksportem JPG, osobny
+  smoke rzeczywistego portable EXE z katalogu ze spacjami, import offline i upload.
+- Linux: SUCCESS. macOS w chwili zapisu nadal oczekuje na runner GitHuba.
+  Publikacja Latest automatycznie dopiero po sukcesie macOS i kontroli assetów.
+- AC-01/02: cel portable i wykonany test launchera potwierdzone automatycznie;
+  ręczny odbiór na zwykłym koncie Windows wciąż niewykonany.
+- AC-03: import offline portable i eksport unpacked PASS; restart presetów
+  rzeczywistego portable niewykonany. AC-04 wymaga ręcznego odbioru.
+- AC-05: Windows/Linux paczki gotowe, końcowy release jeszcze oczekuje na Maca.
+  AC-06: instrukcja portable i informacja o SAC uzupełnione.
