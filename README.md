@@ -76,8 +76,10 @@ Development branch commits do not bump versions. See
 Historical milestones map pre-MVP to `v0.0.1-alpha` and MVP to `v0.0.2-alpha`;
 their target commits are unchanged. Historical manifests are not rewritten.
 
-Betas are source-only: users build the application themselves. No downloadable
-builds or installers are published. A local tag does not itself publish anything.
+Version tags on master trigger GitHub Actions to build macOS Apple Silicon DMG,
+Windows x64 EXE and Linux x64 AppImage packages. Successful builds create a draft
+GitHub Release for manual publication. A local tag alone does not upload or
+publish anything. See [desktop release workflow](docs/DESKTOP.md#github-releases).
 
 ## Features
 

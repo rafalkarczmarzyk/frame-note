@@ -1,0 +1,88 @@
+name: Desktop release
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: desktop-release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version-file: .nvmrc
+      - name: Validate tagged version and master ancestry
+        if: github.event_name == 'push'
+        run: node scripts/validate-release.mjs
+  build:
+    needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15
+            platform: mac-arm64
+          - os: windows-2022
+            platform: windows-x64
+          - os: ubuntu-24.04
+            platform: linux-x64
+    runs-on: ${{ matrix.os }}
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install Electron binary
+        run: node node_modules/electron/install.js
+      - run: pnpm check:version
+      - run: pnpm test:unit
+      - run: pnpm desktop:build
+      - run: node scripts/verify-desktop-assets.mjs
+      - run: pnpm desktop:dist
+      - name: Smoke test packaged app (macOS / Windows)
+        if: runner.os != 'Linux'
+        run: node scripts/smoke-dist-desktop.mjs
+      - name: Smoke test packaged app (Linux)
+        if: runner.os == 'Linux'
+        run: xvfb-run --auto-servernum node scripts/smoke-dist-desktop.mjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: desktop-${{ matrix.platform }}
+          path: |
+            release/ci/*.dmg
+            release/ci/*.exe
+            release/ci/*.AppImage
+          if-no-files-found: error
+          retention-days: 7
+  release:
+    if: github.event_name == 'push'
+    needs: [validate, build]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          pattern: desktop-*
+          path: release-assets
+          merge-multiple: true
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version-file: .nvmrc
+      - name: Prepare checksums and draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/publish-desktop-draft.mjs

@@ -2,16 +2,17 @@
 
 ## Stan i zakres
 
-- Stan: planowanie, propozycja implementacji do uzgodnienia; aktualizacja 2026-11-02.
-- Polecenie użytkownika „zaktualizuj i commit” obejmuje aktualizację i lokalny
-  commit tego dokumentu na master. Nie obejmuje implementacji ani pushowania.
+- Stan: konfiguracja i pakowanie zaimplementowane lokalnie; przygotowanie
+  commita/tagu 0.3.1-beta. Przebieg GitHub Actions i Windows/Linux niewykonany.
+- Najnowsze polecenie obejmuje konfigurację workflow i przygotowanie nowego
+  commita/tagu dla master. Publiczna publikacja szkicu nie jest autoryzowana.
 - Cel: przygotowanie jednej wersji FrameNote uruchamia na GitHub Actions buildy
   trzech systemów; użytkownik pobiera gotowe paczki z GitHub Releases.
 - Decyzje z rozmowy: użytkownik chce darmowego budowania i podpisywania oraz
   planowania rozwiązania. GitHub CLI jest zainstalowany i zalogowany; repozytorium
   `rafalkarczmarzyk/frame-note` było wskazane jako publiczne. Przed wdrożeniem
-  ponownie sprawdzić widoczność repo i dostęp narzędzi. Nie zlecono implementacji,
-  pushowania ani publikacji; autoryzowano wyłącznie commit planu.
+  ponownie sprawdzić widoczność repo i dostęp narzędzi. Wcześniejsze ograniczenie do commita planu zostało zastąpione poleceniem
+  przygotowania konfiguracji i tagu; brak osobnego polecenia pushowania.
 - Proponowane cele początkowe: macOS arm64 DMG, Windows x64 instalator EXE,
   Linux x64 AppImage. Trzy systemy nie oznaczają wszystkich architektur.
 - Podpisy: macOS ad hoc bez certyfikatu i notaryzacji; Windows bez podpisu;
@@ -39,6 +40,12 @@
 - Przed publicznym udostępnieniem paczek przeprowadzić aktualny audyt licencji
   wszystkich dołączanych fontów i zależności oraz dołączyć wymagane teksty licencji.
   Podstawą jest obecny katalog opisany w FONT_LIBRARY.md.
+- Advercase został usunięty z bieżących źródeł i katalogu fontów w osobnym
+  zadaniu (`ebe044e`, wersja `0.3.0-beta`). Typografia UI korzysta obecnie
+  z Montserrat Variable. Uzyskanie licencji Advercase nie jest już zależnością
+  tego planu: nowe paczki nie mają zawierać jego plików. Przed pakowaniem
+  wyczyścić stare wyniki i sprawdzić zawartość gotowych paczek, aby nie przenieść
+  zasobów z wcześniejszych lokalnych buildów.
 - Na master desktop:package nadal czyści release i wykonuje build oraz pakowanie
   aplikacji wraz z DMG; desktop:install buduje i pakuje aplikację bez DMG.
   Nie ma komendy desktop:dist ani mechanizmu ponownego używania aktualnego buildu.
@@ -58,8 +65,8 @@
 ## Wersja i zgodność
 
 - Aktualna wersja produktu: `0.3.0-beta`.
-- Prognoza implementacji według maintain-versioning: `0.4.0-beta`, bo dochodzi dystrybucja
-  aplikacji dla Windows/Linux. Ponownie wyliczyć przy integracji, jeżeli baza
+- Prognoza implementacji według maintain-versioning: `0.3.1-beta`, bo automatyzujemy pakowanie istniejącej aplikacji bez dodawania funkcji.
+  Użytkownik potwierdził PATCH zamiast MINOR. Ponownie wyliczyć przy integracji, jeżeli baza
   wersji lub zakres ulegną zmianie. Jeden przyrost dla ukończonego zadania.
 - Sam zapis planu nie zmienia wersji ani changeloga. Robocze commity nie podbijają
   wersji. Wpis angielski Unreleased powstanie dla rzeczywiście wdrożonych zmian.
@@ -162,3 +169,46 @@
   wersji, nie dodajemy wpisu changeloga ani tagu: jest to wyłącznie dokumentacja.
 - Nie ma implementacji workflow, tagu produktu, szkicu ani publikacji tego zadania.
   Commit planu nie autoryzuje pushowania ani uruchomienia buildów.
+
+## Realizacja — 2026-11-02
+
+- Najnowsze polecenie użytkownika obejmuje przygotowanie nowego tagu/commita
+  i konfiguracji Actions dla tagowanych commitów na master. Łączy prace nad
+  pakowaniem i workflow; nie jest zgodą na publiczne opublikowanie szkicu release.
+- Zakres: istniejąca aplikacja, bez dodawania wsparcia funkcjonalnego lub nowych
+  funkcji Windows/Linux. Wersja PATCH 0.3.1-beta zastępuje prognozę MINOR.
+- Dodano osobny desktop:dist (electron-builder 26), zachowując lokalne skrypty
+  Packagera i instalacji. Cele: macOS arm64 DMG, Windows x64 NSIS, Linux x64
+  AppImage. Staging bez workspace dependencies, pakowanie bez Findera.
+- Workflow reaguje na push tagu v*, sprawdza wersję i przynależność commita do
+  origin/master. Untagowany push nie buduje. Ręczna próba daje tylko artefakty.
+- Wszystkie wymagane buildy poprzedzają szkic release; weryfikowana jest dokładna
+  lista plików i sumy SHA256. Ponowienie nie modyfikuje opublikowanego release.
+- Akcje przypięto do odczytanych SHA. Uprawnienie contents:write tylko przy
+  przygotowywaniu szkicu; brak sekretów certyfikatów i płatnych runnerów.
+- Zaktualizowano dwa nieaktualne testy po wcześniejszym usunięciu fontu: 25
+  rodzin w katalogu i Manrope jako istniejący przykład bez italic.
+- Kontrole dotychczas: lint i typecheck przeszły, 415/415 testów jednostkowych,
+  build desktop i porównanie 96 plików fontów/licencji przeszły. Pierwszy lokalny
+  DMG i codesign verify przeszły; po korekcie izolacji stagingu wymagane ponowienie.
+- Nie wykonano jeszcze zdalnych buildów Windows/Linux ani ręcznego odbioru tych
+  systemów. Sukces pakowania nie oznacza ich weryfikacji funkcjonalnej.
+- Pozostałe AC wymagają przebiegu workflow i odbioru gotowych paczek.
+
+### Wyniki końcowe lokalnej weryfikacji
+
+- 415/415 testów jednostkowych, lint, typecheck, build web i build desktop: PASS.
+- Czysto izolowane pakowanie DMG bez Findera i codesign verify: PASS.
+- Smoke gotowej paczki macOS: uruchomienie i eksport JPG offline PASS. Testowany
+  build: 0.3.1-beta, baza 9da1952 + niezacommitowane zmiany (dirty).
+- 96 fontów/plików licencji zgodnych ze źródłem; usunięty font nie jest kopiowany.
+- Parser YAML oraz negatywna walidacja niepoprawnego/niezgodnego tagu: PASS.
+- Format całego repo: dwa wcześniejsze problemy w docs/EXPORT_VISUAL_TEST_PLAN.md
+  i e2e/photo-export-matrix.spec.ts; pliki tego zadania formatowane osobno.
+- Dodano smoke uruchomienia gotowej paczki i JPG offline dla trzech systemów.
+  Linux CI używa Xvfb; --no-sandbox dotyczy wyłącznie izolowanego procesu testowego
+  na Linux CI, nie konfiguracji aplikacji dystrybuowanej użytkownikom.
+- Windows/Linux, pełny natywny test presetów/ZIP, pobranie na drugim Macu,
+  rzeczywisty upload szkicu i instalacja z pobranych paczek: NIEWYKONANE.
+- Brak zmian UI aplikacji; nie aktualizowano wzorców wizualnych. Wygląd nowego
+  DMG wymaga ręcznego odbioru; dotychczasowe lokalne pakowanie pozostaje bez zmian.

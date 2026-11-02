@@ -6,7 +6,7 @@ import {
   effectiveFontWeight,
   supportsItalic,
 } from '../../../core/src/font-style';
-it('round trips every stable family identifier including legacy families', () => {
+it('round trips every stable family identifier in the bundled catalog', () => {
   for (const font of captionFonts) {
     const layout = createCaptionLayout();
     layout.containers[0]!.style.fontFamily = font.id;
@@ -17,7 +17,7 @@ it('round trips every stable family identifier including legacy families', () =>
       }),
     ).toEqual(preset);
   }
-  expect(captionFonts).toHaveLength(26);
+  expect(captionFonts).toHaveLength(25);
 });
 it('uses only supplied weights and styles', () => {
   const style = createCaptionLayout().containers[0]!.style;

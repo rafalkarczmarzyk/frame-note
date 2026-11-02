@@ -246,3 +246,29 @@ does not weaken certificate validation or change keychain trust settings.
 DMG layout setup retries Finder’s transient busy error (`-15260`) up to five
 times with short backoff. Each AppleScript invocation has a 30-second timeout;
 permission and other errors are reported immediately.
+
+## GitHub Releases
+
+`pnpm desktop:build` followed by `pnpm desktop:dist` creates an installer in
+`release/ci`: DMG on macOS arm64, NSIS EXE on Windows x64, AppImage on Linux x64.
+This separate packaging path does not use Finder automation. Existing local
+macOS packaging and installation commands retain their behavior.
+
+Push master and its new `v<product-version>` tag to trigger `Desktop release`.
+The workflow rejects tag/version mismatches and commits outside master. Untagged
+commits do not trigger builds. Manual runs create only seven-day Actions artifacts.
+After all three builds succeed, a draft release receives the installers and
+`SHA256SUMS`. Published releases are never overwritten by reruns. Publishing the
+draft is a separate manual action. Workflow installation requires pushing the
+configuration; local commits/tags alone do not enable GitHub Actions.
+
+Standard GitHub-hosted runners are used. No signing secrets are needed: macOS is
+ad hoc signed without notarization, Windows is unsigned. Downloaded macOS apps
+may require Privacy & Security → Open Anyway; Windows may show SmartScreen
+warnings or block unsigned apps depending on policy. Do not disable system
+protections. Linux requires a compatible desktop/AppImage environment.
+
+A successful build is not proof of native installation or full functionality.
+Record per-system manual installation, font, import/export and preset-restart
+checks before treating a release as verified. No Windows/Linux runtime checks
+have yet been completed for this workflow.

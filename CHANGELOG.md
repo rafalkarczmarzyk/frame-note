@@ -11,6 +11,15 @@ entering master receive a version, dated section and local tag according to
 
 ## Unreleased
 
+## [0.3.1-beta] - 2026-11-02
+
+### Changed
+
+- Build desktop installers for macOS Apple Silicon, Windows x64 and Linux x64
+  from version tags on master using GitHub Actions. Successful builds prepare
+  a draft GitHub Release with installers and SHA-256 checksums. macOS uses an
+  ad hoc signature; Windows installers are unsigned.
+
 ## [0.3.0-beta] - 2026-11-02
 
 ### Changed

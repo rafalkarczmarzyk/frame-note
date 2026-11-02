@@ -15,7 +15,7 @@ it('combines real italic with bold and falls back for unavailable variants', () 
   expect(canvasFontStyle(caption)).toBe('italic');
   caption.style.fontWeight = 700;
   expect(canvasFontStyle(caption)).toBe('bold italic');
-  caption.style.fontFamily = 'RetiredDisplay';
+  caption.style.fontFamily = 'Manrope';
   expect(supportsItalic(caption.style.fontFamily)).toBe(false);
   expect(effectiveFontStyle(caption)).toBe('normal');
   expect(canvasFontStyle(caption)).toBe('bold');
