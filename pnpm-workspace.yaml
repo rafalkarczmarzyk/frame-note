@@ -15,3 +15,5 @@ allowBuilds:
   esbuild: true
   electron: true
   exifreader: false
+  # Squirrel.Windows is unused; release builds use NSIS.
+  electron-winstaller: false

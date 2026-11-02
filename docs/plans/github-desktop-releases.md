@@ -212,3 +212,24 @@
   rzeczywisty upload szkicu i instalacja z pobranych paczek: NIEWYKONANE.
 - Brak zmian UI aplikacji; nie aktualizowano wzorców wizualnych. Wygląd nowego
   DMG wymaga ręcznego odbioru; dotychczasowe lokalne pakowanie pozostaje bez zmian.
+
+### Pierwszy przebieg Actions — naprawa instalacji zależności
+
+- Run `41483924033`, tag `v0.3.1-beta`: validate PASS; wszystkie trzy buildy
+  zatrzymane podczas pnpm install przez ERR_PNPM_IGNORED_BUILDS dla
+  electron-winstaller@5.4.0. Nie rozpoczęto pakowania ani testów aplikacji.
+- Lokalna poprawka: jawne allowBuilds electron-winstaller: false. Pakiet służy
+  do niewykorzystywanego celu Squirrel.Windows; wybrany instalator Windows to
+  NSIS. Pozostałe zasady strictDepBuilds i frozen-lockfile pozostają aktywne.
+- Czysta instalacja w odseparowanym katalogu tymczasowym, CI=true,
+  pnpm 11.21.0 i frozen-lockfile: PASS (645 pakietów). Pobranie binarnego
+  Electrona pominięto tylko w tym teście instalacji; workflow nadal instaluje je
+  osobnym krokiem. Nie oznacza to zweryfikowania dalszych kroków pipeline'u.
+- Poprawka jeszcze bez commita/pusha. Ponowienie starego run użyłoby starego
+  commita tagu i nie zawierałoby naprawy. Następny krok: po poleceniu użytkownika
+  commit/push i ręczny build próbny master; nie przesuwać istniejącego tagu.
+
+- Użytkownik potwierdził commit/push poprawki i próbny build master. Zmiana
+  określa politykę skryptu niewykorzystywanego narzędzia Squirrel; nie zmienia
+  aplikacji, formatu paczek ani runtime dependencies. Klasyfikacja: narzędzia CI,
+  bez nowej wersji produktu, changeloga i tagu. Nie przesuwamy v0.3.1-beta.
