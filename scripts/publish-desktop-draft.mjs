@@ -8,7 +8,7 @@ if (tag !== `v${version}`) throw Error('Tag/version mismatch');
 const expected = [
   `FrameNote-${version}-mac-arm64.dmg`,
   `FrameNote-${version}-win-x64.exe`,
-  `FrameNote-${version}-linux-x64.AppImage`,
+  `FrameNote-${version}-linux-x86_64.AppImage`,
 ].sort();
 const actual = readdirSync('release-assets').sort();
 if (JSON.stringify(actual) !== JSON.stringify(expected))

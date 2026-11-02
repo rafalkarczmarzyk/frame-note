@@ -267,3 +267,9 @@
   nową wersję manifestów, buildów i instalatorów.
 - Jedyny przyrost PATCH dla przygotowania poprawionego wydania po pierwszym
   nieudanym tagowanym buildzie; format presetów pozostaje v1.
+
+- Tagowany run 41487711759: wszystkie trzy buildy i smoke PASS, uploady PASS.
+  Krok release wykrył nazwę AppImage linux-x86_64 zamiast oczekiwanego linux-x64.
+  Poprawiono wyłącznie kontrolę nazwy w narzędziu publikacji, bez zmiany paczek.
+  Szkic przygotowujemy tym samym skryptem z dokładnych artefaktów runu; master
+  zachowuje poprawkę dla przyszłych wydań. Tag v0.3.2-beta nie jest przesuwany.
