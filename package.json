@@ -25,6 +25,7 @@
     "test:visual:review": "node scripts/run-visual-tests.mjs review",
     "test:visual:report": "node scripts/run-visual-tests.mjs report",
     "test:visual:update": "node scripts/run-visual-tests.mjs update",
+    "desktop:install": "node scripts/install-desktop.mjs",
     "desktop:build": "pnpm typecheck && node scripts/build-desktop.mjs",
     "desktop": "pnpm desktop:build && electron apps/desktop",
     "test:desktop": "node scripts/test-desktop.mjs",

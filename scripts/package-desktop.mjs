@@ -90,4 +90,4 @@ console.log(
     ? 'Developer signature verified (not notarized).'
     : 'Ad hoc signature verified (not notarized; downloaded apps may require Open Anyway).',
 );
-await createDesktopDmg(result[0]);
+if (!process.argv.includes('--no-dmg')) await createDesktopDmg(result[0]);

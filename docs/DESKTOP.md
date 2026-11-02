@@ -65,6 +65,37 @@ test. Do not remove the markers to bypass it. This guard detects known restricte
 environments; it does not guarantee that every graphical session is available.
 Temporary test files are removed even if application startup fails.
 
+## Build and install with one command
+
+After installing the project dependencies, run:
+
+```sh
+pnpm desktop:install
+```
+
+This builds the current sources, packages and verifies an ad hoc signed app,
+then installs it at `/Applications/FrameNote.app`. It skips DMG creation and
+Finder automation. Requires macOS on Apple Silicon with arm64 Node.js and the
+same build tools as desktop packaging. No Apple certificate is required.
+
+Quit FrameNote before installing; the script refuses to close it automatically.
+An existing FrameNote installation is replaced after the staged copy passes
+verification. A failed replacement attempts to restore the previous app; if
+restoration fails, the error reports the preserved backup location. Presets and
+the application profile are not modified. A symlink or another app at the target
+path is rejected.
+
+The target folder must be writable. The script does not invoke sudo or silently
+switch destinations. To use your own Applications folder instead, run:
+
+```sh
+pnpm desktop:install --user
+```
+
+Add `--open` to launch the installed copy after success, for example
+`pnpm desktop:install --user --open`. By default the app stays closed.
+Existing `desktop:package` commands still create both the app and DMG.
+
 ## Installing the local build
 
 Copy FrameNote.app to a user-writable Applications folder, then open it normally.
