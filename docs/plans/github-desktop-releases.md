@@ -273,3 +273,16 @@
   Poprawiono wyłącznie kontrolę nazwy w narzędziu publikacji, bez zmiany paczek.
   Szkic przygotowujemy tym samym skryptem z dokładnych artefaktów runu; master
   zachowuje poprawkę dla przyszłych wydań. Tag v0.3.2-beta nie jest przesuwany.
+
+### Szkic gotowy do oceny użytkownika
+
+- Recovery workflow 41489122899: SUCCESS. Szkic release 431742014,
+  tag v0.3.2-beta, draft=true, prerelease=true.
+- Dołączone DMG mac-arm64, EXE win-x64, AppImage linux-x86_64 i SHA256SUMS.
+  Wszystkie trzy sumy zgodne z digestami assetów GitHuba; uploady zakończone.
+- Recovery sprawdza tag/commit oryginalnego runu i sukces validate oraz trzech
+  buildów, a następnie pobiera jego artefakty bez ponownego budowania. Używa
+  jawnego RELEASE_TAG zamiast zarezerwowanego GITHUB_REF_NAME.
+- Poprawki narzędzi publikacji nie zmieniają aplikacji ani istniejącego tagu;
+  są na master dla następnych wydań. Zdalne odzyskanie zastąpiło wolne lokalne
+  pobieranie, które zatrzymano. Publikacji publicznej NIE wykonano.
