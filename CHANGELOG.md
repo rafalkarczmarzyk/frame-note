@@ -11,6 +11,13 @@ entering master receive a version, dated section and local tag according to
 
 ## Unreleased
 
+## [0.2.2-beta] - 2026-11-02
+
+### Fixed
+
+- Add content opens without a category focus ring; Tab still shows keyboard
+  focus. Removed redundant Browse tooltips from the four category buttons.
+
 ## [0.2.1-beta] - 2026-11-02
 
 ### Removed

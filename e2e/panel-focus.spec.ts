@@ -1,6 +1,7 @@
 import { expect, test, type Locator } from '@playwright/test';
 test('panels receive keyboard focus and return it to their opener', async ({
   page,
+  browserName,
 }) => {
   await page.goto('/');
   const bytes = await page.evaluate(() => {
@@ -82,8 +83,30 @@ test('panels receive keyboard focus and return it to their opener', async ({
   await expect(
     page
       .getByRole('dialog', { name: 'Add content', exact: true })
-      .getByRole('button', { name: 'Metadata', exact: true }),
+      .getByRole('group', { name: 'Content categories', exact: true }),
   ).toBeFocused();
+  const contentPanel = page.getByRole('dialog', { name: 'Add content' });
+  const metadata = contentPanel.getByRole('button', {
+    name: 'Metadata',
+    exact: true,
+  });
+  await expect(metadata).toHaveAttribute('aria-pressed', 'true');
+  await expect(contentPanel.locator('button:focus-visible')).toHaveCount(0);
+  await page.keyboard.press(browserName === 'webkit' ? 'Alt+Tab' : 'Tab');
+  await expect(metadata).toBeFocused();
+  await expect(metadata).toHaveCSS('outline-style', 'solid');
+  await metadata.hover();
+  // Wait beyond the tooltip delay to catch accidental Browse tooltips.
+  await page.waitForTimeout(900);
+  await expect(page.getByRole('tooltip')).toHaveCount(0);
+  await page.keyboard.press(browserName === 'webkit' ? 'Alt+Tab' : 'Tab');
+  await expect(
+    contentPanel.getByRole('button', { name: 'Icons', exact: true }),
+  ).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(
+    contentPanel.getByRole('button', { name: 'Icons', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true');
   await dismiss(page.getByRole('dialog', { name: 'Add content', exact: true }));
   await expect(
     page.getByRole('button', { name: 'Add content', exact: true }),

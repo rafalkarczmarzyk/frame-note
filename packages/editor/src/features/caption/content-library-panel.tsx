@@ -8,7 +8,6 @@ import {
 } from 'lucide-react';
 import { FloatingPanel } from '@/components/layout/floating-panel';
 import { Input } from '@/components/ui/input';
-import { Tooltip } from '@/components/ui/tooltip';
 import { CategoryFilter } from '@/components/ui/category-filter';
 import { PickerList } from '@/components/ui/picker-list';
 import { metadataGroups } from '../../../../core/src/caption-tags';
@@ -83,21 +82,22 @@ export function ContentLibraryPanel({
           <div
             role="group"
             aria-label="Content categories"
-            className="control-segments grid !h-auto grid-cols-2 gap-1"
+            data-panel-initial-focus
+            tabIndex={-1}
+            className="control-segments grid !h-auto grid-cols-2 gap-1 outline-none"
           >
             {categories.map(({ value, label, Icon }) => (
-              <Tooltip key={value} content={`Browse ${label.toLowerCase()}`}>
-                <button
-                  type="button"
-                  aria-pressed={category === value}
-                  data-state={category === value ? 'on' : 'off'}
-                  onClick={() => onCategory(value)}
-                  className="control-segment flex h-9 items-center justify-center gap-2 px-2 text-xs"
-                >
-                  <Icon aria-hidden="true" className="size-4" />
-                  {label}
-                </button>
-              </Tooltip>
+              <button
+                key={value}
+                type="button"
+                aria-pressed={category === value}
+                data-state={category === value ? 'on' : 'off'}
+                onClick={() => onCategory(value)}
+                className="control-segment flex h-9 items-center justify-center gap-2 px-2 text-xs"
+              >
+                <Icon aria-hidden="true" className="size-4" />
+                {label}
+              </button>
             ))}
           </div>
           {category !== 'separators' && (
