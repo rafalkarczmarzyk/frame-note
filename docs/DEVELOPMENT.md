@@ -205,7 +205,7 @@ Historical milestones map pre-MVP to `v0.0.1-alpha` and MVP to `v0.0.2-alpha`;
 their target commits are unchanged. Historical manifests are not rewritten.
 
 Version tags on master trigger GitHub Actions to build macOS Apple Silicon DMG,
-Windows x64 EXE and Linux x64 AppImage packages. Successful builds upload and verify all
+Windows x64 portable EXE and Linux x64 AppImage packages. Successful builds upload and verify all
 installers, then publish the GitHub Release automatically. A local tag alone does not upload or
 publish anything. See [desktop release workflow](DESKTOP.md#github-releases).
 

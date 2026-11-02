@@ -88,12 +88,12 @@ await build({
         { x: 460, y: 190, type: 'link', path: '/Applications' },
       ],
     },
-    win: { target: ['nsis'], signAndEditExecutable: false },
-    nsis: {
-      oneClick: false,
-      perMachine: false,
-      allowToChangeInstallationDirectory: true,
+    win: {
+      target: ['portable'],
+      signAndEditExecutable: false,
+      artifactName: 'FrameNote-${version}-win-${arch}-portable.${ext}',
     },
+    portable: { requestExecutionLevel: 'user' },
     linux: {
       target: ['AppImage'],
       category: 'Graphics',

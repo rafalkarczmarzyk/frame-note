@@ -67,7 +67,7 @@ beforeEach(() => {
       'CHANGELOG.md',
       Buffer.from('## [0.3.2-beta] - 2026-11-02\n\nFixed builds.\n'),
     ],
-    ...['mac-arm64.dmg', 'win-x64.exe', 'linux-x86_64.AppImage'].map(
+    ...['mac-arm64.dmg', 'win-x64-portable.exe', 'linux-x86_64.AppImage'].map(
       (suffix) =>
         [
           `release-assets/FrameNote-0.3.2-beta-${suffix}`,
@@ -120,7 +120,9 @@ it('keeps a draft private when an uploaded digest is wrong', async () => {
   expect(state.calls.some((a) => a[1] === 'edit')).toBe(false);
 });
 it('rejects incomplete local build artifacts before creating a release', async () => {
-  state.files.delete('release-assets/FrameNote-0.3.2-beta-win-x64.exe');
+  state.files.delete(
+    'release-assets/FrameNote-0.3.2-beta-win-x64-portable.exe',
+  );
   await expect(run()).rejects.toThrow(
     'Incomplete or unexpected release assets',
   );

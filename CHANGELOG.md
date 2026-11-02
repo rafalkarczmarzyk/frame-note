@@ -11,6 +11,15 @@ entering master receive a version, dated section and local tag according to
 
 ## Unreleased
 
+## [0.3.3-beta] - 2026-11-02
+
+### Changed
+
+- Distribute Windows x64 as a single portable EXE without an installation wizard.
+  User presets and preferences keep their existing locations. macOS DMG and
+  Linux AppImage downloads are unchanged. The unsigned Windows EXE remains
+  subject to Smart App Control and other system security policies.
+
 ## [0.3.2-beta] - 2026-11-02
 
 ### Fixed

@@ -250,7 +250,7 @@ permission and other errors are reported immediately.
 ## GitHub Releases
 
 `pnpm desktop:build` followed by `pnpm desktop:dist` creates an installer in
-`release/ci`: DMG on macOS arm64, NSIS EXE on Windows x64, AppImage on Linux x64.
+`release/ci`: DMG on macOS arm64, portable EXE on Windows x64, AppImage on Linux x64.
 This separate packaging path does not use Finder automation. Existing local
 macOS packaging and installation commands retain their behavior.
 
@@ -276,3 +276,13 @@ A successful build is not proof of native installation or full functionality.
 Record per-system manual installation, font, import/export and preset-restart
 checks before treating a release as verified. No Windows/Linux runtime checks
 have yet been completed for this workflow.
+
+### Windows portable
+
+Windows downloads are `FrameNote-<version>-win-x64-portable.exe`. Run the EXE
+without an installer or administrator prompt from our launcher. Electron is
+extracted temporarily on launch; this is not a single native binary. Presets
+remain in `~/FrameNote/presets` and preferences in the application profile,
+not beside the executable. Moving the EXE does not move user data. The EXE is
+unsigned: Smart App Control can still block it. Portable does not bypass signing
+requirements or Windows security policies. Older releases retain their installers.

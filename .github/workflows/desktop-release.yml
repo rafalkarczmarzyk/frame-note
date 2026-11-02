@@ -54,6 +54,9 @@ jobs:
       - name: Smoke test packaged app (macOS / Windows)
         if: runner.os != 'Linux'
         run: node scripts/smoke-dist-desktop.mjs
+      - name: Smoke test Windows portable launcher
+        if: runner.os == 'Windows'
+        run: node scripts/smoke-portable-windows.mjs
       - name: Smoke test packaged app (Linux)
         if: runner.os == 'Linux'
         run: xvfb-run --auto-servernum node scripts/smoke-dist-desktop.mjs
