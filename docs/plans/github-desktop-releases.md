@@ -256,3 +256,14 @@
   Dalsza dystrybucja wymaga nowego zgodnego tagu po ustaleniu wersji; istniejącego
   v0.3.1-beta nie przesunięto. Manualna instalacja, ZIP i restart presetów na
   Windows/Linux oraz drugi Mac nadal do odbioru.
+
+### Przygotowanie szkicu do odbioru — 0.3.2-beta
+
+- Użytkownik oczekuje gotowego szkicu do sprawdzenia po uzgodnieniu automatycznego
+  procesu. Przygotowujemy nowy commit/tag 0.3.2-beta z poprawkami z master i
+  uruchamiamy tagowany build, bez publicznego publikowania wydania.
+- Poprzedni tag v0.3.1-beta pozostaje niezmieniony; ręczny build 58ad0f5
+  potwierdził trzy paczki i smoke eksportu. Nowy tag identyfikuje dokładnie
+  nową wersję manifestów, buildów i instalatorów.
+- Jedyny przyrost PATCH dla przygotowania poprawionego wydania po pierwszym
+  nieudanym tagowanym buildzie; format presetów pozostaje v1.

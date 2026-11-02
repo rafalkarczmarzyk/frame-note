@@ -11,6 +11,14 @@ entering master receive a version, dated section and local tag according to
 
 ## Unreleased
 
+## [0.3.2-beta] - 2026-11-02
+
+### Fixed
+
+- Allow tagged desktop builds to complete dependency installation on clean CI
+  runners and run preset failure tests correctly on Windows. Successful builds
+  prepare macOS arm64, Windows x64 and Linux x64 downloads in a draft release.
+
 ## [0.3.1-beta] - 2026-11-02
 
 ### Changed
