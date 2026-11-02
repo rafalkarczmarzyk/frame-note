@@ -286,3 +286,38 @@
 - Poprawki narzędzi publikacji nie zmieniają aplikacji ani istniejącego tagu;
   są na master dla następnych wydań. Zdalne odzyskanie zastąpiło wolne lokalne
   pobieranie, które zatrzymano. Publikacji publicznej NIE wykonano.
+
+### Automatyczna publikacja — zmiana decyzji 2026-11-02
+
+- Użytkownik zlecił pominięcie ręcznego zatwierdzania szkiców. Dla kolejnych tagów
+  główny workflow publikuje wydanie po sukcesie trzech buildów/testów i weryfikacji
+  wszystkich assetów. Ten zapis zastępuje wcześniejszy wymóg ręcznej publikacji.
+- Szkic pozostaje stanem przejściowym na czas uploadu. Błąd uploadu lub niezgodne
+  nazwy, liczba plików, rozmiary czy SHA-256 blokują publikację. Beta to prerelease.
+- Ręczne próbne buildy nie publikują. Recovery pozostaje domyślnie draft-only.
+  Istniejącego wydania 0.3.2-beta ani jego tagu nie zmieniamy.
+- Dodano link do wydania/szkicu w podsumowaniu Actions. Brak zmian aplikacji
+  i presetów; konfiguracja publikacji do sprawdzenia przed commitem/pushem.
+- Weryfikacja lokalna: 421/421 testów jednostkowych (w tym 6 przypadków publikacji:
+  sukces, brak flagi, błąd uploadu, błędny digest, brak pliku i istniejące publiczne
+  wydanie), lint zmienionych skryptów/testów, typecheck i formatowanie PASS.
+- To zmiana orkiestracji CI, bez zmiany instalatorów lub działania aplikacji;
+  nie przygotowano nowej wersji ani tagu produktu. Commit/push jeszcze niewykonane.
+  Rzeczywistej publicznej publikacji nie uruchamiano w ramach lokalnej weryfikacji.
+
+### Widoczność wydania na stronie głównej — decyzja 2026-11-02
+
+- Użytkownik chce widzieć wydanie w panelu Releases na stronie głównej.
+  Na jego polecenie obecne 0.3.2-beta ma prerelease=false i Latest; nazwa beta,
+  tag i instalatory pozostają bez zmian. Jest to świadomy wyjątek od wcześniejszej
+  reguły oznaczania beta jako GitHub Pre-release.
+- Lokalna konfiguracja kolejnych automatycznych publikacji ma jawnie ustawiać
+  prerelease=false i Latest. Zastępuje to wcześniejszą decyzję o etykiecie.
+
+- Użytkownik polecił skonfigurować docelowy proces: automatyczny release Latest
+  po nowym zgodnym tagu na master, z zachowaniem starszych wydań i instalatorów.
+  Polecenie obejmuje wdrożenie konfiguracji na GitHubie. Skrypt nie usuwa historii
+  wydań; ponowne użycie opublikowanego tagu kończy się odmową modyfikacji.
+- Końcowe 6 testów publikacji PASS, lint PASS. Wcześniej pełny zestaw 421/421,
+  typy i formatowanie PASS. Nie uruchamiamy nowego tagu tylko dla zmiany CI.
+  Brak zmiany aplikacji lub formatu paczek — bez podbijania wersji produktu.

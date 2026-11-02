@@ -257,9 +257,13 @@ macOS packaging and installation commands retain their behavior.
 Push master and its new `v<product-version>` tag to trigger `Desktop release`.
 The workflow rejects tag/version mismatches and commits outside master. Untagged
 commits do not trigger builds. Manual runs create only seven-day Actions artifacts.
-After all three builds succeed, a draft release receives the installers and
-`SHA256SUMS`. Published releases are never overwritten by reruns. Publishing the
-draft is a separate manual action. Workflow installation requires pushing the
+After all three builds succeed, installers and `SHA256SUMS` are uploaded to a
+temporary draft. The uploaded names, sizes and SHA-256 digests are verified before
+the release is published automatically. No manual approval is needed. Releases are published as normal GitHub releases
+and explicitly marked Latest so they appear on the repository home page. The
+version name retains its beta suffix; GitHub's prerelease label is not used. Failed uploads or verification leave an unpublished
+draft. Published releases are never overwritten by reruns. A link appears in the
+Actions run summary. The recovery workflow still creates a draft for manual review. Workflow installation requires pushing the
 configuration; local commits/tags alone do not enable GitHub Actions.
 
 Standard GitHub-hosted runners are used. No signing secrets are needed: macOS is

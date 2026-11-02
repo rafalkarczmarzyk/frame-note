@@ -13,6 +13,7 @@ const expected = [
 const actual = readdirSync('release-assets').sort();
 if (JSON.stringify(actual) !== JSON.stringify(expected))
   throw Error('Incomplete or unexpected release assets: ' + actual);
+const publish = process.argv.includes('--publish');
 const sums =
   expected
     .map(
@@ -59,7 +60,6 @@ if (!existing) {
     `FrameNote ${version}`,
     '--notes-file',
     'release-notes.md',
-    ...(/-(alpha|beta|rc)$/.test(version) ? ['--prerelease'] : []),
   ]);
 }
 gh([
@@ -70,3 +70,40 @@ gh([
   'release-assets/SHA256SUMS',
   '--clobber',
 ]);
+
+// Keep the release private until all uploads are present and verified.
+const uploaded = JSON.parse(
+  execFileSync('gh', ['release', 'view', tag, '--json', 'url,isDraft,assets'], {
+    encoding: 'utf8',
+  }),
+);
+const names = [...expected, 'SHA256SUMS'];
+if (!uploaded.isDraft || uploaded.assets.length !== names.length)
+  throw Error('Unexpected release state or asset count');
+for (const name of names) {
+  const asset = uploaded.assets.find((item) => item.name === name);
+  const bytes = readFileSync(`release-assets/${name}`);
+  const digest = 'sha256:' + createHash('sha256').update(bytes).digest('hex');
+  if (
+    !asset ||
+    asset.state !== 'uploaded' ||
+    asset.size !== bytes.length ||
+    asset.digest !== digest
+  )
+    throw Error('Uploaded asset verification failed: ' + name);
+}
+if (publish)
+  gh([
+    'release',
+    'edit',
+    tag,
+    '--draft=false',
+    '--prerelease=false',
+    '--latest',
+  ]);
+if (process.env.GITHUB_STEP_SUMMARY)
+  writeFileSync(
+    process.env.GITHUB_STEP_SUMMARY,
+    `## FrameNote ${version}\n\n[${publish ? 'Open published release' : 'Review release draft'}](${uploaded.url})\n`,
+    { flag: 'a' },
+  );
