@@ -9,7 +9,7 @@ import {
   rename,
 } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 import { PresetFiles } from '../../../apps/desktop/src/preset-files';
 import { createPreset } from './presets';
 import { createCaptionLayout } from './caption-layout';
@@ -63,7 +63,7 @@ it('restores an earlier atomic update if a later publish fails and preserves the
   changed.layout.containers[0]!.template = 'Changed';
   const second = { ...value, id: 'two', name: 'Collision' };
   vi.mocked(link).mockImplementation(async (source, destination) => {
-    if (String(destination).endsWith('/collision.json')) {
+    if (basename(String(destination)) === 'collision.json') {
       await fs.writeFile(destination, 'external file', { flag: 'wx' });
       throw Error('Exclusive publish collision');
     }
@@ -89,13 +89,16 @@ it('retains recovery copies if the rollback itself fails', async () => {
   changed.layout.containers[0]!.template = 'Changed';
   const second = { ...value, id: 'two', name: 'Second' };
   vi.mocked(link).mockImplementation(async (source, destination) => {
-    if (String(destination).endsWith('/second.json'))
+    if (basename(String(destination)) === 'second.json')
       throw Error('Publish failed');
     return fs.link(source, destination);
   });
   let replacements = 0;
   vi.mocked(rename).mockImplementation(async (source, destination) => {
-    if (String(destination).endsWith('/original.json') && ++replacements === 2)
+    if (
+      basename(String(destination)) === 'original.json' &&
+      ++replacements === 2
+    )
       throw Error('Rollback failed');
     return fs.rename(source, destination);
   });

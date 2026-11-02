@@ -233,3 +233,13 @@
   określa politykę skryptu niewykorzystywanego narzędzia Squirrel; nie zmienia
   aplikacji, formatu paczek ani runtime dependencies. Klasyfikacja: narzędzia CI,
   bez nowej wersji produktu, changeloga i tagu. Nie przesuwamy v0.3.1-beta.
+
+### Próbny build master — 43135a0
+
+- Run 41485465703: instalacja przechodzi na trzech systemach; macOS i Linux
+  zakończone sukcesem (pakowanie, smoke eksportu JPG offline, upload artefaktów).
+- Windows: dwa testy preset-files-failure nie wstrzykiwały błędu, ponieważ
+  endsWith('/nazwa.json') nie pasuje do separatora Windows. Zastąpiono je
+  basename(destination), bez zmiany kodu aplikacji. Trzy testy pliku lokalnie PASS.
+- Kontynuacja autoryzowanej naprawy CI: test-only commit/push i kolejny próbny
+  workflow, bez podbijania wersji i bez przesuwania istniejącego tagu.
