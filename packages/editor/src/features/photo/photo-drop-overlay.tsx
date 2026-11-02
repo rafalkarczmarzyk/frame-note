@@ -7,7 +7,7 @@ export function PhotoDropOverlay() {
       role="status"
     >
       <div className="flex h-full flex-col items-center justify-center rounded-3xl border-2 border-dashed border-drop-border p-6 text-center">
-        <p className="text-center font-display text-3xl font-normal tracking-tight sm:text-5xl">
+        <p className="text-center font-display text-3xl font-semibold tracking-tight sm:text-5xl">
           Add your photos.
         </p>
         <p className="mt-5 text-sm text-drop-secondary">

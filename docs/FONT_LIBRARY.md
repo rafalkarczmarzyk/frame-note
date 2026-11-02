@@ -1,9 +1,8 @@
 # Caption font library
 
-The picker includes the 25 requested Google Fonts families and the existing
-RetiredDisplay. Stable family identifiers live in `src/domain/fonts.ts`; presets never
-store font delivery URLs. `Montserrat Variable` and `RetiredDisplay` retain their
-existing identifiers. Preset v1 now accepts arbitrary nonempty family names by explicit product
+The picker includes 25 Google Fonts families. Stable family identifiers live in
+`packages/core/src/fonts.ts`; presets never store font delivery URLs.
+`Montserrat Variable` retains its existing identifier. Preset v1 now accepts arbitrary nonempty family names by explicit product
 decision. Unknown/unloadable families retain their saved name, show Unavailable
 inside the font selector, and render using Montserrat. Explicit selection changes
 the saved family; loading and saving alone preserve it. Older readers may reject
@@ -12,8 +11,7 @@ these names.
 ## Delivery and variants
 
 Montserrat continues to use the existing Fontsource package because it also styles
-the interface. Its existing CSS, font files and rendering are retained. RetiredDisplay
-continues to use the supplied local files.
+the interface. Its CSS and font files also supply interface headings.
 
 The 24 added families are local WOFF2 files in `public/fonts/google`. They were
 retrieved from the official [Google Fonts repository](https://github.com/google/fonts/tree/main/ofl)
@@ -41,14 +39,13 @@ explicit cache/service worker before it can promise a first offline launch.
 ## Licenses and coverage
 
 All 24 downloaded families carry SIL Open Font License 1.1, included beside each
-family. Montserrat's OFL accompanies its installed Fontsource package. RetiredDisplay's
-license was absent from the supplied archive and remains unresolved before
-redistribution; this task preserves the existing asset and picker entry.
+family. Montserrat's OFL accompanies its installed Fontsource package. The previously
+bundled RetiredDisplay assets and picker entry have been removed from current source.
 
 An offline audit of the font cmap tables checked `ąćęłńóśźżĄĆĘŁŃÓŚŹŻ` in every
 included face. Montserrat's Latin and Latin Extended subsets jointly cover these
 letters. All added families except Prata have the full set. Prata lacks most Polish
-letters; legacy RetiredDisplay also has incomplete coverage. These are recorded audit
+letters. These are recorded audit
 findings, not runtime validation or export restrictions. Per user feedback, the
 picker does not show a Polish alphabet or interrupt the existing rendering flow.
 Other scripts are not comprehensively audited.

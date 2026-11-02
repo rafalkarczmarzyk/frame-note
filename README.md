@@ -92,7 +92,7 @@ builds or installers are published. A local tag does not itself publish anything
   editable and are excluded from the preview and export.
 - **Flexible positioning.** Use nine anchors within shared margins, or drag a
   layer into Manual positioning with X/Y coordinates relative to the photo.
-- **Consistent styling.** Choose from 25 Google Fonts families plus RetiredDisplay, supported Bold/Italic variants,
+- **Consistent styling.** Choose from 25 Google Fonts families, supported Bold/Italic variants,
   alignment, line spacing, opacity, quick colors, or a custom HEX color. Size
   content in pixels or as a percentage of the short or long image edge.
 - **Layer backgrounds.** Choose None, Color or Glass in the selected layer inspector.
@@ -310,11 +310,10 @@ UI colors are defined in `packages/editor/src/index.css` and consumed through se
 `pnpm check:tokens` checks this convention. The accessibility addon supports
 component review; it is not a complete accessibility audit.
 
-The caption library offers 25 Google Fonts families plus RetiredDisplay, with category
+The caption library offers 25 Google Fonts families, with category
 filters and local fonts loaded on demand. See [font delivery and licenses](docs/FONT_LIBRARY.md).
-Montserrat is bundled through `@fontsource-variable/montserrat`. RetiredDisplay files
-are stored in `public/fonts/RetiredDisplay`; the supplied archive did not include a
-license file, so its licensing needs review before distribution.
+Montserrat is bundled through `@fontsource-variable/montserrat` and also styles
+interface headings. Font licenses accompany the bundled families.
 
 ### Repository structure
 

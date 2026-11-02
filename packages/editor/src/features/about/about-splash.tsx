@@ -63,7 +63,7 @@ export function AboutSplash({ onClose }: { onClose: () => void }) {
         <section className="flex flex-1 flex-col items-center justify-center px-6 py-8 text-center">
           <h1
             id={title}
-            className="font-display text-4xl font-normal tracking-tight sm:text-6xl"
+            className="font-display text-4xl font-semibold tracking-tight sm:text-6xl"
           >
             Leave your mark.
           </h1>

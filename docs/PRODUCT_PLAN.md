@@ -230,7 +230,8 @@ jednego kontenera. Istniejące wzorce eksportu pozostają bez zmian.
 - Pomocniczy panel tagów/fontów/kolorów pływa nad canvasem, ma przydymione szkło i osobny
   scroll. Otwarcie panelu nie może zmieniać wymiarów zdjęcia.
 - Wspólne prymitywy zamiast osobnych kopii kontrolek. Podział Storybooka na Design, Components (UI/Layout/Brand) i Screens.
-- Montserrat dla interfejsu, RetiredDisplay dla ozdobnych nagłówków.
+- Montserrat dla interfejsu i nagłówków (aktualizacja po usunięciu RetiredDisplay;
+  dawny wygląd pre-MVP pozostaje opisany w sekcji historycznej).
 - Paleta bazowa: charcoal (wariant bazowy, ciemny i jasny), slate, porcelain.
   Primary używa emerald; ikony sekcji mają osobne akcenty. Tło przeciągania
   pozostaje slate, niezależnie od primary. Header i sidebar mają tło charcoal. HEX tylko w definicjach

@@ -146,7 +146,8 @@ Nie zapisywać ścieżek systemowych w przenośnym presecie ani nie obiecywać
 osadzania plików fontów. Bez rozszerzenia zakresu pozostaje obecny katalog.
 Nie rozbudowywać migracji presetów ani formatu dla hipotetycznych potrzeb.
 
-Przed dystrybucją rozstrzygnąć opisaną w FONT_LIBRARY.md licencję RetiredDisplay.
+RetiredDisplay usunięto z aktualnych zasobów; historię jego plików obejmuje osobny plan
+[usunięcia fontu](plans/remove-RetiredDisplay.md).
 
 Odbiór: fonty i presety działają na obu platformach; brak cichego zastępowania
 fontu w eksporcie i uzgodnione zachowanie ewentualnych fontów systemowych.

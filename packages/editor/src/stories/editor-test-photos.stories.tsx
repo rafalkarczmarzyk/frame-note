@@ -164,7 +164,7 @@ multipleLayout.containers[1]!.template = '{exposure}';
 multipleLayout.containers[1]!.position.anchor = 'bottom-right';
 multipleLayout.containers[2]!.template = 'A closer look';
 multipleLayout.containers[2]!.position.anchor = 'top-center';
-multipleLayout.containers[2]!.style.fontFamily = 'RetiredDisplay';
+multipleLayout.containers[2]!.style.fontFamily = 'Playfair Display';
 multipleLayout.containers[2]!.style.fontSize = 4;
 
 export const MultipleCaptions: Story = {

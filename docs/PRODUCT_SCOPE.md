@@ -88,8 +88,8 @@ komentarza, nie dowolnego opisu stackowania ani wszystkich programów.
 
 Każdy blok tekstowy ma własny font, grubość, rozmiar, kolor, przezroczystość,
 interlinię i wyrównanie. W obecnym zakresie styl obowiązuje cały blok;
-różny wygląd treści uzyskuje się przez osobne bloki. Dostępne są Montserrat
-i RetiredDisplay, odmiany Regular i Bold.
+różny wygląd treści uzyskuje się przez osobne bloki. Dostępnych jest 25 rodzin Google Fonts oraz fonty systemowe na desktopie.
+Odmiany Regular/Bold i Italic zależą od rzeczywistych plików danej rodziny.
 
 Wspólna jednostka pozwala określać rozmiary w pikselach albo względem krótszego
 lub dłuższego boku zdjęcia, również z wartościami ułamkowymi. Rozmiary względne

@@ -4,25 +4,9 @@
 @import '@fontsource-variable/montserrat';
 @import '@fontsource-variable/montserrat/wght-italic.css';
 
-@font-face {
-  font-family: 'RetiredDisplay';
-  src: url('/fonts/RetiredDisplay/RetiredDisplay-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'RetiredDisplay';
-  src: url('/fonts/RetiredDisplay/RetiredDisplay-Bold.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
 @theme static {
   --font-sans: 'Montserrat Variable', sans-serif;
-  --font-display: 'RetiredDisplay', Georgia, serif;
+  --font-display: 'Montserrat Variable', sans-serif;
   --color-charcoal: #383f51;
   --color-charcoal-dark: #292e3b;
   --color-charcoal-light: #454e64;

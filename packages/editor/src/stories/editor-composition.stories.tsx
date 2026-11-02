@@ -126,8 +126,8 @@ function EditorDemo({
                     ),
                   },
                   {
-                    id: 'RetiredDisplay',
-                    label: 'RetiredDisplay',
+                    id: 'Playfair Display',
+                    label: 'Playfair Display',
                     preview: (
                       <span className="font-display text-2xl">
                         Leave your mark.

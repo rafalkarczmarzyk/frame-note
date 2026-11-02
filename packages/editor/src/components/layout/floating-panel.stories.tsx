@@ -60,8 +60,8 @@ export const FontContent: Story = {
             ),
           },
           {
-            id: 'RetiredDisplay',
-            label: 'RetiredDisplay',
+            id: 'playfair-display',
+            label: 'Playfair Display',
             selected: true,
             preview: (
               <span className="font-display text-2xl">Leave your mark.</span>

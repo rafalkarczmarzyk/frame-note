@@ -106,7 +106,7 @@ after the first launch attempt. This is not Apple Developer ID trust; do not
 interpret a Gatekeeper rejection as a failed integrity check. Cross-machine launch
 must still be tested before declaring a build verified for distribution.
 Do not disable system protections. Public distribution requires Apple signing,
-notarization and resolution of the RetiredDisplay redistribution license.
+notarization. See FONT_LIBRARY.md for the current bundled fonts and licenses.
 
 To update manually, quit FrameNote and replace the app bundle. Starting with
 `0.1.0-beta`, user presets are individual v1 JSON files in

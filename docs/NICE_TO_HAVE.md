@@ -4,6 +4,17 @@ Pomysły świadomie odłożone przez użytkownika. Ta lista nie jest zatwierdzon
 zakresem ani kolejką do automatycznej realizacji. Wdrożenie wymaga osobnego
 polecenia. Nowe decyzje dopisujemy lub aktualizujemy w istniejącym wpisie.
 
+## NTH-007 — Zmiana logotypu po rezygnacji z fontu
+
+- **Status:** odłożone.
+- **Data decyzji:** 2026-11-02.
+- **Źródło:** plan usunięcia RetiredDisplay ze względów licencyjnych.
+- **Decyzja użytkownika:** logotyp zmieni się później; obecnie jest SVG,
+  nie dołącza pliku fontu. Na start usuwamy font i dostosowujemy typografię UI.
+- **Przy powrocie:** uzgodnić nowy logotyp i zakres wymiany zasobów. Wpis nie
+  stanowi oceny prawnej obecnego SVG ani zgody na redesign.
+- **Plan:** [Usunięcie fontu i redesign](plans/remove-RetiredDisplay.md).
+
 ## NTH-002 — Wersjonowane schematy presetów i migracje
 
 - **Status:** v1 wdrożone w 0.1.0-beta; migracje obowiązują przy przyszłych wersjach.

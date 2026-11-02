@@ -66,7 +66,7 @@ export const NoItalicInspector: Story = {
     scope: 'local',
     caption: {
       ...createCaption(),
-      style: { ...createCaption().style, fontFamily: 'RetiredDisplay' },
+      style: { ...createCaption().style, fontFamily: 'Playfair Display' },
     },
   },
 };

@@ -125,7 +125,7 @@ export function FloatingPanel({
         <div className="flex items-center justify-between gap-3">
           <h2
             id={titleId}
-            className="font-display text-xl leading-6 font-normal"
+            className="font-display text-sm leading-6 font-semibold"
           >
             {title}
           </h2>

@@ -76,7 +76,7 @@ export function SidebarSection({
             </span>
           )}
           <span className="min-w-0 flex-1">
-            <span className="block font-display text-xl leading-6 font-normal text-accordion-label">
+            <span className="block font-display text-sm leading-6 font-semibold text-accordion-label">
               {title}
             </span>
             {description && (

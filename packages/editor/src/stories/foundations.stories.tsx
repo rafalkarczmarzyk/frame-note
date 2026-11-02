@@ -48,9 +48,11 @@ export const Typography: Story = {
     <div className="space-y-6">
       <div>
         <p className="mb-2 text-xs text-content-secondary">
-          Display / RetiredDisplay
+          Headings / Montserrat
         </p>
-        <h1 className="font-display text-5xl">Leave your mark.</h1>
+        <h1 className="font-display text-5xl font-semibold">
+          Leave your mark.
+        </h1>
       </div>
       <div>
         <p className="mb-2 text-xs text-content-secondary">
@@ -138,7 +140,9 @@ export const UsageTokens: Story = {
     <div className="space-y-8">
       {surfaceGroups.map((group) => (
         <section key={group.title}>
-          <h2 className="mb-3 font-display text-2xl">{group.title}</h2>
+          <h2 className="mb-3 font-display text-lg font-semibold">
+            {group.title}
+          </h2>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {group.tokens.map((name) => (
               <div key={name} className="flex items-center gap-3">
@@ -158,7 +162,7 @@ export const UsageTokens: Story = {
 export const ControlSurfaces: Story = {
   render: () => (
     <div className="max-w-sm space-y-4 rounded-xl bg-accordion-base p-5">
-      <h2 className="font-display text-xl text-accordion-label">
+      <h2 className="font-display text-sm font-semibold text-accordion-label">
         Control surfaces
       </h2>
       <Input aria-label="Example input" placeholder="Input placeholder" />

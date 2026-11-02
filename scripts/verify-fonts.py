@@ -22,7 +22,4 @@ for style in ['normal', 'italic']:
         path = root / f'node_modules/@fontsource-variable/montserrat/files/montserrat-{subset}-wght-{style}.woff2'
         coverage.update(TTFont(path).getBestCmap())
     assert all(ord(c) in coverage for c in polish)
-for path in (root / 'public/fonts/RetiredDisplay').glob('*.woff2'):
-    missing = ''.join(c for c in polish if ord(c) not in TTFont(path).getBestCmap())
-    assert missing == 'ąćęłńśźżĄĆĘŁŃŚŹŻ'
-print('Montserrat and legacy RetiredDisplay checked.')
+print('Montserrat checked.')

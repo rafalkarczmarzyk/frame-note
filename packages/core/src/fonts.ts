@@ -27,7 +27,6 @@ export const fontIds = [
   'Oswald',
   'Archivo Black',
   'Cinzel',
-  'RetiredDisplay',
 ] as const;
 export type FontFamily = string;
 
@@ -69,14 +68,6 @@ export const captionFonts: readonly CaptionFont[] = [
     missingPolish:
       font.faces.map((face) => face.missingPolish).find(Boolean) ?? '',
   })),
-  {
-    id: 'RetiredDisplay',
-    label: 'RetiredDisplay',
-    category: 'Display',
-    italic: false,
-    bold: true,
-    missingPolish: 'ąćęłńśźżĄĆĘŁŃŚŹŻ',
-  },
 ];
 export function captionFont(id: string) {
   return (
