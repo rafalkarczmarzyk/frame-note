@@ -1,0 +1,43 @@
+name: Complete desktop draft
+on:
+  workflow_dispatch:
+    inputs:
+      build_run:
+        description: Tagged build run with successful validate and all build jobs
+        required: true
+      tag:
+        description: Existing version tag of that build
+        required: true
+permissions:
+  contents: read
+jobs:
+  draft:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version-file: .nvmrc
+      - name: Verify build provenance and restore version metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUILD_RUN: ${{ inputs.build_run }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: node scripts/verify-desktop-draft-recovery.mjs
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          run-id: ${{ inputs.build_run }}
+          github-token: ${{ github.token }}
+          pattern: desktop-*
+          path: release-assets
+          merge-multiple: true
+      - name: Complete draft without publishing
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REF_NAME: ${{ inputs.tag }}
+        run: node scripts/publish-desktop-draft.mjs
