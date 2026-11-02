@@ -18,7 +18,6 @@ declare global {
         touchedIds?: readonly string[],
       ): Promise<void>;
       saveFile(name: string, bytes: Uint8Array): Promise<'saved' | 'cancelled'>;
-      setSessionOpen(value: boolean): void;
       onCommand(
         callback: (command: 'open' | 'export' | 'about') => void,
       ): () => void;
@@ -66,15 +65,6 @@ desktop.onCommand((command) => {
     )
     ?.click();
 });
-let reported = false;
-new MutationObserver(() => {
-  const open = !!document.querySelector('[data-photo-canvas] canvas');
-  if (open !== reported) {
-    reported = open;
-    desktop.setSessionOpen(open);
-  }
-}).observe(document.documentElement, { subtree: true, childList: true });
-
 mountEditor({
   platform: getDesktopPlatform(desktop.platform),
 });

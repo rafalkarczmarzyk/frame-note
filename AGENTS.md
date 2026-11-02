@@ -68,6 +68,19 @@ Nie włączaj odłożonych pomysłów do bieżącego zakresu bez polecenia użyt
 
 ## Regresja wizualna interfejsu
 
+### Uruchamianie desktopu w testach
+
+`pnpm test:desktop` wymaga sesji graficznej macOS i dostępu do usług systemowych.
+W Codex uruchamiaj go od pierwszej próby przez `exec_command` z
+`sandbox_permissions: "require_escalated"`. Nie uruchamiaj Electrona próbnie
+w ograniczonym środowisku: macOS może przerwać jego start w `_RegisterApplication`
+i pokazać użytkownikowi raport awarii. Skrypt testowy blokuje znane ograniczone
+środowiska przed startem Electrona; nie usuwaj znaczników środowiska, by ominąć
+tę kontrolę. Brak odpowiedniego dostępu oznacza niewykonaną weryfikację.
+Testy desktopowe i przeglądarkowe uruchamiaj kolejno, żeby nie konkurowały o fokus.
+
+### Kontrola wyglądu
+
 Przed oddaniem zmian wyglądu, kontrolek lub układu uruchom `pnpm test:visual`.
 Przy zmianach wspólnych styli i komponentów sprawdź również
 `pnpm test:visual --all-projects`. Katalog scen i sposób przeglądania różnic:

@@ -6,9 +6,6 @@ contextBridge.exposeInMainWorld('frameNoteDesktop', {
   writePresets: (source, touchedIds) =>
     ipcRenderer.invoke('presets-write', source, touchedIds),
   saveFile: (name, bytes) => ipcRenderer.invoke('save-output', name, bytes),
-  setSessionOpen: (value) => {
-    if (typeof value === 'boolean') ipcRenderer.send('session-state', value);
-  },
   onCommand: (callback) => {
     const listener = (_event, command) => {
       if (command === 'open' || command === 'export' || command === 'about')

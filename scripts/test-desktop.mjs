@@ -1,11 +1,13 @@
 import { verifyWindowChrome } from './desktop-window-chrome.mjs';
 import { verifyTooltipMaterial } from './desktop-tooltip-material.mjs';
+import { assertDesktopTestEnvironment } from './desktop-test-environment.mjs';
 import ExifReader from 'exifreader';
 import { _electron as electron, expect } from '@playwright/test';
 import { createRequire } from 'node:module';
-import { readFile, readdir, mkdtemp, rm } from 'node:fs/promises';
+import { readFile, readdir, mkdtemp, mkdir, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
+assertDesktopTestEnvironment(process.platform, process.env);
 const require = createRequire(import.meta.url);
 const env = { ...process.env };
 delete env.ELECTRON_RUN_AS_NODE;
@@ -21,8 +23,9 @@ const launch = () =>
     ],
     env,
   });
-let app = await launch();
+let app;
 try {
+  app = await launch();
   const page = await app.firstWindow();
   const errors = [];
   page.on('dialog', (dialog) => dialog.accept());
@@ -64,7 +67,8 @@ try {
   });
   if (!process.argv.includes('--chrome-only')) {
     await page.context().setOffline(true);
-    const temp = await mkdtemp(resolve(tmpdir(), 'framenote-desktop-'));
+    const temp = resolve(profileRoot, 'exports');
+    await mkdir(temp);
     const output = resolve(temp, 'output.jpg');
     await app.evaluate(({ dialog }, file) => {
       dialog.showSaveDialog = async () => ({ canceled: false, filePath: file });
@@ -126,7 +130,9 @@ try {
     if (!(await page.evaluate(() => typeof window.require === 'undefined')))
       throw new Error('Node exposed');
     await app.evaluate(({ dialog }) => {
-      dialog.showMessageBoxSync = () => 1;
+      dialog.showMessageBoxSync = () => {
+        throw new Error('Unexpected native confirmation dialog');
+      };
     });
     await page.evaluate(() => {
       window.confirm = () => true;
@@ -210,7 +216,13 @@ try {
       .getByRole('button', { name: 'Close manage presets', exact: true })
       .click();
     await page.screenshot({ path: 'release/FrameNote-macOS-preview.png' });
+    const windowClosed = page.waitForEvent('close', { timeout: 10000 });
+    await app.evaluate(({ BrowserWindow }) => {
+      BrowserWindow.getAllWindows()[0].close();
+    });
+    await windowClosed;
     await app.close();
+    app = undefined;
     app = await launch();
     const reopened = await app.firstWindow();
     await reopened.locator('details[data-section="export"] > summary').click();
@@ -231,6 +243,9 @@ try {
   }
   if (errors.length) throw new Error(errors.join('\n'));
 } finally {
-  await app.close();
-  await rm(profileRoot, { recursive: true, force: true });
+  try {
+    await app?.close();
+  } finally {
+    await rm(profileRoot, { recursive: true, force: true });
+  }
 }

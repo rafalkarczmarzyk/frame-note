@@ -11,6 +11,12 @@ entering master receive a version, dated section and local tag according to
 
 ## Unreleased
 
+## [0.2.1-beta] - 2026-11-02
+
+### Removed
+
+- Desktop no longer asks for confirmation when closing an open photo session.
+
 ## [0.2.0-beta] - 2026-11-01
 
 ### Added

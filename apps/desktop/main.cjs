@@ -34,7 +34,6 @@ protocol.registerSchemesAsPrivileged([
   },
 ]);
 let window;
-let hasWork = false;
 function trusted(event) {
   return (
     event.sender === window?.webContents &&
@@ -79,9 +78,6 @@ app.whenReady().then(async () => {
       },
     }),
   );
-  ipcMain.on('session-state', (event, value) => {
-    if (trusted(event) && typeof value === 'boolean') hasWork = value;
-  });
   ipcMain.handle('presets-read', (event) => {
     if (!trusted(event)) throw Error('Untrusted preset request.');
     return presetFiles.read();
@@ -195,20 +191,6 @@ app.whenReady().then(async () => {
   });
   window.webContents.on('will-navigate', (event, url) => {
     if (!url.startsWith('framenote://app/')) event.preventDefault();
-  });
-  window.on('close', (event) => {
-    if (hasWork) {
-      const result = dialog.showMessageBoxSync(window, {
-        type: 'question',
-        buttons: ['Keep editing', 'Discard and close'],
-        defaultId: 0,
-        cancelId: 0,
-        message: 'Close FrameNote and discard this session?',
-        detail:
-          'Unsaved layouts and open photos will be closed. Saved presets and source files are kept.',
-      });
-      if (result !== 1) event.preventDefault();
-    }
   });
   session.defaultSession.on('will-download', (_event, item) => {
     item.setSaveDialogOptions({

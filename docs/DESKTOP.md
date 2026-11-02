@@ -55,6 +55,16 @@ It can target a packaged executable through the `FRAMENOTE_PACKAGED` environment
 variable. It requires a macOS graphical session. Run desktop and web tests
 sequentially to avoid competing for application focus.
 
+Run the desktop test from a terminal in the logged-in macOS graphical session.
+In Codex, use elevated execution (`sandbox_permissions: "require_escalated"`)
+for `pnpm test:desktop` on the first attempt. Launching Electron inside the
+restricted Seatbelt environment can abort in macOS `_RegisterApplication` and
+display a system crash report. The runner rejects known sandbox markers before
+launching Electron; this is a failed environment check, not a passed or skipped
+test. Do not remove the markers to bypass it. This guard detects known restricted
+environments; it does not guarantee that every graphical session is available.
+Temporary test files are removed even if application startup fails.
+
 ## Installing the local build
 
 Copy FrameNote.app to a user-writable Applications folder, then open it normally.
@@ -92,8 +102,8 @@ enabled each session. Configuration files and cloud sync are not implemented.
 Tests launched with `--user-data-dir` put presets under that isolated profile's
 `FrameNote/presets` directory, leaving the real home directory untouched.
 
-Open photos and unsaved per-photo edits are session-only. Closing an open session
-asks for confirmation, including sessions whose images have already been exported.
+Open photos and unsaved per-photo edits are session-only. Closing the window or quitting
+the application ends the session without confirmation.
 The built-in font catalog is available offline. Installed font families are listed in the System category. On macOS the
 application reads the native AppKit font catalog once at startup, then loads
 visible previews and selected faces locally. Restart after installing fonts.
