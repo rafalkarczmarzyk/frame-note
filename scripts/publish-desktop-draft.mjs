@@ -3,7 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 const version = JSON.parse(readFileSync('package.json', 'utf8')).version;
-const tag = process.env.GITHUB_REF_NAME;
+const tag = process.env.RELEASE_TAG || process.env.GITHUB_REF_NAME;
 if (tag !== `v${version}`) throw Error('Tag/version mismatch');
 const expected = [
   `FrameNote-${version}-mac-arm64.dmg`,

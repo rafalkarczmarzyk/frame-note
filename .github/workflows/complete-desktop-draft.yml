@@ -39,5 +39,5 @@ jobs:
       - name: Complete draft without publishing
         env:
           GH_TOKEN: ${{ github.token }}
-          GITHUB_REF_NAME: ${{ inputs.tag }}
+          RELEASE_TAG: ${{ inputs.tag }}
         run: node scripts/publish-desktop-draft.mjs
