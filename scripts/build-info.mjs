@@ -1,6 +1,8 @@
+// SPDX-FileCopyrightText: 2026 Rafał Karczmarzyk
+// SPDX-License-Identifier: GPL-3.0-or-later
 import { URL } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 export function buildInfo() {
   const { version } = JSON.parse(
     readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
@@ -17,7 +19,13 @@ export function buildInfo() {
       stdio: ['ignore', 'pipe', 'ignore'],
     }).trim();
   } catch {
-    /* Source archives can be built without Git metadata. */
+    const metadata = new URL('../.framenote-source.json', import.meta.url);
+    if (existsSync(metadata)) {
+      const source = JSON.parse(readFileSync(metadata, 'utf8'));
+      if (source.version !== version || !/^[a-f0-9]{40}$/.test(source.commit))
+        throw Error('Invalid source archive identity');
+      commit = source.commit.slice(0, 7);
+    }
   }
   return { version, commit, dirty };
 }

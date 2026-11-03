@@ -1,22 +1,25 @@
 import { verifyWindowChrome } from './desktop-window-chrome.mjs';
 import { verifyTooltipMaterial } from './desktop-tooltip-material.mjs';
+import { verifyDesktopLicenseReader } from './desktop-license-reader.mjs';
 import { assertDesktopTestEnvironment } from './desktop-test-environment.mjs';
 import ExifReader from 'exifreader';
 import { _electron as electron, expect } from '@playwright/test';
-import { createRequire } from 'node:module';
+import { desktopExecutable } from './desktop-runtime.mjs';
 import { readFile, readdir, mkdtemp, mkdir, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 assertDesktopTestEnvironment(process.platform, process.env);
-const require = createRequire(import.meta.url);
+const executable =
+  process.env.FRAMENOTE_PACKAGED || (await desktopExecutable());
 const env = { ...process.env };
 delete env.ELECTRON_RUN_AS_NODE;
+delete env.FRAMENOTE_DEV_SERVER_URL;
 const profileRoot = await mkdtemp(resolve(tmpdir(), 'framenote-profile-'));
 // A first launch must create a previously nonexistent user-data directory.
 const profile = resolve(profileRoot, 'user-data');
 const launch = () =>
   electron.launch({
-    executablePath: process.env.FRAMENOTE_PACKAGED || require('electron'),
+    executablePath: executable,
     args: [
       ...(process.env.FRAMENOTE_PACKAGED ? [] : [resolve('apps/desktop')]),
       '--user-data-dir=' + profile,
@@ -32,6 +35,7 @@ try {
   page.on('pageerror', (error) => errors.push(error.message));
   await page.waitForLoadState('networkidle');
   await expect(page.getByLabel('Choose JPG or PNG photo')).toBeAttached();
+  await verifyDesktopLicenseReader(app, page);
   const nativeFonts = await page.evaluate(() =>
     window.frameNoteDesktop.readSystemFonts(),
   );

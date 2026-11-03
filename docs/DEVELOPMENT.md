@@ -15,12 +15,28 @@ pnpm install --frozen-lockfile
 ```
 
 With dependencies installed, `pnpm run dev` serves web on port 3000 and
-`pnpm run desktop` builds and launches Electron. If Electron installation was
+`pnpm run desktop` launches Electron with live UI updates from a loopback Vite server on port 3001. If Electron installation was
 skipped, run `node node_modules/electron/install.js`.
 
 Vite and Storybook listen on `0.0.0.0`: use the printed network address to open
 them from another device on your LAN. Web uses port 3000, Storybook 6006; the
 web development server fails if its port is occupied.
+
+Desktop preview is local to this computer. Closing the window or pressing Ctrl+C
+stops Electron and the preview server. Native restarts reset open photos; React
+Fast Refresh preserves state where the edited module supports it. Fix syntax
+errors to resume updates. Port 3001 must be free.
+
+Use `pnpm run desktop:preview` to compile and launch once without live updates.
+`pnpm run desktop:build` creates the standalone app at
+`release/FrameNote-darwin-arm64/FrameNote.app` on macOS Apple Silicon. Open that
+app in Finder; the `release/dev` directory is only an internal Electron runtime.
+`pnpm run desktop:compile` prepares renderer/adapter files for tests or `desktop:dist`
+without creating an app bundle.
+`pnpm run test:desktop:dev` checks live updates and native restarts in a macOS
+graphical session, with the same elevated-execution requirement as desktop tests.
+It temporarily edits and restores the empty-canvas text and preload source;
+run it without concurrent source edits.
 
 ## Stack
 
@@ -58,8 +74,10 @@ project tool such as Playwright. The shorter `pnpm <script>` form is also valid.
 | `pnpm run test:visual:update`     | Update explicitly selected visual references; requires --project and --grep                             |
 | `pnpm run storybook`              | Start Storybook on port 6006                                                                            |
 | `pnpm run build-storybook`        | Build static Storybook                                                                                  |
-| `pnpm run desktop`                | Build and launch Electron                                                                               |
-| `pnpm run desktop:build`          | Typecheck and build desktop renderer and preset adapter                                                 |
+| `pnpm run desktop`                | Live desktop preview; UI refreshes on save                                                              |
+| `pnpm run desktop:build`          | Create a runnable FrameNote.app on macOS Apple Silicon, without installation or DMG                     |
+| `pnpm run desktop:compile`        | Compile renderer and adapter for tests and platform-specific distribution                               |
+| `pnpm run desktop:preview`        | Compile and launch once without live updates                                                            |
 | `pnpm run desktop:install`        | Build and install locally on macOS Apple Silicon; supports --user and --open                            |
 | `pnpm run desktop:package`        | Clean release, build and package local macOS arm64 app and DMG                                          |
 | `pnpm run desktop:package:signed` | Local macOS packaging using explicit DEVELOPER_ID; no notarization                                      |
@@ -133,7 +151,7 @@ pnpm run desktop:package
 The separate cross-platform packaging path requires a fresh build first:
 
 ```sh
-pnpm run desktop:build
+pnpm run desktop:compile
 pnpm run desktop:dist
 ```
 
@@ -148,7 +166,7 @@ installs without creating a DMG. Details and signing options: [desktop guide](DE
 After building the desktop, run it separately from a graphical macOS session:
 
 ```sh
-pnpm run desktop:build
+pnpm run desktop:compile
 pnpm run test:desktop
 ```
 

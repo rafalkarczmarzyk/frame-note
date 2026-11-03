@@ -1,0 +1,12 @@
+{
+  "react-remove-scroll-bar@2.3.8": {
+    "repository": "https://github.com/theKashey/react-remove-scroll-bar",
+    "commit": "8ca9ba5ea52de03308fe8ced94f7b159a44d28ff",
+    "reason": "npm gitHead is unavailable. All four src modules transpile to the published es2019 modules after AST normalization. Reverify during source preparation."
+  },
+  "react-style-singleton@2.2.3": {
+    "repository": "https://github.com/theKashey/react-style-singleton",
+    "commit": "0855d4b3478326fda30efff7e0511540be7f57e8",
+    "reason": "npm gitHead is unavailable. All four src modules transpile to the published es2019 modules after AST normalization. Reverify during source preparation."
+  }
+}

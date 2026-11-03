@@ -1,12 +1,13 @@
 {
   "name": "@framenote/web",
   "private": true,
-  "version": "0.3.3-beta",
+  "version": "0.3.4-beta",
   "type": "module",
   "scripts": {
     "build": "vite build --config ../../vite.config.ts"
   },
   "dependencies": {
     "@framenote/editor": "workspace:*"
-  }
+  },
+  "license": "GPL-3.0-or-later"
 }

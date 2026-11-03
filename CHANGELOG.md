@@ -11,6 +11,35 @@ entering master receive a version, dated section and local tag according to
 
 ## Unreleased
 
+## [0.3.4-beta] - 2026-11-03
+
+### Added
+
+- License FrameNote's original software under GPL-3.0-or-later, with separate
+  photograph terms and explicit third-party and artwork exceptions.
+- Provide an offline license reader with full application, dependency, font and
+  bundled Electron/Chromium notices. Require a corresponding source archive
+  alongside new desktop release downloads.
+- Add an About button beside the logo in the web header.
+
+### Changed
+
+- Redesign About around one continuous bird photograph, a frosted information
+  panel and project links with icons. The license reader replaces the content
+  without resizing the dialog. Leave the application behind About unchanged,
+  without dimming or blurring it.
+- Keep only the application version in the empty canvas footer.
+- Use live UI updates for local `pnpm desktop` sessions. `desktop:build` now
+  creates a runnable FrameNote.app on macOS Apple Silicon without installation
+  or DMG; `desktop:compile` prepares files for tests and platform-specific dist.
+
+### Fixed
+
+- Use the FrameNote name and Dock icon for local macOS launches without
+  modifying the installed Electron dependency.
+- Focus the About dialog on opening, keeping Close and its tooltip inactive
+  until reached through keyboard navigation.
+
 ## [0.3.3-beta] - 2026-11-02
 
 ### Changed

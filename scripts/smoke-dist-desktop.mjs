@@ -1,6 +1,7 @@
 import process from 'node:process';
 import { _electron as electron, expect } from '@playwright/test';
 import { assertDesktopTestEnvironment } from './desktop-test-environment.mjs';
+import { verifyDesktopLicenseReader } from './desktop-license-reader.mjs';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -33,6 +34,7 @@ try {
   page.on('dialog', (dialog) => dialog.accept());
   await page.waitForLoadState('networkidle');
   await expect(page.getByLabel('Choose JPG or PNG photo')).toBeAttached();
+  await verifyDesktopLicenseReader(app, page, true);
   await page.context().setOffline(true);
   const output = join(profile, 'output.jpg');
   await app.evaluate(({ dialog }, file) => {

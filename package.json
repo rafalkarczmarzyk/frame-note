@@ -1,7 +1,7 @@
 {
   "name": "frame-note",
   "private": true,
-  "version": "0.3.3-beta",
+  "version": "0.3.4-beta",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -26,11 +26,14 @@
     "test:visual:report": "node scripts/run-visual-tests.mjs report",
     "test:visual:update": "node scripts/run-visual-tests.mjs update",
     "desktop:install": "node scripts/install-desktop.mjs",
-    "desktop:build": "pnpm typecheck && node scripts/build-desktop.mjs",
-    "desktop": "pnpm desktop:build && electron apps/desktop",
+    "desktop:compile": "pnpm typecheck && node scripts/build-desktop.mjs",
+    "desktop:build": "node scripts/build-app-desktop.mjs",
+    "desktop": "node scripts/dev-desktop.mjs",
+    "desktop:preview": "pnpm desktop:compile && node scripts/run-desktop.mjs",
     "test:desktop": "node scripts/test-desktop.mjs",
-    "desktop:package": "pnpm desktop:clean && pnpm desktop:build && node scripts/package-desktop.mjs",
-    "desktop:package:signed": "pnpm desktop:clean && pnpm desktop:build && node scripts/package-desktop.mjs --signed",
+    "test:desktop:dev": "node scripts/test-desktop-dev.mjs",
+    "desktop:package": "pnpm desktop:clean && pnpm desktop:compile && node scripts/package-desktop.mjs",
+    "desktop:package:signed": "pnpm desktop:clean && pnpm desktop:compile && node scripts/package-desktop.mjs --signed",
     "version:set": "node scripts/versioning.mjs set",
     "check:version": "node scripts/versioning.mjs check",
     "desktop:clean": "node scripts/clean-desktop.mjs",
@@ -86,5 +89,6 @@
     "vite": "^8.3.4",
     "vitest": "^5.0.5"
   },
-  "packageManager": "pnpm@11.21.0+sha512.521705bce689924eac72f5a3587122f362689ef6571e55ba80076fd637c11132ecffada26fad4ea79c485bfddbfd3d5a2a5b05805a77e893de71ec8a6cca3bb1"
+  "packageManager": "pnpm@11.21.0+sha512.521705bce689924eac72f5a3587122f362689ef6571e55ba80076fd637c11132ecffada26fad4ea79c485bfddbfd3d5a2a5b05805a77e893de71ec8a6cca3bb1",
+  "license": "GPL-3.0-or-later"
 }

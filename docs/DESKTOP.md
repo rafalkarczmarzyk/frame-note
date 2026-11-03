@@ -21,22 +21,33 @@ The web application has no extra title bar and keeps its clickable logo.
 
 ## Development and packaging
 
+Local macOS launches (`pnpm desktop` and the desktop workspace start command)
+prepare a private FrameNote runtime in the ignored `release/dev` directory.
+Its native bundle metadata and icon identify the app as FrameNote in the system
+menu and Dock. The installed Electron dependency is not edited. The locally
+signed runtime is cached for the current Electron binary, architecture, icon and
+entitlements; `pnpm desktop:clean` removes it. This does not create an installer.
+
 From the repository root, install with `pnpm install`. If installation policy
 skips Electron's binary download, run `node node_modules/electron/install.js`.
 
 - `pnpm dev`: web app on port 3000.
 - `pnpm build`: web output in `apps/web/dist`.
-- `pnpm desktop`: build and launch the desktop app.
-- `pnpm desktop:build`: build the desktop renderer and preset file adapter.
+- `pnpm desktop`: live desktop preview on 127.0.0.1:3001. UI changes use React Fast Refresh; main/preload and preset adapter changes restart Electron.
+- `pnpm desktop:preview`: build and launch once, without a dev server.
+- `pnpm test:desktop:dev`: verify live updates, native restart and dev server cleanup.
+- `pnpm desktop:build`: create a runnable `release/FrameNote-darwin-arm64/FrameNote.app` on macOS Apple Silicon, without installation or DMG.
+- `pnpm desktop:compile`: compile the desktop renderer and preset file adapter for tests or distribution.
 - `pnpm desktop:clean`: remove the generated `release/` directory.
 - `pnpm test:desktop`: integration smoke test of a previously built desktop.
 - `pnpm desktop:package`: create `release/FrameNote-darwin-arm64/FrameNote.app` and
   `release/FrameNote-macOS-arm64.dmg`.
 
+The local app build does not clean `release/dev` or install/launch the result.
 Both packaging commands (`desktop:package` and `desktop:package:signed`) clean
 all of `release/` before typechecking and building. A failed packaging attempt
 therefore leaves no previous app or DMG to mistake for a new build. The ordinary
-`desktop:build` command leaves `release/` alone; it refreshes the renderer and
+`desktop:compile` command leaves `release/` alone; it refreshes the renderer and
 preset adapter used during development.
 
 - `node scripts/verify-desktop-assets.mjs`: compare bundled font/license files.
@@ -158,6 +169,8 @@ No remote Netlify site configuration has been read or changed during local setup
 - `packages/core`: models and pure domain logic.
 - `public`: single source of bundled fonts and shared static artwork.
 
+Packaged apps and built previews load bundled resources through `framenote://app`.
+Only an unpackaged live-preview launch can load the loopback dev server.
 The desktop renderer has no Node API. A narrow bridge handles native output and
 menu/session events. Its entry point maps the OS to a `PlatformProvider` value
 (`macos`, `windows` or `linux`); the web entry point explicitly supplies `web`.
@@ -249,7 +262,7 @@ permission and other errors are reported immediately.
 
 ## GitHub Releases
 
-`pnpm desktop:build` followed by `pnpm desktop:dist` creates an installer in
+`pnpm desktop:compile` followed by `pnpm desktop:dist` creates an installer in
 `release/ci`: DMG on macOS arm64, portable EXE on Windows x64, AppImage on Linux x64.
 This separate packaging path does not use Finder automation. Existing local
 macOS packaging and installation commands retain their behavior.

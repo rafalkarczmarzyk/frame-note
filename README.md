@@ -15,6 +15,7 @@
 </p>
 
 <p align="center">
+  <a href="https://framenoteapp.netlify.app">Open web app</a> ·
   <a href="#quick-start">Quick start</a> ·
   <a href="docs/USER_GUIDE.md">User guide</a> ·
   <a href="docs/DEVELOPMENT.md">Development</a> ·
@@ -42,6 +43,9 @@ See [desktop setup and release limitations](docs/DESKTOP.md).
 
 ## Quick start
 
+Use [FrameNote in your browser](https://framenoteapp.netlify.app), or run it locally
+with the steps below.
+
 Use Node.js from [`.nvmrc`](.nvmrc) and pnpm pinned in
 [`package.json`](package.json). With nvm installed:
 
@@ -55,7 +59,9 @@ pnpm run dev
 
 Open [localhost:3000](http://localhost:3000).
 
-For desktop development, run `pnpm run desktop`. To build and install on your
+For desktop development, run `pnpm run desktop`. `pnpm run desktop:build` creates
+a ready-to-open app at `release/FrameNote-darwin-arm64/FrameNote.app`.
+To build and install on your
 Apple Silicon Mac:
 
 ```sh
@@ -71,7 +77,7 @@ after installation. See [desktop requirements](docs/DESKTOP.md#build-and-install
 | Command                    | Purpose                                              |
 | -------------------------- | ---------------------------------------------------- |
 | `pnpm run dev`             | Run web locally                                      |
-| `pnpm run desktop`         | Build and launch desktop locally                     |
+| `pnpm run desktop`         | Run desktop with live UI updates                     |
 | `pnpm run desktop:install` | Build and install locally on macOS Apple Silicon     |
 | `pnpm run build`           | Build web for production                             |
 | `pnpm run storybook`       | Browse shared UI components                          |
@@ -93,3 +99,15 @@ release instructions are in the [development guide](docs/DEVELOPMENT.md).
 - [Changelog](CHANGELOG.md)
 
 Some internal planning documents are maintained in Polish.
+
+## License
+
+FrameNote's original software code is licensed under **GPL-3.0-or-later**.
+Copyright © 2026 Rafał Karczmarzyk. See [LICENSE](LICENSE) and
+[licensing and asset exceptions](LICENSING.md). The software comes without warranty.
+
+Bundled sample photographs have separate, noncommercial terms; fonts and
+dependencies retain their own licenses, and some artwork is excluded from the
+software license. These terms do not apply to your own photos or exported images.
+New releases include a source archive alongside the downloads; see
+[building and redistributing FrameNote](docs/SOURCE_DISTRIBUTION.md).

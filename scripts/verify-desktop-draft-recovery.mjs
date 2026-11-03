@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2026 Rafał Karczmarzyk
+// SPDX-License-Identifier: GPL-3.0-or-later
 import process from 'node:process';
 import { execFileSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
@@ -30,6 +32,7 @@ const jobs = api(
 ).flatMap((page) => page.jobs);
 const names = [
   'validate',
+  'source',
   'build (macos-15, mac-arm64)',
   'build (windows-2022, windows-x64)',
   'build (ubuntu-24.04, linux-x64)',

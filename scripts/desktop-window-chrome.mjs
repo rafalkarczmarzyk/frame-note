@@ -1,5 +1,7 @@
 import { expect } from '@playwright/test';
 import console from 'node:console';
+import { execFileSync } from 'node:child_process';
+import process from 'node:process';
 
 /** Layout and interaction checks run in the real Electron renderer. */
 export async function verifyWindowChrome(
@@ -7,6 +9,23 @@ export async function verifyWindowChrome(
   page,
   { nativeTransitions = true } = {},
 ) {
+  if (process.platform === 'darwin') {
+    const name = execFileSync(
+      '/usr/bin/osascript',
+      [
+        '-l',
+        'JavaScript',
+        '-e',
+        `ObjC.import('AppKit'); $.NSRunningApplication.runningApplicationWithProcessIdentifier(${app.process().pid}).localizedName.js`,
+      ],
+      { encoding: 'utf8' },
+    ).trim();
+    expect(name).toBe('FrameNote');
+    const menu = await app.evaluate(
+      ({ Menu }) => Menu.getApplicationMenu().items[0].label,
+    );
+    expect(menu).toBe('FrameNote');
+  }
   const initial = await app.evaluate(({ BrowserWindow, screen }) => {
     const window = BrowserWindow.getAllWindows()[0];
     const bounds = window.getBounds();

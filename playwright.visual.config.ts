@@ -1,6 +1,9 @@
 import { defineConfig } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import process from 'node:process';
+const port = Number(process.env.FRAMENOTE_VISUAL_PORT ?? 4184);
+if (!Number.isInteger(port) || port < 1024 || port > 65535)
+  throw Error('Invalid FRAMENOTE_VISUAL_PORT');
 export default defineConfig({
   timeout: 60000,
   metadata: {
@@ -37,7 +40,7 @@ export default defineConfig({
     },
   },
   use: {
-    baseURL: 'http://127.0.0.1:4184',
+    baseURL: `http://127.0.0.1:${port}`,
     viewport: { width: 1440, height: 900 },
     deviceScaleFactor: 1,
     locale: 'en-US',
@@ -69,9 +72,8 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command:
-        'pnpm build && pnpm preview --host 127.0.0.1 --port 4184 --strictPort',
-      url: 'http://127.0.0.1:4184',
+      command: `pnpm build && pnpm preview --host 127.0.0.1 --port ${port} --strictPort`,
+      url: `http://127.0.0.1:${port}`,
       reuseExistingServer: false,
     },
   ],

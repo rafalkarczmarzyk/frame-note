@@ -81,6 +81,17 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Presets: Story = {};
+export const About: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      await canvas.findByRole('button', { name: /^About$/ }),
+    );
+    await expect(
+      await within(canvasElement.ownerDocument.body).findByRole('dialog'),
+    ).toBeVisible();
+  },
+};
 /** No toolbar logo; About is opened from the native FrameNote menu in Electron. */
 export const MacOS: Story = {
   args: { width: 1440, platform: 'macos' },

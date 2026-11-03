@@ -1,10 +1,11 @@
 {
   "name": "@framenote/core",
   "private": true,
-  "version": "0.3.3-beta",
+  "version": "0.3.4-beta",
   "type": "module",
   "scripts": {},
   "dependencies": {
     "zod": "^4.6.7"
-  }
+  },
+  "license": "GPL-3.0-or-later"
 }

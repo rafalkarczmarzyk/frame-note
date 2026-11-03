@@ -91,8 +91,25 @@ pierwszą akcją po lewej jest Add photos. Padding nagłówka wynosi 6 px na ka�
 z czterech stron; wysokość wynika z kontrolek 36 px, paddingu i dolnej linii 1 px
 (łącznie 49 px). Informacje o aplikacji otwiera systemowe
 menu FrameNote → About FrameNote, przez ten sam komponent `AboutSplash`.
-Warunek `isWeb` pokazuje klikalne logo i wybiera dotychczasowe odstępy webu.
+Warunek `isWeb` pokazuje klikalne logo oraz tekstowy przycisk About obok niego;
+obie akcje otwierają ten sam dialog. Web zachowuje dotychczasowe odstępy nagłówka.
 Przykłady: Storybook → Sidebar & panels/AppHeader → MacOS i MacOSMinimum.
+
+### About
+
+Wspólny `AboutSplash` ma jedno ciągłe zdjęcie pod całym oknem i przyciemnioną
+nakładkę pod informacjami po lewej. Kadr pokazuje ptaszka po prawej, bez prawego
+pionowego słupka. Nie powielaj obrazu w osobnych panelach ani nie twórz
+osobnej kopii zdjęcia; blur pod tekstem zapewnia backdrop-filter na panelu.
+Czytnik licencji podmienia treść w tych samych wymiarach okna, nad tym samym
+zdjęciem rozmytym w całym oknie. Tło aplikacji za modalem pozostaje bez zmian: bez przyciemnienia i blura.
+Nie dodawaj dodatkowego focus outline na kontener.
+Początkowy fokus trafia na dialog; Close nie pokazuje tooltipa przy otwarciu.
+Licenses jest tekstowym odnośnikiem do lokalnego czytnika. Powrót z czytnika
+przywraca fokus odnośnikowi. Okno otwieramy z przycisku/logo na webie lub menu
+aplikacji na desktopie. Nie pokazuje się automatycznie przy starcie.
+Storybook → Screens/AboutFrameNote zawiera About i LicenseReader; prototypy
+AboutProposal i odrzucone warianty zostały usunięte.
 
 ### Platforma aplikacji
 

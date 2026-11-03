@@ -1,7 +1,11 @@
+// SPDX-FileCopyrightText: 2026 Rafał Karczmarzyk
+// SPDX-License-Identifier: GPL-3.0-or-later
 import { readFile, readdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
 import console from 'node:console';
+import { verifyLegalMaterials } from './verify-legal-materials.mjs';
+verifyLegalMaterials('apps/desktop/renderer');
 async function verify(folder) {
   let count = 0;
   for (const entry of await readdir(`public/${folder}`, {

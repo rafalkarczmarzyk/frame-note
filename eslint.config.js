@@ -44,7 +44,7 @@ export default defineConfig([
     rules: { '@typescript-eslint/no-require-imports': 'off' },
   },
   {
-    files: ['scripts/*desktop.mjs'],
+    files: ['scripts/*desktop.mjs', 'scripts/test-desktop-dev.mjs'],
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
   prettier,

@@ -31,7 +31,6 @@ try {
     execFileSync(command, commandArgs, { cwd: root, stdio: 'inherit' });
   run('pnpm', ['desktop:clean']);
   run('pnpm', ['desktop:build']);
-  run(process.execPath, ['scripts/package-desktop.mjs', '--no-dmg']);
   const installed = await installLocalApp(
     join(root, 'release/FrameNote-darwin-arm64/FrameNote.app'),
     directory,

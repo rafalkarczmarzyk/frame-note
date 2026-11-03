@@ -1,9 +1,13 @@
+// SPDX-FileCopyrightText: 2026 Rafał Karczmarzyk
+// SPDX-License-Identifier: GPL-3.0-or-later
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { build, Platform, Arch } from 'electron-builder';
 import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
+import { stageDesktopLegal } from './stage-desktop-legal.mjs';
+import { verifyPackagedLegal } from './verify-packaged-legal.mjs';
 
 // Isolated staging avoids packaging workspace dependencies or stale local builds.
 const stage = await mkdtemp(join(tmpdir(), 'framenote-dist-'));
@@ -40,12 +44,14 @@ await writeFile(
       main: 'main.cjs',
       description: 'Local photo captions and metadata editor',
       author: 'FrameNote contributors',
+      license: 'GPL-3.0-or-later',
       packageManager: 'npm@10.9.2',
     },
     null,
     2,
   ),
 );
+await stageDesktopLegal(stage);
 await build({
   projectDir: stage,
   targets: target.createTarget(undefined, arch),
@@ -65,8 +71,18 @@ await build({
       'preset-files.cjs',
       'renderer/**/*',
       'package.json',
+      'LICENSE',
+      'LICENSING.md',
+      'PHOTOGRAPHS.txt',
     ],
     asar: true,
+    afterPack(context) {
+      const resources =
+        process.platform === 'darwin'
+          ? `${context.appOutDir}/FrameNote.app/Contents/Resources`
+          : `${context.appOutDir}/resources`;
+      verifyPackagedLegal(resources);
+    },
     npmRebuild: false,
     artifactName: 'FrameNote-${version}-${os}-${arch}.${ext}',
     mac: {

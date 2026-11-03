@@ -4,6 +4,11 @@ Stan: 29 października 2026. Zestaw sprawdza tylko widoki prawdziwej aplikacji. 
 
 ## Sceny
 
+`tests/visual/licenses.spec.ts` dodaje About licensing footer oraz offline
+license reader: wspólny widok About i lokalny odczyt pełnych licencji.
+Pierwsze wzorce wymagają oceny użytkownika. `FRAMENOTE_VISUAL_PORT` pozwala
+uruchomić zestaw na innym porcie, gdy domyślny 4184 jest zajęty.
+
 | Test                             | Co obejmuje                                                             |
 | -------------------------------- | ----------------------------------------------------------------------- |
 | Empty editor                     | Puste okno, akcje i układ początkowy.                                   |

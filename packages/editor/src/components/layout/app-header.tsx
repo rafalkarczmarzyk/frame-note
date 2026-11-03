@@ -9,6 +9,7 @@ import { FrameNoteLogo } from '@/components/brand/frame-note-logo';
 import { PresetToolbar } from '@/features/presets/preset-toolbar';
 import { builtinPresets } from '@/domain/builtin-presets';
 import { FrameNoteIcon } from '@/components/brand/frame-note-icon';
+import { Button } from '@/components/ui/button';
 
 export function AppHeader({
   children,
@@ -31,19 +32,28 @@ export function AppHeader({
         )}
       >
         {isWeb && (
-          <Tooltip content="About FrameNote">
-            <button
-              type="button"
-              aria-label="About FrameNote"
-              className="control-button control-height inline-flex min-w-10 shrink-0 items-center justify-center px-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring"
+          <div className="flex shrink-0 items-center gap-1">
+            <Tooltip content="About FrameNote">
+              <button
+                type="button"
+                aria-label="About FrameNote"
+                className="control-button control-height inline-flex min-w-10 shrink-0 items-center justify-center px-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring"
+                onClick={() => setAboutOpen(true)}
+              >
+                <span className="inline-flex shrink-0 items-center">
+                  <FrameNoteLogo className="hidden h-[22px] w-auto sm:block" />
+                  <FrameNoteIcon className="size-[22px] sm:hidden" />
+                </span>
+              </button>
+            </Tooltip>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => setAboutOpen(true)}
             >
-              <span className="inline-flex shrink-0 items-center">
-                <FrameNoteLogo className="hidden h-[22px] w-auto sm:block" />
-                <FrameNoteIcon className="size-[22px] sm:hidden" />
-              </span>
-            </button>
-          </Tooltip>
+              About
+            </Button>
+          </div>
         )}
         {aboutOpen && <AboutSplash onClose={() => setAboutOpen(false)} />}
         {photoAction}

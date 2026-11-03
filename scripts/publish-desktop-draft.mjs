@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2026 Rafał Karczmarzyk
+// SPDX-License-Identifier: GPL-3.0-or-later
 import process from 'node:process';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -9,6 +11,7 @@ const expected = [
   `FrameNote-${version}-mac-arm64.dmg`,
   `FrameNote-${version}-win-x64-portable.exe`,
   `FrameNote-${version}-linux-x86_64.AppImage`,
+  `FrameNote-${version}-source.tar.gz`,
 ].sort();
 const actual = readdirSync('release-assets').sort();
 if (JSON.stringify(actual) !== JSON.stringify(expected))
@@ -30,7 +33,7 @@ if (!section) throw Error('Missing release notes');
 writeFileSync(
   'release-notes.md',
   section.replace(/^ - [^\n]+\n/, '') +
-    '\n\nDownloads: macOS Apple Silicon (arm64), Windows x64 portable (no installation), Linux x64.\n\nmacOS is ad hoc signed, not notarized; downloaded apps may require Open Anyway in Privacy & Security. Windows is unsigned and may display warnings or be blocked by security policies. Linux AppImage requires a compatible desktop environment.\n\nVerify downloads against SHA256SUMS. Native installation and functional testing on each system remain necessary.\n',
+    `\n\nDownloads: macOS Apple Silicon (arm64), Windows x64 portable (no installation), Linux x64.\n\nSource: [FrameNote-${version}-source.tar.gz](https://github.com/${process.env.GITHUB_REPOSITORY}/releases/download/${tag}/FrameNote-${version}-source.tar.gz). Code: GPL-3.0-or-later; bundled photographs and artwork have separate terms (see LICENSING.md in the source archive). No warranty.\n\nmacOS is ad hoc signed, not notarized; downloaded apps may require Open Anyway in Privacy & Security. Windows is unsigned and may display warnings or be blocked by security policies. Linux AppImage requires a compatible desktop environment.\n\nVerify downloads against SHA256SUMS. Native installation and functional testing on each system remain necessary.\n`,
 );
 const gh = (args) => execFileSync('gh', args, { stdio: 'inherit' });
 // Listing succeeds even when no release exists; authentication/network failures must fail closed.

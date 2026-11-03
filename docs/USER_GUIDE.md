@@ -41,7 +41,10 @@
 
 FrameNote opens into an empty editor with a photo-selection button, JPG/PNG drop
 guidance and a privacy note in the canvas. The application version, GitHub and
-Changelog links sit at the bottom. Open About for application information.
+Changelog links sit at the bottom. On the web, open About using the button beside
+the logo (or the logo itself). On desktop, use FrameNote → About FrameNote in
+the application menu. About shows the version, project links and an offline
+license reader. It does not open automatically at startup.
 
 1. Choose one or more JPG/PNG photos, or drop them onto the canvas.
 2. Edit the default caption, insert metadata from the tag browser, and add images

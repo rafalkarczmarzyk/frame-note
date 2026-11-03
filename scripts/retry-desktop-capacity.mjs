@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2026 Rafał Karczmarzyk
+// SPDX-License-Identifier: GPL-3.0-or-later
 import { setTimeout as delay } from 'node:timers/promises';
 import { URL } from 'node:url';
 // Only retry runner allocation failures; never execute code from the failed run.
@@ -39,6 +41,7 @@ export async function retryDesktopCapacity({
   const knownJobs = new Set([
     'validate',
     'release',
+    'source',
     'build (macos-15, mac-arm64)',
     'build (windows-2022, windows-x64)',
     'build (ubuntu-24.04, linux-x64)',

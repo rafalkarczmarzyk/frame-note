@@ -67,7 +67,12 @@ beforeEach(() => {
       'CHANGELOG.md',
       Buffer.from('## [0.3.2-beta] - 2026-11-02\n\nFixed builds.\n'),
     ],
-    ...['mac-arm64.dmg', 'win-x64-portable.exe', 'linux-x86_64.AppImage'].map(
+    ...[
+      'mac-arm64.dmg',
+      'win-x64-portable.exe',
+      'linux-x86_64.AppImage',
+      'source.tar.gz',
+    ].map(
       (suffix) =>
         [
           `release-assets/FrameNote-0.3.2-beta-${suffix}`,
@@ -134,6 +139,13 @@ it('does not alter an already published release', async () => {
   expect(state.calls.some((a) => a[1] === 'upload' || a[1] === 'edit')).toBe(
     false,
   );
+});
+it('rejects binary-only releases before contacting GitHub', async () => {
+  state.files.delete('release-assets/FrameNote-0.3.2-beta-source.tar.gz');
+  await expect(run()).rejects.toThrow(
+    'Incomplete or unexpected release assets',
+  );
+  expect(state.calls).toEqual([]);
 });
 it('preserves draft-only behavior without the publish flag', async () => {
   vi.spyOn(process, 'argv', 'get').mockReturnValue(['node', 'publish']);

@@ -27,6 +27,15 @@ const dataDirectory = profile
   : path.join(app.getPath('home'), 'FrameNote');
 const presetFiles = new PresetFiles(dataDirectory);
 const rendererRoot = path.join(__dirname, 'renderer');
+// Only the local development launcher may replace bundled renderer resources.
+const devServerUrl = !app.isPackaged && process.env.FRAMENOTE_DEV_SERVER_URL;
+if (devServerUrl && !/^http:\/\/127\.0\.0\.1:[0-9]{1,5}\/$/u.test(devServerUrl))
+  throw new Error(
+    'Desktop live preview requires a loopback development server.',
+  );
+const rendererUrl = devServerUrl || 'framenote://app/';
+const rendererOrigin = rendererUrl.slice(0, -1);
+const isRendererUrl = (url) => url.startsWith(rendererUrl);
 protocol.registerSchemesAsPrivileged([
   {
     scheme: 'framenote',
@@ -38,10 +47,17 @@ function trusted(event) {
   return (
     event.sender === window?.webContents &&
     event.senderFrame === window.webContents.mainFrame &&
-    event.senderFrame.url.startsWith('framenote://app/')
+    isRendererUrl(event.senderFrame.url)
   );
 }
 app.whenReady().then(async () => {
+  if (process.platform === 'darwin' && !app.isPackaged)
+    app.dock.setIcon(
+      path.resolve(
+        __dirname,
+        '../../packages/editor/src/assets/graphics/framenote-app-icon.png',
+      ),
+    );
   protocol.handle('framenote', (request) => {
     const url = new URL(request.url);
     const file = path.resolve(
@@ -59,22 +75,23 @@ app.whenReady().then(async () => {
         permission === 'local-fonts' &&
           contents === window?.webContents &&
           details.isMainFrame &&
-          details.requestingUrl.startsWith('framenote://app/'),
+          isRendererUrl(details.requestingUrl),
       ),
   );
   session.defaultSession.setPermissionCheckHandler(
     (contents, permission, origin) =>
       permission === 'local-fonts' &&
       contents === window?.webContents &&
-      origin === 'framenote://app',
+      origin === rendererOrigin,
   );
+  const contentSecurityPolicy = devServerUrl
+    ? `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self' data:; connect-src 'self' blob: ${rendererOrigin.replace('http:', 'ws:')}; object-src 'none'; base-uri 'none'`
+    : "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self' data:; connect-src 'self' blob:; object-src 'none'; base-uri 'none'";
   session.defaultSession.webRequest.onHeadersReceived((details, callback) =>
     callback({
       responseHeaders: {
         ...details.responseHeaders,
-        'Content-Security-Policy': [
-          "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self' data:; connect-src 'self' blob:; object-src 'none'; base-uri 'none'",
-        ],
+        'Content-Security-Policy': [contentSecurityPolicy],
       },
     }),
   );
@@ -190,7 +207,7 @@ app.whenReady().then(async () => {
     return { action: 'deny' };
   });
   window.webContents.on('will-navigate', (event, url) => {
-    if (!url.startsWith('framenote://app/')) event.preventDefault();
+    if (!isRendererUrl(url)) event.preventDefault();
   });
   session.defaultSession.on('will-download', (_event, item) => {
     item.setSaveDialogOptions({
@@ -243,10 +260,10 @@ app.whenReady().then(async () => {
       { role: 'windowMenu' },
     ]),
   );
-  await window.loadURL('framenote://app/');
+  await window.loadURL(rendererUrl);
 });
 app.on('window-all-closed', () => app.quit());
 
-// Keep renderer resources inside the packaged application, never a remote URL.
-if (!fs.existsSync(rendererRoot))
+// Packaged apps and built previews always load bundled renderer resources.
+if (!devServerUrl && !fs.existsSync(rendererRoot))
   throw new Error('Build the web renderer before starting desktop.');

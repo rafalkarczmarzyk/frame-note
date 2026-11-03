@@ -1,11 +1,4 @@
-import {
-  Download,
-  ExternalLink,
-  Layers,
-  LockKeyhole,
-  Plus,
-  Scan,
-} from 'lucide-react';
+import { Download, Layers, LockKeyhole, Plus, Scan } from 'lucide-react';
 import { PhotoDropOverlay } from './photo-drop-overlay';
 import { PhotoLoadingIndicator } from './photo-loading-indicator';
 import { appVersion as version } from '@/lib/build-info';
@@ -128,27 +121,8 @@ export function EmptyPhotoCanvas({
           </p>
         </section>
       </div>
-      <footer className="flex shrink-0 flex-wrap items-center justify-center gap-x-4 gap-y-2 px-6 py-4 text-[11px] text-content-muted">
+      <footer className="flex shrink-0 items-center justify-center px-6 py-4 text-[11px] text-content-muted">
         <span>FrameNote · v{version}</span>
-        {[
-          ['GitHub', 'https://github.com/rafalkarczmarzyk/frame-note'],
-          [
-            'Changelog',
-            'https://github.com/rafalkarczmarzyk/frame-note/blob/master/CHANGELOG.md',
-          ],
-        ].map(([label, href]) => (
-          <a
-            key={label}
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 rounded-sm hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring"
-          >
-            {label}
-            <ExternalLink className="size-3" aria-hidden="true" />
-            <span className="sr-only"> (opens in a new tab)</span>
-          </a>
-        ))}
       </footer>
     </div>
   );

@@ -1,9 +1,13 @@
+// SPDX-FileCopyrightText: 2026 Rafał Karczmarzyk
+// SPDX-License-Identifier: GPL-3.0-or-later
 import { configureDesktopTools, verifyDesktopApp } from './tools-desktop.mjs';
 import { createRequire } from 'node:module';
 import { execFileSync } from 'node:child_process';
 import { createDesktopDmg } from './create-dmg-desktop.mjs';
 import { packager } from '@electron/packager';
 import { cp, mkdir, rm } from 'node:fs/promises';
+import { stageDesktopLegal } from './stage-desktop-legal.mjs';
+import { verifyPackagedLegal } from './verify-packaged-legal.mjs';
 const signed = process.argv.includes('--signed');
 const identity = process.env.DEVELOPER_ID?.trim();
 if (signed) {
@@ -45,6 +49,7 @@ for (const name of [
   'renderer',
 ])
   await cp(`apps/desktop/${name}`, `${stage}/${name}`, { recursive: true });
+await stageDesktopLegal(stage);
 const result = await packager({
   dir: stage,
   out: 'release',
@@ -82,6 +87,7 @@ const result = await packager({
   osxNotarize: false,
 });
 console.log(result.join('\n'));
+verifyPackagedLegal(`${result[0]}/FrameNote.app/Contents/Resources`);
 await rm(stage, { recursive: true, force: true });
 
 verifyDesktopApp(`${result[0]}/FrameNote.app`);

@@ -1,0 +1,21 @@
+FrameNote sample photographs
+Copyright (c) Rafał Karczmarzyk. All rights reserved.
+
+Scope: public/images/*.jpg and tests/fixtures/*.jpg, including photographic
+content reproduced in project screenshots and test baselines.
+
+Permission is granted to view these photographs within FrameNote and to copy
+them for noncommercial development, testing and demonstration of FrameNote.
+Unmodified photographs may be redistributed only as part of noncommercial
+FrameNote source distributions and builds, with this notice preserved.
+Modified copies may be made locally for testing the editor and image exports.
+Project screenshots and test baselines containing the photographs may be
+redistributed for noncommercial documentation and testing with this notice.
+
+No permission is granted to sell the photographs, distribute them separately,
+use them commercially, or publish other modified photographic works.
+Other uses require separate permission from the copyright holder.
+
+These photographs are not licensed under the GNU GPL. These restrictions
+apply to the photographs, not to FrameNote's GPL-licensed software source code.
+They do not apply to photographs supplied by users of the application.
