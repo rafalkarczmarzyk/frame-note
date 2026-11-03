@@ -81,7 +81,7 @@ after installation. See [desktop requirements](docs/DESKTOP.md#build-and-install
 | `pnpm run desktop:install` | Build and install locally on macOS Apple Silicon     |
 | `pnpm run build`           | Build web for production                             |
 | `pnpm run storybook`       | Browse shared UI components                          |
-| `pnpm run check`           | Check code, run web/unit/visual suites and build web |
+| `pnpm run check`           | Check code, run the compact test suite and build web |
 
 Native desktop tests run separately. All commands, prerequisites, packaging and
 release instructions are in the [development guide](docs/DEVELOPMENT.md).

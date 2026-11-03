@@ -26,7 +26,17 @@ it('round trips italic and accepts presets without fontStyle', () => {
   const validate = () => {
     throw Error('Unexpected asset');
   };
-  expect(parsePreset(JSON.stringify(preset), validate)).toEqual(preset);
+  const legacyPreset = structuredClone(preset);
+  delete (
+    legacyPreset.layout.containers[0]!.style as {
+      fontStyle?: 'normal' | 'italic';
+    }
+  ).fontStyle;
+  expect(
+    effectiveFontStyle(
+      parsePreset(JSON.stringify(legacyPreset), validate).layout.containers[0]!,
+    ),
+  ).toBe('normal');
   preset.layout.containers[0]!.style.fontStyle = 'italic';
   expect(
     parsePreset(JSON.stringify(preset), validate).layout.containers[0]!.style

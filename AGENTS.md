@@ -39,13 +39,16 @@ UI i refaktory prowadź na branchach `codex/`. PR jest opcjonalny, zalecany dla
 dużych lub ryzykownych zmian. Preferuj squash merge ukończonego zadania.
 Nie wprowadzaj osobnego, stałego brancha `develop`.
 
-Polecenie commita ukończonej zmiany aplikacji na `master` lub merge'a
-zaakceptowanego zadania obejmuje podbicie wersji, changelog i lokalny tag bez
-dodatkowego potwierdzenia. Commity robocze na branchach nie podbijają wersji.
-Beta zaczyna się od `0.1.0-beta`. Poprawki zwiększają PATCH, funkcje i zmiany
-niezgodne zwiększają MINOR i zerują PATCH. Nie dodajemy licznika po `-beta`
-ani `-alpha`. Jedno ukończone zadanie wprowadzane do `master` oznacza jedno
-podbicie wersji bazowej. `1.0.0` oznacza pierwszą ukończoną stabilną wersję.
+Commity i merge'e, również na `master`, gromadzą zmiany pod `Unreleased`; nie
+podbijaj przy nich wersji ani nie twórz taga. Gdy użytkownik wyraźnie uzna, że
+czas przygotować wydanie, zastosuj skill
+[prepare-release](.agents/skills/prepare-release/SKILL.md), który ocenia
+zebrany zakres i tworzy jeden datowany wpis wydania.
+Beta zaczyna się od `0.1.0-beta`. Preferuj PATCH dla poprawek i kompatybilnych
+udoskonaleń istniejących możliwości; nowa odrębna funkcja lub zmiana kontraktu
+może wymagać MINOR i wyzerowania PATCH. Oceniaj całość przy przygotowaniu
+wydania, nie przy każdym zadaniu. Nie dodajemy licznika po `-beta`
+ani `-alpha`. `1.0.0` oznacza pierwszą ukończoną stabilną wersję.
 Pierwsze przejście z alphy do bety, przejście do RC i
 stabilnego wydania wymagają wyraźnego polecenia. Zmiany wyłącznie dokumentacji,
 testów, narzędzi i skilla nie wymagają podbicia ani wpisu wydania. Konfigurację
@@ -82,8 +85,8 @@ Testy desktopowe i przeglądarkowe uruchamiaj kolejno, żeby nie konkurowały o 
 ### Kontrola wyglądu
 
 Przed oddaniem zmian wyglądu, kontrolek lub układu uruchom `pnpm test:visual`.
-Przy zmianach wspólnych styli i komponentów sprawdź również
-`pnpm test:visual --all-projects`. Katalog scen i sposób przeglądania różnic:
+Zestaw zawiera sześć pełnych scen w jednym profilu Chromium desktop. Katalog
+scen i sposób przeglądania różnic:
 [UI_VISUAL_REGRESSION_PLAN.md](docs/UI_VISUAL_REGRESSION_PLAN.md).
 
 Różnica wizualna wymaga obejrzenia expected/actual/diff. Nie aktualizuj wzorców,

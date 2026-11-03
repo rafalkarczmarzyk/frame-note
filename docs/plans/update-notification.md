@@ -2,8 +2,7 @@
 
 ## Stan i zakres
 
-- Stan: przygotowane do oceny użytkownika; automatyczna weryfikacja wykonana,
-  kontrola wizualna zablokowana przez brak zapisanych wzorców scen.
+- Stan: opublikowane jako v0.4.2-beta.
 - Desktop: automatyczne sprawdzanie dostępności wydania przy starcie i trwałe
   powiadomienie w obszarze roboczym, u góry, wyśrodkowane.
 - Uzgodniony wygląd: szklana powierzchnia jak istniejące tooltipy, ikona
@@ -13,13 +12,13 @@
   powiadomienia o aktualizacji. Użytkownik wskazał, że web jest dostarczany
   w aktualnej wersji. Wspólny komponent UI może służyć desktopowi.
 - Format presetów: bez zmian.
-- Poza obecnym uzgodnieniem: instalacja aktualizacji, ręczne sprawdzanie w menu
-  i About. Wcześniejsze propozycje agenta nie oznaczają akceptacji tych dodatków.
+- Poza zakresem: instalowanie aktualizacji bezpośrednio w aplikacji oraz przycisk
+  sprawdzania w About.
 - Dodatkowa poprawka menu Electron: menu ręcznie zbudowane z potrzebnych poleceń;
   Help usunięte. Check for Updates… znajduje się w menu FrameNote pod About.
   Help i Edit usunięte. Zachowane: About, ukrywanie/kończenie aplikacji,
   otwieranie i eksport zdjęć, Close Window oraz sterowanie oknem.
-- Autoryzacja: ustalanie zachowania i wyglądu; brak polecenia commita lub wydania.
+- Autoryzacja: użytkownik zaakceptował zmiany i polecił je opublikować.
 
 ## Wersja i zgodność
 
@@ -32,14 +31,14 @@
 
 ## Kryteria akceptacji
 
-| AC    | Zachowanie                                                                                                                           | Weryfikacja                                     | Stan        |
-| ----- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------- | ----------- |
-| AC-01 | Desktop sprawdza wydania przy starcie; odpowiedź jest walidowana minimalnym schematem Zod, wersje przez SemVer z uwzględnieniem bet. | Testy logiki i desktop                          | Niewykonane |
-| AC-02 | Nowsze wydanie pokazuje szklany komunikat u góry, na środku obszaru roboczego, z ikoną i numerem wersji.                             | Storybook, regresja wizualna, ocena użytkownika | Niewykonane |
-| AC-03 | Komunikat pozostaje do zamknięcia przez X; nie przejmuje fokusu i nie zmienia układu edytora.                                        | Test UI, ocena użytkownika                      | Niewykonane |
-| AC-04 | Przycisk otwiera stronę konkretnego wydania na GitHubie w przeglądarce systemowej.                                                   | Walidacja adresu, test desktop                  | Niewykonane |
-| AC-05 | Błędy sieci, HTTP, JSON i nieprawidłowe dane nie przerywają pracy i nie pokazują fałszywej aktualizacji.                             | Testy obsługi błędów                            | Niewykonane |
-| AC-06 | Web nie sprawdza wydań na GitHubie i nie wyświetla powiadomienia o aktualizacji.                                                     | Kontrola integracji platform i test web         | Niewykonane |
+| AC    | Zachowanie                                                                                                                           | Weryfikacja                                     | Stan             |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------- | ---------------- |
+| AC-01 | Desktop sprawdza wydania przy starcie; odpowiedź jest walidowana minimalnym schematem Zod, wersje przez SemVer z uwzględnieniem bet. | Testy logiki i desktop                          | Pass             |
+| AC-02 | Nowsze wydanie pokazuje szklany komunikat u góry, na środku obszaru roboczego, z ikoną i numerem wersji.                             | Storybook, regresja wizualna, ocena użytkownika | Do oceny ręcznej |
+| AC-03 | Komunikat pozostaje do zamknięcia przez X; nie przejmuje fokusu i nie zmienia układu edytora.                                        | Test UI, ocena użytkownika                      | Do oceny ręcznej |
+| AC-04 | Przycisk otwiera stronę konkretnego wydania na GitHubie w przeglądarce systemowej.                                                   | Walidacja adresu, test desktop                  | Pass             |
+| AC-05 | Błędy sieci, HTTP, JSON i nieprawidłowe dane nie przerywają pracy i nie pokazują fałszywej aktualizacji.                             | Testy obsługi błędów                            | Pass             |
+| AC-06 | Web nie sprawdza wydań na GitHubie i nie wyświetla powiadomienia o aktualizacji.                                                     | Kontrola integracji platform i test web         | Pass             |
 
 ## Etapy i decyzje
 
@@ -51,8 +50,8 @@
 5. Ocena użytkownika — zaakceptowana poleceniem „jest git, publikujemy”.
 6. Publikacja 0.4.1 — nieudana; smoke testy macOS/Windows i Linux zgłosiły
    timeout uruchomienia. Przyczyna: pakiet nie zawierał update-checker/Zod.
-7. Poprawka pakowania — zaimplementowana i lokalnie sprawdzona na spakowanym
-   macOS; przygotowano 0.4.2-beta do ponownej publikacji.
+7. Poprawka pakowania — wdrożona; lokalny macOS smoke test przeszedł.
+8. v0.4.2-beta opublikowano po sukcesie buildów i smoke testów trzech systemów.
 
 2026-11-03: użytkownik wybrał automatyczne sprawdzanie przy starcie oraz
 położenie, materiał, ikonę, link do release i ręczne zamykanie komunikatu.
@@ -72,11 +71,11 @@ wdrożono też ręczne menu bez pełnych domyślnych `editMenu` i `windowMenu`.
 2026-11-03: użytkownik zdecydował o usunięciu całego menu Edit.
 2026-11-03: publikacja v0.4.1-beta zatrzymała się na smoke testach paczek.
 Poprawka: bundlowanie Zod wraz z checkerem oraz dołączenie pliku do obu ścieżek
-pakowania; macOS lokalny smoke test przechodzi. Przygotowano wydanie 0.4.2-beta.
+pakowania; macOS lokalny smoke test przechodzi. Wydanie 0.4.2-beta opublikowano.
 
 ## Weryfikacja i wydanie
 
-Sprawdzany build: 0.4.0-beta, zmiany lokalne bez commita, macOS.
+Sprawdzany build: 0.4.2-beta, commit `35528fd`, macOS oraz GitHub Actions.
 
 - Testy mocków: 5/5 zaliczone.
 - `pnpm test:desktop`: zaliczone.
@@ -87,7 +86,21 @@ Sprawdzany build: 0.4.0-beta, zmiany lokalne bez commita, macOS.
   `docs/EXPORT_VISUAL_TEST_PLAN.md` i `e2e/photo-export-matrix.spec.ts`.
 - `pnpm test:visual`: 9/9 scen niedostępnych, bo brak ich oczekiwanych
   snapshotów dla Chromium desktop na macOS. Nie zapisano nowych wzorców.
+- `pnpm test:e2e`: 171/188 zaliczone; 17 niepowodzeń w istniejących scenariuszach,
+  głównie oczekiwania na usunięty RetiredDisplay oraz inne testy sesji/filmu/UI.
+- Pakowanie lokalne i smoke test macOS: zaliczone. Zdalne buildy i smoke testy
+  macOS, Windows i Linux: zaliczone.
 
-Do oceny: uruchomić desktop, zasymulować odpowiedź API z nową wersją i sprawdzić
-położenie, wygląd, przycisk release oraz zamknięcie X. Publikacja wymaga osobnego
-polecenia po akceptacji. Commit, merge, push i pakowanie nieautoryzowane.
+Ręczna akceptacja UI: sprawdzić komunikat w aplikacji. Wydanie opublikowane:
+https://github.com/rafalkarczmarzyk/frame-note/releases/tag/v0.4.2-beta
+
+## Wynik publikacji
+
+- `65756d5`, tag `v0.4.1-beta`: workflow nie opublikował paczek, bo brakowało
+  bundla checkera i Zod.
+- `35528fd`, tag `v0.4.2-beta`: poprawione pakowanie.
+- GitHub Release `v0.4.2-beta` opublikowany jako Latest (`prerelease=false` zgodnie
+  z wcześniejszą decyzją dla bet).
+- Assety: macOS arm64 DMG, Windows x64 portable EXE, Linux x64 AppImage,
+  tarball źródłowy i `SHA256SUMS`.
+- Workflow `41681283408`: success; working tree po pushu czysty.

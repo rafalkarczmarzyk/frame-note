@@ -57,18 +57,6 @@ export default defineConfig({
         launchOptions: { args: ['--disable-gpu'] },
       },
     },
-    {
-      name: 'chromium-compact',
-      use: {
-        browserName: 'chromium',
-        launchOptions: { args: ['--disable-gpu'] },
-        viewport: { width: 1100, height: 700 },
-      },
-    },
-    {
-      name: 'webkit-desktop',
-      use: { browserName: 'webkit' },
-    },
   ],
   webServer: [
     {

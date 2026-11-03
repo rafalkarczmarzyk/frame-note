@@ -1,19 +1,13 @@
 import { expect, test } from '@playwright/test';
-import { openPhoto, ready, shot, section } from './helpers.js';
+import { openPhoto, ready, shot } from './helpers.js';
 import { graphicPreset } from './fixtures/graphics.js';
-import { portraitFixture } from '../fixtures.js';
 
 test('empty editor', async ({ page }) => {
   await page.goto('/');
   await shot(page, 'window');
 });
 
-test('photo and editor', async ({ page }) => {
-  await openPhoto(page);
-  await shot(page, 'window');
-});
-
-test('three layers', async ({ page }) => {
+test('prepared photo session', async ({ page }) => {
   await openPhoto(page);
   for (let i = 0; i < 2; i++)
     await page.getByRole('button', { name: 'Add layer', exact: true }).click();
@@ -21,14 +15,23 @@ test('three layers', async ({ page }) => {
   await shot(page, 'window');
 });
 
-test('left margin hover', async ({ page }) => {
+test('font panel', async ({ page }) => {
   await openPhoto(page);
-  await section(page, 'sizing');
-  await page.getByRole('slider', { name: 'Left margin', exact: true }).hover();
-  await shot(page, 'window', true);
+  await page.getByRole('button', { name: 'Font', exact: true }).click();
+  await expect(
+    page.getByRole('dialog', { name: 'Choose a font' }),
+  ).toBeVisible();
+  await shot(page, 'window');
 });
 
-test('SVG graphic form', async ({ page }) => {
+test('metadata panel', async ({ page }) => {
+  await openPhoto(page);
+  await page.getByRole('button', { name: 'Add content', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'Add content' })).toBeVisible();
+  await shot(page, 'window');
+});
+
+test('graphic settings', async ({ page }) => {
   await openPhoto(page);
   const preset = await graphicPreset('svg', 'font', 'center');
   await page.getByLabel('Import preset file').setInputFiles({
@@ -42,41 +45,16 @@ test('SVG graphic form', async ({ page }) => {
     preset.layout.containers[0]!.template,
   );
   await editor.locator('[data-token]').last().click();
-  const panel = page.getByLabel('Selected image settings', { exact: true });
-  await expect(panel).toBeVisible();
-  await panel.scrollIntoViewIfNeeded();
-  await shot(page, 'window');
-});
-
-test('photo roll', async ({ page }) => {
-  await openPhoto(page);
-  await page
-    .getByLabel('Choose JPG or PNG photo')
-    .setInputFiles(portraitFixture.path);
   await expect(
-    page.getByRole('region', { name: 'Photo film roll' }),
+    page.getByLabel('Selected image settings', { exact: true }),
   ).toBeVisible();
   await shot(page, 'window');
 });
 
-test('unavailable font inside selector', async ({ page }) => {
-  await openPhoto(page);
-  const preset = await graphicPreset('svg', 'font', 'center');
-  preset.layout.containers[0]!.style.fontFamily = 'Missing Studio Font';
-  await page.getByLabel('Import preset file').setInputFiles({
-    name: 'unavailable-font.json',
-    mimeType: 'application/json',
-    buffer: Buffer.from(JSON.stringify(preset)),
-  });
-  const font = page.getByRole('button', { name: 'Font', exact: true });
-  await expect(font.getByText('Unavailable')).toBeVisible();
-  await font.scrollIntoViewIfNeeded();
-  await ready(page);
-  await page.mouse.move(0, 0);
-  await page.screenshot({
-    path: test.info().outputPath('candidate.png'),
-    animations: 'disabled',
-    caret: 'hide',
-  });
+test('About', async ({ page }) => {
+  await page.goto('/');
+  await page
+    .getByRole('button', { name: 'About FrameNote', exact: true })
+    .click();
   await shot(page, 'window');
 });

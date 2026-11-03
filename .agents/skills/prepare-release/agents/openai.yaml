@@ -1,0 +1,3 @@
+interface:
+  display_name: "Prepare FrameNote release"
+  short_description: "Prepare a release or recover its failed build"

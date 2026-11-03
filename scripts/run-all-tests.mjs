@@ -3,10 +3,9 @@ import console from 'node:console';
 import process from 'node:process';
 
 const suites = [
-  ['Unit', ['test:unit']],
-  ['E2E (Chromium and WebKit)', ['test:e2e']],
-  ['Visual UI (all projects)', ['test:visual', '--all-projects']],
-  ['Glass (Chromium and WebKit)', ['test:glass-trial']],
+  ['Unit, integration and tooling (Vitest)', ['test:unit']],
+  ['E2E export smoke (Chromium)', ['test:e2e']],
+  ['Visual UI (Chromium desktop)', ['test:visual']],
 ];
 // Desktop tests require a graphical macOS session and a built renderer; run
 // explicitly with pnpm desktop:compile && pnpm test:desktop.

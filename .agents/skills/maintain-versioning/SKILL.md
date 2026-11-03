@@ -1,14 +1,16 @@
 ---
 name: maintain-versioning
-description: Maintain FrameNote beta versions, changelog and local version tags when committing completed application changes to master or merging an accepted task. Also use for explicit versioning or changelog requests. Development branch commits do not bump versions.
+description: Maintain FrameNote's synchronized product version and changelog conventions. Use for development changelog updates and explicitly requested release preparation; ordinary commits and merges do not create a release version or tag.
 ---
 
 # Maintain versioning — FrameNote
 
-Apply these project conventions when preparing an authorized commit or merge.
-This skill does not authorize commits, merges, product-stage acceptance, remote
-pushes, publication, signing or distribution. An explicit user override wins;
-report any intentionally skipped versioning or changelog action.
+Apply these conventions to product versions and changelog entries. A normal
+commit or merge is a development checkpoint, not a release boundary. Use
+[prepare-release](../prepare-release/SKILL.md) only when the user explicitly
+chooses to prepare a release. This skill does not authorize commits, merges,
+product-stage acceptance, remote pushes, publication, signing or distribution.
+An explicit user override wins.
 
 ## Branches and review
 
@@ -22,18 +24,15 @@ report any intentionally skipped versioning or changelog action.
 - Prefer squash merge for a completed task: one logical result on `master`.
   Preserve other contributors' or parallel tasks' changes; do not rewrite shared
   history. Inspect the actual branch and diff before deciding the workflow.
-- Development branch commits and intermediate checkpoints do not bump versions
-  or create version tags. Update a task's entries under Unreleased when useful,
-  refining them across iterations instead of duplicating them.
+- Commits and merges to `master` accumulate under Unreleased. Refine and
+  consolidate entries as work progresses; do not bump versions or create tags
+  for each completed task.
 
 ## Version boundary
 
-An authorized commit of a completed application change directly to `master`, or
-an authorized merge of an accepted task into `master`, includes the version
-update, dated changelog section and local version tag without another question.
-Do not infer merge permission or task acceptance from a request to commit work
-on a task branch. One completed task entering `master` gets one increment, even
-if it contains multiple commits, features or fixes.
+Only an explicitly requested release preparation creates a version boundary,
+dated changelog section, or release tag. Accumulated work may span many commits
+and merges. A request to commit or merge alone is not a request to release.
 
 Qualifying changes affect application behavior, appearance, compatibility,
 runtime dependencies, delivery or packaging. Documentation-only, test-only,
@@ -46,17 +45,20 @@ by their actual effect on the application. Never add filler entries.
 - Start the beta series at `0.1.0-beta`. Initial transition from alpha must
   be explicitly requested; installing this skill alone does not start a beta.
 - Before stable 1.0, use `0.x.y-beta` without a trailing prerelease counter.
-  Compatible fixes increment PATCH (`0.1.0-beta` → `0.1.1-beta`); features and
-  incompatible changes increment MINOR and reset PATCH (`0.1.1-beta` →
-  `0.2.0-beta`). Mixed tasks use the highest required increment. Every completed
-  application task entering master gets a new base version, not a beta counter.
+  Prefer PATCH for fixes and compatible refinements within existing documented
+  capabilities (`0.1.0-beta` → `0.1.1-beta`). Use MINOR and reset PATCH when a
+  release adds a distinct supported capability or changes the compatibility
+  contract (`0.1.1-beta` → `0.2.0-beta`). Do not misclassify a genuinely new
+  capability as PATCH solely to avoid a MINOR increment. Assess combined
+  Unreleased changes once at the release boundary; do not bump once per task.
   Incompatible changes still require migration and explicit changelog coverage.
   Alpha versions follow the same format, `0.x.y-alpha`. This is the project's
   prerelease convention using SemVer; reserve `1.0.0` for the first finished
   stable product. Never reset a larger base version to 1.0.
 - Moving to `rc` or stable `1.0.0` requires an explicit user decision.
-- After stable 1.0, use PATCH for compatible fixes, MINOR for compatible new
-  functionality, and MAJOR for incompatible changes to the documented contract.
+- After stable 1.0, use PATCH for compatible fixes and refinements, MINOR for
+  compatible new functionality, and MAJOR for incompatible changes to the
+  documented contract.
   Reset lower components appropriately. Choose the highest required increment
   when several changes are combined. Use channel labels without numerical
   counters for later prereleases too, e.g. `1.1.0-beta` or `1.1.0-rc`.
@@ -93,9 +95,10 @@ precedence; a commit hash identifies code, not release ordering.
   Use the user's local date and Added, Changed, Fixed or Removed as appropriate.
 - Describe resulting user behavior and compatibility implications, not attempts,
   implementation chronology or a transcript of commits.
-- At the version boundary, move only the completed task's Unreleased entries to
-  its dated section; preserve unrelated pending work. Consolidate entries for
-  the same result. Keep an empty Unreleased heading ready for later work.
+- At the version boundary, move only the accumulated entries selected for this
+  release to its dated section; preserve later or unrelated pending work.
+  Consolidate entries for the same result. Keep an empty Unreleased heading
+  ready for later work.
 - For the first beta, summarize the current delivered baseline from Unreleased
   and the actual diff/history. Retain historical milestone sections as history;
   do not invent past SemVer releases or claim new work for old milestones.
@@ -111,19 +114,17 @@ precedence; a commit hash identifies code, not release ordering.
    At a boundary, calculate an unused increasing version, synchronize manifests
    and prepare its changelog section in the same logical commit as the task.
    For squash merges, include these changes before finalizing the squash commit.
-3. Verify matching valid SemVer across manifests, the expected increment and
-   changelog coverage with `pnpm check:version`. Use `pnpm version:set <version>`
-   to synchronize manifests; prepare the matching changelog entry separately.
-   Before committing a version boundary, run `pnpm check:version --base=<ref>`
-   against the previous version commit to check increase and tag availability.
-   A skill is agent guidance, not a Git hook or CI enforcement mechanism.
-4. Only after the authorized commit on `master` succeeds, create an annotated
-   local tag `v<version>` on that commit. Check its target and version contents.
-   Never tag a task branch commit as a completed version. If tagging fails,
-   report the committed state and missing tag; do not create another bump.
-5. Report version, changelog, commit and local tag, or explain why no bump was
-   required. Do not push, publish, package, sign or advance product stages merely
-   because the local version was recorded.
+3. For an explicitly authorized release, verify matching valid SemVer across
+   manifests, the selected increment and changelog coverage with
+   `pnpm check:version`. Use `pnpm version:set <version>` to synchronize
+   manifests. Run `pnpm check:version --base=<ref>` for a new version when no
+   existing tag is being recovered.
+4. Create a local version tag only as part of an explicitly authorized release
+   workflow. Confirm whether pushing it triggers a build or publication first.
+   A commit or merge by itself never creates a tag. Recovery of a failed,
+   unpublished version follows `prepare-release`; never reuse a published tag.
+5. Report the version/changelog state. Do not push, publish, package, sign or
+   advance product stages without the corresponding explicit authorization.
 
 ## Build identity
 

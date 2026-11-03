@@ -199,6 +199,6 @@ interakcji.
 - Czy Storybook pokazuje zastosowanie, ważne zachowania i kompozycję?
 - Czy dokumentacja odsyła do prawdziwego kodu i story?
 
-Przed oddaniem zmian interfejsu uruchom `pnpm test:visual`; przy zmianach
-wspólnych komponentów lub styli również `pnpm test:visual --all-projects`.
+Przed oddaniem zmian interfejsu uruchom sześć scen Chromium desktop przez
+`pnpm test:visual`.
 Zobacz [katalog regresji wizualnej](UI_VISUAL_REGRESSION_PLAN.md).

@@ -52,19 +52,7 @@ preset adapter used during development.
 
 - `node scripts/verify-desktop-assets.mjs`: compare bundled font/license files.
 
-The desktop smoke test imports seven original photos offline, saves a JPG and ZIP
-through automated native dialog responses, checks cancellation and validates
-renderer isolation. It restarts the application to verify saved presets and JPG
-quality. Each run starts with a missing user-data directory inside an isolated
-temporary profile, checking first-launch initialization.
-It also checks the title bar, toolbar layout at 1440 and 800 px, menus,
-minimize/restore and full-screen transitions. `pnpm test:desktop --chrome-only`
-runs only these window checks. `--skip-native-transitions` explicitly omits
-minimize/restore/fullscreen checks when the graphical session cannot focus the
-app; it does not count those checks as verified.
-It can target a packaged executable through the `FRAMENOTE_PACKAGED` environment
-variable. It requires a macOS graphical session. Run desktop and web tests
-sequentially to avoid competing for application focus.
+The desktop smoke starts an isolated profile, checks the window at 1440 and 800 px and verifies a native fullscreen round trip. It imports four fixture photos, switches the active film-roll frame, saves a JPG through the native desktop bridge and exports the four-photo roll to ZIP. It checks the decoded JPG dimensions, ZIP entry names and page errors, then closes and cleans up in `finally`. Native save dialog responses are stubbed to keep output inside the temporary directory. `FRAMENOTE_PACKAGED` selects a packaged executable. These are behavioral assertions; screenshot baselines belong to the web visual suite.
 
 Run the desktop test from a terminal in the logged-in macOS graphical session.
 In Codex, use elevated execution (`sandbox_permissions: "require_escalated"`)

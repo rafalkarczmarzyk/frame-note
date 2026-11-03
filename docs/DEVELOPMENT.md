@@ -41,7 +41,7 @@ run it without concurrent source edits.
 ## Stack
 
 The stack combines React, TypeScript, Vite, Tailwind CSS, Konva, Tiptap,
-ExifReader, and Radix UI. Unit tests use Vitest; browser tests use Playwright.
+ExifReader, and Radix UI. All Vitest tests: unit, integration and tooling use Vitest; browser tests use Playwright.
 Shared components and design tokens are documented in Storybook.
 
 ## Commands
@@ -62,12 +62,11 @@ project tool such as Playwright. The shorter `pnpm <script>` form is also valid.
 | `pnpm run check:version`          | Check manifest versions and changelog                                                                   |
 | `pnpm run version:set <version>`  | Synchronize product versions in workspace manifests                                                     |
 | `pnpm run check`                  | Formatting, versions, tokens, lint, types, aggregate tests and web build; excludes native desktop tests |
-| `pnpm run test`                   | Unit, E2E, all visual UI projects and Glass suites; excludes native desktop tests                       |
-| `pnpm run test:unit`              | Unit tests                                                                                              |
-| `pnpm run test:e2e`               | Browser flows in Chromium and WebKit                                                                    |
+| `pnpm run test`                   | Vitest, one Chromium export smoke and six Chromium desktop screenshots; excludes native desktop tests   |
+| `pnpm run test:unit`              | All Vitest tests: unit, integration and tooling                                                         |
+| `pnpm run test:e2e`               | One representative JPG export in Chromium                                                               |
 | `pnpm run test:e2e:ui`            | Open browser test UI                                                                                    |
 | `pnpm run test:e2e:report`        | Open browser test report                                                                                |
-| `pnpm run test:glass-trial`       | Build Storybook and check Glass rendering                                                               |
 | `pnpm run test:visual`            | Default Chromium desktop UI regression                                                                  |
 | `pnpm run test:visual:review`     | Open visual regression test UI                                                                          |
 | `pnpm run test:visual:report`     | Open visual regression report                                                                           |
@@ -86,25 +85,18 @@ project tool such as Playwright. The shorter `pnpm <script>` form is also valid.
 | `pnpm run test:desktop`           | Native macOS smoke test; requires a built desktop and graphical session                                 |
 
 Pass options to the main commands instead of using separate shortcuts: `pnpm run lint --fix`,
-`pnpm run test:unit --watch`, `pnpm run test:e2e --grep "Photo export"`, or
-`pnpm run test:e2e:ui --grep "Photo export"`.
+`pnpm run test:unit --watch` or `pnpm run test:e2e:ui`.
 
 Install browser engines before running E2E tests:
 
 ```sh
-pnpm exec playwright install chromium webkit
+pnpm exec playwright install chromium
 pnpm run check
 ```
 
-Playwright serves the production build on port 4173. Coverage includes
-photo import and multi-photo sessions, metadata, layers, inline graphics, presets, positioning,
-and JPG export. Export checks inspect dimensions, encoded size, metadata removal,
-sRGB colors, orientation, and rendered pixels.
+Playwright serves the production build on port 4173. Its one browser test imports a representative wildlife photo, exports a JPG and compares the decoded image with one snapshot. Other browser, batch, clipboard, drag/drop and native window interactions are checked manually when their behavior changes.
 
-Visual export baselines are platform-specific. Review actual/expected/diff images
-before deliberately updating them with
-`pnpm run test:e2e --update-snapshots --project=chromium`. UI-only changes should not require new
-export baselines. Automated WebKit tests do not replace manual Safari testing.
+The JPG export is compared with a decoded PNG snapshot. To intentionally create or update it, run `pnpm test:e2e --update-snapshots` and review the image before accepting it. The normal run never writes baselines.
 
 ### Storybook and design system
 
@@ -178,7 +170,6 @@ the guard. See [desktop test requirements](DESKTOP.md#development-and-packaging)
 
 ```sh
 pnpm run test:visual
-pnpm run test:visual --all-projects
 pnpm run test:visual:review
 pnpm run test:visual:report
 ```
@@ -186,11 +177,20 @@ pnpm run test:visual:report
 Review expected/actual/diff before updating intentionally changed scenes:
 
 ```sh
-pnpm run test:visual:update --project chromium-desktop --grep 'left margin hover'
+pnpm run test:visual:update --project chromium-desktop --grep 'metadata panel'
 ```
 
-References depend on OS/browser profile; do not replace macOS references with
-outputs from another platform. See [visual regression workflow](UI_VISUAL_REGRESSION_PLAN.md).
+The suite has six full-window scenes in one Chromium desktop profile. A new browser test or profile requires explicit agreement to expand the suite. See [visual regression workflow](UI_VISUAL_REGRESSION_PLAN.md).
+
+### Test selection policy
+
+- Test data rules, geometry and save failures at the lowest useful layer.
+- Before adding a test, name the new failure it would catch and check existing coverage.
+- Expand one of the six UI compositions instead of adding a screenshot for each control.
+- Avoid fixed sleeps, retries that hide failures and automatic baseline acceptance.
+- Keep one responsibility per scenario; fixtures must not reproduce implementation logic.
+- Manually check drag/drop, focus and keyboard, clipboard, batch ZIP, other browsers
+  and native window transitions when relevant; the automated suite does not cover them.
 
 ## Versioning
 
@@ -215,14 +215,14 @@ Source archives without Git metadata show `unknown`. To prepare a version, run
 `pnpm run check:version --base=<previous-version-commit>`. The regular `pnpm run check`
 includes manifest and changelog consistency checks.
 
-An authorized commit or merge of a completed application task into `master`
-includes one version increment, dated changelog section and local tag.
-Development branch commits do not bump versions. See
-[maintain-versioning](../.agents/skills/maintain-versioning/SKILL.md).
+Changes accumulate under `Unreleased` across master commits and merges. Prepare
+a versioned changelog section only when you explicitly decide to release. Use
+the [prepare-release skill](../.agents/skills/prepare-release/SKILL.md) for the
+version forecast, release notes and failed-build recovery.
 Historical milestones map pre-MVP to `v0.0.1-alpha` and MVP to `v0.0.2-alpha`;
 their target commits are unchanged. Historical manifests are not rewritten.
 
-Version tags on master trigger GitHub Actions to build macOS Apple Silicon DMG,
+Pushing a version tag to master triggers GitHub Actions to build macOS Apple Silicon DMG,
 Windows x64 portable EXE and Linux x64 AppImage packages. Successful builds upload and verify all
 installers, then publish the GitHub Release automatically. A local tag alone does not upload or
 publish anything. See [desktop release workflow](DESKTOP.md#github-releases).

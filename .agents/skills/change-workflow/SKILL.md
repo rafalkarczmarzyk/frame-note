@@ -100,16 +100,19 @@ whole sequence. Respect existing explicit permission without asking again.
 Do not ask for final release approval until the concrete diff, checks and release
 contents are ready for review. Never proceed to the next unapproved stage.
 
-After final acceptance, prepare the release under `maintain-versioning`:
+After final acceptance, keep changes in `Unreleased` unless the user has
+explicitly requested a release. For an explicitly requested release, use
+[`prepare-release`](../prepare-release/SKILL.md), then apply
+`maintain-versioning` for manifest and tag conventions:
 
 1. Compare the final diff to AC and accepted scope. Inspect current master,
-   manifests and tags; recompute the forecast if the base or scope has changed.
-   Explain any revised version. One completed task entering master receives one
-   product increment, not one increment per stage or working commit.
-2. Synchronize product manifests/lockfile metadata and move only this task's
-   completed Unreleased entries to the dated English release section. Retain an
-   Unreleased heading and other tasks' entries. Cover compatibility, migrations
-   and required user actions where applicable. Run required final/version checks.
+   manifests and tags; recompute the proposed version if the base or selected
+   release scope has changed. Explain any revision. A release may include many
+   accepted tasks and commits; it receives one product increment.
+2. Synchronize product manifests/lockfile metadata and move only the accumulated
+   entries selected for this release to the dated English section. Retain an
+   Unreleased heading and later/unselected entries. Cover compatibility,
+   migrations and required user actions where applicable. Run required checks.
 3. With commit/merge authorization, create the final master commit containing
    implementation, version and changelog, preferably via squash for task branches.
    Only after success create and verify its annotated local version tag.

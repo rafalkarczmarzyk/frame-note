@@ -5,9 +5,9 @@ Historical pre-MVP and MVP milestones map to `v0.0.1-alpha` and
 `v0.0.2-alpha`. The previous `1.0.0-alpha.1` designation is normalized below
 to `0.0.3-alpha`; historical commits are unchanged. The first beta is
 `0.1.0-beta`, with `1.0.0` reserved for the first finished stable product.
-Development changes accumulate under Unreleased. Completed application tasks
-entering master receive a version, dated section and local tag according to
-[the versioning skill](.agents/skills/maintain-versioning/SKILL.md).
+Development changes accumulate under Unreleased across commits and merges.
+Prepare a versioned section and tag only when a release is explicitly requested;
+see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 
 ## Unreleased
 

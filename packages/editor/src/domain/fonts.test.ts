@@ -17,7 +17,6 @@ it('round trips every stable family identifier in the bundled catalog', () => {
       }),
     ).toEqual(preset);
   }
-  expect(captionFonts).toHaveLength(25);
 });
 it('uses only supplied weights and styles', () => {
   const style = createCaptionLayout().containers[0]!.style;

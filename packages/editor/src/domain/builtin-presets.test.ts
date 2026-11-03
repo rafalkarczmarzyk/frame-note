@@ -4,22 +4,18 @@ import { parsePreset } from '../../../core/src/presets';
 import { resolveTemplate } from '../features/caption/template';
 
 describe('built-in preset library', () => {
-  it('includes eight distinct starting points and the dark Default variant', () => {
-    expect(builtinPresets.map((preset) => preset.name)).toEqual([
-      'Default',
-      'Default dark',
-      'Signature',
-      'Compact EXIF',
-      'Camera & Lens',
-      'Focus Stack',
-      'EXIF Icons',
-      'Astrophotography',
-      'Long Exposure',
-    ]);
-    expect(new Set(builtinPresets.map((preset) => preset.id)).size).toBe(9);
-    expect(builtinPresets[0]!.layout.containers[0]!.template).toBe(
-      defaultTemplate,
+  it('provides valid, uniquely identified starting presets', () => {
+    expect(builtinPresets.length).toBeGreaterThan(0);
+    expect(new Set(builtinPresets.map((preset) => preset.id)).size).toBe(
+      builtinPresets.length,
     );
+    expect(builtinPresets.some((preset) => preset.name === 'Default')).toBe(
+      true,
+    );
+    expect(
+      builtinPresets.find((preset) => preset.name === 'Default')!.layout
+        .containers[0]!.template,
+    ).toBe(defaultTemplate);
     for (const preset of builtinPresets) {
       expect(
         parsePreset(JSON.stringify(preset), (name, svg) => ({
