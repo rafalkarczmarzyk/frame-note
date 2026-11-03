@@ -35,6 +35,7 @@ for (const file of [
 ]) {
   await cp(`apps/desktop/${file}`, `${stage}/${file}`, { recursive: true });
 }
+await cp('release/desktop-build/update-check.cjs', `${stage}/update-check.cjs`);
 await writeFile(
   `${stage}/package.json`,
   JSON.stringify(
@@ -69,6 +70,7 @@ await build({
       'main.cjs',
       'preload.cjs',
       'preset-files.cjs',
+      'update-check.cjs',
       'renderer/**/*',
       'package.json',
       'LICENSE',

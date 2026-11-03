@@ -24,9 +24,10 @@
 ## Wersja i zgodność
 
 - Obecna wersja z manifestu: 0.4.0-beta.
-- Prognoza: 0.4.1-beta — PATCH zgodnie z jawną decyzją użytkownika dla tego
-  zadania, jako wyjątek od domyślnego MINOR dla nowej funkcji. Przeliczyć względem
-  aktualnej wersji przy wprowadzaniu ukończonego zadania do master.
+- Wydanie funkcji: 0.4.1-beta — PATCH zgodnie z jawną decyzją użytkownika.
+  Tag został wypchnięty, ale wydanie nie zostało opublikowane: CI nie pakowało
+  modułu checkera i Zod, co blokowało start paczek na wszystkich systemach.
+- Poprawka pakowania: 0.4.2-beta, PATCH; nowy tag, bez przesuwania v0.4.1-beta.
 - Brak migracji i zmian formatu presetów.
 
 ## Kryteria akceptacji
@@ -47,7 +48,11 @@
 3. Testy jednostkowe na mockach odpowiedzi API — 5/5 przeszło.
 4. Pozostała weryfikacja wizualna — uruchomiona, niezaliczona: brak 9 bazowych
    zrzutów dla Chromium desktop na macOS; wzorce nie były generowane.
-5. Ocena użytkownika — oczekuje.
+5. Ocena użytkownika — zaakceptowana poleceniem „jest git, publikujemy”.
+6. Publikacja 0.4.1 — nieudana; smoke testy macOS/Windows i Linux zgłosiły
+   timeout uruchomienia. Przyczyna: pakiet nie zawierał update-checker/Zod.
+7. Poprawka pakowania — zaimplementowana i lokalnie sprawdzona na spakowanym
+   macOS; przygotowano 0.4.2-beta do ponownej publikacji.
 
 2026-11-03: użytkownik wybrał automatyczne sprawdzanie przy starcie oraz
 położenie, materiał, ikonę, link do release i ręczne zamykanie komunikatu.
@@ -65,6 +70,9 @@ mechanizmu sprawdzania wydań ani komunikatu o nowej wersji.
 2026-11-03: użytkownik wskazał Check for Updates… pod About w menu FrameNote;
 wdrożono też ręczne menu bez pełnych domyślnych `editMenu` i `windowMenu`.
 2026-11-03: użytkownik zdecydował o usunięciu całego menu Edit.
+2026-11-03: publikacja v0.4.1-beta zatrzymała się na smoke testach paczek.
+Poprawka: bundlowanie Zod wraz z checkerem oraz dołączenie pliku do obu ścieżek
+pakowania; macOS lokalny smoke test przechodzi. Przygotowano wydanie 0.4.2-beta.
 
 ## Weryfikacja i wydanie
 

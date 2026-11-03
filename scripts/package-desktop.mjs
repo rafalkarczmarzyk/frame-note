@@ -49,6 +49,7 @@ for (const name of [
   'renderer',
 ])
   await cp(`apps/desktop/${name}`, `${stage}/${name}`, { recursive: true });
+await cp('release/desktop-build/update-check.cjs', `${stage}/update-check.cjs`);
 await stageDesktopLegal(stage);
 const result = await packager({
   dir: stage,
