@@ -1,97 +1,90 @@
 # Development
 
-[Back to README](../README.md) · [Desktop setup and packaging](DESKTOP.md)
+[Back to README](../README.md) · [Desktop installation](DESKTOP.md)
 
 ## Setup
 
-Use Node.js from [`.nvmrc`](../.nvmrc) and the pnpm version pinned in
-[`package.json`](../package.json). Run commands from the repository root.
+Use Node.js from [`.nvmrc`](../.nvmrc) and pnpm pinned in
+[`package.json`](../package.json). Commands run from the repository root.
+With nvm installed:
 
 ```sh
 nvm install
 nvm use
 corepack enable
-pnpm install --frozen-lockfile
+pnpm i
 ```
 
-With dependencies installed, `pnpm run dev` serves web on port 3000 and
-`pnpm run desktop` launches Electron with live UI updates from a loopback Vite server on port 3001. If Electron installation was
-skipped, run `node node_modules/electron/install.js`.
+Choose `pnpm dev` for web on port 3000 or `pnpm desktop` for Electron with live
+UI updates on 127.0.0.1:3001. If Electron's binary download was skipped, run
+`node node_modules/electron/install.js`. Web and Storybook listen on the LAN;
+desktop live preview is loopback-only. Their ports must be free.
 
-Vite and Storybook listen on `0.0.0.0`: use the printed network address to open
-them from another device on your LAN. Web uses port 3000, Storybook 6006; the
-web development server fails if its port is occupied.
+Desktop UI uses Fast Refresh where supported. Main/preload and preset-adapter
+changes restart Electron and reset the photo session. Closing the window or
+Ctrl+C stops the app and server. `desktop:preview` builds and starts once offline;
+`desktop:build` creates a standalone macOS app without installation or DMG.
+The ignored `release/dev` directory is the cached, private FrameNote runtime,
+not the application to distribute; the installed Electron dependency is unchanged.
 
-Desktop preview is local to this computer. Closing the window or pressing Ctrl+C
-stops Electron and the preview server. Native restarts reset open photos; React
-Fast Refresh preserves state where the edited module supports it. Fix syntax
-errors to resume updates. Port 3001 must be free.
-
-Use `pnpm run desktop:preview` to compile and launch once without live updates.
-`pnpm run desktop:build` creates the standalone app at
-`release/FrameNote-darwin-arm64/FrameNote.app` on macOS Apple Silicon. Open that
-app in Finder; the `release/dev` directory is only an internal Electron runtime.
-`pnpm run desktop:compile` prepares renderer/adapter files for tests or `desktop:dist`
-without creating an app bundle.
-`pnpm run test:desktop:dev` checks live updates and native restarts in a macOS
-graphical session, with the same elevated-execution requirement as desktop tests.
-It temporarily edits and restores the empty-canvas text and preload source;
-run it without concurrent source edits.
+`test:desktop:dev` diagnoses HMR/restarts, temporarily editing and restoring
+sources. Use it only for launcher changes, without concurrent source edits,
+and with the same graphical-session access as the native smoke test.
 
 ## Stack
 
 The stack combines React, TypeScript, Vite, Tailwind CSS, Konva, Tiptap,
-ExifReader, and Radix UI. All Vitest tests: unit, integration and tooling use Vitest; browser tests use Playwright.
+ExifReader, and Radix UI. Vitest covers unit, integration and tooling tests; browser tests use Playwright.
 Shared components and design tokens are documented in Storybook.
 
 ## Commands
 
-`pnpm run <script>` executes a package.json script. `pnpm exec <tool>` executes a
+`pnpm <script>` executes a package.json script. `pnpm exec <tool>` executes a
 project tool such as Playwright. The shorter `pnpm <script>` form is also valid.
 
-| Command                           | Purpose                                                                                                 |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `pnpm run dev`                    | Start web development server on port 3000                                                               |
-| `pnpm run build`                  | Typecheck and build web into apps/web/dist                                                              |
-| `pnpm run preview`                | Preview the built web app                                                                               |
-| `pnpm run typecheck`              | Check workspace TypeScript                                                                              |
-| `pnpm run lint`                   | Check ESLint rules                                                                                      |
-| `pnpm run format`                 | Format repository files                                                                                 |
-| `pnpm run format:check`           | Check repository formatting                                                                             |
-| `pnpm run check:tokens`           | Check semantic UI color tokens                                                                          |
-| `pnpm run check:version`          | Check manifest versions and changelog                                                                   |
-| `pnpm run version:set <version>`  | Synchronize product versions in workspace manifests                                                     |
-| `pnpm run check`                  | Formatting, versions, tokens, lint, types, aggregate tests and web build; excludes native desktop tests |
-| `pnpm run test`                   | Vitest, one Chromium export smoke and six Chromium desktop screenshots; excludes native desktop tests   |
-| `pnpm run test:unit`              | All Vitest tests: unit, integration and tooling                                                         |
-| `pnpm run test:e2e`               | One representative JPG export in Chromium                                                               |
-| `pnpm run test:e2e:ui`            | Open browser test UI                                                                                    |
-| `pnpm run test:e2e:report`        | Open browser test report                                                                                |
-| `pnpm run test:visual`            | Default Chromium desktop UI regression                                                                  |
-| `pnpm run test:visual:review`     | Open visual regression test UI                                                                          |
-| `pnpm run test:visual:report`     | Open visual regression report                                                                           |
-| `pnpm run test:visual:update`     | Update explicitly selected visual references; requires --project and --grep                             |
-| `pnpm run storybook`              | Start Storybook on port 6006                                                                            |
-| `pnpm run build-storybook`        | Build static Storybook                                                                                  |
-| `pnpm run desktop`                | Live desktop preview; UI refreshes on save                                                              |
-| `pnpm run desktop:build`          | Create a runnable FrameNote.app on macOS Apple Silicon, without installation or DMG                     |
-| `pnpm run desktop:compile`        | Compile renderer and adapter for tests and platform-specific distribution                               |
-| `pnpm run desktop:preview`        | Compile and launch once without live updates                                                            |
-| `pnpm run desktop:install`        | Build and install locally on macOS Apple Silicon; supports --user and --open                            |
-| `pnpm run desktop:package`        | Clean release, build and package local macOS arm64 app and DMG                                          |
-| `pnpm run desktop:package:signed` | Local macOS packaging using explicit DEVELOPER_ID; no notarization                                      |
-| `pnpm run desktop:dist`           | Package a previously built desktop for the current system into release/ci; does not build the renderer  |
-| `pnpm run desktop:clean`          | Remove release outputs                                                                                  |
-| `pnpm run test:desktop`           | Native macOS smoke test; requires a built desktop and graphical session                                 |
+| Command                       | Purpose                                                                                                 |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `pnpm dev`                    | Start web development server on port 3000                                                               |
+| `pnpm build`                  | Typecheck and build web into apps/web/dist                                                              |
+| `pnpm preview`                | Preview the built web app                                                                               |
+| `pnpm typecheck`              | Check workspace TypeScript                                                                              |
+| `pnpm lint`                   | Check ESLint rules                                                                                      |
+| `pnpm format`                 | Format repository files                                                                                 |
+| `pnpm format:check`           | Check repository formatting                                                                             |
+| `pnpm check:tokens`           | Check semantic UI color tokens                                                                          |
+| `pnpm check:version`          | Check manifest versions and changelog                                                                   |
+| `pnpm version:set <version>`  | Synchronize product versions in workspace manifests                                                     |
+| `pnpm check`                  | Formatting, versions, tokens, lint, types, aggregate tests and web build; excludes native desktop tests |
+| `pnpm test`                   | Vitest, one Chromium export smoke and six Chromium desktop screenshots; excludes native desktop tests   |
+| `pnpm test:unit`              | All Vitest tests: unit, integration and tooling                                                         |
+| `pnpm test:e2e`               | One representative JPG export in Chromium                                                               |
+| `pnpm test:e2e:ui`            | Open browser test UI                                                                                    |
+| `pnpm test:e2e:report`        | Open browser test report                                                                                |
+| `pnpm test:visual`            | Default Chromium desktop UI regression                                                                  |
+| `pnpm test:visual:review`     | Open visual regression test UI                                                                          |
+| `pnpm test:visual:report`     | Open visual regression report                                                                           |
+| `pnpm test:visual:update`     | Update explicitly selected visual references; requires --project and --grep                             |
+| `pnpm storybook`              | Start Storybook on port 6006                                                                            |
+| `pnpm build-storybook`        | Build static Storybook                                                                                  |
+| `pnpm desktop`                | Live desktop preview; UI refreshes on save                                                              |
+| `pnpm desktop:build`          | Create a runnable FrameNote.app on macOS Apple Silicon, without installation or DMG                     |
+| `pnpm desktop:compile`        | Compile renderer and adapter for tests and platform-specific distribution                               |
+| `pnpm desktop:preview`        | Compile and launch once without live updates                                                            |
+| `pnpm desktop:install`        | Build and install locally on macOS Apple Silicon; supports --user and --open                            |
+| `pnpm desktop:package`        | Clean release, build and package local macOS arm64 app and DMG                                          |
+| `pnpm desktop:package:signed` | Local macOS packaging using explicit DEVELOPER_ID; no notarization                                      |
+| `pnpm desktop:dist`           | Package a previously built desktop for the current system into release/ci; does not build the renderer  |
+| `pnpm desktop:clean`          | Remove release outputs                                                                                  |
+| `pnpm test:desktop`           | Native macOS smoke test; requires a built desktop and graphical session                                 |
 
-Pass options to the main commands instead of using separate shortcuts: `pnpm run lint --fix`,
-`pnpm run test:unit --watch` or `pnpm run test:e2e:ui`.
+Pass options to the main commands instead of using separate shortcuts: `pnpm lint --fix`,
+`pnpm exec vitest` or `pnpm test:e2e:ui`.
 
 Install browser engines before running E2E tests:
 
 ```sh
 pnpm exec playwright install chromium
-pnpm run check
+pnpm check
 ```
 
 Playwright serves the production build on port 4173. Its one browser test imports a representative wildlife photo, exports a JPG and compares the decoded image with one snapshot. Other browser, batch, clipboard, drag/drop and native window interactions are checked manually when their behavior changes.
@@ -100,13 +93,13 @@ The JPG export is compared with a decoded PNG snapshot. To intentionally create 
 
 ### Storybook and design system
 
-Open [localhost:6006](http://localhost:6006) after running `pnpm run storybook`.
+Open [localhost:6006](http://localhost:6006) after running `pnpm storybook`.
 Stories are grouped by purpose, including **Foundations**, **Actions**,
 **Fields**, **Sidebar & panels**, and **Screens**. `Screens/TestPhotos` exercises the real editor with original photo
 fixtures. Application and stories share components and CSS.
 
 UI colors are defined in `packages/editor/src/index.css` and consumed through semantic tokens.
-`pnpm run check:tokens` checks this convention. The accessibility addon supports
+`pnpm check:tokens` checks this convention. The accessibility addon supports
 component review; it is not a complete accessibility audit.
 
 The caption library offers 25 Google Fonts families, with category
@@ -132,55 +125,60 @@ e2e/                Playwright flows and export baselines
 tests/fixtures/     Original test photos and graphics
 ```
 
+The desktop renderer has no Node API. An isolated, sender-validated IPC bridge
+handles native output, presets and menus. Output uses a temporary file and rename;
+packaged resources load through `framenote://app`, live preview through loopback.
+Opening files uses HTML's native chooser and shared import validation.
+
 ## Packaging
 
 Local macOS packaging rebuilds and creates both an app and DMG:
 
 ```sh
-pnpm run desktop:package
+pnpm desktop:package
 ```
 
 The separate cross-platform packaging path requires a fresh build first:
 
 ```sh
-pnpm run desktop:compile
-pnpm run desktop:dist
+pnpm desktop:compile
+pnpm desktop:dist
 ```
 
 It produces `release/ci/*.dmg` on macOS arm64, `*.exe` on Windows x64 or
 `*.AppImage` on Linux x64. It does not install the app or publish a release.
 Local `desktop:install` remains a macOS Apple Silicon command, and builds and
-installs without creating a DMG. Details and signing options: [desktop guide](DESKTOP.md).
+installs without creating a DMG. Signing and packaging requirements are below; user installation is in the [desktop guide](DESKTOP.md).
 
 ## Desktop verification
 
-`pnpm run test` and `pnpm run check` do **not** launch the native desktop suite.
+`pnpm test` and `pnpm check` do **not** launch the native desktop suite.
 After building the desktop, run it separately from a graphical macOS session:
 
 ```sh
-pnpm run desktop:compile
-pnpm run test:desktop
+pnpm desktop:compile
+pnpm test:desktop
 ```
 
 Run desktop and browser tests sequentially. In Codex the first desktop test
 attempt requires elevated execution; never remove environment markers to bypass
-the guard. See [desktop test requirements](DESKTOP.md#development-and-packaging).
+the guard. See [desktop test requirements](../AGENTS.md#uruchamianie-desktopu-w-testach).
 
 ## UI visual regression
 
 ```sh
-pnpm run test:visual
-pnpm run test:visual:review
-pnpm run test:visual:report
+pnpm test:visual
+pnpm test:visual:review
+pnpm test:visual:report
 ```
 
 Review expected/actual/diff before updating intentionally changed scenes:
 
 ```sh
-pnpm run test:visual:update --project chromium-desktop --grep 'metadata panel'
+pnpm test:visual:update --project chromium-desktop --grep 'metadata panel'
 ```
 
-The suite has six full-window scenes in one Chromium desktop profile. A new browser test or profile requires explicit agreement to expand the suite. See [visual regression workflow](UI_VISUAL_REGRESSION_PLAN.md).
+The suite has six full-window scenes in one Chromium desktop profile. A new browser test or profile requires explicit agreement to expand the suite. See [visual regression workflow](UI_VISUAL_TESTS.md).
 
 ### Test selection policy
 
@@ -190,45 +188,100 @@ The suite has six full-window scenes in one Chromium desktop profile. A new brow
 - Avoid fixed sleeps, retries that hide failures and automatic baseline acceptance.
 - Keep one responsibility per scenario; fixtures must not reproduce implementation logic.
 - Manually check drag/drop, focus and keyboard, clipboard, batch ZIP, other browsers
-  and native window transitions when relevant; the automated suite does not cover them.
+  and additional native window transitions when relevant. Native smoke covers
+  four-photo JPG/ZIP, frame switching, resizing and fullscreen; other interactions remain manual.
 
 ## Versioning
 
-The version is recorded in [package.json](../package.json) and [CHANGELOG.md](../CHANGELOG.md). **1.0.0** is reserved for the first
-finished stable version. The previous alpha designation `1.0.0-alpha.1` was
-normalized to `0.0.3-alpha`; historical commit contents are unchanged.
+The shared product version is authoritative in [package.json](../package.json).
+To build a historical release, check out its `v<version>` tag and follow Setup.
+Data compatibility is documented in [PRESET_FORMATS](PRESET_FORMATS.md).
 
-To build a specific version, check out its existing `v<version>` tag and follow Setup above.
-User presets use the same v1 JSON and Zod schema on both platforms. Web keeps
-localStorage; macOS uses `~/FrameNote/presets`. No old preset migration is provided.
-
-During beta, compatible fixes increment PATCH (`0.1.0-beta` → `0.1.1-beta`);
-features and incompatible changes increment MINOR (`0.1.1-beta` → `0.2.0-beta`),
-resetting PATCH. Mixed tasks use the highest required increment. Channel labels
-have no extra counter: use `-alpha`, `-beta` and `-rc`. This is our
-[SemVer](https://semver.org/) prerelease convention; incompatible changes before
-1.0 still require migration and changelog coverage.
+For numbering, branch and changelog conventions use
+[maintain-versioning](../.agents/skills/maintain-versioning/SKILL.md).
 
 About displays the product version, build commit and `dirty` for local changes.
-Source archives without Git metadata show `unknown`. To prepare a version, run
-`pnpm run version:set <version>`, add its changelog section, then run
-`pnpm run check:version --base=<previous-version-commit>`. The regular `pnpm run check`
+Prepared source archives recover the commit from `.framenote-source.json`;
+without either source metadata or Git, the build shows `unknown`. To prepare a version, run
+`pnpm version:set <version>`, add its changelog section, then run
+`pnpm check:version --base=<previous-version-commit>`. The regular `pnpm check`
 includes manifest and changelog consistency checks.
 
 Changes accumulate under `Unreleased` across master commits and merges. Prepare
 a versioned changelog section only when you explicitly decide to release. Use
 the [prepare-release skill](../.agents/skills/prepare-release/SKILL.md) for the
 version forecast, release notes and failed-build recovery.
-Historical milestones map pre-MVP to `v0.0.1-alpha` and MVP to `v0.0.2-alpha`;
-their target commits are unchanged. Historical manifests are not rewritten.
-
-Pushing a version tag to master triggers GitHub Actions to build macOS Apple Silicon DMG,
-Windows x64 portable EXE and Linux x64 AppImage packages. Successful builds upload and verify all
-installers, then publish the GitHub Release automatically. A local tag alone does not upload or
-publish anything. See [desktop release workflow](DESKTOP.md#github-releases).
 
 ## Web deployment
 
-[netlify.toml](../netlify.toml) runs `pnpm run build` from the workspace root and
+[netlify.toml](../netlify.toml) runs `pnpm build` from the workspace root and
 publishes `apps/web/dist`. Electron downloads are skipped for web deployment.
-A local build does not deploy the site. See [deployment notes](DESKTOP.md#web-deployment).
+A local build does not deploy the site. Validate a Deploy Preview before changing production;
+Netlify dashboard base/package settings must agree with the repository configuration.
+
+## Local macOS packaging
+
+`desktop:package` and `desktop:package:signed` clean all of `release/` before
+compiling; a failed attempt leaves no old app/DMG to mistake for a new build.
+`desktop:build` creates `release/FrameNote-darwin-arm64/FrameNote.app` without
+DMG or installation and preserves the dev runtime cache. `desktop:compile`
+only refreshes renderer/adapter files. `desktop:dist` requires a fresh compile.
+
+Local DMG packaging uses Finder automation in a graphical macOS session, a
+640 × 400 installation window and the background generated by
+`apps/desktop/installer/background.swift`. It verifies the staged app, read-only
+DMG and signature before replacing the result. Allow Finder Automation if asked.
+Check layout, Applications shortcut, installation outside the repository,
+replacement preserving presets and launch on another Mac before distribution.
+A signature/integrity failure is not a successful installation test.
+
+### Xcode detection
+
+An explicit `DEVELOPER_DIR` takes precedence; otherwise the scripts try the active
+directory and Xcode under `/Applications` or `~/Applications`, without changing
+`xcode-select`. Icon Composer requires macOS/actool 26; older tools use `.icns`.
+Failure compiling the chosen icon fails the build.
+
+### Code signing
+
+Ordinary local packaging signs ad hoc, without an Apple account or certificate,
+even when `DEVELOPER_ID` is set. For certificate signing:
+
+```sh
+security find-identity -v -p codesigning
+export DEVELOPER_ID='Exact certificate name or SHA-1'
+pnpm desktop:package:signed
+```
+
+The signed command requires the matching private key and fails without fallback.
+It uses a timestamp and Hardened Runtime; ad hoc mode omits Hardened Runtime's
+Team-ID-dependent library validation. Both retain V8 JIT entitlements and verify
+nested code with `codesign --verify --deep --strict`. No keys are stored in Git.
+The DMG is not signed; neither command notarizes or uploads to Apple. Normal
+Gatekeeper trust requires Developer ID and notarization, beyond local integrity.
+
+## GitHub Releases
+
+The [workflow](../.github/workflows/desktop-release.yml) builds macOS arm64 DMG,
+Windows x64 portable EXE and Linux x64 AppImage via `desktop:compile` then
+`desktop:dist`. This path does not automate Finder. Standard hosted runners
+need no signing secrets; platform limitations are in [DESKTOP](DESKTOP.md).
+
+- Push master and its matching `v<product-version>` tag to trigger the release.
+  Tag/version mismatches and commits outside master are rejected.
+- All three binary builds/smoke tests and the source job must pass. Packages,
+  the [source archive](SOURCE_DISTRIBUTION.md) and SHA256SUMS are uploaded to a
+  temporary draft, then names, sizes and hashes are checked before publication.
+- Publication is automatic after those checks: Latest, `prerelease=false`, even
+  with a beta version suffix. Authorization to push a release tag must cover this.
+- Manual runs produce seven-day Actions artifacts, not releases. Recovery creates
+  a draft for review and requires the original successful source and binary jobs.
+- Failed upload/verification leaves an unpublished draft. Published releases are
+  never overwritten. A local tag alone does not publish.
+- Infrastructure retry applies only when every failed job has a confirmed missing
+  hosted runner: five-minute delay, at most four attempts including manual ones.
+  Manual reruns cancel the pending retry; code, packaging and publication failures
+  are not retried by that rule. Successful jobs and the tag remain unchanged.
+
+CI startup/import/export checks are narrower than manual platform acceptance;
+see the outstanding installation/font/persistence checks in DESKTOP.

@@ -1,97 +1,64 @@
-# FrameNote — kontekst dla agenta
+# FrameNote — instrukcja pracy
 
-Przed rozpoczęciem pracy przeczytaj:
+Przed pracą przeczytaj [README](README.md), [kontekst produktu](docs/PRODUCT.md)
+i [odłożone pomysły](docs/NICE_TO_HAVE.md). Przed zmianą UI sprawdź
+[design system](docs/DESIGN_SYSTEM.md) i aktualne komponenty/stories.
+Komendy i weryfikację opisuje [DEVELOPMENT](docs/DEVELOPMENT.md).
 
-- [Kontekst produktu i plan pre-MVP/MVP](docs/PRODUCT_PLAN.md).
-- [Uruchomienie i aktualne możliwości](README.md).
-- [Design system](docs/DESIGN_SYSTEM.md).
-- [Nice to have — pomysły odłożone na później](docs/NICE_TO_HAVE.md).
+## Zakres i decyzje
 
-Pre-MVP jest ukończone i zaakceptowane. Plan MVP zawiera propozycje, które
-wymagają uzgodnienia zakresu. Pracujemy etapami: implementacja, ocena użytkownika,
-poprawki, a następnie jego potwierdzenie przejścia dalej. Nie realizuj kolejnego
-etapu ani nie wykonuj commita bez polecenia użytkownika.
+Zmiany desktopu, webu i wspólnych modeli prowadź według
+[change-workflow](.agents/skills/change-workflow/SKILL.md): implementacja,
+ocena użytkownika, poprawki i potwierdzenie następnego etapu.
+Nie wykonuj kolejnego etapu ani commita bez polecenia. Akceptacja działania
+nie oznacza zgody na commit/push; użytkownik może połączyć zgody.
+Nie pytaj ponownie o zgodę już udzieloną.
 
-Przed zmianą lub dodaniem UI sprawdź [instrukcję FrameNote UI](docs/DESIGN_SYSTEM.md)
-i aktualne komponenty/stories. Rozszerzaj wspólne komponenty zamiast kopiować ich
-style Tailwind do feature; nowy wspólny komponent dokumentuj w Storybooku.
+Dokumentacja, testy, narzędzia i skille wymagają proporcjonalnej weryfikacji,
+bez pełnego procesu zmian aplikacji. Wspólne UI rozszerzaj zamiast kopiować
+style Tailwind do feature; nowy komponent dokumentuj w Storybooku.
 
-## Planowanie i wdrażanie zmian
+## Git i wydania
 
-Przy planowaniu i realizacji zmian aplikacji desktopowej, webowej lub wspólnych
-modeli stosuj projektowy skill
-[change-workflow](.agents/skills/change-workflow/SKILL.md).
-Dotyczy to również kontynuacji etapów, poprawek po ocenie i przygotowania wydania.
-Skill prowadzi zapisany plan, kryteria akceptacji (AC), prognozę wersji,
-weryfikację automatyczną i ocenę użytkownika. Drobne poprawki mają skrócony proces;
-zwykłe pytania o kod oraz zmiany wyłącznie dokumentacji, testów, narzędzi lub
-skilli nie wymagają pełnego procesu zmian aplikacji.
-Akceptacja działania nie jest poleceniem commita ani pushowania; użytkownik może
-połączyć te zgody w jednym poleceniu. Nie pytaj ponownie o udzieloną zgodę.
+Stosuj [maintain-versioning](.agents/skills/maintain-versioning/SKILL.md)
+przy commitach, merge'ach, zmianach wersji i changeloga. Małe poprawki mogą
+trafiać na master; funkcje, większe UI i refaktory na `codex/`. Preferuj squash
+ukończonego zadania, bez stałego develop; PR jest opcjonalny.
 
-## Branche, wersje i changelog
+Commity/merge'e gromadzą zmiany pod Unreleased, bez podbicia wersji i taga.
+Wyraźnie zlecone wydanie prowadź przez
+[prepare-release](.agents/skills/prepare-release/SKILL.md).
+Wersja produktu jest wspólna dla manifestów; changelog po angielsku.
+Zmiany wyłącznie dokumentacji/testów/narzędzi/skilli nie wymagają wydania.
+Commit brancha nie oznacza akceptacji ani merge'a. Push, publikacja,
+podpisywanie i dystrybucja wymagają właściwego polecenia; lokalny tag nie publikuje.
 
-Przy przygotowaniu commita, merge'a oraz zmian wersji lub changeloga zastosuj
-projektowy skill
-[maintain-versioning](.agents/skills/maintain-versioning/SKILL.md).
-Małe poprawki mogą trafiać bezpośrednio do `master`; nowe funkcje, większe zmiany
-UI i refaktory prowadź na branchach `codex/`. PR jest opcjonalny, zalecany dla
-dużych lub ryzykownych zmian. Preferuj squash merge ukończonego zadania.
-Nie wprowadzaj osobnego, stałego brancha `develop`.
+## Dokumentacja i pomysły
 
-Commity i merge'e, również na `master`, gromadzą zmiany pod `Unreleased`; nie
-podbijaj przy nich wersji ani nie twórz taga. Gdy użytkownik wyraźnie uzna, że
-czas przygotować wydanie, zastosuj skill
-[prepare-release](.agents/skills/prepare-release/SKILL.md), który ocenia
-zebrany zakres i tworzy jeden datowany wpis wydania.
-Beta zaczyna się od `0.1.0-beta`. Preferuj PATCH dla poprawek i kompatybilnych
-udoskonaleń istniejących możliwości; nowa odrębna funkcja lub zmiana kontraktu
-może wymagać MINOR i wyzerowania PATCH. Oceniaj całość przy przygotowaniu
-wydania, nie przy każdym zadaniu. Nie dodajemy licznika po `-beta`
-ani `-alpha`. `1.0.0` oznacza pierwszą ukończoną stabilną wersję.
-Pierwsze przejście z alphy do bety, przejście do RC i
-stabilnego wydania wymagają wyraźnego polecenia. Zmiany wyłącznie dokumentacji,
-testów, narzędzi i skilla nie wymagają podbicia ani wpisu wydania. Konfigurację
-oceniaj według wpływu na działanie lub paczkowanie aplikacji.
+Opisuj aktualny wynik, nie przebieg rozmowy. Zastępuj nieaktualne statusy;
+jedna informacja ma jedno główne miejsce. Po zamknięciu zadania przenieś
+trwałe ustalenia do właściwej instrukcji, usuń plan; historia pozostaje w Git.
+Otwarte kwestie i dowody audytu zachowaj przed usunięciem.
 
-Zachowuj wspólną wersję produktu we wszystkich manifestach workspace.
-Changelog prowadź po angielsku, z datowanymi sekcjami wersji i Unreleased dla
-zmian oczekujących. Respektuj jawne wyjątki użytkownika. Commit na branchu nie
-oznacza akceptacji ani zgody na merge. Lokalny tag nie oznacza publikacji;
-push, publikacja, podpisywanie i dystrybucja wymagają osobnego polecenia.
+Konkretny pomysł odłożony przez użytkownika zapisz w tej samej turze zgodnie z
+[deferred-ideas](.agents/skills/deferred-ideas/SKILL.md), bez duplikatów.
+NICE_TO_HAVE jest pamięcią decyzji, nie zgodą na implementację.
 
-## Pomysły na później
+## Uruchamianie desktopu w testach
 
-Gdy użytkownik odkłada konkretny pomysł („na kiedyś”, „później”, „nie teraz”),
-zastosuj projektowy skill
-[deferred-ideas](.agents/skills/deferred-ideas/SKILL.md) i zapisz decyzję
-w `docs/NICE_TO_HAVE.md` w tej samej turze. Sprawdź istniejące wpisy, żeby nie
-tworzyć duplikatów. Lista jest pamięcią decyzji, nie zgodą na implementację.
-Nie włączaj odłożonych pomysłów do bieżącego zakresu bez polecenia użytkownika.
+`pnpm test:desktop` wymaga sesji graficznej macOS. W Codex od pierwszej próby
+używaj `exec_command` z `sandbox_permissions: "require_escalated"`.
+Nie próbuj startu Electrona w ograniczonym środowisku: macOS może przerwać
+`_RegisterApplication` i wyświetlić raport awarii. Nie usuwaj znaczników
+środowiska, by ominąć kontrolę skryptu. Brak dostępu oznacza niewykonaną
+weryfikację. Testy desktopowe i przeglądarkowe uruchamiaj kolejno.
 
-## Regresja wizualna interfejsu
+## Kontrola wyglądu
 
-### Uruchamianie desktopu w testach
-
-`pnpm test:desktop` wymaga sesji graficznej macOS i dostępu do usług systemowych.
-W Codex uruchamiaj go od pierwszej próby przez `exec_command` z
-`sandbox_permissions: "require_escalated"`. Nie uruchamiaj Electrona próbnie
-w ograniczonym środowisku: macOS może przerwać jego start w `_RegisterApplication`
-i pokazać użytkownikowi raport awarii. Skrypt testowy blokuje znane ograniczone
-środowiska przed startem Electrona; nie usuwaj znaczników środowiska, by ominąć
-tę kontrolę. Brak odpowiedniego dostępu oznacza niewykonaną weryfikację.
-Testy desktopowe i przeglądarkowe uruchamiaj kolejno, żeby nie konkurowały o fokus.
-
-### Kontrola wyglądu
-
-Przed oddaniem zmian wyglądu, kontrolek lub układu uruchom `pnpm test:visual`.
-Zestaw zawiera sześć pełnych scen w jednym profilu Chromium desktop. Katalog
-scen i sposób przeglądania różnic:
-[UI_VISUAL_REGRESSION_PLAN.md](docs/UI_VISUAL_REGRESSION_PLAN.md).
-
-Różnica wizualna wymaga obejrzenia expected/actual/diff. Nie aktualizuj wzorców,
-żeby jedynie naprawić test; aktualizuj wyłącznie świadomie zaakceptowane sceny.
-Dodając nowy istotny stan interfejsu, dodaj jego scenariusz do zestawu.
-Wzorce są zależne od systemu i profilu przeglądarki; brak właściwego środowiska
-zgłoś jako niewykonaną weryfikację, zamiast zapisywać wzorce z innego systemu.
-Testy UI uzupełniają istniejące testy eksportu JPG.
+Przed oddaniem zmian wyglądu, kontrolek lub układu uruchom `pnpm test:visual`:
+sześć pełnych scen Chromium desktop. [Sceny i raporty](docs/UI_VISUAL_TESTS.md).
+Różnice wymagają obejrzenia expected/actual/diff. Aktualizuj wyłącznie świadomie
+zaakceptowane sceny, nigdy tylko dla naprawienia testu. Nowy stan włączaj do
+istniejącej kompozycji; nowy test lub profil wymaga uzgodnienia rozszerzenia zestawu.
+Wzorce zależą od systemu/profilu; brak właściwego środowiska oznacza niewykonaną
+kontrolę, nie zgodę na zapis wzorców z innego systemu. UI uzupełnia jeden test JPG.

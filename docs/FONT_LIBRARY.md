@@ -17,7 +17,7 @@ The 24 added families are local WOFF2 files in `public/fonts/google`. They were
 retrieved from the official [Google Fonts repository](https://github.com/google/fonts/tree/main/ofl)
 on 2026-10-26 and losslessly repackaged from TTF into WOFF2 using FontTools.
 Each family includes upstream METADATA.pb and OFL.txt. The checked-in manifest
-`src/domain/google-fonts.json` records source URLs, WOFF2 SHA-256 hashes, weights,
+`packages/core/src/google-fonts.json` records source URLs, WOFF2 SHA-256 hashes, weights,
 styles and the glyph audit. Assets are checked in; building or running the app
 requires no connection to Google or a font CDN.
 
@@ -32,9 +32,7 @@ and export, with its original name and Unavailable badge retained in the selecto
 Only real supplied 400/700 and italic variants are offered. Variable font weight
 ranges supply both weights where supported. Families without Bold or Italic disable
 that control and normalize the effective rendering variant, including imported
-presets. Additional families are not fetched at application startup. The checked-in
-assets are suitable for a future packaged desktop app; a web app still needs an
-explicit cache/service worker before it can promise a first offline launch.
+presets. Additional families are not fetched at application startup. Desktop bundles these assets for offline use. Web does not promise a first offline launch.
 
 ## Licenses and coverage
 
@@ -56,23 +54,12 @@ To repeat the asset audit with Python, FontTools and Brotli installed:
 python scripts/verify-fonts.py
 ```
 
-## Category controls
+## System fonts
 
-`CategoryFilter` is a controlled, single-selection chip group built on the existing
-Radix toggle group. It adds the configurable All option, wraps long labels and
-supports arrow navigation, Space/Enter and visible focus. `filterByCategory` holds
-the domain-independent category/search predicate.
+Desktop adds a System category; All includes installed and bundled families.
+On macOS the native catalog is read at startup; restart after installing fonts.
+Only actual installed faces are used. Bundled families take precedence on name
+collisions. Web does not enumerate local fonts or request font permissions.
 
-Filters and search belong to FloatingPanel's fixed toolbar, outside its scrolling
-content. Font categories are All, Sans-serif, Serif, Monospace and Display. Desktop also
-provides System; All includes those families. The native macOS catalog is read at
-startup and registered with local PostScript face sources. Only installed variants
-are used, including the bold/italic combination; restart to refresh the catalog.
-Web does not enumerate local fonts or request font permissions. Tag
-categories follow the real metadata namespaces plus FrameNote helpers; no Custom
-tag model is invented. Colors retain their exact values and the existing Neutrals
-and Soft colors groups. Switching filters never updates the selected domain value.
-
-Stories: Components/UI/CategoryFilter, FontPicker, MetadataPicker and ColorPicker.
-These include stateful search/category interactions, empty results, keyboard
-navigation, long labels, narrow layout and selection retention.
+Stories: `Pickers/FontPicker`; shared category control:
+`Selection & feedback/CategoryFilter`.

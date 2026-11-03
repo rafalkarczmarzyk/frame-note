@@ -42,7 +42,7 @@ source archive is not an offline package-manager cache.
 Desktop packaging is platform-specific: `pnpm desktop:dist` prepares the current
 system's CI target, while `pnpm desktop:package` is the local macOS path.
 The Electron binary installer must run first (`node node_modules/electron/install.js`).
-See [desktop prerequisites](DESKTOP.md) for signing, system and architecture limits.
+See [desktop prerequisites](DEVELOPMENT.md#local-macos-packaging) for signing, system and architecture limits.
 Rebuilding does not promise byte-identical signatures or binary archives.
 
 `third-party/npm` preserves the distributed package form; upstream archives

@@ -77,6 +77,14 @@ Presets do not include the source photo or export settings. Imports also pass
 [parsePreset](../packages/core/src/presets.ts), which validates colors, identifiers,
 embedded artwork and the 5 MB size limit in addition to the Zod structure.
 
+## Font-name compatibility
+
+By explicit product decision, v1 accepts arbitrary nonempty font family names.
+Earlier v1 readers with a fixed family list may reject them. An unavailable family
+retains its saved name and renders with Montserrat until explicitly replaced;
+font files and system paths are not embedded. This exception does not authorize
+other schema changes without a new format version.
+
 ## Future format changes
 
 From now on, every new format version requires:

@@ -13,7 +13,7 @@ justify a new UI control.
 ## Components
 
 - Check installed `lucide-react` exports for standard UI symbols before adding custom SVGs. Import only the icons used.
-- Keep brand assets in `src/components/brand`, alongside `FrameNoteLogo` and `FrameNoteIcon`. New custom UI icons belong in `src/components/icons` when needed.
+- Keep brand assets in `packages/editor/src/components/brand`, alongside `FrameNoteLogo` and `FrameNoteIcon`. New custom UI icons belong in `packages/editor/src/components/icons` when needed.
 - Use PascalCase component names and kebab-case filenames. Follow existing names without adding an SVG suffix or renaming unrelated assets.
 - Keep each custom asset as a standalone component accepting `SVGProps<SVGSVGElement>`; a shared SVG wrapper is unnecessary for the current assets.
 
@@ -28,7 +28,7 @@ justify a new UI control.
 
 ## Storybook and verification
 
-- Add stories beside the component: `Components/Brand/<Name>` for brand assets, `Components/UI/<Name>` for custom UI icons.
+- Add stories beside the component; use the current purpose-based grouping in DESIGN_SYSTEM and nearby stories (brand foundations generally belong under Foundations).
 - Default and Accent stories use identical dimensions and differ only in color. Use a separately named story for size variants when useful or requested.
 - Do not rely solely on a newly introduced Tailwind utility to constrain the story preview; retain explicit default SVG dimensions.
 - Run `pnpm check` and `pnpm build-storybook`. Open changed stories and check actual rendered dimensions, proportions, clipping and colors. Confirm equal dimensions for Default and Accent.

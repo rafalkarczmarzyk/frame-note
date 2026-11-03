@@ -40,8 +40,7 @@
 ## Create your first caption
 
 FrameNote opens into an empty editor with a photo-selection button, JPG/PNG drop
-guidance and a privacy note in the canvas. The application version, GitHub and
-Changelog links sit at the bottom. On the web, open About using the button beside
+guidance and a privacy note in the canvas. The application version sits at the bottom; GitHub and Changelog links are in About. On the web, open About using the button beside
 the logo (or the logo itself). On desktop, use FrameNote → About FrameNote in
 the application menu. About shows the version, project links and an offline
 license reader. It does not open automatically at startup.
@@ -89,13 +88,19 @@ migrations. See [preset format](PRESET_FORMATS.md).
 Desktop saves presets as individual JSON files in `~/FrameNote/presets` (inside
 the user's home directory). Export/import `.framenote.json` files to transfer
 layouts between web and desktop; storage is not synchronized. Desktop file names,
-conflict handling and external edits are described in [desktop storage](DESKTOP.md#installing-the-local-build).
+conflict handling and external edits are described in [desktop storage](DESKTOP.md#data-and-presets).
 
 **Add photos** and canvas drops append photos to the session. A film roll appears
 below the canvas when two or more photos are open. Selecting a frame restores
-its independent layout, artwork and preset selection. Each added photo starts
-with Default; a single first import preserves the layout prepared in the empty
-editor. Opening several photos together starts all of them with Default.
+its independent layout, artwork and preset selection. Every import copies the current layout at the start of the operation into each
+new photo, including an import into the empty editor. Later edits are independent.
+
+**Copy settings / Paste settings** in the sidebar or under a film-roll frame copy
+the layout, layers and artwork without creating a preset. Copy captures a snapshot;
+Paste replaces the target layout and resolves tokens against that photo's metadata.
+These actions do not change the active photo or export preferences. The internal
+copy lasts until the application closes or reloads; it is not the system clipboard.
+Paste requires a copy, and the actions are unavailable while editing is locked.
 
 **Photo actions → Close photo** closes the active photo and selects a neighbor.
 **Dispose roll…** closes all photos after confirmation. Closing the last photo
@@ -116,11 +121,9 @@ and are clipped at the photo edge. Empty resolved content has no background;
 None retains its settings without applying padding. Shadows do not enlarge the
 selection area. The layer's padded background does enlarge it.
 
-Glass previews render at screen resolution (up to 1600 pixels on the long edge);
-JPGs use full photo resolution. They share composition and material calculations,
-with normal rasterization and JPG differences. Full glass remains active while
-dragging. Performance with many overlapping glass layers on slower devices still
-needs broader measurement.
+Glass preview and full-resolution JPG may differ slightly through rasterization
+and JPG compression. Performance with many overlapping Glass layers on slower
+devices has not been broadly measured.
 
 ## Limits and export behavior
 
@@ -161,10 +164,6 @@ paths before importing. The editor limits active image content to 100 images.
 - Import and batch export show progress and can be cancelled. Cancellation waits
   for current decoding/encoding to return and discards pending output. Batch export
   locks editing until it finishes or cancellation completes.
-- Only active-preview/import/export photos are fully decoded; inactive photos keep
-  small thumbnails and session-owned copies of the encoded source bytes. Switching
-  and batch export do not reread the original disk files. These copies last until
-  the photos are closed or the page is refreshed and can increase memory/storage
-  use for large rolls. Large-series memory budgets still need measurement.
-- Zoom/pan remains outside the current scope. A local macOS Apple Silicon desktop
-  build is available; see [desktop setup and packaging](DESKTOP.md).
+- Session copies of source photos remain until closed or the app reloads.
+  Large rolls can consume substantial memory/storage; no unlimited-series guarantee.
+- Zoom/pan remains outside the current scope. For desktop installation and update notifications, see [desktop setup and packaging](DESKTOP.md).

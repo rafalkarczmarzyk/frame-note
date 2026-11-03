@@ -28,10 +28,9 @@ FrameNote adds watermarks, logos and photo metadata to your images. Compose
 layers with text and graphics, save reusable presets, and export JPGs individually
 or as a ZIP. Processing stays on your device; no account or backend is required.
 
-**Beta:** the web editor and local macOS Apple Silicon app are available from
-source. Tagged builds are configured to prepare macOS, Windows and Linux packages
-in GitHub Releases; availability depends on a successful build and publication.
-See [desktop setup and release limitations](docs/DESKTOP.md).
+**Beta:** web and Electron desktop share the same editor. Desktop packages target
+macOS Apple Silicon, Windows x64 and Linux x64. See [installation and platform
+limitations](docs/DESKTOP.md).
 
 ## Features
 
@@ -46,45 +45,19 @@ See [desktop setup and release limitations](docs/DESKTOP.md).
 Use [FrameNote in your browser](https://framenoteapp.netlify.app), or run it locally
 with the steps below.
 
-Use Node.js from [`.nvmrc`](.nvmrc) and pnpm pinned in
-[`package.json`](package.json). With nvm installed:
+Requires Node.js from [`.nvmrc`](.nvmrc) and pnpm from [`package.json`](package.json).
+From the repository root:
 
 ```sh
-nvm install
-nvm use
-corepack enable
-pnpm install --frozen-lockfile
-pnpm run dev
+pnpm i
+
+pnpm dev      # Web — http://localhost:3000
+pnpm desktop  # Desktop — live preview
 ```
 
-Open [localhost:3000](http://localhost:3000).
-
-For desktop development, run `pnpm run desktop`. `pnpm run desktop:build` creates
-a ready-to-open app at `release/FrameNote-darwin-arm64/FrameNote.app`.
-To build and install on your
-Apple Silicon Mac:
-
-```sh
-pnpm run desktop:install
-```
-
-Quit FrameNote first. The command installs into `/Applications`; use
-`pnpm run desktop:install --user` for `~/Applications`, or add `--open` to launch
-after installation. See [desktop requirements](docs/DESKTOP.md#build-and-install-with-one-command).
-
-## Development
-
-| Command                    | Purpose                                              |
-| -------------------------- | ---------------------------------------------------- |
-| `pnpm run dev`             | Run web locally                                      |
-| `pnpm run desktop`         | Run desktop with live UI updates                     |
-| `pnpm run desktop:install` | Build and install locally on macOS Apple Silicon     |
-| `pnpm run build`           | Build web for production                             |
-| `pnpm run storybook`       | Browse shared UI components                          |
-| `pnpm run check`           | Check code, run the compact test suite and build web |
-
-Native desktop tests run separately. All commands, prerequisites, packaging and
-release instructions are in the [development guide](docs/DEVELOPMENT.md).
+Choose the app you want to run. For environment setup, builds and tests, see
+[Development](docs/DEVELOPMENT.md). For local installation, see
+[Desktop](docs/DESKTOP.md#local-macos-installation).
 
 ## Documentation
 
@@ -95,7 +68,7 @@ release instructions are in the [development guide](docs/DEVELOPMENT.md).
 - [Preset format v1](docs/PRESET_FORMATS.md)
 - [Fonts and licenses](docs/FONT_LIBRARY.md)
 - [Design system](docs/DESIGN_SYSTEM.md)
-- [Product plan](docs/PRODUCT_PLAN.md) · [Deferred ideas](docs/NICE_TO_HAVE.md)
+- [Product context](docs/PRODUCT.md) · [Deferred ideas](docs/NICE_TO_HAVE.md)
 - [Changelog](CHANGELOG.md)
 
 Some internal planning documents are maintained in Polish.

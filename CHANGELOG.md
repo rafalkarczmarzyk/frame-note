@@ -495,4 +495,4 @@ because Windows packaging failed.
 
 For current capabilities and limits, see the [README](README.md). Historical
 implementation details and milestone reviews live in the
-[product plan](docs/PRODUCT_PLAN.md).
+[product context](docs/PRODUCT.md).

@@ -28,6 +28,7 @@ Ten skill jest projektowy; nie zapisuj pomysłów w globalnych ustawieniach Code
   Kontynuuj pozostały uzgodniony zakres bez odłożonego elementu.
 - Przy ponownym podjęciu tematu odczytaj istniejący wpis. Po wyraźnym poleceniu
   użytkownika zaktualizuj status i powiąż z uzgodnionym zakresem. Zakończenie
-  oznacz dopiero po rzeczywistym wykonaniu; zachowaj wpis jako historię decyzji.
+  oznacz dopiero po rzeczywistym wykonaniu; usuń wykonany wpis po przeniesieniu trwałych ustaleń do dokumentacji funkcji.
+  Historia pozostaje w Git i changelogu; nie wykorzystuj ponownie jego ID.
 - W odpowiedzi krótko wskaż, co zapisano, i podaj link do rejestru. Nie przedstawiaj
   odłożonego pomysłu jako zatwierdzonego następnego etapu.

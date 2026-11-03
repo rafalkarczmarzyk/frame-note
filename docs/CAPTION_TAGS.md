@@ -1,148 +1,80 @@
-# Tagi podpisu FrameNote
+# Tagi podpisu
 
-Stan: 24 października 2026. Helpery działają na metadanych odczytanych z bieżącego
-zdjęcia. Nie zapisują niczego w oryginalnym JPG i nie zastępują oryginalnych tagów.
+Helpery FrameNote mają zapis `{author}`, oryginalne pola `{group:name}`, np.
+`{exif:Artist}` i `{exif:UserComment}`. Nazwy rozróżniają wielkość liter.
+Tokeny nie zmieniają źródłowych metadanych; są rozwiązywane dla bieżącego zdjęcia.
+Panel metadanych pokazuje wartość i źródło, wyszukuje również po źródłach,
+wstawia przy zapamiętanym kursorze i pozwala użyć helpera bez danych.
 
-## Szablon
+## Helpery i źródła
 
-Domyślny podpis w edytorze:
+Pierwsze poprawne źródło wygrywa, z osobną walidacją ISO opisaną niżej.
+Prefiksy dc/tiff/exif/exifEX/aux/photoshop w tabeli oznaczają standardowe namespace
+XMP sprawdzane przez URI; nie zmieniają składni oryginalnych tokenów.
 
-```text
-{author}
-{lens}
-{exposure}
-```
+| Helper                | Wynik                                          | Priorytet źródeł                                                                                                   |
+| --------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `{author}`            | Autor                                          | XMP dc:creator → XMP tiff:Artist → EXIF Artist → IPTC By-line/Byline                                               |
+| `{camera}`            | Canon EOS R6m2                                 | EXIF Model → XMP tiff:Model                                                                                        |
+| `{lens}`              | RF100mm F2.8 L MACRO IS USM                    | EXIF LensModel → XMP exifEX:LensModel → XMP aux:Lens                                                               |
+| `{shutter}`           | 1/250 s                                        | EXIF ExposureTime → XMP exif:ExposureTime → EXIF ShutterSpeedValue → XMP exif:ShutterSpeedValue                    |
+| `{shutterDuration}`   | 1 h 1 min 1.5 s                                | Te same źródła co shutter; poniżej minuty ten sam format, od minuty godziny/minuty/sekundy bez zerowych składników |
+| `{aperture}`          | f/8                                            | EXIF FNumber → XMP exif:FNumber → EXIF ApertureValue → XMP exif:ApertureValue                                      |
+| `{iso}`               | ISO 400                                        | Poprawny zestaw EXIF → poprawny zestaw standardowego XMP; reguły poniżej                                           |
+| `{focalLength}`       | 100 mm                                         | EXIF FocalLength → XMP exif:FocalLength; nie ekwiwalent 35 mm                                                      |
+| `{date}`              | 2026-10-20                                     | EXIF DateTimeOriginal → XMP exif:DateTimeOriginal → IPTC DateCreated → XMP photoshop:DateCreated                   |
+| `{copyright}`         | Treść praw                                     | XMP dc:rights → EXIF Copyright → IPTC Copyright Notice/CopyrightNotice                                             |
+| `{exposure}`          | 1/250 s · f/8 · ISO 400                        | Składa shutter, aperture i iso, pomijając brakujące części i separatory                                            |
+| `{heliconStack}`      | Focus stack · 15 images · Method A · R=8 · S=4 | EXIF UserComment → XMP exif:UserComment                                                                            |
+| `{heliconStackCount}` | 15                                             | Ten sam pełny parser komentarza co heliconStack                                                                    |
 
-Helpery FrameNote nie mają namespace. Oryginalne pola zachowują zapis
-`{group:name}`, np. `{exif:Artist}`, `{xmp:creator}`, `{exif:UserComment}`.
-Można mieszać oba rodzaje w jednym szablonie; stare szablony nadal działają.
-Nazwy są rozróżniane wielkością liter, np. `{focalLength}`.
+Czas, przysłona, ISO i ogniskowa zawierają jednostki — nie dopisuj ich ponownie.
+Helicon rozpoznaje pełny komentarz `Stacked from N images. Method=A (R=8,S=4)`,
+metody A/B/C, dodatkowe spacje i różną wielkość liter. Nie zgaduje liczby z dowolnego komentarza.
 
-## Dostępne helpery i źródła
+## Reguły i ograniczenia
 
-Źródła w tabeli są sprawdzane od lewej do prawej. Pierwsza niepusta wartość,
-którą helper potrafi sformatować, wygrywa. W razie konfliktu niczego nie scalamy
-ani nie nadpisujemy w źródłach; wybrany tag jest pokazany w panelu.
-
-| Helper          | Wynik / przykład          | Kolejność źródeł                                                                                                                         |
-| --------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `{author}`      | Autor                     | `xmp:creator` → `xmp:tiff:Artist` → `exif:Artist` → `iptc:By-line` → `iptc:Byline`                                                       |
-| `{camera}`      | Canon EOS R6m2            | `exif:Model` → `xmp:Model`                                                                                                               |
-| `{lens}`        | EF-S24mm f/2.8 STM        | `exif:LensModel` → `xmp:LensModel` → `xmp:Lens`                                                                                          |
-| `{shutter}`     | `1/250 s` lub `3.2 s`     | `exif:ExposureTime` → `xmp:ExposureTime`                                                                                                 |
-| `{aperture}`    | `f/8`                     | `exif:FNumber` → `xmp:FNumber`                                                                                                           |
-| `{iso}`         | `ISO 400`                 | `exif:PhotographicSensitivity` → `exif:ISOSpeedRatings` → `exif:ISO` → `xmp:PhotographicSensitivity` → `xmp:ISOSpeedRatings` → `xmp:ISO` |
-| `{focalLength}` | `100 mm`                  | `exif:FocalLength` → `xmp:FocalLength`                                                                                                   |
-| `{date}`        | `2026-10-20`              | `exif:DateTimeOriginal` → `xmp:DateTimeOriginal` → `iptc:DateCreated` → `xmp:DateCreated`                                                |
-| `{copyright}`   | Treść praw autorskich     | `xmp:rights` → `exif:Copyright` → `iptc:Copyright Notice` → `iptc:CopyrightNotice`                                                       |
-| `{exposure}`    | `1/250 s · f/8 · ISO 400` | Składa dostępne `{shutter}`, `{aperture}` i `{iso}`; pokazuje wszystkie użyte źródła                                                     |
-
-Czas, przysłona, ISO i ogniskowa mają już jednostki/oznaczenia. Nie dopisuj ponownie
-`s`, `f/`, `ISO` ani `mm`. `{exposure}`
-dodaje ten prefiks samodzielnie, pomija brakujące części i nie pozostawia pustych
-separatorów. Bez żadnych parametrów ekspozycji jest traktowany jako brak danych.
-
-`{iso}` rozwiązuje EXIF PhotographicSensitivity (dawniej ISOSpeedRatings)
-razem z SensitivityType. Tag ten opisuje czułość używaną przy wykonaniu zdjęcia;
-typ może wskazywać SOS, REI, ISO Speed albo ich zgodne kombinacje. Dla zgodnego
-zestawu helper zachowuje format `ISO N`, również przy SensitivityType=2 (REI).
-Przy wartości granicznej 65535 korzysta z pełnego pola wskazanego przez typ.
-Samotne Auto ISO, Base ISO, ISOSpeed lub latitude nie zastępują czułości zdjęcia.
-
-Import obsługuje JPG i PNG. Eksport nadal zapisuje JPG; przezroczyste piksele PNG
-mają białe tło zarówno w podglądzie, jak i eksporcie.
-
-Data zachowuje dzień z metadanych; nie przeliczamy jej na strefę czasową urządzenia.
-`xmp:CreateDate` jest pomijane, bo może opisywać eksport lub utworzenie po edycji.
-Daty są sprawdzane kalendarzowo; `20240229` i `2024-02-29` są poprawne, ale
-`2023-02-29` nie daje wartości helpera.
-Ogniskowa oznacza wartość zapisaną w FocalLength, nie ekwiwalent 35 mm.
-Nie wyliczamy parametrów z alternatywnych wartości APEX ani nie zgadujemy modelu
-aparatu na podstawie obiektywu.
-
-## Lista tagów
-
-**Browse available tags** otwiera panel z osobnym przewijaniem:
-
-1. **FrameNote** — helpery, zawsze na górze, z wartością i źródłem.
-2. **EXIF**.
-3. **XMP**.
-4. **IPTC**.
-5. Pozostałe odczytane namespace, posortowane alfabetycznie.
-
-Wyszukiwarka sprawdza klucze, wartości, namespace i źródła helperów. Pozostawia
-nagłówki tylko dla grup zawierających wyniki. Wiersz oznaczony **Used** jest już
-w szablonie. Kliknięcie wstawia token przy zapamiętanym kursorze albo zastępuje
-zaznaczenie w textarea.
-
-Oryginalne pola są nadal widoczne i można je wstawiać niezależnie od helperów.
-Wartości pokazane przy helperach są podglądem dla aktualnego zdjęcia; zmiana
-zdjęcia ponownie je rozwiązuje, zachowując sam szablon.
+- APEX jest zastępczym zapisem ekspozycji: czas = `2 ** -ShutterSpeedValue`,
+  przysłona = `2 ** (ApertureValue / 2)`. Bezpośrednie parametry mają pierwszeństwo.
+- ISO korzysta z PhotographicSensitivity/ISOSpeedRatings (także aliasu EXIF ISO)
+  i SensitivityType. Wartość 65535 wymaga pełnego parametru wskazanego przez typ.
+  Nie mieszamy typu EXIF z wartością XMP; listy nie są dzielone jak ułamki.
+  Samotne Auto ISO/Base ISO nie zastępują czułości zdjęcia.
+- Data waliduje dzień kalendarzowy i zachowuje dzień zapisany w źródle, bez
+  konwersji strefy. CreateDate nie jest datą wykonania. Lista w tabeli odpowiada
+  implementacji; nie obiecuje odczytu dowolnego wariantu IPTC.
+- Warianty językowe XMP: x-default → angielski → pierwszy dostępny kandydat.
+  Nie sklejamy tłumaczeń. Nazwy sprzętu pozostają nazwami ze źródła; nie ma bazy
+  modeli, zgadywania aparatu ani rozwiązywania LensID.
+- ExifReader i adapter zachowują pochodzenie standardowych pól XMP. Odczyt
+  nie obejmuje wszystkich MakerNotes ani dowolnych tagów producenta.
+  Skompresowane XMP iTXt w PNG nie jest wspierane.
+- Rzeczywiste fixture obejmują głównie Canon/Lightroom i XMP bez ekspozycji;
+  brak próbek Sony, Nikon, Fujifilm, Panasonic i OM System ogranicza weryfikację.
 
 ## Brakujące dane
 
-Helper bez wartości pokazuje **No data in this photo.** Można go wstawić, aby
-przygotować szablon używany również z innymi zdjęciami. W podpisie brakujący token
-jest pusty; całkowicie puste wiersze są pomijane. Lista brakujących pól jest widoczna
-w karcie Caption, a eksport takiego podpisu wymaga potwierdzenia.
+Znany helper bez danych daje pustą wartość; nieznany token jest raportowany.
+Wiersz opróżniony przez brakujące tokeny znika, celowo pusty wiersz zostaje.
+Własne etykiety i separatory pozostają. Eksport widocznych warstw z brakami
+wymaga potwierdzenia; ukryte warstwy nie zgłaszają braków do eksportu.
 
-Znany helper bez danych nie jest błędem składni. Nieznana nazwa bez namespace,
-np. `{Artist}`, jest błędem składni; użyj `{author}` albo `{exif:Artist}`.
-Dowolne dosłowne separatory i tekst pozostają — automatyczne usuwanie pustych
-separatorów dotyczy tylko gotowego helpera `{exposure}`.
+## Grafiki inline
 
-`Agata-104.jpg` jest przypadkiem testowym z autorem i obiektywem w XMP, bez
-odczytanego modelu aparatu i parametrów ekspozycji. Brak tych wartości nie oznacza
-awarii helperów. Lista wszystkich oryginałów: [zdjęcia testowe](../tests/fixtures/README.md).
+`{icon:camera}` zachowuje domyślny wygląd. Wersja z ustawieniami:
+`{icon:camera:1.5:font:center}` — wysokość, jednostka `font|document`,
+wyrównanie `top|center|bottom`.
 
-## Helicon i dalsza rozbudowa
+Obrazy: `{image:id:height:font|document:original|single}` z opcjonalnym
+`:top`, `:center` lub `:bottom`. Bez sufiksu są wyśrodkowane. PNG zachowuje
+oryginalne kolory; jednolity kolor dotyczy SVG. Ustawienia są per wystąpienie,
+wyższa grafika zwiększa wiersz, a zmiana jednostki przelicza wysokości dokumentowe.
+Zasoby i ustawienia zapisuje preset; sam token bez zasobu nie przenosi grafiki.
 
-Komentarz stacku jest dostępny jako `{exif:UserComment}` i formatowany helper
-`{heliconStack}` opisany poniżej. Obecny plik testowy zawiera
-`Stacked from 15 images. Method=A (R=8,S=4)`.
+## Kod
 
-Logika helperów i grupowania: `src/domain/caption-tags.ts`. Resolver szablonu:
-`src/features/caption/template.ts`. UI listy: `src/features/caption/metadata-picker.tsx`.
-Nowe aliasy wymagają jawnej kolejności źródeł, formatowania i testów fallbacku.
-
-### Helicon Focus — helper `{heliconStack}`
-
-Helper rozpoznaje pełny komentarz `Stacked from N images. Method=A (R=8,S=4)`
-z EXIF UserComment (następnie XMP UserComment). Obsługuje metody A/B/C,
-niezależnie od wielkości liter i dodatkowych spacji. Wynik:
-`Focus stack · 15 images · Method A · R=8 · S=4`.
-Nie zmienia oryginalnego UserComment. Przy braku pełnego rozpoznanego formatu
-wartość jest pusta, bez zgadywania liczby zdjęć z innego komentarza.
-Wbudowany preset Focus Stack (wcześniej Macro) dodaje osobny kontener `{heliconStack}` w prawym dolnym rogu.
-
-Helper `{heliconStackCount}` korzysta z tego samego parsera i źródeł co `{heliconStack}`,
-ale zwraca wyłącznie liczbę, np. `15`. Umożliwia własny podpis:
-`Stacked {heliconStackCount} images` → `Stacked 15 images`. Bez rozpoznanego komentarza
-zachowuje standardowe oznaczenie brakującej wartości.
-
-### Czytelny czas — `{shutterDuration}`
-
-Korzysta z tych samych źródeł, reguł namespace i fallbacku co `{shutter}`:
-EXIF ExposureTime → XMP ExposureTime → EXIF ShutterSpeedValue → XMP
-ShutterSpeedValue. Wartości APEX są najpierw przeliczane na sekundy.
-
-Dla czasów poniżej minuty zachowuje format `{shutter}`: `1/250 s`, `3.2 s`,
-`30 s`. Od minuty rozkłada czas na godziny, minuty i pozostałe sekundy, bez
-zaokrąglania do pełnych minut: `60 s` → `1 min`, `90 s` → `1 min 30 s`,
-`125 s` → `2 min 5 s`, `600 s` → `10 min`, `3661.5 s` → `1 h 1 min 1.5 s`.
-Pomija zerowe jednostki. Oryginalne `{shutter}` i `{exposure}` pozostają bez
-zmian. Brak poprawnej dodatniej wartości jest raportowany jak dla innych helperów.
-Astrophotography i Long Exposure używają nowego helpera.
-
-## Individual inline graphic settings
-
-The editor writes configured icons as `{icon:name:height:font|document:top|center|bottom}`,
-for example `{icon:camera:1.5:font:center}`. Plain `{icon:camera}` remains supported
-with its existing size and placement. `font` multiplies the layer font size;
-`document` uses the document sizing unit. Changing that unit converts fixed
-heights while retaining the rendered size.
-
-SVG/PNG references may append `:top`, `:center` or `:bottom` after their color mode.
-Existing image references without this suffix retain centered alignment. Alignment
-is within each caption line; taller graphics increase that line's height.
-Settings are per occurrence and are included in copied text and layout presets.
+- [Helpery i źródła](../packages/core/src/caption-tags.ts).
+- [ISO](../packages/core/src/photographic-metadata.ts).
+- [Ekstrakcja](../packages/editor/src/features/photo/extract-metadata.ts).
+- [Resolver treści](../packages/editor/src/features/caption/template.ts).
+- [Fixture zdjęć](../tests/fixtures/README.md).

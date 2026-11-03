@@ -25,6 +25,13 @@ it to the task rather than filling irrelevant sections. Capture prior explicit
 decisions from the conversation, including exceptions and authorizations.
 Do not treat assistant proposals as accepted user decisions.
 
+Keep one current status, scope and verification result. Replace superseded text;
+do not append conversation transcripts, repeated approvals or logs of each attempt.
+Preserve only decisions whose rationale still matters. On task closure, move
+lasting behavior and limitations into the relevant reference document, record
+user-facing changes in the changelog, and remove the completed plan. Keep open
+acceptance items and audit evidence until resolved; Git preserves task history.
+
 For a small isolated fix, a short plan and AC in the conversation are sufficient;
 persist them if work spans stages or needs a later handoff. Ordinary questions
 and documentation/test/tool/skill-only edits use proportionate verification and

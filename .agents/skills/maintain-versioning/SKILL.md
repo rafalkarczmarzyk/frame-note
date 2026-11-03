@@ -136,6 +136,8 @@ than inventing a hash. Keep package SemVer separate from display metadata and
 native platform build-number constraints.
 
 Build identity is injected by Vite at build time and displayed in About.
-Without Git metadata it reads unknown; no separate build counter is maintained.
-Betas are source-only: no downloadable builds, installers, remote publishing or
-automatic deployments follow from a local version commit and tag.
+Without Git, prepared source archives use `.framenote-source.json`; without either
+source it reads unknown. No separate build counter is maintained. Desktop beta
+packages are built by the tagged release workflow. A local commit/tag does not
+publish; pushing the release tag triggers automatic publication after its checks.
+Inspect the workflow and obtain the corresponding remote-action authorization.

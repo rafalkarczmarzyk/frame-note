@@ -79,55 +79,17 @@ preferuj semantyczne stany komponentu zamiast ręcznego formatowania w call-site
 
 ## Wzorce FrameNote
 
-### Pasek okna macOS
+### Platforma i About
 
-`AppHeader` odczytuje platformę przez `usePlatform()`. Dla `isMacOS` pokazuje
-`MacOSTitleBar`: nad nagłówkiem z narzędziami osobny pasek 28 px
-z nazwą FrameNote na środku. Oba korzystają z `bg-header-base`; pasek okna nie
-ma dodatkowej linii oddzielającej. Natywne przyciski macOS są rysowane przez
-system. Przesuwanie okna obejmuje tylko górny pasek, a narzędzia zachowują swój
-dotychczasowy układ i obsługę. Wariant desktopowy pomija logo w nagłówku:
-pierwszą akcją po lewej jest Add photos. Padding nagłówka wynosi 6 px na każdej
-z czterech stron; wysokość wynika z kontrolek 36 px, paddingu i dolnej linii 1 px
-(łącznie 49 px). Informacje o aplikacji otwiera systemowe
-menu FrameNote → About FrameNote, przez ten sam komponent `AboutSplash`.
-Warunek `isWeb` pokazuje klikalne logo oraz tekstowy przycisk About obok niego;
-obie akcje otwierają ten sam dialog. Web zachowuje dotychczasowe odstępy nagłówka.
-Przykłady: Storybook → Sidebar & panels/AppHeader → MacOS i MacOSMinimum.
+`PlatformProvider` i `usePlatform()` udostępniają `web | macos | windows | linux`.
+Nie wykrywaj platformy przez user agent ani API Electrona we wspólnym UI.
+Usługi zapisu i pamięci udostępnia osobno `lib/platform.ts`.
 
-### About
-
-Wspólny `AboutSplash` ma jedno ciągłe zdjęcie pod całym oknem i przyciemnioną
-nakładkę pod informacjami po lewej. Kadr pokazuje ptaszka po prawej, bez prawego
-pionowego słupka. Nie powielaj obrazu w osobnych panelach ani nie twórz
-osobnej kopii zdjęcia; blur pod tekstem zapewnia backdrop-filter na panelu.
-Czytnik licencji podmienia treść w tych samych wymiarach okna, nad tym samym
-zdjęciem rozmytym w całym oknie. Tło aplikacji za modalem pozostaje bez zmian: bez przyciemnienia i blura.
-Nie dodawaj dodatkowego focus outline na kontener.
-Początkowy fokus trafia na dialog; Close nie pokazuje tooltipa przy otwarciu.
-Licenses jest tekstowym odnośnikiem do lokalnego czytnika. Powrót z czytnika
-przywraca fokus odnośnikowi. Okno otwieramy z przycisku/logo na webie lub menu
-aplikacji na desktopie. Nie pokazuje się automatycznie przy starcie.
-Storybook → Screens/AboutFrameNote zawiera About i LicenseReader; prototypy
-AboutProposal i odrzucone warianty zostały usunięte.
-
-### Platforma aplikacji
-
-`PlatformProvider` dostarcza jedną wartość `web | macos | windows | linux`.
-Hook `usePlatform()` zwraca `platform` oraz wyliczone flagi `isWeb`, `isMacOS`,
-`isWindows` i `isLinux`. Korzystaj z tych flag w warunkach UI; nie wykrywaj
-platformy przez user agent, szerokość okna ani API Electrona we wspólnym edytorze.
-Hook wymaga providera — brak konfiguracji zgłasza błąd.
-
-Punkt wejścia webu wywołuje `mountEditor({ platform: 'web' })`, także na Macu.
-Desktop mapuje `darwin → macos`, `win32 → windows`, `linux → linux`.
-Provider jest nad `App`, więc platformy nie przekazujemy przez pośrednie propsy.
-Istniejący `platform()` w `lib/platform.ts` nadal udostępnia usługi zapisu,
-pamięci i menu. Nie służy do warunkowania wyglądu.
-
-Storybook domyślnie dostarcza kontekst `web`; stories nagłówka nadpisują go
-lokalnym providerem. Windows i Linux są przygotowane w typie i podglądach;
-nie oznacza to zweryfikowanych paczek ani natywnej obsługi tych systemów.
+macOS używa `MacOSTitleBar` z natywnymi przyciskami; tylko pasek okna jest
+obszarem przeciągania. Web otwiera About przez logo/przycisk, desktop przez menu.
+Wspólny `AboutSplash` i czytnik licencji zachowują geometrię, neutralny fokus
+na otwarciu i powrót fokusu po zamknięciu. Szczegóły pokazują stories
+`Sidebar & panels/AppHeader` i `Screens/AboutFrameNote`.
 
 ### Sidebar i dodatkowe opcje
 
@@ -173,6 +135,7 @@ poziomów folderów. Zalecane sekcje:
 - **Selection & feedback** — Badge, Switch, Slider, SegmentedControl, PickerList,
   InlineNotice i stany błędów/wyboru.
 - **Sidebar & panels** — SidebarSection, FloatingPanel i dodatkowe pickery.
+- **Pickers** — fonty, kolory, metadane i grafiki.
 - **Layers** — lista, zaznaczenie, ustawienia i akcje warstwy.
 - **Photo session** — FilmRoll, PhotoActions, import, postęp i sesja.
 - **Screens** — pełne kompozycje produkcyjne i zdjęcia testowe.
@@ -201,4 +164,4 @@ interakcji.
 
 Przed oddaniem zmian interfejsu uruchom sześć scen Chromium desktop przez
 `pnpm test:visual`.
-Zobacz [katalog regresji wizualnej](UI_VISUAL_REGRESSION_PLAN.md).
+Zobacz [katalog regresji wizualnej](UI_VISUAL_TESTS.md).
