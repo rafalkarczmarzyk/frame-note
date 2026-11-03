@@ -14,6 +14,14 @@ type Story = StoryObj<typeof meta>;
 
 export const Empty: Story = {};
 export const ImportedSeries: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Loads three photos into the real session. Each new photo inherits the active layout. Use Copy/Paste in the sidebar footer or under film frames; confirmation appears at the bottom of the workspace.',
+      },
+    },
+  },
   play: async ({ canvasElement }) => {
     const files = await Promise.all(
       [

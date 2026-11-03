@@ -1090,6 +1090,49 @@ fieldset:disabled .glass-switch {
 }
 
 @layer components {
+  .photo-settings-feedback {
+    position: absolute;
+    z-index: 50;
+    inset-inline: 0;
+    bottom: 32px;
+    display: flex;
+    justify-content: center;
+    padding-inline: 12px;
+    pointer-events: none;
+    animation:
+      settings-feedback-overlay-in 160ms ease-out,
+      settings-feedback-out 250ms ease-in 1.75s forwards;
+  }
+  .settings-feedback-toast {
+    color: var(--content-primary);
+    text-shadow:
+      0 1px 4px var(--tone-shadow),
+      0 0 14px var(--tone-shadow);
+  }
+  @keyframes settings-feedback-overlay-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes settings-feedback-out {
+    to {
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .photo-settings-feedback {
+      animation: none;
+    }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .settings-feedback-toast {
+      text-shadow: 0 1px 4px var(--tone-shadow);
+    }
+  }
+
   .glass-popover {
     background: var(--panel-base);
   }

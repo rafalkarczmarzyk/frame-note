@@ -11,6 +11,13 @@ entering master receive a version, dated section and local tag according to
 
 ## Unreleased
 
+## [0.4.0-beta] - 2026-11-03
+
+### Added
+
+- Carry the active photo's layout into newly added photos, and copy or paste
+  layout settings from the sidebar or film roll.
+
 ## [0.3.5-beta] - 2026-11-03
 
 First downloadable release of the GPL licensing, redesigned About and desktop

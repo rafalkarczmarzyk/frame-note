@@ -1,6 +1,6 @@
 {
   "name": "@framenote/desktop",
-  "version": "0.3.5-beta",
+  "version": "0.4.0-beta",
   "private": true,
   "main": "main.cjs",
   "scripts": {

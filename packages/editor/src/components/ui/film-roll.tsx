@@ -1,8 +1,10 @@
 import {
+  Fragment,
   useEffect,
   useRef,
   type PointerEvent,
   type CSSProperties,
+  type ReactNode,
 } from 'react';
 import {
   FilmRollStart,
@@ -31,6 +33,8 @@ export interface FilmRollProps {
   className?: string;
   disabled?: boolean;
   variant?: FilmRollVariant;
+  /** Optional actions below each frame; shown on hover or keyboard focus. */
+  renderPhotoActions?: (photo: FilmRollPhoto) => ReactNode;
 }
 
 export function FilmRoll({
@@ -42,6 +46,7 @@ export function FilmRoll({
   className,
   disabled = false,
   variant = 'emerald',
+  renderPhotoActions,
 }: FilmRollProps) {
   const frameWidth = Math.round((height * 148) / 180);
   const frameHeight = Math.round((height * 129) / 180);
@@ -213,7 +218,11 @@ export function FilmRoll({
 
   return (
     <div
-      className={cn('film-roll', className)}
+      className={cn(
+        'film-roll',
+        renderPhotoActions && 'film-roll-with-actions',
+        className,
+      )}
       style={
         {
           '--film-roll-height': `${height}px`,
@@ -262,25 +271,37 @@ export function FilmRoll({
             className="film-roll-leader"
           />
           {photos.map((photo, index) => (
-            <button
-              key={photo.id}
-              type="button"
-              disabled={disabled}
-              className="film-roll-frame"
-              aria-label={`Photo ${index + 1}: ${photo.name}`}
-              aria-pressed={photo.id === activePhotoId}
-              onClick={() => onSelectPhoto?.(photo.id)}
-            >
-              <span className="film-roll-photo">
-                <img
-                  src={photo.src}
-                  alt=""
-                  draggable={false}
-                  decoding="async"
-                />
-              </span>
-              <FilmRollFrame className="film-roll-overlay" />
-            </button>
+            <Fragment key={photo.id}>
+              <button
+                type="button"
+                disabled={disabled}
+                className="film-roll-frame"
+                aria-label={`Photo ${index + 1}: ${photo.name}`}
+                aria-pressed={photo.id === activePhotoId}
+                onClick={() => onSelectPhoto?.(photo.id)}
+              >
+                <span className="film-roll-photo">
+                  <img
+                    src={photo.src}
+                    alt=""
+                    draggable={false}
+                    decoding="async"
+                  />
+                </span>
+                <FilmRollFrame className="film-roll-overlay" />
+              </button>
+              {renderPhotoActions && (
+                <div
+                  className="film-roll-photo-actions"
+                  style={{ left: index * frameWidth, width: frameWidth }}
+                  onPointerDown={(event) => event.stopPropagation()}
+                  role="group"
+                  aria-label={`Settings for ${photo.name}`}
+                >
+                  {renderPhotoActions(photo)}
+                </div>
+              )}
+            </Fragment>
           ))}
           <button
             type="button"

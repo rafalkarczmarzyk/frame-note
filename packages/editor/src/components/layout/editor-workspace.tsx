@@ -24,6 +24,22 @@ export function EditorWorkspace({
   );
 }
 
+/** Glass actions overlay the scroll; reserve bottom padding in the scroll area. */
+export function ToolSidebarFooter({
+  className,
+  ...props
+}: ComponentProps<'div'>) {
+  return (
+    <div
+      className={cn(
+        'glass-popover absolute inset-x-0 bottom-0 z-20 border-t border-border-subtle p-3',
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
 export function ToolSidebar({
   className,
   children,

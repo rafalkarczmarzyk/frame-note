@@ -3,6 +3,7 @@ import {
   storeExportQuality,
 } from '@/lib/export-preferences';
 import { platform } from '@/lib/platform';
+import { cn } from '@/lib/utils';
 import { separatorToken } from '../../../../core/src/inline-separator';
 import type { SeparatorColorActions } from '../caption/editor/caption-editor';
 import { Badge } from '@/components/ui/badge';
@@ -72,6 +73,7 @@ import {
 import { createCaption, type Caption } from '../../../../core/src/document';
 import { ColorPickerPanel } from '../caption/color-picker-panel';
 import {
+  Check,
   Download,
   LoaderCircle,
   Layers,
@@ -143,6 +145,8 @@ function PhotoWorkspaceContent({
   filmRoll,
   batchBusy = false,
   onExportAll,
+  sidebarFooter,
+  settingsFeedback,
 }: {
   photo: LoadedPhoto | null;
   loading?: boolean;
@@ -162,6 +166,9 @@ function PhotoWorkspaceContent({
   filmRoll?: ReactNode;
   batchBusy?: boolean;
   onExportAll?: (options: RollExportOptions) => void;
+  /** Optional glass footer overlaying the scrolling tools. */
+  sidebarFooter?: ReactNode;
+  settingsFeedback?: string;
 }) {
   const dimensions = photo?.document.photo.dimensions ?? emptyDimensions;
   const fields = photo?.document.photo.metadata ?? emptyMetadata;
@@ -575,13 +582,25 @@ function PhotoWorkspaceContent({
           </span>,
           exportTarget,
         )}
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-workspace-base">
+      <div className="relative flex min-h-0 min-w-0 flex-1 flex-col bg-workspace-base">
         <div
           ref={host}
           data-photo-canvas
           data-glass-ready={glassPreview.tiles ? 'true' : 'false'}
           className="relative flex min-h-[40vh] min-w-0 flex-1 flex-col bg-workspace-base md:min-h-0"
         >
+          {settingsFeedback && (
+            <div
+              className="photo-settings-feedback"
+              role="status"
+              aria-live="polite"
+            >
+              <div className="settings-feedback-toast flex items-center gap-3 text-2xl font-medium">
+                <Check className="size-6 shrink-0" aria-hidden="true" />
+                <span>{settingsFeedback}</span>
+              </div>
+            </div>
+          )}
           {loadingLabel && (
             <PhotoLoadingIndicator
               label={loadingLabel}
@@ -1039,7 +1058,10 @@ function PhotoWorkspaceContent({
       )}
       <ToolSidebar aria-label="Photo tools">
         <div
-          className="min-h-0 flex-1 overflow-y-auto"
+          className={cn(
+            'min-h-0 flex-1 overflow-y-auto',
+            sidebarFooter && 'pb-20',
+          )}
           inert={exporting || undefined}
         >
           <SidebarSection
@@ -1510,6 +1532,7 @@ function PhotoWorkspaceContent({
             </fieldset>
           </SidebarSection>
         </div>
+        {sidebarFooter}
       </ToolSidebar>
     </EditorWorkspace>
   );

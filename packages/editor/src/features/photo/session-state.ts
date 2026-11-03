@@ -40,6 +40,24 @@ export function updateSessionDocument(
   };
 }
 
+export function setPhotoDocument(
+  state: PhotoSessionState,
+  id: string,
+  editor: SessionDocument,
+): PhotoSessionState {
+  const exists = state.items.some((item) => item.id === id);
+  return {
+    ...state,
+    items: state.items.map((item) =>
+      item.id === id ? { ...item, editor } : item,
+    ),
+    empty:
+      !exists && state.empty.id === id
+        ? { ...state.empty, editor }
+        : state.empty,
+  };
+}
+
 export function removeSessionPhoto(
   state: PhotoSessionState,
   id: string,

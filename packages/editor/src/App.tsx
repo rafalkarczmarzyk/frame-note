@@ -18,6 +18,9 @@ import { AppHeader } from '@/components/layout/app-header';
 import { EmptyWorkspace } from '@/features/photo/empty-workspace';
 import { Download } from 'lucide-react';
 import { PhotoActions } from '@/features/photo/photo-actions';
+import { PhotoSettingsActions } from '@/features/photo/photo-settings-actions';
+import { ToolSidebarFooter } from '@/components/layout/editor-workspace';
+import type { SessionDocument } from '@/features/photo/session-document';
 import { Button } from '@/components/ui/button';
 
 const loadWorkspace = () => import('@/features/photo/photo-workspace');
@@ -42,9 +45,27 @@ export default function App() {
     cancelImport,
     previewReady,
     updateDocument,
+    copySettings,
+    pasteSettings,
     document: editorDocument,
     documentKey,
   } = usePhotoSession();
+  const [copiedSettings, setCopiedSettings] = useState<SessionDocument | null>(
+    null,
+  );
+  const [settingsFeedback, setSettingsFeedback] = useState('');
+  const settingsFeedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+  const showSettingsFeedback = (message: string) => {
+    setSettingsFeedback(message);
+    if (settingsFeedbackTimer.current)
+      clearTimeout(settingsFeedbackTimer.current);
+    settingsFeedbackTimer.current = setTimeout(
+      () => setSettingsFeedback(''),
+      2000,
+    );
+  };
   const loading = !!progress;
   const input = useRef<HTMLInputElement>(null);
   const batchAbort = useRef<AbortController | null>(null);
@@ -79,6 +100,8 @@ export default function App() {
     () => () => {
       importQueue.current = [];
       batchAbort.current?.abort();
+      if (settingsFeedbackTimer.current)
+        clearTimeout(settingsFeedbackTimer.current);
     },
     [],
   );
@@ -293,6 +316,35 @@ export default function App() {
             sessionDocument={editorDocument}
             onDocumentChange={updateDocument}
             documentKey={documentKey}
+            settingsFeedback={settingsFeedback}
+            sidebarFooter={
+              session.items.length > 0 ? (
+                <ToolSidebarFooter aria-label="Photo settings actions">
+                  <PhotoSettingsActions
+                    placement="sidebar"
+                    copied={copiedSettings !== null}
+                    disabled={loading || !!batch}
+                    onCopy={() => {
+                      const copied = copySettings();
+                      if (copied) {
+                        setCopiedSettings(copied);
+                        showSettingsFeedback(
+                          `Settings copied from ${photo?.document.photo.name ?? 'photo'}.`,
+                        );
+                      }
+                    }}
+                    onPaste={() => {
+                      if (copiedSettings && session.activeId) {
+                        pasteSettings(session.activeId, copiedSettings);
+                        showSettingsFeedback(
+                          `Settings pasted to ${photo?.document.photo.name ?? 'photo'}.`,
+                        );
+                      }
+                    }}
+                  />
+                </ToolSidebarFooter>
+              ) : undefined
+            }
             batchBusy={!!batch}
             onExportAll={session.items.length > 1 ? exportAll : undefined}
             filmRoll={
@@ -304,6 +356,30 @@ export default function App() {
                     src: item.thumbnailUrl,
                     name: item.photo.name,
                   }))}
+                  renderPhotoActions={(item) => (
+                    <PhotoSettingsActions
+                      placement="film"
+                      copied={copiedSettings !== null}
+                      disabled={loading || !!batch}
+                      onCopy={() => {
+                        const copied = copySettings(item.id);
+                        if (copied) {
+                          setCopiedSettings(copied);
+                          showSettingsFeedback(
+                            `Settings copied from ${item.name}.`,
+                          );
+                        }
+                      }}
+                      onPaste={() => {
+                        if (copiedSettings) {
+                          pasteSettings(item.id, copiedSettings);
+                          showSettingsFeedback(
+                            `Settings pasted to ${item.name}.`,
+                          );
+                        }
+                      }}
+                    />
+                  )}
                   activePhotoId={session.activeId ?? undefined}
                   onSelectPhoto={(id) => void selectPhoto(id)}
                   disabled={loading || !!batch}

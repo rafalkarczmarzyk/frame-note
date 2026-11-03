@@ -265,3 +265,57 @@
 .film-roll-tone-light {
   background-color: var(--film-tabletop-base);
 }
+
+/* Opt-in action row; the default production roll keeps its original geometry. */
+.film-roll-with-actions .film-roll-strip {
+  height: max(
+    var(--film-cassette-height),
+    calc(var(--film-tape-top) + var(--film-frame-height) + 24px)
+  );
+}
+.film-roll-photo-actions {
+  position: absolute;
+  top: calc(var(--film-tape-top) + var(--film-frame-height));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  height: 24px;
+  opacity: 0;
+  cursor: default;
+}
+.film-roll-frame:hover + .film-roll-photo-actions,
+.film-roll-frame:focus-within + .film-roll-photo-actions,
+.film-roll-photo-actions:hover,
+.film-roll-photo-actions:focus-within {
+  opacity: 1;
+}
+.film-roll-settings-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 0;
+  background: none;
+  padding: 4px;
+  font-size: 12px;
+  color: var(--content-secondary);
+  cursor: pointer;
+}
+.film-roll-settings-action:hover:not(:disabled) {
+  color: var(--content-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.film-roll-settings-action:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.film-roll-settings-action:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+@media (hover: none) {
+  .film-roll-photo-actions {
+    opacity: 1;
+  }
+}

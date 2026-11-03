@@ -91,7 +91,7 @@ function TestPhotoEditor({
   }, [src, name, exposureSeconds]);
   const preset = builtinPresets.find((preset) => preset.id === presetId);
   return (
-    <div className="flex h-svh min-h-0 flex-col overflow-hidden bg-app-base text-content-primary">
+    <div className="relative flex h-svh min-h-0 flex-col overflow-hidden bg-app-base text-content-primary">
       <AppHeader>
         <div id="export-actions" />
       </AppHeader>

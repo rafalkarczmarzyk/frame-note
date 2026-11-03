@@ -8,6 +8,7 @@ import {
 import {
   activeDocument,
   removeSessionPhoto,
+  setPhotoDocument,
   updateSessionDocument,
   type PhotoSessionState,
 } from './session-state';
@@ -69,7 +70,7 @@ export function usePhotoSession() {
       setError('');
       setPreviewLoading(true);
       setProgress({ done: 0, total: files.length });
-      const retainLayout = !state.current.items.length && files.length === 1;
+      const importDocument = structuredClone(activeDocument(state.current));
       let activated = false;
       const failures: string[] = [];
       try {
@@ -88,15 +89,15 @@ export function usePhotoSession() {
             if (generation.current !== token) break;
             const first = !state.current.items.length;
             const id =
-              first && retainLayout ? state.current.empty.id : createId();
+              first && !state.current.items.length
+                ? state.current.empty.id
+                : createId();
             const item = {
               id,
               file: loaded.sourceFile,
               photo: loaded.document.photo,
               thumbnailUrl,
-              editor: retainLayout
-                ? activeDocument(state.current)
-                : defaultSessionDocument(),
+              editor: structuredClone(importDocument),
             };
             thumbnails.current.add(thumbnailUrl);
             thumbnailUrl = undefined;
@@ -182,6 +183,19 @@ export function usePhotoSession() {
     setProgress(null);
     setPreviewLoading(false);
   }, []);
+  const copySettings = useCallback((id?: string) => {
+    const source = id
+      ? state.current.items.find((item) => item.id === id)?.editor
+      : activeDocument(state.current);
+    return source ? structuredClone(source) : null;
+  }, []);
+  const pasteSettings = useCallback(
+    (id: string, editor: SessionDocument) => {
+      if (busy.current) return;
+      commit(setPhotoDocument(state.current, id, structuredClone(editor)));
+    },
+    [commit],
+  );
   const closePhoto = useCallback(() => {
     if (busy.current || !state.current.activeId) return;
     const next = removeSessionPhoto(state.current, state.current.activeId);
@@ -250,6 +264,8 @@ export function usePhotoSession() {
     cancelImport,
     previewReady,
     updateDocument,
+    copySettings,
+    pasteSettings,
     document: activeDocument(session),
     documentKey: session.activeId ?? session.empty.id,
   };
