@@ -1,19 +1,25 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 import { createRequire } from 'node:module';
 import { readFileSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, normalize } from 'node:path';
 import { digest, repositoryRoot } from './legal-materials.mjs';
 
-export function verifyPackagedLegal(resources) {
+export function packagedFileReader(resources) {
   const archive = join(resources, 'app.asar');
   const require = createRequire(import.meta.url);
   const asar = existsSync(archive)
     ? createRequire(require.resolve('@electron/packager'))('@electron/asar')
     : null;
-  const read = (name) =>
+  // ASAR traverses directories by the host path separator. On Windows a
+  // slash-separated nested name otherwise looks like one directory key.
+  return (name) =>
     asar
-      ? asar.extractFile(archive, name)
+      ? asar.extractFile(archive, normalize(name))
       : readFileSync(join(resources, 'app', name));
+}
+
+export function verifyPackagedLegal(resources) {
+  const read = packagedFileReader(resources);
   for (const [source, destination] of [
     ['LICENSE', 'LICENSE'],
     ['LICENSING.md', 'LICENSING.md'],

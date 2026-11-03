@@ -11,6 +11,17 @@ entering master receive a version, dated section and local tag according to
 
 ## Unreleased
 
+## [0.3.5-beta] - 2026-11-03
+
+First downloadable release of the GPL licensing, redesigned About and desktop
+workflow changes recorded under 0.3.4-beta. That earlier tag was not published
+because Windows packaging failed.
+
+### Fixed
+
+- Normalize nested ASAR paths when verifying packaged license files on Windows,
+  allowing portable EXE packaging to finish while keeping all license checks.
+
 ## [0.3.4-beta] - 2026-11-03
 
 ### Added
