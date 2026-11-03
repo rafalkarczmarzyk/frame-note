@@ -15,6 +15,7 @@ const { pathToFileURL } = require('node:url');
 const fs = require('node:fs');
 const { execFile } = require('node:child_process');
 const runFile = require('node:util').promisify(execFile);
+const { checkForUpdates } = require('./update-check.cjs');
 let systemFonts;
 app.setName('FrameNote');
 const profile = app.commandLine.getSwitchValue('user-data-dir');
@@ -98,6 +99,37 @@ app.whenReady().then(async () => {
   ipcMain.handle('presets-read', (event) => {
     if (!trusted(event)) throw Error('Untrusted preset request.');
     return presetFiles.read();
+  });
+  ipcMain.handle('updates-check', async (event) => {
+    if (!trusted(event)) throw Error('Untrusted update request.');
+    try {
+      const response = await fetch(
+        'https://api.github.com/repos/rafalkarczmarzyk/frame-note/releases?per_page=30',
+        {
+          headers: {
+            Accept: 'application/vnd.github+json',
+            'X-GitHub-Api-Version': '2022-11-28',
+          },
+          signal: AbortSignal.timeout(8000),
+        },
+      );
+      if (!response.ok) return { status: 'error' };
+      const release = checkForUpdates(await response.json(), app.getVersion());
+      return release ? { status: 'available', release } : { status: 'current' };
+    } catch {
+      return { status: 'error' };
+    }
+  });
+  ipcMain.handle('updates-open-release', (event, url) => {
+    if (
+      !trusted(event) ||
+      typeof url !== 'string' ||
+      !/^https:\/\/github\.com\/rafalkarczmarzyk\/frame-note\/releases\/tag\/[\w.-]+$/u.test(
+        url,
+      )
+    )
+      throw Error('Invalid release URL.');
+    return shell.openExternal(url);
   });
   ipcMain.handle('system-fonts-read', async (event) => {
     if (!trusted(event)) throw Error('Untrusted font request.');
@@ -198,7 +230,10 @@ app.whenReady().then(async () => {
     if (
       url === 'https://github.com/rafalkarczmarzyk/frame-note' ||
       url ===
-        'https://github.com/rafalkarczmarzyk/frame-note/blob/master/CHANGELOG.md'
+        'https://github.com/rafalkarczmarzyk/frame-note/blob/master/CHANGELOG.md' ||
+      /^https:\/\/github\.com\/rafalkarczmarzyk\/frame-note\/releases\/tag\/[\w.-]+$/u.test(
+        url,
+      )
     )
       void shell.openExternal(url);
   };
@@ -229,8 +264,10 @@ app.whenReady().then(async () => {
         label: app.getName(),
         submenu: [
           { label: 'About FrameNote', click: () => command('about') },
-          { type: 'separator' },
-          { role: 'services' },
+          {
+            label: 'Check for Updates…',
+            click: () => command('check-updates'),
+          },
           { type: 'separator' },
           { role: 'hide' },
           { role: 'hideOthers' },
@@ -256,8 +293,16 @@ app.whenReady().then(async () => {
           { role: 'close' },
         ],
       },
-      { role: 'editMenu' },
-      { role: 'windowMenu' },
+      {
+        label: 'Window',
+        submenu: [
+          { role: 'minimize' },
+          { role: 'zoom' },
+          { role: 'togglefullscreen' },
+          { type: 'separator' },
+          { role: 'front' },
+        ],
+      },
     ]),
   );
   await window.loadURL(rendererUrl);

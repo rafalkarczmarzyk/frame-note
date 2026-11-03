@@ -11,6 +11,13 @@ entering master receive a version, dated section and local tag according to
 
 ## Unreleased
 
+## [0.4.1-beta] - 2026-11-03
+
+### Added
+
+- Show desktop users a dismissible notice when a newer GitHub release is available.
+- Add a manual update check to the FrameNote menu and remove unused default menus and commands.
+
 ## [0.4.0-beta] - 2026-11-03
 
 ### Added

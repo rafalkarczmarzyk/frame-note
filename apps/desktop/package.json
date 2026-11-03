@@ -1,13 +1,14 @@
 {
   "name": "@framenote/desktop",
-  "version": "0.4.0-beta",
+  "version": "0.4.1-beta",
   "private": true,
   "main": "main.cjs",
   "scripts": {
     "start": "node ../../scripts/dev-desktop.mjs"
   },
   "dependencies": {
-    "@framenote/editor": "workspace:*"
+    "@framenote/editor": "workspace:*",
+    "zod": "^4.6.7"
   },
   "productName": "FrameNote",
   "license": "GPL-3.0-or-later"

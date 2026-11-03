@@ -19,7 +19,9 @@ declare global {
       ): Promise<void>;
       saveFile(name: string, bytes: Uint8Array): Promise<'saved' | 'cancelled'>;
       onCommand(
-        callback: (command: 'open' | 'export' | 'about') => void,
+        callback: (
+          command: 'open' | 'export' | 'about' | 'check-updates',
+        ) => void,
       ): () => void;
     };
   }
@@ -51,6 +53,10 @@ configurePlatform({
 });
 desktop.onCommand((command) => {
   if (command === 'about') return;
+  if (command === 'check-updates') {
+    window.dispatchEvent(new Event('framenote-check-updates'));
+    return;
+  }
   const selector =
     command === 'open'
       ? 'input[aria-label="Choose JPG or PNG photo"]'
