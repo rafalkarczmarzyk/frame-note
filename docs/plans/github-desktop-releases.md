@@ -321,3 +321,21 @@
 - Końcowe 6 testów publikacji PASS, lint PASS. Wcześniej pełny zestaw 421/421,
   typy i formatowanie PASS. Nie uruchamiamy nowego tagu tylko dla zmiany CI.
   Brak zmiany aplikacji lub formatu paczek — bez podbijania wersji produktu.
+
+### Automatyczne ponawianie braku runnera — 2026-11-03
+
+- Na prośbę użytkownika przygotowano workflow_run dla zakończonych Desktop release.
+  Wyłącznie push tagu w tym repo, zgodna aktualna próba, sukces Windows/Linux,
+  brak błędów kroków Maca i adnotacja o nieprzydzielonym hosted runnerze.
+- Maksymalnie 4 próby łącznie, 5 minut przerwy. Ręczne ponowienie w czasie
+  oczekiwania zapobiega duplikacji. Błędy aplikacji nie są automatycznie ponawiane.
+- Kod pobierany z zaufanego master, nie z nieudanego buildu. Uprawnienia actions
+  write i checks read ograniczone do zadania ponawiającego.
+- 6 testów decyzji/limitów i wyścigu z ręczną próbą; nie symulowano ponownej
+  niedostępności hostowanych maszyn na GitHubie. Zmiana CI, bez wersji produktu.
+- Konfiguracja lokalna, bez commita/pusha; wymaga wdrożenia na master.
+
+- Korekta zakresu użytkownika: retry obejmuje brak runnera dowolnego systemu,
+  również validate/release. Każde nieudane zadanie musi mieć potwierdzony błąd
+  przydziału; mieszane błędy infrastruktury i aplikacji nie są ponawiane.
+  Można ponowić kilka systemów naraz. Limit/przerwa pozostają bez zmian.

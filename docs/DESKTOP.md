@@ -286,3 +286,15 @@ remain in `~/FrameNote/presets` and preferences in the application profile,
 not beside the executable. Moving the EXE does not move user data. The EXE is
 unsigned: Smart App Control can still block it. Portable does not bypass signing
 requirements or Windows security policies. Older releases retain their installers.
+
+### Automatic retries for unavailable runners
+
+A separate workflow watches completed tagged desktop builds. When GitHub explicitly reports that a hosted runner was not acquired for
+Windows, Linux, macOS or a validation/publication job, it waits five minutes
+and reruns failed jobs (including dependent release work). Every failed job must
+have this confirmed infrastructure cause; mixed application failures stop retries. It allows at most four total attempts for the same run, counting
+manual attempts. Successful builds are preserved and the tag does not change.
+Test, packaging and publication failures are not retried by this rule. A manual
+restart during the delay cancels the automatic retry decision. At the limit,
+review the run manually. The workflow must be pushed to master before it can
+respond to new completion events; it does not retroactively process old failures.
