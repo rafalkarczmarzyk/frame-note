@@ -36,6 +36,7 @@ Używaj komponentu z kolumny „Wybierz”, a nie buduj równoważnej kontrolki 
 | Krótka etykieta stanu      | `Badge`                                          | Semantyczny `tone`; badge nie jest przyciskiem.                           |
 | Wybór z listy / zakresu    | `Select`, `SegmentedControl`, `Slider`, `Switch` | Wybierz zgodnie z liczbą opcji i sposobem zmiany wartości.                |
 | Menu dodatkowych akcji     | `ActionMenu`                                     | Krótka lista poleceń dla konkretnego obiektu.                             |
+| Modal blokujący            | `Modal`                                          | Natywny dialog z fokusem; Settings i About pokazują kompozycje.           |
 | Panel dodatkowych narzędzi | `FloatingPanel`                                  | Większa zawartość, np. picker, wyszukiwanie lub lista.                    |
 | Powtarzalna lista wyboru   | `PickerList`                                     | Utrzymuje wspólne zachowanie wyboru, fokusu i wierszy.                    |
 

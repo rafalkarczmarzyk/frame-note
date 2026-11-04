@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "exportQuality": 75,
+  "removeMetadata": false,
+  "historyLimit": 200,
+  "rememberWindow": true,
+  "checkUpdatesAtStartup": false,
+  "window": {
+    "x": -1800,
+    "y": 60,
+    "width": 1200,
+    "height": 900,
+    "displayId": 2,
+    "maximized": false
+  }
+}

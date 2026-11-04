@@ -43,6 +43,7 @@ await rm(stage, { recursive: true, force: true });
 await mkdir(stage, { recursive: true });
 for (const name of [
   'main.cjs',
+  'window-geometry.cjs',
   'preload.cjs',
   'preset-files.cjs',
   'package.json',

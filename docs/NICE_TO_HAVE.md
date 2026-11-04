@@ -66,28 +66,6 @@ Przy powrocie ustalić sposób przywracania, zakres zapisywanych ustawień oraz
 zachowanie, gdy pliki źródłowe zostaną przeniesione lub usunięte.
 Wpływ: desktop, zapis stanu edytora i obsługa zamykania aplikacji.
 
-### Plik konfiguracyjny desktop
-
-Status: **zakres 1.0** (decyzja 2026-11-04).
-
-Decyzja: 2026-10-31, rozmowa o plikowych presetach. Konfiguracja w katalogu
-FrameNote jest planowana w zakresie 1.0; obecnie są tam presety.
-
-Konfiguracja może przechowywać:
-
-- preferencje aplikacji zapisywane obecnie w profilu;
-- limit liczby kroków historii cofania/ponawiania
-  (dodane 2026-11-04 w rozmowie o konfiguracji desktopu);
-- rozmiar i położenie okna do przywrócenia przy uruchomieniu
-  (odłożone 2026-11-01 przy rozmowie o większym oknie);
-- ustawienie włączające lub wyłączające sprawdzanie aktualizacji przy starcie
-  aplikacji (doprecyzowane 2026-11-04, powrót do pomysłu z rozmowy
-  o sprawdzaniu aktualizacji).
-
-Przy powrocie ustalić zakres konfiguracji, wersjonowanie, przeniesienie preferencji
-z profilu aplikacji oraz zapis geometrii i zachowanie po zmianie monitorów.
-Miejsca danych opisuje [DESKTOP](DESKTOP.md#data-and-presets).
-
 ## Proces rozwoju
 
 ### Ochrona master i wymagany pipeline PR

@@ -16,17 +16,20 @@ const fs = require('node:fs');
 const { execFile } = require('node:child_process');
 const runFile = require('node:util').promisify(execFile);
 const { checkForUpdates } = require('./update-check.cjs');
+const { restoreWindowGeometry } = require('./window-geometry.cjs');
 let systemFonts;
 app.setName('FrameNote');
 const profile = app.commandLine.getSwitchValue('user-data-dir');
 const userData = profile || path.join(app.getPath('appData'), 'FrameNote');
 fs.mkdirSync(userData, { recursive: true });
 app.setPath('userData', userData);
-const { PresetFiles } = require('./preset-files.cjs');
+const { PresetFiles, ConfigFile } = require('./preset-files.cjs');
 const dataDirectory = profile
   ? path.join(userData, 'FrameNote')
   : path.join(app.getPath('home'), 'FrameNote');
 const presetFiles = new PresetFiles(dataDirectory);
+const configuration = new ConfigFile(dataDirectory);
+let configurationInitialized = false;
 const rendererRoot = path.join(__dirname, 'renderer');
 // Only the local development launcher may replace bundled renderer resources.
 const devServerUrl = !app.isPackaged && process.env.FRAMENOTE_DEV_SERVER_URL;
@@ -52,6 +55,54 @@ function trusted(event) {
   );
 }
 app.whenReady().then(async () => {
+  await configuration.load();
+  ipcMain.handle('configuration-read', async (event, quality) => {
+    if (!trusted(event)) throw Error('Untrusted configuration request.');
+    const result = await configuration.initialize(quality);
+    configurationInitialized = true;
+    return result;
+  });
+  ipcMain.handle('configuration-write', async (event, patch, settingsSave) => {
+    if (
+      !trusted(event) ||
+      !patch ||
+      typeof patch !== 'object' ||
+      Object.keys(patch).some(
+        (key) =>
+          ![
+            'exportQuality',
+            'removeMetadata',
+            'historyLimit',
+            'rememberWindow',
+            'checkUpdatesAtStartup',
+          ].includes(key),
+      )
+    )
+      throw Error('Invalid configuration request.');
+    let replace = false;
+    if (configuration.canReplace() && settingsSave === true) {
+      const result = await dialog.showMessageBox(window, {
+        type: 'warning',
+        title: 'Replace invalid configuration?',
+        message: 'Back up and replace the invalid configuration file?',
+        detail:
+          'The original will be kept beside config.json as a backup. Your current settings will be saved in a new configuration file.',
+        buttons: ['Cancel', 'Back up and replace'],
+        defaultId: 0,
+        cancelId: 0,
+      });
+      if (result.response !== 1)
+        throw Error('Configuration replacement cancelled.');
+      replace = true;
+    }
+    const result = await configuration.update(patch, replace);
+    configurationInitialized = true;
+    return result;
+  });
+  ipcMain.handle('configuration-reveal', (event) => {
+    if (!trusted(event)) throw Error('Untrusted configuration request.');
+    shell.showItemInFolder(configuration.file);
+  });
   if (process.platform === 'darwin' && !app.isPackaged)
     app.dock.setIcon(
       path.resolve(
@@ -229,13 +280,22 @@ app.whenReady().then(async () => {
   );
   const width = Math.min(2240, workArea.width);
   const height = Math.min(1560, workArea.height);
+  const startupConfig = configuration.snapshot().config;
+  const geometry = restoreWindowGeometry(
+    startupConfig.rememberWindow ? startupConfig.window : undefined,
+    screen.getAllDisplays(),
+    screen.getPrimaryDisplay(),
+    {
+      width,
+      height,
+      x: workArea.x + Math.floor((workArea.width - width) / 2),
+      y: workArea.y + Math.floor((workArea.height - height) / 2),
+    },
+  );
   window = new BrowserWindow({
-    width,
-    height,
-    x: workArea.x + Math.floor((workArea.width - width) / 2),
-    y: workArea.y + Math.floor((workArea.height - height) / 2),
-    minWidth: Math.min(800, width),
-    minHeight: Math.min(600, height),
+    ...geometry,
+    minWidth: Math.min(800, geometry.width),
+    minHeight: Math.min(600, geometry.height),
     title: 'FrameNote',
     show: false,
     ...(process.platform === 'darwin' ? { titleBarStyle: 'hidden' } : {}),
@@ -246,7 +306,48 @@ app.whenReady().then(async () => {
       nodeIntegration: false,
     },
   });
-  window.once('ready-to-show', () => window.show());
+  window.once('ready-to-show', () => {
+    if (startupConfig.rememberWindow && startupConfig.window?.maximized)
+      window.maximize();
+    window.show();
+  });
+  let geometryTimer;
+  let closing = false;
+  const saveGeometry = () => {
+    if (
+      !configurationInitialized ||
+      !configuration.snapshot().config.rememberWindow ||
+      window.isFullScreen() ||
+      window.isMinimized()
+    )
+      return Promise.resolve();
+    const bounds = window.getNormalBounds();
+    return configuration
+      .update({
+        window: {
+          ...bounds,
+          displayId: screen.getDisplayMatching(bounds).id,
+          maximized: window.isMaximized(),
+        },
+      })
+      .catch(() => {
+        /* Invalid source is preserved; renderer reports configuration errors. */
+      });
+  };
+  for (const name of ['resize', 'move', 'maximize', 'unmaximize'])
+    window.on(name, () => {
+      clearTimeout(geometryTimer);
+      geometryTimer = setTimeout(() => {
+        void saveGeometry();
+      }, 300);
+    });
+  window.on('close', (event) => {
+    clearTimeout(geometryTimer);
+    if (closing) return;
+    event.preventDefault();
+    closing = true;
+    void saveGeometry().finally(() => window.close());
+  });
   const openProjectLink = (url) => {
     if (
       url === 'https://github.com/rafalkarczmarzyk/frame-note' ||
@@ -279,12 +380,33 @@ app.whenReady().then(async () => {
     });
   });
   const command = (name) => window?.webContents.send('menu-command', name);
+  // Handle the standard preferences shortcut before renderer text/edit handlers.
+  window.webContents.on('before-input-event', (event, input) => {
+    if (
+      process.platform === 'darwin' &&
+      input.type === 'keyDown' &&
+      input.meta &&
+      !input.control &&
+      !input.alt &&
+      !input.shift &&
+      input.key === ','
+    ) {
+      event.preventDefault();
+      command('settings');
+    }
+  });
   Menu.setApplicationMenu(
     Menu.buildFromTemplate([
       {
         label: app.getName(),
         submenu: [
           { label: 'About FrameNote', click: () => command('about') },
+          {
+            id: 'app-settings',
+            label: 'Settings…',
+            ...(process.platform === 'darwin' ? { accelerator: 'Cmd+,' } : {}),
+            click: () => command('settings'),
+          },
           {
             label: 'Check for Updates…',
             click: () => command('check-updates'),

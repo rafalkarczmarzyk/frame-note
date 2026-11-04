@@ -180,3 +180,5 @@ export class PresetFiles {
     return result;
   }
 }
+
+export { ConfigFile } from './config-file.mts';

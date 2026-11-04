@@ -1,6 +1,24 @@
+import type {
+  DesktopConfig,
+  SettingsValues,
+} from '../../../core/src/desktop-config';
 import type { PresetRepository } from '../features/presets/async-preset-store';
 /** Platform services are installed once by the application entry point. */
 export interface PlatformServices {
+  startupAbout?: { readonly show: boolean; markShown(): void };
+  configuration?: {
+    current(): DesktopConfig;
+    warning(): string;
+    save(
+      values: Partial<SettingsValues> & {
+        exportQuality?: number;
+        removeMetadata?: boolean;
+      },
+    ): Promise<void>;
+    subscribe(changed: () => void): () => void;
+    reveal(): Promise<void>;
+  };
+  onSettings?: (show: () => void) => () => void;
   onHistoryCommand?: (run: (direction: 'undo' | 'redo') => void) => () => void;
   updateHistoryMenu?: (state: {
     canUndo: boolean;

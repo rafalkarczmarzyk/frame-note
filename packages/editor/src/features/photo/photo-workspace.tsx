@@ -5,6 +5,8 @@ import {
 import type { EditOptions } from './session-document';
 import {
   readExportQuality,
+  readRemoveMetadata,
+  storeRemoveMetadata,
   storeExportQuality,
 } from '@/lib/export-preferences';
 import { platform } from '@/lib/platform';
@@ -388,7 +390,14 @@ function PhotoWorkspaceContent({
   const exporting = singleExporting || batchBusy;
   const [quality, setQuality] = useState(readExportQuality);
   useEffect(() => storeExportQuality(quality), [quality]);
-  const [metadataOptions, setMetadataOptions] = useState(defaultExportMetadata);
+  const [metadataOptions, setMetadataOptions] = useState(() => ({
+    ...defaultExportMetadata(),
+    removeAll: readRemoveMetadata(),
+  }));
+  useEffect(
+    () => storeRemoveMetadata(metadataOptions.removeAll),
+    [metadataOptions.removeAll],
+  );
   const [loadedFont, setLoadedFont] = useState('');
   const [fontFailure, setFontFailure] = useState<{
     key: string;

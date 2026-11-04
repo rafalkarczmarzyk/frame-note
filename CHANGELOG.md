@@ -11,6 +11,19 @@ see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 
 ## Unreleased
 
+### Added
+
+- Show About once on the first desktop launch of each product version, remembering
+  the displayed version in the application profile without a Settings option.
+
+- Desktop configuration in `~/FrameNote/config.json` (format v1), preserving
+  export quality and metadata removal preferences, configurable undo history,
+  optional startup update checks, and opt-in window position, size and maximization restoration (off by default). Invalid or unsupported files are preserved.
+- Desktop Settings dialog in the application menu (Cmd+, on macOS), with draft
+  editing, validation, defaults restoration and configuration file reveal. Settings
+  uses grouped option rows, info tooltips, a draggable numeric history control,
+  and an X button that discards changes like Cancel.
+
 ## [0.5.0-beta] - 2026-11-04
 
 ### Added

@@ -32,6 +32,16 @@ const PhotoWorkspace = lazy(() =>
 
 export default function App() {
   const [isDragging, setIsDragging] = useState(false);
+  const [configWarning, setConfigWarning] = useState(() =>
+    platform().configuration?.warning(),
+  );
+  useEffect(
+    () =>
+      platform().configuration?.subscribe(() =>
+        setConfigWarning(platform().configuration?.warning()),
+      ),
+    [],
+  );
   const [availableUpdate, setAvailableUpdate] = useState<{
     version: string;
     url: string;
@@ -78,7 +88,8 @@ export default function App() {
     };
     const onManualCheck = () => check(true);
     window.addEventListener('framenote-check-updates', onManualCheck);
-    check(false);
+    if (platform().configuration?.current().checkUpdatesAtStartup !== false)
+      check(false);
     return () => {
       active = false;
       window.removeEventListener('framenote-check-updates', onManualCheck);
@@ -316,6 +327,7 @@ export default function App() {
             : null;
       if (!direction) return;
       const target = event.target;
+      if (target instanceof Element && target.closest('dialog')) return;
       if (
         target instanceof HTMLInputElement &&
         !['number', 'color', 'range'].includes(target.type) &&
@@ -334,6 +346,7 @@ export default function App() {
     () =>
       platform().onHistoryCommand?.((direction) => {
         const target = document.activeElement;
+        if (target instanceof Element && target.closest('dialog')) return;
         if (
           target instanceof HTMLTextAreaElement ||
           (target instanceof HTMLInputElement &&
@@ -370,6 +383,14 @@ export default function App() {
 
   return (
     <div className="flex h-svh flex-col overflow-hidden bg-app-base text-content-primary">
+      {configWarning && (
+        <div
+          role="alert"
+          className="border-b border-panel-border px-6 py-3 text-xs"
+        >
+          {configWarning}
+        </div>
+      )}
       <AppHeader
         historyAction={
           <HistoryControls

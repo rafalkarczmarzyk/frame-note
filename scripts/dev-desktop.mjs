@@ -12,8 +12,8 @@ import { desktopExecutable } from './desktop-runtime.mjs';
 
 const runFile = promisify(execFile);
 const root = fileURLToPath(new URL('../', import.meta.url));
-const nativeFiles = ['main.cjs', 'preload.cjs'].map((name) =>
-  resolve(root, 'apps/desktop', name),
+const nativeFiles = ['main.cjs', 'preload.cjs', 'window-geometry.cjs'].map(
+  (name) => resolve(root, 'apps/desktop', name),
 );
 let adapterSources = new Set();
 let server;

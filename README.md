@@ -39,6 +39,7 @@ limitations](docs/DESKTOP.md).
 - Bundled fonts plus installed system fonts in the desktop app.
 - Local presets with shared v1 JSON import/export across web and desktop.
 - JPG quality and metadata controls, with batch export to ZIP.
+- Desktop Settings with local configuration, undo limits and window restoration.
 
 ## Quick start
 

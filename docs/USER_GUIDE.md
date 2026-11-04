@@ -98,6 +98,9 @@ By default, each document keeps up to 100 steps, with a shared 64 MiB estimated
 history budget. Older steps may be discarded; the Undo tooltip indicates this.
 Artwork required by remaining steps, current documents and copied settings stays
 available. These limits estimate stored history, not the application's total RAM.
+Desktop **Settings…** can change the per-photo limit to 1–1000. Saving a lower
+limit immediately trims existing histories; raising it does not restore removed
+steps. Web keeps the default limit.
 
 ## Presets and local storage
 
@@ -132,7 +135,9 @@ Paste requires a copy, and the actions are unavailable while editing is locked.
 **Photo actions → Close photo** closes the active photo and selects a neighbor.
 **Dispose roll…** closes all photos after confirmation. Closing the last photo
 keeps its layout in the empty editor. Source files and saved presets are not deleted.
-Export quality, metadata choices and sidebar state are shared session settings.
+Export settings and sidebar state are shared across the photo session. Desktop
+also remembers JPG quality and the Remove all metadata choice between launches;
+individual metadata groups remain session-only.
 Each photo retains its own Undo/Redo history when switching frames.
 The layout editor and preset management are available before opening a photo.
 The first import preserves the prepared layout; document-unit conversions wait

@@ -1,6 +1,11 @@
 const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('frameNoteDesktop', {
   platform: process.platform,
+  readConfiguration: (quality) =>
+    ipcRenderer.invoke('configuration-read', quality),
+  writeConfiguration: (patch, settingsSave) =>
+    ipcRenderer.invoke('configuration-write', patch, settingsSave),
+  revealConfiguration: () => ipcRenderer.invoke('configuration-reveal'),
   readSystemFonts: () => ipcRenderer.invoke('system-fonts-read'),
   readPresets: () => ipcRenderer.invoke('presets-read'),
   writePresets: (source, touchedIds) =>
@@ -15,6 +20,7 @@ contextBridge.exposeInMainWorld('frameNoteDesktop', {
         command === 'open' ||
         command === 'export' ||
         command === 'about' ||
+        command === 'settings' ||
         command === 'check-updates' ||
         command === 'undo' ||
         command === 'redo'

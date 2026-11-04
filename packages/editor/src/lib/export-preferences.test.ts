@@ -1,6 +1,12 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import { browserPlatform, configurePlatform } from './platform';
-import { readExportQuality, storeExportQuality } from './export-preferences';
+import {
+  readExportQuality,
+  storeExportQuality,
+  readRemoveMetadata,
+  storeRemoveMetadata,
+} from './export-preferences';
+import { defaultDesktopConfig } from '../../../core/src/desktop-config';
 afterEach(() => configurePlatform(browserPlatform));
 it('restores valid export quality and keeps preferences separate from presets', () => {
   const setItem = vi.fn();
@@ -33,4 +39,31 @@ it('defaults safely for malformed or unavailable preferences', () => {
   });
   expect(readExportQuality()).toBe(95);
   expect(() => storeExportQuality(75)).not.toThrow();
+});
+
+it('routes desktop export preferences to configuration without changing web storage', async () => {
+  const setItem = vi.fn();
+  const save = vi.fn(async () => {});
+  configurePlatform({
+    ...browserPlatform,
+    storage: { getItem: () => '60', setItem },
+    configuration: {
+      current: () => ({
+        ...defaultDesktopConfig(),
+        exportQuality: 75,
+        removeMetadata: false,
+      }),
+      warning: () => '',
+      save,
+      subscribe: () => () => {},
+      reveal: async () => {},
+    },
+  });
+  expect(readExportQuality()).toBe(75);
+  expect(readRemoveMetadata()).toBe(false);
+  storeExportQuality(90);
+  storeRemoveMetadata(true);
+  expect(save).toHaveBeenCalledWith({ exportQuality: 90 });
+  expect(save).toHaveBeenCalledWith({ removeMetadata: true });
+  expect(setItem).not.toHaveBeenCalled();
 });

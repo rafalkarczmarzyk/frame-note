@@ -1,3 +1,4 @@
+import { checkDesktopConfiguration } from './configuration-checks-desktop.mjs';
 import { assertDesktopTestEnvironment } from './desktop-test-environment.mjs';
 import { _electron as electron, expect } from '@playwright/test';
 import { desktopExecutable } from './desktop-runtime.mjs';
@@ -45,6 +46,12 @@ try {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.waitForLoadState('networkidle');
+  const startupAboutClose = page.getByRole('button', {
+    name: 'Close about FrameNote',
+    exact: true,
+  });
+  await expect(startupAboutClose).toBeVisible();
+  await startupAboutClose.click();
   const bounds = async () =>
     app.evaluate(({ BrowserWindow }) =>
       BrowserWindow.getAllWindows()[0].getBounds(),
@@ -241,6 +248,9 @@ try {
     'macro-framenote.jpg',
   ]);
   if (errors.length) throw new Error(errors.join('\n'));
+  await app.close();
+  app = undefined;
+  await checkDesktopConfiguration({ executable, env });
 } finally {
   try {
     await app?.close();

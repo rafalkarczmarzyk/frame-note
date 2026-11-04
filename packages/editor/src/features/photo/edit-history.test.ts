@@ -223,3 +223,29 @@ describe('mixed layout operations', () => {
     expect(history.status('a').canRedo).toBe(false);
   });
 });
+
+it('applies a lower limit immediately to past and future without restoring pruned steps', () => {
+  const history = new EditHistorySession();
+  for (const id of ['a', 'b']) {
+    history.reset(id, document());
+    for (let n = 1; n <= 5; n++)
+      history.record(id, document(String(n)), 'Edit');
+  }
+  history.undo('a');
+  history.undo('a');
+  history.setLimit(2);
+  expect(history.status('a')).toMatchObject({
+    canUndo: false,
+    canRedo: true,
+    truncated: true,
+  });
+  history.redo('a');
+  history.redo('a');
+  expect(history.document('a')).toEqual(document('5'));
+  history.undo('b');
+  history.undo('b');
+  expect(history.status('b').canUndo).toBe(false);
+  history.setLimit(100);
+  expect(history.status('b').canUndo).toBe(false);
+  expect(() => history.setLimit(0)).toThrow();
+});

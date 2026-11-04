@@ -25,7 +25,7 @@ export class EditHistorySession {
   private sequence = 0;
   private assetSequence = 0;
   private retained: Snapshot[] = [];
-  readonly limit: number;
+  limit: number;
   readonly budget: number;
 
   constructor(options: { limit?: number; budget?: number } = {}) {
@@ -35,6 +35,13 @@ export class EditHistorySession {
       throw Error('History limit must be a non-negative integer.');
     if (!Number.isFinite(this.budget) || this.budget < 0)
       throw Error('History budget must be non-negative.');
+  }
+
+  setLimit(limit: number) {
+    if (!Number.isInteger(limit) || limit < 1 || limit > 1000)
+      throw Error('History limit must be from 1 to 1000.');
+    this.limit = limit;
+    this.prune();
   }
 
   private snapshot(document: SessionDocument): Snapshot {

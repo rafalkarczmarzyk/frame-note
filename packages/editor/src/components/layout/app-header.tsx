@@ -1,3 +1,4 @@
+import { SettingsDialog } from '@/features/settings/settings-dialog';
 import { Tooltip } from '@/components/ui/tooltip';
 import { useEffect, useState, type ReactNode } from 'react';
 import { platform as platformServices } from '@/lib/platform';
@@ -20,11 +21,42 @@ export function AppHeader({
   photoAction?: ReactNode;
   historyAction?: ReactNode;
 }) {
-  const [aboutOpen, setAboutOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(
+    () => platformServices().startupAbout?.show ?? false,
+  );
+  useEffect(() => {
+    if (aboutOpen) platformServices().startupAbout?.markShown();
+  }, [aboutOpen]);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const configuration = platformServices().configuration;
+  useEffect(
+    () =>
+      platformServices().onSettings?.(() => {
+        setAboutOpen(false);
+        setSettingsOpen(true);
+      }),
+    [],
+  );
   const { platform, isWeb, isMacOS } = usePlatform();
-  useEffect(() => platformServices().onAbout?.(() => setAboutOpen(true)), []);
+  useEffect(
+    () =>
+      platformServices().onAbout?.(() => {
+        setSettingsOpen(false);
+        setAboutOpen(true);
+      }),
+    [],
+  );
   return (
     <>
+      {settingsOpen && configuration && (
+        <SettingsDialog
+          initial={configuration.current()}
+          warning={configuration.warning()}
+          onSave={(values) => configuration.save(values)}
+          onReveal={() => configuration.reveal()}
+          onClose={() => setSettingsOpen(false)}
+        />
+      )}
       {isMacOS && <MacOSTitleBar />}
       <header
         data-platform={platform}

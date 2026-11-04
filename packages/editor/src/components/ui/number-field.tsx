@@ -1,3 +1,4 @@
+import type { KeyboardEventHandler } from 'react';
 import { Tooltip } from './tooltip';
 import { Field } from './field';
 import { NumberInput } from './number-input';
@@ -17,8 +18,10 @@ export function NumberField({
   unit,
   hideLabel = false,
   className,
+  onKeyDown,
 }: {
   className?: string;
+  onKeyDown?: KeyboardEventHandler<HTMLInputElement>;
   label: string;
   title?: string;
   tooltip?: string;
@@ -42,6 +45,7 @@ export function NumberField({
       max,
       step,
       disabled,
+      onKeyDown,
       stepperLabel: label,
       className,
     };
@@ -66,6 +70,7 @@ export function NumberField({
           max,
           step,
           disabled,
+          onKeyDown,
           stepperLabel: label,
         };
         const control = unit ? (

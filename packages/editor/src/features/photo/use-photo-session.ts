@@ -1,3 +1,4 @@
+import { platform } from '@/lib/platform';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createId } from '@/lib/create-id';
 import { loadPhoto, type LoadedPhoto } from './load-photo';
@@ -22,10 +23,20 @@ export function usePhotoSession() {
     empty: { id: createId(), editor: defaultSessionDocument() },
   }));
   const [history] = useState(() => {
-    const value = new EditHistorySession();
+    const value = new EditHistorySession({
+      limit: platform().configuration?.current().historyLimit,
+    });
     value.reset(session.empty.id, session.empty.editor);
     return value;
   });
+  useEffect(
+    () =>
+      platform().configuration?.subscribe(() => {
+        history.setLimit(platform().configuration!.current().historyLimit);
+        setSession((value) => ({ ...value }));
+      }),
+    [history],
+  );
   const group = useRef<string | null>(null);
   const state = useRef(session);
   const [photo, setPhoto] = useState<LoadedPhoto | null>(null);

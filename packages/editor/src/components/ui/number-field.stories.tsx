@@ -17,7 +17,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Controlled numeric field. Keeps an editing draft for fractions and empty input; restores a valid value on blur. External values update when unfocused.',
+          'Controlled numeric field. Keeps an editing draft for fractions and empty input; restores a valid value on blur. External values update when unfocused. Optional onKeyDown runs before the built-in input keyboard handling, so modal forms can own Escape.',
       },
     },
   },

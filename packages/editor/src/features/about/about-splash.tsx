@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Rafał Karczmarzyk
 // SPDX-License-Identifier: GPL-3.0-or-later
-import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { Modal } from '@/components/ui/modal';
+import { useEffect, useId, useRef, useState } from 'react';
 import {
   ExternalLink,
   History,
@@ -16,7 +17,6 @@ import { IconButton } from '@/components/ui/icon-button';
 
 /** Shared web and desktop About dialog with local license notices. */
 export function AboutSplash({ onClose }: { onClose: () => void }) {
-  const dialog = useRef<HTMLDialogElement>(null);
   const title = useId();
   const description = useId();
   const [legal, setLegal] = useState(false);
@@ -67,15 +67,6 @@ export function AboutSplash({ onClose }: { onClose: () => void }) {
       });
     return () => controller.abort();
   }, [legal, nativeSelected]);
-  useLayoutEffect(() => {
-    const element = dialog.current;
-    if (!element) return;
-    element.showModal();
-    element.focus({ preventScroll: true });
-    return () => {
-      if (element.open) element.close();
-    };
-  }, []);
   const sourceUrl = /^[a-f0-9]+(?:-dirty)?$/.test(appBuild)
     ? `https://github.com/rafalkarczmarzyk/frame-note/tree/${appBuild.replace(/-dirty$/, '')}`
     : 'https://github.com/rafalkarczmarzyk/frame-note';
@@ -139,27 +130,12 @@ export function AboutSplash({ onClose }: { onClose: () => void }) {
     </nav>
   );
   return (
-    <dialog
-      ref={dialog}
-      tabIndex={-1}
-      aria-labelledby={title}
-      aria-describedby={description}
-      className="about-splash fixed inset-0 m-auto max-h-[90svh] w-[min(880px,94vw)] max-w-[94vw] overflow-y-auto rounded-2xl border border-solid border-panel-border bg-app-base p-0 text-content-primary shadow-none outline-none"
-      onCancel={(event) => {
-        event.preventDefault();
-        onClose();
-      }}
-      onClick={(event) => {
-        if (event.target !== event.currentTarget) return;
-        const bounds = event.currentTarget.getBoundingClientRect();
-        if (
-          event.clientX < bounds.left ||
-          event.clientX > bounds.right ||
-          event.clientY < bounds.top ||
-          event.clientY > bounds.bottom
-        )
-          onClose();
-      }}
+    <Modal
+      titleId={title}
+      descriptionId={description}
+      onClose={onClose}
+      closeOnBackdrop
+      className="w-[min(880px,94vw)]"
     >
       <div className="relative isolate overflow-hidden">
         <div className="absolute right-3 top-3 z-10">
@@ -301,6 +277,6 @@ export function AboutSplash({ onClose }: { onClose: () => void }) {
           </section>
         )}
       </div>
-    </dialog>
+    </Modal>
   );
 }

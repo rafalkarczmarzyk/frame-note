@@ -1083,7 +1083,7 @@ fieldset:disabled .glass-switch {
       backdrop-filter: none;
     }
   }
-  .about-splash::backdrop {
+  .modal-surface::backdrop {
     background: transparent;
     backdrop-filter: none;
   }

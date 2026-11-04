@@ -29,6 +29,7 @@ await rm(stage, { recursive: true, force: true });
 await mkdir(stage, { recursive: true });
 for (const file of [
   'main.cjs',
+  'window-geometry.cjs',
   'preload.cjs',
   'preset-files.cjs',
   'renderer',
@@ -68,6 +69,7 @@ await build({
     },
     files: [
       'main.cjs',
+      'window-geometry.cjs',
       'preload.cjs',
       'preset-files.cjs',
       'update-check.cjs',
