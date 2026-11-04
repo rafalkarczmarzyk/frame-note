@@ -1,13 +1,15 @@
 # Historia edycji — wspólne Undo / Redo
 
-Stan: zaakceptowane do scalenia i wydania 0.5.0-beta; kontrole automatyczne PASS. Data: 2026-11-04.
-Użytkownik zezwolił na przejście przez wszystkie etapy i lokalny commit po każdym.
-Branch `codex/edit-history`; bez push, wydania i podbijania wersji.
-Odbiór ręczny użytkownika pozostaje niewykonany. Lokalne zmiany innych zadań zachowane.
+Stan: opublikowane `0.5.0-beta` z master, commit `4c71ec6`, tag `v0.5.0-beta`.
+Data: 2026-11-04. Użytkownik zlecił scalenie i publikację po akceptacji układu.
+[Wydanie](https://github.com/rafalkarczmarzyk/frame-note/releases/tag/v0.5.0-beta) ·
+[Kontrole CI](https://github.com/rafalkarczmarzyk/frame-note/actions/runs/41811355029).
+Plan pozostaje zapisem dowodów audytu i otwartych kontroli ręcznych.
+Lokalne zmiany innych zadań zachowane poza wydaniem.
 
 ## Zakres i zgodność
 
-Źródło uzgodnionego zachowania: [Wspólne Undo / Redo](../NICE_TO_HAVE.md#historia-edycji).
+Bieżące zachowanie: [Undo and Redo](../USER_GUIDE.md#undo-and-redo).
 Jedna historia całego układu per zdjęcie, zachowywana przy przełączaniu zdjęć,
 wyłącznie w bieżącej sesji. Wspólna dla contentu, stylów, warstw, widoczności,
 kolejności, pozycji, marginesów, presetów i Paste settings. Grupowanie według
@@ -22,7 +24,7 @@ Poza zakresem: zapis sesji, plik konfiguracji desktopu, zoom/pan, panel listy
 historii, cofanie importu/zamknięcia zdjęcia, zapisywania/usuwania presetów,
 eksportu i preferencji aplikacji. Nie cofamy nawigacji ani samego zaznaczenia.
 
-Wersja przygotowanego wydania we wszystkich pięciu manifestach: `0.5.0-beta`.
+Wersja opublikowanego wydania we wszystkich pięciu manifestach: `0.5.0-beta`.
 Format presetów pozostaje v1,
 bez migracji: historia i jej zasoby nie są eksportowane do presetów ani przyszłej
 zapisanej sesji. Dotychczasowe presety mają działać bez zmian.
@@ -165,7 +167,14 @@ rozmiaru inline elementów i przy przenoszeniu fokusu z contentu na suwak.
   Wcześniejszy timeout fullscreen nie wystąpił na kompilacji wydania.
   Testy desktopowe i przeglądarkowe uruchamiano kolejno.
 
-### Otwarte przed odbiorem
+### Publikacja
+
+CI zakończone sukcesem: walidacja taga, budowa i smoke paczek macOS arm64,
+Windows x64 (także portable launcher) i Linux x64, archiwum źródeł oraz publikacja.
+Potwierdzono publiczne wydanie (nie draft), pięć plików ze zgodnymi sumami SHA256
+i tag wskazujący commit wydania. To nie zastępuje ręcznych kontroli poniżej.
+
+### Pozostałe kontrole ręczne
 
 Użytkownik zaakceptował układ Undo/Redo za Add photos, w jednej grupie z odstępem
 4 px, i zlecił aktualizację regresji wizualnej. Wzorce sześciu scen zaktualizowane
@@ -179,4 +188,4 @@ Kontrole nieautomatyczne wymienione poniżej pozostają jawnie nieweryfikowane.
 
 Trwałe zachowanie opisuje USER_GUIDE. Plan pozostaje jako zapis otwartych kwestii
 odbioru i dowodów audytu; nie usuwamy go przed ich rozwiązaniem. Zmiany funkcji
-wybrano do `0.5.0-beta`; autoryzowane squash do master, tag i publikacja przez CI.
+opublikowano w `0.5.0-beta` po squash do master i pomyślnych kontrolach CI.
