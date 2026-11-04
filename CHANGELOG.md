@@ -11,6 +11,8 @@ see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 
 ## Unreleased
 
+## [0.6.1-beta] - 2026-11-04
+
 ### Fixed
 
 - Desktop update checks use the public GitHub Atom feed instead of the rate-limited

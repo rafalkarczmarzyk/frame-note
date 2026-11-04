@@ -1,7 +1,7 @@
 # Sprawdzanie aktualizacji przez Atom
 
-Stan: implementacja zweryfikowana automatycznie; ręczny odbiór niewykonany. Data: 2026-11-04.
-Autoryzacja: implementacja oraz commit na `master`, bez wydania. Użytkownik
+Stan: przygotowanie wydania 0.6.1-beta; ręczny odbiór niewykonany. Data: 2026-11-04.
+Autoryzacja: implementacja, commit na `master`, następnie przygotowanie wydania patch 0.6.1-beta. Użytkownik
 nie ma możliwości ręcznej weryfikacji i polecił zapisanie zmian na master.
 
 ## Przyczyna
@@ -18,8 +18,9 @@ zgodnie z istniejącą opcją oraz ręcznie. Walidacja XML, wersji i adresów w�
 repozytorium; brak automatycznej instalacji. Błędy pozostają nieblokujące.
 Testy natywne, restarty i testy dystrybucji używają lokalnego pustego feedu,
 bez zapytań aktualizacyjnych do GitHuba. Web i zapisane dane/presety bez zmian.
-Bieżąca wersja: 0.6.0-beta. Prognoza: 0.6.1-beta (poprawa istniejącej funkcji).
-Bez zmiany manifestów, push ani wydania. Zmiany pozostają pod Unreleased.
+Wersja przygotowanego wydania: 0.6.1-beta (poprawa istniejącej funkcji).
+Manifesty zsynchronizowane, zmiany w sekcji wydania changeloga.
+Test wykrycia kolejnej wersji będzie możliwy po publikacji późniejszego wydania.
 
 ## Kryteria i wynik
 
@@ -39,9 +40,17 @@ Pierwszy przebieg wykazał nieaktualny mock JSON w teście konfiguracji;
 po zastąpieniu lokalnym Atom i ponowieniu pełny przebieg przeszedł.
 Launchery Windows/Linux i test restartów dev sprawdzone w kodzie, bez uruchamiania
 ich osobnych zestawów. Brak zmian UI, więc testy wizualne i JPG nie były wymagane.
-Build do oceny: 0.6.0-beta, baza d118200, dirty; branch codex/atom-update-check.
+Implementacja: commit 4e4a9ec na master. Wydanie przygotowane jako 0.6.1-beta.
+Kontrole wydania: wersje względem v0.6.0-beta, formatowanie, tokeny, lint,
+TypeScript, 472 testy jednostkowe, JPG Chromium, 6 scen wizualnych Chromium,
+build web, kompilacja desktop i kontrola 96 plików fontów/licencji PASS.
+Obejrzano expected/actual/diff dwóch scen: jedyna różnica to numer wersji
+w stopce; zaktualizowano wyłącznie te wzorce macOS. Pełny zestaw wizualny PASS.
+Test natywny z poprzedniego etapu dotyczył 0.6.0-beta z tym samym refaktorem;
+nie ponawiano go po zmianie numeru wersji. Lockfile nie zawiera wersji produktu
+i nie wymaga zmiany. Publikacja i test zainstalowanego wydania pozostają niewykonane.
 
 Odbiór ręczny desktop: sprawdzenie z menu, uruchomienie z włączoną/wyłączoną opcją,
 przy błędzie sieci możliwość dalszej edycji. Brak zmian wyglądu.
 Ręczna weryfikacja użytkownika niewykonana; polecenie integracji na master
-nie jest dowodem ręcznego sprawdzenia. Zgoda obejmuje lokalny commit, bez push i release.
+nie jest dowodem ręcznego sprawdzenia. Użytkownik zlecił następnie wydanie patch, aby testować wykrywanie kolejnych aktualizacji.
