@@ -15,7 +15,7 @@ Ten skill jest projektowy; nie zapisuj pomysłów w globalnych ustawieniach Code
 - Dopisuj tylko pomysły odłożone przez użytkownika. Zwykła propozycja agenta,
   niezdecydowanie i odrzucony pomysł nie są automatycznie wpisem nice to have.
 - Znajdź wpis o tym samym celu i uzupełnij go zamiast tworzyć duplikat.
-  Nowemu pomysłowi nadaj następny wolny numer `NTH-XXX`.
+  Wpisy identyfikuj krótkimi nazwami, bez numeracji.
 - Zachowaj krótki tytuł, status „odłożone”, lokalną datę decyzji, źródło/kontekst,
   sens pomysłu i istotne granice zakresu. Linkuj istniejące materiały, jeśli są
   potrzebne do późniejszego podjęcia tematu; nie wymyślaj wymagań ani priorytetu.
@@ -29,6 +29,6 @@ Ten skill jest projektowy; nie zapisuj pomysłów w globalnych ustawieniach Code
 - Przy ponownym podjęciu tematu odczytaj istniejący wpis. Po wyraźnym poleceniu
   użytkownika zaktualizuj status i powiąż z uzgodnionym zakresem. Zakończenie
   oznacz dopiero po rzeczywistym wykonaniu; usuń wykonany wpis po przeniesieniu trwałych ustaleń do dokumentacji funkcji.
-  Historia pozostaje w Git i changelogu; nie wykorzystuj ponownie jego ID.
+  Historia pozostaje w Git i changelogu.
 - W odpowiedzi krótko wskaż, co zapisano, i podaj link do rejestru. Nie przedstawiaj
   odłożonego pomysłu jako zatwierdzonego następnego etapu.

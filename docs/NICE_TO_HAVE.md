@@ -1,53 +1,101 @@
 # Nice to have
 
-Wyłącznie pomysły odłożone przez użytkownika; nie są kolejką do automatycznej
-realizacji. ID są stałe i nie używamy ich ponownie. Wykonane wpisy usuwamy;
-historia pozostaje w Git i changelogu. Wszystkie poniższe wpisy: **odłożone**.
+Pomysły zgłoszone przez użytkownika; nie są kolejką do automatycznej
+realizacji. Wpisy identyfikujemy nazwami, bez numeracji. Wykonane wpisy usuwamy;
+historia pozostaje w Git i changelogu. Domyślny status: **odłożone**.
+Wybrane pozycje należą do [zakresu 1.0](plans/release-1.0.md); plan opisuje
+stan realizacji i pozostałą pracę.
 
 ## Kompozycja zdjęcia
 
-### NTH-008 — Ramki i polaroidy
+### Ramki i polaroidy
 
 Decyzja: 2026-11-03, rozmowa o przyszłych funkcjach. Ramki wokół zdjęcia,
-w tym szerszy dolny pas na podpis. Crop jest niezależny (NTH-009).
-Jednoczesne warstwy na zdjęciu i ramce wymagają obszarów odniesienia (NTH-010).
+w tym szerszy dolny pas na podpis. Crop jest osobnym, niezależnym pomysłem.
 Przy powrocie ustalić geometrię, jednostki, rozmiar eksportu i zachowanie warstw
-po wyłączeniu ramki. Wpływ: web/desktop, presety, podgląd i eksport seryjny.
+na zdjęciu i ramce oraz po wyłączeniu ramki.
+Wpływ: web/desktop, presety, podgląd i eksport seryjny.
 
-### NTH-009 — Niezależny crop
+### Niezależny crop
 
 Decyzja: 2026-11-03, rozmowa o proporcjach polaroidów. Kadrowanie do wybranych
 proporcji ma działać niezależnie od ramek; ramka nie wymusza cropu.
 Przy powrocie ustalić zapis kadru per zdjęcie, wpływ na warstwy i presety oraz
 zachowanie w serii. Wpływ: web/desktop, geometria zdjęcia i eksport.
 
-### NTH-010 — Obszary odniesienia warstw
+### Powtarzany watermark
 
-Decyzja: 2026-11-03, potrzeba podpisów na zdjęciu i krawędziach ramki.
-Obecnie pozycje odnoszą się do zdjęcia, a jednostka i marginesy są wspólne.
-Przy powrocie ustalić obszary, anchory, pozycje ręczne, bazę rozmiarów procentowych
-oraz zachowanie przy cropie i braku ramki. Wpływ: web/desktop, wspólny model,
-presety i eksport. Zgodność oceniać według [formatu presetów](PRESET_FORMATS.md).
+Decyzja: 2026-11-04, rozmowa o watermarkach pokrywających całe zdjęcie.
+Nakładka powtarzana według wzoru na całej powierzchni zdjęcia, jak kafelkowana
+tekstura. Edycja jako jedna warstwa, w edytorze tekstowym z możliwością dodania
+własnej grafiki; własna grafika jest preferowaną formą watermarku.
+Opcje wzoru: kąt (np. 45°), liczba powtórzeń, gęstość/odstępy i krycie.
+Przy powrocie ustalić relację liczby powtórzeń do gęstości, skalowanie wzoru
+do wymiarów zdjęcia oraz zapis w presetach.
+Wpływ: web/desktop, model warstw, podgląd i eksport seryjny.
+
+## Widok edytora
+
+### Powiększanie i przesuwanie widoku
+
+Status: **zakres 1.0** (decyzja 2026-11-04).
+
+Decyzja: 2026-11-04, burza mózgów o ramkach do zdjęć. Osobny pomysł na
+powiększanie i przesuwanie widoku zdjęcia, z suwakiem powiększenia podobnym
+do Lightroom Classic oraz miniaturą Navigator wskazującą aktualnie oglądany
+obszar. Szybkie przełączanie na dopasowanie całego zdjęcia do widoku i zoom 100%.
+Funkcja dotyczy widoku edytora, nie zmiany rozmiaru zdjęcia ani eksportu.
+Przy powrocie ustalić interakcje przesuwania widoku i warstw, znaczenie 100%
+na ekranach HiDPI oraz dopasowanie całej kompozycji po dodaniu ramki.
+Wpływ: wspólny edytor web/desktop. Niezależne od pomysłu ramek;
+nie ustalono zależności ani kolejności implementacji.
 
 ## Desktop
 
-### NTH-005 — Plik konfiguracji
+### Zapisywanie sesji
+
+Status: **zakres 1.0** (decyzja 2026-11-04).
+
+Decyzja: 2026-11-04, rozmowa o zapamiętywaniu otwartych plików i ich ustawień.
+Możliwość zapisania i przywrócenia sesji obejmującej otwarte pliki oraz ustawienia
+każdego zdjęcia. Przy zamykaniu aplikacji pytanie, czy zapisać sesję.
+Zapisana sesja zawiera bieżący stan edycji, bez historii cofania/ponawiania.
+Obecna historia edycji pozostaje wyłącznie w pamięci bieżącej sesji i nie
+będzie częścią zapisanego pliku sesji.
+Przy powrocie ustalić sposób przywracania, zakres zapisywanych ustawień oraz
+zachowanie, gdy pliki źródłowe zostaną przeniesione lub usunięte.
+Wpływ: desktop, zapis stanu edytora i obsługa zamykania aplikacji.
+
+### Plik konfiguracyjny desktop
+
+Status: **zakres 1.0** (decyzja 2026-11-04).
 
 Decyzja: 2026-10-31, rozmowa o plikowych presetach. Konfiguracja w katalogu
-FrameNote pozostaje na później; obecnie są tam presety. Przy powrocie ustalić
-zakres, wersjonowanie i przeniesienie preferencji z profilu aplikacji.
+FrameNote jest planowana w zakresie 1.0; obecnie są tam presety.
+
+Konfiguracja może przechowywać:
+
+- preferencje aplikacji zapisywane obecnie w profilu;
+- limit liczby kroków historii cofania/ponawiania
+  (dodane 2026-11-04 w rozmowie o konfiguracji desktopu);
+- rozmiar i położenie okna do przywrócenia przy uruchomieniu
+  (odłożone 2026-11-01 przy rozmowie o większym oknie);
+- ustawienie włączające lub wyłączające sprawdzanie aktualizacji przy starcie
+  aplikacji (doprecyzowane 2026-11-04, powrót do pomysłu z rozmowy
+  o sprawdzaniu aktualizacji).
+
+Przy powrocie ustalić zakres konfiguracji, wersjonowanie, przeniesienie preferencji
+z profilu aplikacji oraz zapis geometrii i zachowanie po zmianie monitorów.
 Miejsca danych opisuje [DESKTOP](DESKTOP.md#data-and-presets).
 
-### NTH-006 — Pamiętanie geometrii okna
+## Proces rozwoju
 
-Decyzja: 2026-11-01, rozmowa o większym oknie. Przywracanie rozmiaru i położenia
-pozostaje odłożone. Obecnie stały rozmiar startowy jest ograniczany ekranem.
-Przy powrocie ustalić zapis i zachowanie po zmianie monitorów.
+### Ochrona master i wymagany pipeline PR
 
-## Marka
+Status: **odłożone** (decyzja 2026-11-04).
 
-### NTH-007 — Nowy logotyp
-
-Decyzja: 2026-11-02, rezygnacja z fontu RetiredDisplay. Font usunięto;
-logotyp SVG pozostaje do osobnego redesignu. Przy powrocie uzgodnić wygląd
-oraz zakres wymiany ikon i materiałów. To nie jest ocena praw do obecnego SVG.
+Kontekst: rozmowa o obowiązkowych PR i gotowości do wydania po merge.
+Ochrona `master`, wszystkie zmiany przez PR oraz wymagane testy i budowanie
+aplikacji przed merge. Nie rozpoczęto implementacji; do ustalenia pozostaje
+podział kontroli między PR i wydanie oraz ewentualne ponowne użycie paczek.
+Obecny proces: [GitHub Releases](DEVELOPMENT.md#github-releases).
