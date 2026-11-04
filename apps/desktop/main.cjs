@@ -96,6 +96,27 @@ app.whenReady().then(async () => {
       },
     }),
   );
+  ipcMain.on('history-menu-state', (event, state) => {
+    if (
+      !trusted(event) ||
+      !state ||
+      typeof state.canUndo !== 'boolean' ||
+      typeof state.canRedo !== 'boolean'
+    )
+      return;
+    const menu = Menu.getApplicationMenu();
+    for (const [direction, enabled, label] of [
+      ['undo', state.canUndo, state.undoLabel],
+      ['redo', state.canRedo, state.redoLabel],
+    ]) {
+      const item = menu?.getMenuItemById(`edit-${direction}`);
+      if (!item) continue;
+      item.enabled = enabled;
+      item.label = `${direction === 'undo' ? 'Undo' : 'Redo'}${typeof label === 'string' ? ` ${label.slice(0, 80)}` : ''}`;
+    }
+    const alternate = menu?.getMenuItemById('edit-redo-alternate');
+    if (alternate) alternate.enabled = state.canRedo;
+  });
   ipcMain.handle('presets-read', (event) => {
     if (!trusted(event)) throw Error('Untrusted preset request.');
     return presetFiles.read();
@@ -291,6 +312,42 @@ app.whenReady().then(async () => {
           },
           { type: 'separator' },
           { role: 'close' },
+        ],
+      },
+      {
+        label: 'Edit',
+        submenu: [
+          {
+            id: 'edit-undo',
+            label: 'Undo',
+            enabled: false,
+            accelerator: 'CmdOrCtrl+Z',
+            click: () => command('undo'),
+          },
+          {
+            id: 'edit-redo',
+            label: 'Redo',
+            enabled: false,
+            accelerator: 'CmdOrCtrl+Shift+Z',
+            click: () => command('redo'),
+          },
+          ...(process.platform === 'darwin'
+            ? []
+            : [
+                {
+                  id: 'edit-redo-alternate',
+                  enabled: false,
+                  label: 'Redo',
+                  visible: false,
+                  accelerator: 'Ctrl+Y',
+                  click: () => command('redo'),
+                },
+              ]),
+          { type: 'separator' },
+          { role: 'cut' },
+          { role: 'copy' },
+          { role: 'paste' },
+          { role: 'selectAll' },
         ],
       },
       {

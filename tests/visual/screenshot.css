@@ -1,0 +1,4 @@
+/* Build identity changes between commits; keep it out of visual comparisons. */
+[data-build-info] {
+  visibility: hidden;
+}

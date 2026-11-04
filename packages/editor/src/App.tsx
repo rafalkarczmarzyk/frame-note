@@ -1,3 +1,4 @@
+import { HistoryControls } from '@/features/photo/history-controls';
 import { platform } from '@/lib/platform';
 import { usePhotoSession } from '@/features/photo/use-photo-session';
 import {
@@ -13,6 +14,7 @@ import {
   useEffect,
   useRef,
   useState,
+  useMemo,
 } from 'react';
 import { AppHeader } from '@/components/layout/app-header';
 import { EmptyWorkspace } from '@/features/photo/empty-workspace';
@@ -97,11 +99,22 @@ export default function App() {
     cancelImport,
     previewReady,
     updateDocument,
+    beginEdit,
+    finishEdit,
+    finishTyping,
+    cancelEdit,
+    restoreHistory,
+    historyStatus,
+    retainSettings,
     copySettings,
     pasteSettings,
     document: editorDocument,
     documentKey,
   } = usePhotoSession();
+  const historyActions = useMemo(
+    () => ({ beginEdit, finishEdit, finishTyping, cancelEdit }),
+    [beginEdit, finishEdit, finishTyping, cancelEdit],
+  );
   const [copiedSettings, setCopiedSettings] = useState<SessionDocument | null>(
     null,
   );
@@ -283,6 +296,65 @@ export default function App() {
     };
   }, [addFiles]);
 
+  useEffect(() => {
+    const keydown = (event: KeyboardEvent) => {
+      if (
+        event.defaultPrevented ||
+        event.isComposing ||
+        !(event.metaKey || event.ctrlKey) ||
+        event.altKey
+      )
+        return;
+      const key = event.key.toLowerCase();
+      const direction =
+        key === 'z'
+          ? event.shiftKey
+            ? 'redo'
+            : 'undo'
+          : key === 'y' && event.ctrlKey && !event.metaKey
+            ? 'redo'
+            : null;
+      if (!direction) return;
+      const target = event.target;
+      if (
+        target instanceof HTMLInputElement &&
+        !['number', 'color', 'range'].includes(target.type) &&
+        !target.hasAttribute('data-layout-draft')
+      )
+        return;
+      if (target instanceof HTMLTextAreaElement) return;
+      event.preventDefault();
+      if (!loading && !batch) restoreHistory(direction);
+    };
+    window.addEventListener('keydown', keydown, true);
+    return () => window.removeEventListener('keydown', keydown, true);
+  }, [restoreHistory, loading, batch]);
+
+  useEffect(
+    () =>
+      platform().onHistoryCommand?.((direction) => {
+        const target = document.activeElement;
+        if (
+          target instanceof HTMLTextAreaElement ||
+          (target instanceof HTMLInputElement &&
+            !['number', 'color', 'range'].includes(target.type) &&
+            !target.hasAttribute('data-layout-draft'))
+        ) {
+          document.execCommand(direction);
+          return;
+        }
+        if (!loading && !batch) restoreHistory(direction);
+      }),
+    [restoreHistory, loading, batch],
+  );
+  useEffect(() => {
+    platform().updateHistoryMenu?.({
+      ...historyStatus,
+      canUndo: !loading && !batch && historyStatus.canUndo,
+      canRedo: !loading && !batch && historyStatus.canRedo,
+    });
+  }, [historyStatus, loading, batch]);
+
   const loadingLabel = batch
     ? `Exporting ${Math.min(batch.completed + 1, batch.total)} of ${batch.total}`
     : progress && progress.total > 1
@@ -299,6 +371,14 @@ export default function App() {
   return (
     <div className="flex h-svh flex-col overflow-hidden bg-app-base text-content-primary">
       <AppHeader
+        historyAction={
+          <HistoryControls
+            status={historyStatus}
+            disabled={loading || !!batch}
+            onUndo={() => restoreHistory('undo')}
+            onRedo={() => restoreHistory('redo')}
+          />
+        }
         photoAction={
           <PhotoActions
             hasPhoto={session.items.length > 0}
@@ -413,6 +493,7 @@ export default function App() {
             sessionDocument={editorDocument}
             onDocumentChange={updateDocument}
             documentKey={documentKey}
+            historyActions={historyActions}
             settingsFeedback={settingsFeedback}
             sidebarFooter={
               session.items.length > 0 ? (
@@ -424,6 +505,7 @@ export default function App() {
                     onCopy={() => {
                       const copied = copySettings();
                       if (copied) {
+                        retainSettings(copied);
                         setCopiedSettings(copied);
                         showSettingsFeedback(
                           `Settings copied from ${photo?.document.photo.name ?? 'photo'}.`,
@@ -461,6 +543,7 @@ export default function App() {
                       onCopy={() => {
                         const copied = copySettings(item.id);
                         if (copied) {
+                          retainSettings(copied);
                           setCopiedSettings(copied);
                           showSettingsFeedback(
                             `Settings copied from ${item.name}.`,

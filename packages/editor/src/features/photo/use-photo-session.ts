@@ -9,9 +9,10 @@ import {
   activeDocument,
   removeSessionPhoto,
   setPhotoDocument,
-  updateSessionDocument,
   type PhotoSessionState,
 } from './session-state';
+import { EditHistorySession } from './edit-history';
+import type { EditOptions } from './session-document';
 import { photoThumbnail } from './photo-thumbnail';
 
 export function usePhotoSession() {
@@ -20,6 +21,12 @@ export function usePhotoSession() {
     activeId: null,
     empty: { id: createId(), editor: defaultSessionDocument() },
   }));
+  const [history] = useState(() => {
+    const value = new EditHistorySession();
+    value.reset(session.empty.id, session.empty.editor);
+    return value;
+  });
+  const group = useRef<string | null>(null);
   const state = useRef(session);
   const [photo, setPhoto] = useState<LoadedPhoto | null>(null);
   const currentPhoto = useRef<LoadedPhoto | null>(null);
@@ -33,10 +40,47 @@ export function usePhotoSession() {
   } | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [error, setError] = useState('');
-  const commit = useCallback((next: PhotoSessionState) => {
-    state.current = next;
-    setSession(next);
-  }, []);
+  const commit = useCallback(
+    (next: PhotoSessionState) => {
+      history.synchronize(state.current, next);
+      state.current = next;
+      setSession(next);
+    },
+    [history],
+  );
+  const finishEdit = useCallback(() => {
+    history.commit(state.current.activeId ?? state.current.empty.id);
+    group.current = null;
+    setSession({ ...state.current });
+  }, [history]);
+  const beginEdit = useCallback(
+    (label: string, key = label) => {
+      const id = state.current.activeId ?? state.current.empty.id;
+      if (group.current === key) return;
+      history.begin(id, label);
+      group.current = key;
+    },
+    [history],
+  );
+  const cancelEdit = useCallback(() => {
+    const id = state.current.activeId ?? state.current.empty.id;
+    history.cancel(id);
+    group.current = null;
+    commit(setPhotoDocument(state.current, id, history.document(id)));
+  }, [commit, history]);
+  const restoreHistory = useCallback(
+    (direction: 'undo' | 'redo') => {
+      if (busy.current) return;
+      // Blur synchronously settles the focused field before choosing a step.
+      if (document.activeElement instanceof HTMLInputElement)
+        document.activeElement.blur();
+      const id = state.current.activeId ?? state.current.empty.id;
+      const restored = history[direction](id);
+      group.current = null;
+      commit(setPhotoDocument(state.current, id, restored));
+    },
+    [commit, history],
+  );
   const showPhoto = useCallback((loaded: LoadedPhoto | null) => {
     if (loaded) resources.current.add(loaded);
     currentPhoto.current = loaded;
@@ -46,10 +90,43 @@ export function usePhotoSession() {
     if (currentPhoto.current === loaded) setPreviewLoading(false);
   }, []);
   const updateDocument = useCallback(
-    (update: (value: SessionDocument) => SessionDocument) => {
-      commit(updateSessionDocument(state.current, update));
+    (
+      update: (value: SessionDocument) => SessionDocument,
+      options?: EditOptions,
+    ) => {
+      const id =
+        options?.targetId ?? state.current.activeId ?? state.current.empty.id;
+      const original =
+        state.current.items.find((item) => item.id === id)?.editor ??
+        (id === state.current.empty.id ? state.current.empty.editor : null);
+      if (!original) return;
+      const updated = update(original);
+      const layerId = updated.layout.activeId;
+      const editor =
+        options?.selectionAfter && layerId
+          ? { ...updated, selection: { ...options.selectionAfter, layerId } }
+          : updated;
+      if (options?.selectionBefore && layerId)
+        history.observe(id, {
+          ...original,
+          selection: { ...options.selectionBefore, layerId },
+        });
+      if (options?.viewOnly) history.observe(id, editor);
+      else {
+        if (options?.group) beginEdit(options.label ?? 'Typing', options.group);
+        if (
+          options?.label &&
+          !options.group &&
+          !(options.gesture && group.current && group.current !== 'typing')
+        ) {
+          history.record(id, editor, options.label);
+          group.current = null;
+        } else if (group.current) history.update(id, editor);
+        else history.record(id, editor, 'Edit layout');
+      }
+      commit(setPhotoDocument(state.current, id, editor));
     },
-    [commit],
+    [commit, history, beginEdit],
   );
 
   const openFiles = useCallback(
@@ -65,6 +142,7 @@ export function usePhotoSession() {
       // changes, so a focused field cannot display the previous photo's value.
       if (document.activeElement instanceof HTMLElement)
         document.activeElement.blur();
+      finishEdit();
       busy.current = true;
       const token = ++generation.current;
       setError('');
@@ -135,7 +213,7 @@ export function usePhotoSession() {
         }
       }
     },
-    [commit, showPhoto],
+    [commit, showPhoto, finishEdit],
   );
 
   const selectPhoto = useCallback(
@@ -147,6 +225,9 @@ export function usePhotoSession() {
         return;
       const item = state.current.items.find((item) => item.id === id);
       if (!item) return;
+      if (document.activeElement instanceof HTMLElement)
+        document.activeElement.blur();
+      finishEdit();
       busy.current = true;
       const token = ++generation.current;
       setProgress({ done: 0, total: 1 });
@@ -174,7 +255,7 @@ export function usePhotoSession() {
         }
       }
     },
-    [commit, showPhoto],
+    [commit, showPhoto, finishEdit],
   );
 
   const cancelImport = useCallback(() => {
@@ -192,21 +273,30 @@ export function usePhotoSession() {
   const pasteSettings = useCallback(
     (id: string, editor: SessionDocument) => {
       if (busy.current) return;
+      if (
+        !state.current.items.some((item) => item.id === id) &&
+        state.current.empty.id !== id
+      )
+        return;
+      finishEdit();
+      history.record(id, editor, 'Paste settings');
       commit(setPhotoDocument(state.current, id, structuredClone(editor)));
     },
-    [commit],
+    [commit, history, finishEdit],
   );
   const closePhoto = useCallback(() => {
     if (busy.current || !state.current.activeId) return;
+    finishEdit();
     const next = removeSessionPhoto(state.current, state.current.activeId);
     commit(next);
     showPhoto(null);
     setPreviewLoading(false);
     setError('');
     if (next.activeId) void selectPhoto(next.activeId);
-  }, [commit, selectPhoto, showPhoto]);
+  }, [commit, selectPhoto, showPhoto, finishEdit]);
   const disposeRoll = useCallback(() => {
     cancelImport();
+    finishEdit();
     const editor = activeDocument(state.current);
     commit({
       items: [],
@@ -218,7 +308,7 @@ export function usePhotoSession() {
     });
     showPhoto(null);
     setError('');
-  }, [cancelImport, commit, showPhoto]);
+  }, [cancelImport, commit, showPhoto, finishEdit]);
 
   useEffect(() => {
     for (const loaded of resources.current) {
@@ -264,6 +354,16 @@ export function usePhotoSession() {
     cancelImport,
     previewReady,
     updateDocument,
+    beginEdit,
+    finishEdit,
+    finishTyping: useCallback(() => {
+      if (group.current === 'typing') finishEdit();
+    }, [finishEdit]),
+    cancelEdit,
+    restoreHistory,
+    retainSettings: (value: SessionDocument | null) =>
+      history.retain(value ? [value] : []),
+    historyStatus: history.status(session.activeId ?? session.empty.id),
     copySettings,
     pasteSettings,
     document: activeDocument(session),

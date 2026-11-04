@@ -39,7 +39,7 @@ it('counts active references separately from retained undo resources', () => {
       '',
       Array.from({ length: 1001 }, () => asset),
     ),
-  ).toThrow('undo history');
+  ).toThrow('Content resources');
 });
 
 it('allows 100 distinct active image references and rejects the 101st', () => {

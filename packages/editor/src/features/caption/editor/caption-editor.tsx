@@ -1,3 +1,7 @@
+import type {
+  EditOptions,
+  EditorSelection,
+} from '../../photo/session-document';
 import { IconButton } from '@/components/ui/icon-button';
 import {
   parseSeparatorToken,
@@ -88,8 +92,14 @@ export function CaptionEditor({
   onReady,
   onGraphicsActionsReady,
   onBrowseSeparatorColors,
+  sharedHistory = false,
+  selection,
+  onCursorChange,
 }: {
   onBrowseSeparatorColors?: (actions: SeparatorColorActions) => void;
+  sharedHistory?: boolean;
+  selection?: EditorSelection;
+  onCursorChange?: (selection: Omit<EditorSelection, 'layerId'>) => void;
   value: string;
   actions?: ReactNode;
   onBrowseContent?: () => void;
@@ -101,25 +111,42 @@ export function CaptionEditor({
   fields: readonly MetadataField[];
   hasPhoto?: boolean;
   icons: readonly SvgIcon[];
-  onChange: (value: string, images?: ImageAsset[]) => void;
+  onChange: (
+    value: string,
+    images?: ImageAsset[],
+    options?: EditOptions,
+  ) => void;
   onFocus: () => void;
   onBlur: () => void;
   onReady: (editor: Editor | null) => void;
   onGraphicsActionsReady?: (actions: GraphicsEditorActions | null) => void;
 }) {
-  const callbacks = useRef({ onChange, onFocus, onBlur, onReady });
+  const callbacks = useRef({
+    onChange,
+    onFocus,
+    onBlur,
+    onReady,
+    onCursorChange,
+  });
   useEffect(() => {
-    callbacks.current = { onChange, onFocus, onBlur, onReady };
+    callbacks.current = { onChange, onFocus, onBlur, onReady, onCursorChange };
   });
   const revision = useRef(0);
+  const restoring = useRef(false);
+  const selectionBefore = useRef({ from: 1, to: 1, node: false });
   const imageAssets = useRef<ImageAsset[]>([...images]);
   useEffect(() => {
-    const retained = new Map(
-      imageAssets.current.map((asset) => [asset.id, asset]),
-    );
-    for (const asset of images) retained.set(asset.id, asset);
-    imageAssets.current = [...retained.values()];
-  }, [images]);
+    imageAssets.current = sharedHistory
+      ? [...images]
+      : [
+          ...new Map(
+            [...imageAssets.current, ...images].map((asset) => [
+              asset.id,
+              asset,
+            ]),
+          ).values(),
+        ];
+  }, [images, sharedHistory]);
   const [selectedPosition, setSelectedPosition] = useState<number | null>(null);
   const selectedRef = useRef<number | null>(null);
   const inSettings = useRef(false);
@@ -141,6 +168,7 @@ export function CaptionEditor({
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
+        undoRedo: sharedHistory ? false : undefined,
         heading: false,
         blockquote: false,
         bulletList: false,
@@ -159,14 +187,62 @@ export function CaptionEditor({
       CaptionWhitespace,
     ],
     content: templateDocument(value),
-    onUpdate: ({ editor }) =>
+    onUpdate: ({ editor, transaction }) => {
       callbacks.current.onChange(
         documentTemplate(editor.getJSON()),
         activeImageAssets(
           documentTemplate(editor.getJSON()),
           imageAssets.current,
         ),
-      ),
+        (() => {
+          const tokens = (doc: typeof transaction.doc) => {
+            const values: string[] = [];
+            doc.descendants((node) => {
+              if (node.type.name === 'captionToken')
+                values.push(String(node.attrs.token));
+            });
+            return values;
+          };
+          const beforeTokens = tokens(transaction.before);
+          const afterTokens = tokens(transaction.doc);
+          const changedTokens =
+            JSON.stringify(beforeTokens) !== JSON.stringify(afterTokens);
+          const identity = (token: string) =>
+            parseImageToken(token)?.assetId ??
+            parseIconToken(token)?.name ??
+            (parseSeparatorToken(token) ? 'separator' : token);
+          const gesture =
+            changedTokens &&
+            JSON.stringify(beforeTokens.map(identity)) ===
+              JSON.stringify(afterTokens.map(identity));
+          return {
+            ...(changedTokens
+              ? { label: 'Change content element' }
+              : { label: 'Typing', group: 'typing' }),
+            gesture,
+            selectionBefore: selectionBefore.current,
+            selectionAfter: {
+              from: editor.state.selection.from,
+              to: editor.state.selection.to,
+              node: editor.state.selection instanceof NodeSelection,
+            },
+          };
+        })(),
+      );
+      if (sharedHistory)
+        imageAssets.current = activeImageAssets(
+          documentTemplate(editor.getJSON()),
+          imageAssets.current,
+        );
+    },
+    onSelectionUpdate: ({ editor, transaction }) =>
+      !transaction.docChanged &&
+      !restoring.current &&
+      callbacks.current.onCursorChange?.({
+        from: editor.state.selection.from,
+        to: editor.state.selection.to,
+        node: editor.state.selection instanceof NodeSelection,
+      }),
     onTransaction: ({ editor, transaction }) => {
       if (transaction.docChanged) revision.current++;
       const selection = editor.state.selection;
@@ -375,6 +451,20 @@ export function CaptionEditor({
       },
     },
   });
+  useEffect(() => {
+    if (!editor) return;
+    const capture = () => {
+      selectionBefore.current = {
+        from: editor.state.selection.from,
+        to: editor.state.selection.to,
+        node: editor.state.selection instanceof NodeSelection,
+      };
+    };
+    editor.on('beforeTransaction', capture);
+    return () => {
+      editor.off('beforeTransaction', capture);
+    };
+  }, [editor]);
   const addImage = useCallback(
     async (file: File, replaceAt: number | null = null) => {
       if (!editor || editor.isDestroyed || importingImage.current) return;
@@ -572,11 +662,33 @@ export function CaptionEditor({
     return () => onReady(null);
   }, [editor, onReady]);
   useEffect(() => {
-    if (editor && !composing && documentTemplate(editor.getJSON()) !== value)
+    if (editor && !composing && documentTemplate(editor.getJSON()) !== value) {
+      restoring.current = true;
       editor.commands.setContent(templateDocument(value), {
         emitUpdate: false,
       });
+      restoring.current = false;
+    }
   }, [value, editor, composing]);
+  useEffect(() => {
+    if (!editor || !selection || composing) return;
+    const max = editor.state.doc.content.size;
+    const from = Math.max(0, Math.min(max, selection.from));
+    const to = Math.max(from, Math.min(max, selection.to));
+    if (
+      editor.state.selection.from !== from ||
+      editor.state.selection.to !== to
+    ) {
+      restoring.current = true;
+      if (
+        selection.node &&
+        editor.state.doc.nodeAt(from)?.type.name === 'captionToken'
+      )
+        editor.commands.setNodeSelection(from);
+      else editor.commands.setTextSelection({ from, to });
+      restoring.current = false;
+    }
+  }, [editor, selection, value, composing]);
   const values = Object.fromEntries(
     [...captionTags(fields), ...fields].map((field) => [
       field.key,

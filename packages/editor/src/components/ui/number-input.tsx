@@ -168,6 +168,11 @@ export function NumberInput({
         onKeyDown={(event) => {
           onKeyDown?.(event);
           if (event.defaultPrevented) return;
+          if (event.key === 'Escape' || event.key === 'Enter') {
+            event.preventDefault();
+            setFocused(false);
+            event.currentTarget.blur();
+          }
           if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
             event.preventDefault();
             nudge(event.key === 'ArrowUp' ? 1 : -1);

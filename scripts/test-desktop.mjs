@@ -153,6 +153,45 @@ try {
   await expect(photos.nth(0)).toHaveAttribute('aria-pressed', 'false');
   await photos.nth(0).click();
   await expect(photos.nth(0)).toHaveAttribute('aria-pressed', 'true');
+  // Shared editor history, menu availability and one command per accelerator.
+  const addLayer = page.getByRole('button', { name: 'Add layer', exact: true });
+  const layerCount = async () =>
+    page.locator('[data-section="containers"] [data-picker-row]').count();
+  const initialLayerCount = await layerCount();
+  await addLayer.click();
+  await addLayer.click();
+  await expect.poll(layerCount).toBe(initialLayerCount + 2);
+  const menuState = (id) =>
+    app.evaluate(
+      ({ Menu }, id) => Menu.getApplicationMenu().getMenuItemById(id).enabled,
+      id,
+    );
+  await expect.poll(() => menuState('edit-undo')).toBe(true);
+  await page.keyboard.press(
+    process.platform === 'darwin' ? 'Meta+z' : 'Control+z',
+  );
+  await expect.poll(layerCount).toBe(initialLayerCount + 1);
+  await app.evaluate(({ Menu }) =>
+    Menu.getApplicationMenu().getMenuItemById('edit-undo').click(),
+  );
+  await expect.poll(layerCount).toBe(initialLayerCount);
+  await expect.poll(() => menuState('edit-undo')).toBe(false);
+  await app.evaluate(({ Menu }) =>
+    Menu.getApplicationMenu().getMenuItemById('edit-redo').click(),
+  );
+  await expect.poll(layerCount).toBe(initialLayerCount + 1);
+  await page.keyboard.press(
+    process.platform === 'darwin' ? 'Meta+Shift+z' : 'Control+Shift+z',
+  );
+  await expect.poll(layerCount).toBe(initialLayerCount + 2);
+  await photos.nth(2).click();
+  await expect.poll(layerCount).toBe(initialLayerCount);
+  await expect.poll(() => menuState('edit-undo')).toBe(false);
+  await photos.nth(0).click();
+  await expect.poll(layerCount).toBe(initialLayerCount + 2);
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(layerCount).toBe(initialLayerCount);
   const exportButton = page.getByRole('button', {
     name: 'Export JPG',
     exact: true,

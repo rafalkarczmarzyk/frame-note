@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { expect, type Page } from '@playwright/test';
 import { wildlifeFixture } from '../fixtures.js';
 export async function openPhoto(page: Page, path = wildlifeFixture.path) {
@@ -73,7 +74,9 @@ export async function shot(page: Page, name: string, hover = false) {
         requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
       ),
   );
-  await expect(page).toHaveScreenshot(`${name}.png`);
+  await expect(page).toHaveScreenshot(`${name}.png`, {
+    stylePath: fileURLToPath(new URL('./screenshot.css', import.meta.url)),
+  });
 }
 export async function section(page: Page, key: string) {
   const details = page.locator(`details[data-section="${key}"]`);

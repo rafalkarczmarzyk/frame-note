@@ -4,6 +4,10 @@ Stan: 3 listopada 2026. Zestaw sprawdza widoki prawdziwej aplikacji w jednym pro
 
 ## Sceny
 
+Numer kompilacji (`data-build-info`) jest ukrywany wyłącznie na screenshotach
+przez `tests/visual/screenshot.css`, aby wzorce nie zależały od commita.
+W aplikacji pozostaje widoczny.
+
 Scena About obejmuje prawdziwy dialog aplikacji; osobny widok czytnika licencji
 pozostaje poza screenshotami. `FRAMENOTE_VISUAL_PORT` pozwala
 uruchomić zestaw na innym porcie, gdy domyślny 4184 jest zajęty.

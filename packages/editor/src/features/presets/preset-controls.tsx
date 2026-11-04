@@ -185,7 +185,7 @@ export function PresetControls({
     }
   };
   const apply = (preset: LayoutPreset) => {
-    setSelected(preset.id);
+    if (!onSelectedPresetChange) setSelected(preset.id);
     setName(preset.name);
     setNaming(false);
     setError('');

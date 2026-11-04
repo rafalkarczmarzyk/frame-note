@@ -230,6 +230,7 @@ export function ColorControls({
                 <ColorSwatch value={value} />
                 <Input
                   autoFocus
+                  data-layout-draft
                   id={fieldId}
                   aria-describedby={descriptionId}
                   aria-invalid={!!error}
@@ -246,11 +247,18 @@ export function ColorControls({
                     }
                     setError('');
                   }}
-                  onBlur={() => {
+                  onBlur={(event) => {
+                    if (event.currentTarget.dataset.historyCancelled) {
+                      delete event.currentTarget.dataset.historyCancelled;
+                      setDraft({ value, text: resolvedColor(value) });
+                      return;
+                    }
                     const hex = normalizeHex(text);
                     if (hex) choose(hex);
-                    else
-                      setError('Enter a valid HEX color using 3 or 6 digits.');
+                    else {
+                      setDraft({ value, text: resolvedColor(value) });
+                      setError('');
+                    }
                   }}
                 />
               </div>

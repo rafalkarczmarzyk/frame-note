@@ -72,6 +72,33 @@ source precedence, formatting, and missing-data behavior.
 `{shutterDuration}` formats long exposures as minutes and hours, for example
 `600 s` → `10 min`; `{shutter}` keeps its original seconds format.
 
+## Undo and Redo
+
+Use the header arrows or the desktop **Edit → Undo / Redo** menu. On macOS,
+press **Cmd+Z** or **Cmd+Shift+Z**; on Windows/Linux, use **Ctrl+Z**,
+**Ctrl+Shift+Z**, or **Ctrl+Y** for Redo. Search and preset-name fields retain
+normal text editing; caption content and layout controls share the photo history.
+
+History covers content, tags, artwork, styles, layers, visibility, order,
+position, margins, preset application and Paste settings. Typing stays one step
+until you leave the editor or start another operation; adding/removing a tag or
+image makes a separate step. A continuous drag or slider gesture is one step.
+Numeric/HEX edits finish on Enter or leaving the field; Escape cancels the edit.
+Undo while typing finishes and undoes the whole group. A new edit after Undo
+clears Redo; simply selecting layers does not create a step.
+
+History belongs to each photo and survives frame switching during the session.
+New imports start with empty histories; closing a photo discards its history.
+The empty workspace has its own history, reset when the last photo closes.
+History is not saved in presets or exported files and disappears on reload/quit.
+Saving/deleting presets, importing/closing photos, export and view navigation
+are outside Undo/Redo.
+
+By default, each document keeps up to 100 steps, with a shared 64 MiB estimated
+history budget. Older steps may be discarded; the Undo tooltip indicates this.
+Artwork required by remaining steps, current documents and copied settings stays
+available. These limits estimate stored history, not the application's total RAM.
+
 ## Presets and local storage
 
 Presets include layers, content templates, styles, positions, visibility,
@@ -106,7 +133,7 @@ Paste requires a copy, and the actions are unavailable while editing is locked.
 **Dispose roll…** closes all photos after confirmation. Closing the last photo
 keeps its layout in the empty editor. Source files and saved presets are not deleted.
 Export quality, metadata choices and sidebar state are shared session settings.
-Text undo/redo resets when switching photos; edits themselves are retained.
+Each photo retains its own Undo/Redo history when switching frames.
 The layout editor and preset management are available before opening a photo.
 The first import preserves the prepared layout; document-unit conversions wait
 for real image dimensions, and JPG export requires a photo.

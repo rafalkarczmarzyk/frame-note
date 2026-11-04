@@ -11,6 +11,12 @@ see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 
 ## Unreleased
 
+## [0.5.0-beta] - 2026-11-04
+
+### Added
+
+- Shared, session-only Undo/Redo for each photo, with grouped typing and gestures, header controls, keyboard shortcuts and the desktop Edit menu. Preset and settings application can be undone together with layer and content edits.
+
 ## [0.4.2-beta] - 2026-11-03
 
 ### Fixed

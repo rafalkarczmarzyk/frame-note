@@ -18,9 +18,16 @@ declare global {
         touchedIds?: readonly string[],
       ): Promise<void>;
       saveFile(name: string, bytes: Uint8Array): Promise<'saved' | 'cancelled'>;
+      updateHistoryMenu(state: {
+        canUndo: boolean;
+        canRedo: boolean;
+        undoLabel?: string;
+        redoLabel?: string;
+      }): void;
       onCommand(
         callback: (
-          command: 'open' | 'export' | 'about' | 'check-updates',
+          command:
+            'open' | 'export' | 'about' | 'check-updates' | 'undo' | 'redo',
         ) => void,
       ): () => void;
     };
@@ -46,13 +53,18 @@ configurePlatform({
   async saveFile(blob, name) {
     return desktop.saveFile(name, new Uint8Array(await blob.arrayBuffer()));
   },
+  updateHistoryMenu: (state) => desktop.updateHistoryMenu(state),
+  onHistoryCommand: (run) =>
+    desktop.onCommand((command) => {
+      if (command === 'undo' || command === 'redo') run(command);
+    }),
   onAbout: (show) =>
     desktop.onCommand((command) => {
       if (command === 'about') show();
     }),
 });
 desktop.onCommand((command) => {
-  if (command === 'about') return;
+  if (command === 'about' || command === 'undo' || command === 'redo') return;
   if (command === 'check-updates') {
     window.dispatchEvent(new Event('framenote-check-updates'));
     return;

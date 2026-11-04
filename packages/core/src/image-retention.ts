@@ -14,7 +14,7 @@ export function activeImageAssets(
   const ids = referencedImageIds(template);
   return assets.filter((asset) => ids.has(asset.id));
 }
-/** Undo assets live only in the mounted editor, never in presets or the layout. */
+/** Validate content resources independently of the session history budget. */
 export function checkImageRetention(
   template: string,
   assets: readonly ImageAsset[],
@@ -27,6 +27,6 @@ export function checkImageRetention(
       64_000_000
   )
     throw Error(
-      'Image undo history reached 64 MB or 1000 assets. Switch layers to release history before adding more images.',
+      'Content resources reached 64 MB or 1000 assets. Remove unused images before adding more.',
     );
 }

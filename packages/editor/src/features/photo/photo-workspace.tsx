@@ -1,4 +1,9 @@
 import {
+  HistoryInteractions,
+  type HistoryActions,
+} from './history-interactions';
+import type { EditOptions } from './session-document';
+import {
   readExportQuality,
   storeExportQuality,
 } from '@/lib/export-preferences';
@@ -123,7 +128,9 @@ export function PhotoWorkspace(
 ) {
   return (
     <MarginPreviewProvider>
-      <PhotoWorkspaceContent {...props} />
+      <HistoryInteractions actions={props.historyActions}>
+        <PhotoWorkspaceContent {...props} />
+      </HistoryInteractions>
     </MarginPreviewProvider>
   );
 }
@@ -147,6 +154,7 @@ function PhotoWorkspaceContent({
   onExportAll,
   sidebarFooter,
   settingsFeedback,
+  historyActions,
 }: {
   photo: LoadedPhoto | null;
   loading?: boolean;
@@ -161,6 +169,7 @@ function PhotoWorkspaceContent({
   sessionDocument?: SessionDocument;
   onDocumentChange?: (
     update: (value: SessionDocument) => SessionDocument,
+    options?: EditOptions,
   ) => void;
   documentKey?: string;
   filmRoll?: ReactNode;
@@ -169,6 +178,7 @@ function PhotoWorkspaceContent({
   /** Optional glass footer overlaying the scrolling tools. */
   sidebarFooter?: ReactNode;
   settingsFeedback?: string;
+  historyActions?: HistoryActions;
 }) {
   const dimensions = photo?.document.photo.dimensions ?? emptyDimensions;
   const fields = photo?.document.photo.metadata ?? emptyMetadata;
@@ -344,7 +354,27 @@ function PhotoWorkspaceContent({
   const setTemplate = (
     template: string,
     images?: import('../../../../core/src/inline-image').ImageAsset[],
-  ) => setSettings({ ...settings, template, ...(images ? { images } : {}) });
+    options?: EditOptions,
+  ) => {
+    const id = layout.activeId;
+    if (!id) return;
+    if (onDocumentChange)
+      onDocumentChange(
+        (value) => ({
+          ...value,
+          layout: {
+            ...value.layout,
+            containers: value.layout.containers.map((container) =>
+              container.id === id
+                ? { ...container, template, ...(images ? { images } : {}) }
+                : container,
+            ),
+          },
+        }),
+        { ...options, targetId: documentKey },
+      );
+    else setSettings({ ...settings, template, ...(images ? { images } : {}) });
+  };
   const selectContainer = (id: string) => {
     setEditingId(null);
     if (layout.containers.find((container) => container.id === id)?.logo)
@@ -1101,7 +1131,9 @@ function PhotoWorkspaceContent({
             onSelectedPresetChange={
               onDocumentChange
                 ? (presetId) =>
-                    onDocumentChange((value) => ({ ...value, presetId }))
+                    onDocumentChange((value) => ({ ...value, presetId }), {
+                      viewOnly: true,
+                    })
                 : undefined
             }
             initialPresetId={
@@ -1123,11 +1155,14 @@ function PhotoWorkspaceContent({
                 ),
               ];
               if (onDocumentChange)
-                onDocumentChange(() => ({
-                  layout: structuredClone(preset.layout),
-                  icons: nextIcons,
-                  presetId: preset.id,
-                }));
+                onDocumentChange(
+                  () => ({
+                    layout: structuredClone(preset.layout),
+                    icons: nextIcons,
+                    presetId: preset.id,
+                  }),
+                  { label: 'Apply preset' },
+                );
               else {
                 setLayout(structuredClone(preset.layout));
                 setIcons(nextIcons);
@@ -1252,8 +1287,27 @@ function PhotoWorkspaceContent({
                   <>
                     <InspectorSection title="Content" imageDrop>
                       <CaptionEditor
-                        key={documentKey}
+                        key={`${documentKey}:${activeContainer.id}`}
                         value={template}
+                        sharedHistory={!!historyActions}
+                        selection={
+                          sessionDocument?.selection?.layerId ===
+                          activeContainer.id
+                            ? sessionDocument.selection
+                            : undefined
+                        }
+                        onCursorChange={(selection) =>
+                          onDocumentChange?.(
+                            (value) => ({
+                              ...value,
+                              selection: {
+                                ...selection,
+                                layerId: activeContainer.id,
+                              },
+                            }),
+                            { viewOnly: true, targetId: documentKey },
+                          )
+                        }
                         images={settings.images}
                         sizingUnit={settings.sizingUnit}
                         fontSize={settings.style.fontSize}
@@ -1263,7 +1317,10 @@ function PhotoWorkspaceContent({
                         icons={icons}
                         onChange={setTemplate}
                         onFocus={() => setEditingId(activeContainer.id)}
-                        onBlur={() => setEditingId(null)}
+                        onBlur={() => {
+                          setEditingId(null);
+                          historyActions?.finishTyping?.();
+                        }}
                         onReady={editorReady}
                         onGraphicsActionsReady={registerGraphicsActions}
                         onBrowseSeparatorColors={(actions) => {
@@ -1450,7 +1507,10 @@ function PhotoWorkspaceContent({
                   checked={metadataOptions.removeAll}
                   disabled={exporting}
                   onCheckedChange={(removeAll) =>
-                    setMetadataOptions((current) => ({ ...current, removeAll }))
+                    setMetadataOptions((current) => ({
+                      ...current,
+                      removeAll,
+                    }))
                   }
                   description="Only affects the exported file. Visible captions stay on the photo."
                 />

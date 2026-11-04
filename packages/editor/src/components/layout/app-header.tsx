@@ -14,9 +14,11 @@ import { Button } from '@/components/ui/button';
 export function AppHeader({
   children,
   photoAction,
+  historyAction,
 }: {
   children?: ReactNode;
   photoAction?: ReactNode;
+  historyAction?: ReactNode;
 }) {
   const [aboutOpen, setAboutOpen] = useState(false);
   const { platform, isWeb, isMacOS } = usePlatform();
@@ -56,7 +58,12 @@ export function AppHeader({
           </div>
         )}
         {aboutOpen && <AboutSplash onClose={() => setAboutOpen(false)} />}
-        {photoAction}
+        {(photoAction || historyAction) && (
+          <div className="flex shrink-0 items-center gap-1">
+            {photoAction}
+            {historyAction}
+          </div>
+        )}
         <div className="min-w-0 flex-1" />
         <div
           id="preset-actions"

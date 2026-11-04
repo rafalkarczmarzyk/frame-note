@@ -1,3 +1,4 @@
+import { HistoryControls } from '@/features/photo/history-controls';
 import { Download } from 'lucide-react';
 import { PhotoActions } from '@/features/photo/photo-actions';
 import { expect, userEvent, within } from 'storybook/test';
@@ -35,6 +36,20 @@ function HeaderPreview({
         ref={attach}
       >
         <AppHeader
+          historyAction={
+            <HistoryControls
+              status={{
+                canUndo: layout.containers.length === 0,
+                canRedo: false,
+                truncated: false,
+                undoLabel: 'Edit layout',
+              }}
+              onUndo={() =>
+                setLayout(structuredClone(builtinPresets[0]!.layout))
+              }
+              onRedo={() => {}}
+            />
+          }
           photoAction={
             <PhotoActions
               hasPhoto={hasPhoto}

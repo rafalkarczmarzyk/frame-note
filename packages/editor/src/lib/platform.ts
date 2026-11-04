@@ -1,6 +1,13 @@
 import type { PresetRepository } from '../features/presets/async-preset-store';
 /** Platform services are installed once by the application entry point. */
 export interface PlatformServices {
+  onHistoryCommand?: (run: (direction: 'undo' | 'redo') => void) => () => void;
+  updateHistoryMenu?: (state: {
+    canUndo: boolean;
+    canRedo: boolean;
+    undoLabel?: string;
+    redoLabel?: string;
+  }) => void;
   systemFonts?: boolean;
   systemFontsError?: string;
   saveFile(
