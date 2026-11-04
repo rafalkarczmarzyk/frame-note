@@ -2,7 +2,7 @@ import { rulerThickness } from '@/components/ui/ruler-metrics';
 import { Ruler } from '@/components/ui/ruler';
 import { MarginHandle } from '@/components/ui/margin-handle';
 import { MarginGuides } from '@/components/ui/margin-guides';
-import { useRef } from 'react';
+import { useLayoutEffect, useEffect, useRef } from 'react';
 import type { ImageDimensions } from '../../../../core/src/document';
 import {
   marginSides,
@@ -28,6 +28,7 @@ export function MarginRulers({
   x,
   y,
   disabled = false,
+  viewport,
   onChange,
 }: {
   dimensions: ImageDimensions;
@@ -38,6 +39,7 @@ export function MarginRulers({
   x: number;
   y: number;
   disabled?: boolean;
+  viewport?: { x: number; y: number; width: number; height: number };
   onChange: (margins: Margins) => void;
 }) {
   const preview = useMarginPreview();
@@ -47,12 +49,45 @@ export function MarginRulers({
     margins: Margins;
     scale: number;
   } | null>(null);
+  const captured = useRef<{ element: HTMLElement; id: number } | null>(null);
   const finish = (cancel = false) => {
     if (!drag.current) return;
     if (cancel) onChange(drag.current.margins);
     drag.current = null;
     preview?.drag(null);
+    const pointer = captured.current;
+    captured.current = null;
+    if (pointer?.element.hasPointerCapture(pointer.id))
+      pointer.element.releasePointerCapture(pointer.id);
   };
+  const finishRef = useRef(finish);
+  useLayoutEffect(() => {
+    finishRef.current = finish;
+  });
+  useLayoutEffect(() => {
+    finishRef.current();
+    const pointer = captured.current;
+    if (pointer?.element.hasPointerCapture(pointer.id))
+      pointer.element.releasePointerCapture(pointer.id);
+    captured.current = null;
+  }, [
+    x,
+    y,
+    scale,
+    dimensions.width,
+    dimensions.height,
+    disabled,
+    viewport?.width,
+    viewport?.height,
+  ]);
+  useEffect(() => {
+    const blur = () => finishRef.current();
+    window.addEventListener('blur', blur);
+    return () => {
+      window.removeEventListener('blur', blur);
+      finishRef.current();
+    };
+  }, []);
   const limits = marginLimits(margins, unit, dimensions, linkMode);
   const factor = pixelsPerUnit(unit, dimensions);
   const width = dimensions.width * scale;
@@ -63,10 +98,30 @@ export function MarginRulers({
     top: margins.top * factor * scale,
     bottom: height - margins.bottom * factor * scale,
   };
+  const left = Math.max(x, viewport?.x ?? x);
+  const top = Math.max(y, viewport?.y ?? y);
+  const visibleWidth = Math.max(
+    0,
+    Math.min(x + width, viewport ? viewport.x + viewport.width : x + width) -
+      left,
+  );
+  const visibleHeight = Math.max(
+    0,
+    Math.min(y + height, viewport ? viewport.y + viewport.height : y + height) -
+      top,
+  );
+  const offsetX = left - x;
+  const offsetY = top - y;
+  const visiblePositions = {
+    left: positions.left - offsetX,
+    right: positions.right - offsetX,
+    top: positions.top - offsetY,
+    bottom: positions.bottom - offsetY,
+  };
   return (
     <div
       className="pointer-events-none absolute"
-      style={{ left: x, top: y, width, height }}
+      style={{ left, top, width: visibleWidth, height: visibleHeight }}
     >
       <span
         aria-hidden="true"
@@ -82,12 +137,14 @@ export function MarginRulers({
       </span>
       {(['horizontal', 'vertical'] as const).map((axis) => {
         const horizontal = axis === 'horizontal';
-        const length = horizontal ? width : height;
+        const length = horizontal ? visibleWidth : visibleHeight;
+        const offset = horizontal ? offsetX : offsetY;
         return (
           <Ruler
             key={axis}
             orientation={axis}
             length={length}
+            startUnit={offset / (factor * scale)}
             pixelsPerUnit={factor * scale}
             unitLabel={sizingLabels[unit]}
             active={preview?.visible}
@@ -106,11 +163,16 @@ export function MarginRulers({
                   ? side === 'left' || side === 'right'
                   : side === 'top' || side === 'bottom',
               )
+              .filter(
+                (side) =>
+                  visiblePositions[side] >= 0 &&
+                  visiblePositions[side] <= length,
+              )
               .map((side) => (
                 <MarginHandle
                   key={side}
                   side={side}
-                  position={positions[side]}
+                  position={visiblePositions[side]}
                   value={margins[side]}
                   max={limits[side]}
                   unitLabel={sizingLabels[unit]}
@@ -140,6 +202,10 @@ export function MarginRulers({
                     event.preventDefault();
                     event.currentTarget.focus({ preventScroll: true });
                     event.currentTarget.setPointerCapture(event.pointerId);
+                    captured.current = {
+                      element: event.currentTarget,
+                      id: event.pointerId,
+                    };
                     drag.current = {
                       side,
                       start: horizontal ? event.clientX : event.clientY,
@@ -206,9 +272,9 @@ export function MarginRulers({
       })}
       {preview?.visible && (
         <MarginGuides
-          width={width}
-          height={height}
-          positions={positions}
+          width={visibleWidth}
+          height={visibleHeight}
+          positions={visiblePositions}
           active={preview.active}
           linkMode={linkMode}
         />

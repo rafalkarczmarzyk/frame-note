@@ -6,6 +6,8 @@ export interface RulerProps extends ComponentProps<'div'> {
   length: number;
   pixelsPerUnit: number;
   active?: boolean;
+  /** Image units preceding the visible ruler segment. */
+  startUnit?: number;
   unitLabel: string;
 }
 export function Ruler({
@@ -13,6 +15,7 @@ export function Ruler({
   length,
   pixelsPerUnit,
   active = false,
+  startUnit = 0,
   unitLabel,
   children,
   className,
@@ -24,11 +27,12 @@ export function Ruler({
     const raw = 60 / pixelsPerUnit;
     const power = 10 ** Math.floor(Math.log10(raw));
     const step = [1, 2, 5, 10].find((n) => n * power >= raw)! * power;
+    const first = Math.ceil(startUnit / step) * step;
     return Array.from(
       { length: Math.floor(length / (step * pixelsPerUnit)) + 1 },
       (_, i) => ({
-        position: i * step * pixelsPerUnit,
-        label: Number((i * step).toPrecision(6)).toString(),
+        position: (first + i * step - startUnit) * pixelsPerUnit,
+        label: Number((first + i * step).toPrecision(6)).toString(),
       }),
     );
   };
@@ -81,7 +85,12 @@ export function Ruler({
             </text>
             {[1, 2, 3, 4].map((minor) => {
               const offset =
-                position + (minor * (marks[1]?.position ?? length)) / 5;
+                position +
+                (minor *
+                  (marks[1] && marks[0]
+                    ? marks[1].position - marks[0].position
+                    : length)) /
+                  5;
               return (
                 offset < length && (
                   <path

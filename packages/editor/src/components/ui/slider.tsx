@@ -1,5 +1,5 @@
 import * as SliderPrimitive from '@radix-ui/react-slider';
-import { useState, type ReactNode } from 'react';
+import { useState, type ReactNode, type KeyboardEventHandler } from 'react';
 
 export interface SliderMark {
   value: number;
@@ -16,6 +16,8 @@ export function Slider({
   label,
   id,
   marks = [],
+  valueText,
+  onKeyDown,
 }: {
   value: number;
   onValueChange: (value: number) => void;
@@ -24,6 +26,10 @@ export function Slider({
   step?: number;
   disabled?: boolean;
   label: string;
+  /** Accessible formatted value for transformed scales (for example logarithmic zoom). */
+  valueText?: string;
+  /** Optional domain increments for transformed scales; preventDefault owns a key. */
+  onKeyDown?: KeyboardEventHandler<HTMLSpanElement>;
   id?: string;
   /** Optional visual ticks. Values outside min/max are omitted; labels do not snap the slider. */
   marks?: readonly SliderMark[];
@@ -42,6 +48,7 @@ export function Slider({
     <div className="slider-field w-full">
       <SliderPrimitive.Root
         id={id}
+        onKeyDown={onKeyDown}
         data-dragging={dragging && !disabled ? '' : undefined}
         onPointerDownCapture={(event) => {
           if (!disabled && event.button === 0) setDragging(true);
@@ -64,6 +71,7 @@ export function Slider({
         </SliderPrimitive.Track>
         <SliderPrimitive.Thumb
           aria-label={label}
+          aria-valuetext={valueText}
           className="control-slider-thumb relative block h-5 rounded-full"
         />
       </SliderPrimitive.Root>

@@ -122,6 +122,10 @@ export default function App() {
     document: editorDocument,
     documentKey,
   } = usePhotoSession();
+  const viewKeys = useMemo(
+    () => session.items.map((item) => item.id),
+    [session.items],
+  );
   const historyActions = useMemo(
     () => ({ beginEdit, finishEdit, finishTyping, cancelEdit }),
     [beginEdit, finishEdit, finishTyping, cancelEdit],
@@ -514,6 +518,7 @@ export default function App() {
             sessionDocument={editorDocument}
             onDocumentChange={updateDocument}
             documentKey={documentKey}
+            viewKeys={viewKeys}
             historyActions={historyActions}
             settingsFeedback={settingsFeedback}
             sidebarFooter={

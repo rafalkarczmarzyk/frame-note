@@ -40,6 +40,9 @@ export const Active: Story = { args: { active: true } };
 export const Pixels: Story = {
   args: { unitLabel: 'px', pixelsPerUnit: 0.08, active: true },
 };
+export const VisibleRange: Story = {
+  args: { unitLabel: 'px', pixelsPerUnit: 1, startUnit: 740, active: true },
+};
 export const Small: Story = { args: { length: 120 } };
 export const ScaleDensity: Story = {
   render: (args) => (

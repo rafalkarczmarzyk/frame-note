@@ -11,6 +11,22 @@ see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 
 ## Unreleased
 
+## [0.7.0-beta] - 2026-11-04
+
+### Added
+
+- Photo Navigator with a composition overview, a draggable viewport outline,
+  Fit/100% controls and a numeric zoom field in the editor sidebar.
+- Logarithmic zoom up to 800% with whole percentages for manual changes and
+  one-point numeric steps. Fit retains its precise fractional scale; 100% maps
+  one image pixel to one CSS pixel, including on Retina displays.
+- Independent zoom and pan for each open photo, Z to switch recent zoom settings,
+  Space-drag or middle-button pan, and cursor-centered Cmd-wheel zoom on macOS
+  or Ctrl-wheel zoom on Windows/Linux. Rulers follow the visible photo region.
+
+View navigation does not change photo settings, edit history, exported JPGs or
+preset format v1. View settings remain in memory for the current session.
+
 ## [0.6.1-beta] - 2026-11-04
 
 ### Fixed

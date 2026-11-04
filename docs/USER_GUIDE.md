@@ -37,6 +37,44 @@
   encoded file size, choose which supported metadata groups to keep, and download
   the prepared result. Preview and export share layout calculations.
 
+## Navigating the photo
+
+Navigator sits at the top of the tools sidebar. Its overview includes the photo
+and visible layers; the outline marks the part currently visible in the editor.
+Drag inside the outline to move it, or click elsewhere in the overview to center
+on that point. Empty space around the overview does nothing.
+
+- **Fit** shows the whole composition without enlarging small photos.
+- **100%** maps one image pixel to one CSS pixel, including on Retina displays.
+- The percentage field shows the current zoom and accepts a typed value. Its
+  arrows change zoom by one percentage point. Fit and 100% highlight their
+  active states; these controls share one input group.
+- Manual changes from the slider, percentage field or scrolling round to whole
+  percentages. Fit keeps its exact fractional scale. Tiny wheel/pinch deltas
+  accumulate until the next whole percentage instead of being discarded.
+- The slider uses a logarithmic scale. The zoom buttons step through fixed levels,
+  up to 800%. The manual minimum rounds the smaller of Fit/25% up to a whole
+  percentage; Fit can sit just below that manual minimum.
+- **Z** switches between the last two zoom settings. Consecutive numeric-field, slider, wheel
+  and zoom-button changes form one action, even with pauses. Panning, choosing a
+  preset, using another tool or leaving the window ends that action.
+- Hold **Space** and drag with the left mouse button, or drag with the middle
+  mouse button, to pan. Press Escape during a pan to restore its starting point.
+- Scroll or use two fingers to pan. Shift with vertical scrolling pans
+  horizontally. **Cmd + wheel** on macOS and **Ctrl + wheel** on Windows/Linux
+  zoom around the cursor; browsers also supply trackpad pinch as Ctrl + wheel.
+  Gesture delivery depends on the browser and device.
+
+Rulers follow the top and left photo edges, then stay at the viewport boundary
+when those edges move out of view. Offscreen margin handles remain offscreen;
+use the sidebar fields to adjust them. Navigation shortcuts leave text fields,
+open menus and dialogs to their normal keyboard handling.
+
+Each open photo remembers its own zoom, pan and recent zoom settings for this
+session. The panel's collapsed state is shared. Closing the
+session discards view settings. Navigation does not change layers, Undo/Redo,
+presets or exported JPGs.
+
 ## Create your first caption
 
 FrameNote opens into an empty editor with a photo-selection button, JPG/PNG drop
@@ -198,4 +236,4 @@ paths before importing. The editor limits active image content to 100 images.
   locks editing until it finishes or cancellation completes.
 - Session copies of source photos remain until closed or the app reloads.
   Large rolls can consume substantial memory/storage; no unlimited-series guarantee.
-- Zoom/pan remains outside the current scope. For desktop installation and update notifications, see [desktop setup and packaging](DESKTOP.md).
+- For desktop installation and update notifications, see [desktop setup and packaging](DESKTOP.md).

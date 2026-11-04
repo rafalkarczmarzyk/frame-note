@@ -10,7 +10,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Primary and outline actions. Icon content inherits currentColor; className allows Tailwind overrides.',
+          'Primary and outline actions, plus segment actions inside a shared input group. Icon content inherits currentColor; className allows Tailwind overrides.',
       },
     },
   },
@@ -68,6 +68,26 @@ export const Variants: Story = {
         Icon only: 18 / 16 px. Icon with label: 14 / 12 px. Standalone /
         grouped.
       </p>
+    </div>
+  ),
+};
+
+export const SegmentActions: Story = {
+  render: () => (
+    <div
+      role="group"
+      aria-label="Zoom presets"
+      className="control-segments inline-flex gap-1"
+    >
+      <Button variant="segment" aria-pressed>
+        Fit
+      </Button>
+      <Button variant="segment" aria-pressed={false}>
+        100%
+      </Button>
+      <Button variant="segment" disabled>
+        Disabled
+      </Button>
     </div>
   ),
 };

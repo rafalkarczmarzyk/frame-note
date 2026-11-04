@@ -43,7 +43,14 @@ export function HistoryInteractions({
       className="contents"
       onPointerDownCapture={(event) => {
         const target = event.target as Element;
-        if (target.closest('.caption-content-editor')) return;
+        if (
+          target.closest(
+            '.caption-content-editor, [data-photo-view-controls]',
+          ) ||
+          event.button === 1 ||
+          target.closest('[data-view-pan-intent="true"]')
+        )
+          return;
         actions?.finishEdit();
         if (
           target.closest(
@@ -55,6 +62,8 @@ export function HistoryInteractions({
         }
       }}
       onFocusCapture={(event) => {
+        if ((event.target as Element).closest('[data-photo-view-controls]'))
+          return;
         if (
           event.target instanceof HTMLInputElement &&
           (event.target.type === 'number' ||
@@ -63,6 +72,8 @@ export function HistoryInteractions({
           actions?.beginEdit('Change value', 'number');
       }}
       onBlur={(event) => {
+        if ((event.target as Element).closest('[data-photo-view-controls]'))
+          return;
         if (
           event.target instanceof HTMLInputElement &&
           (event.target.type === 'number' ||
@@ -71,6 +82,8 @@ export function HistoryInteractions({
           actions?.finishEdit();
       }}
       onKeyDownCapture={(event) => {
+        if ((event.target as Element).closest('[data-photo-view-controls]'))
+          return;
         if (
           event.target instanceof HTMLInputElement &&
           (event.target.type === 'number' ||
@@ -92,6 +105,8 @@ export function HistoryInteractions({
           actions?.beginEdit('Adjust value', 'slider-key');
       }}
       onKeyUp={(event) => {
+        if ((event.target as Element).closest('[data-photo-view-controls]'))
+          return;
         if ((event.target as Element).getAttribute('role') === 'slider')
           actions?.finishEdit();
       }}

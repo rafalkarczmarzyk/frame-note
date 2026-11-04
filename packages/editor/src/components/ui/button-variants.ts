@@ -7,6 +7,7 @@ export const buttonVariants = cva(
       variant: {
         default: 'button-primary',
         outline: 'control-neutral',
+        segment: 'control-segment text-xs',
       },
       size: { default: 'control-height px-4', sm: 'control-height px-3' },
       color: {

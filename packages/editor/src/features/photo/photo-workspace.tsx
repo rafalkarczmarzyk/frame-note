@@ -1,3 +1,7 @@
+import type Konva from 'konva';
+import { PhotoNavigator } from './photo-navigator';
+import { usePhotoView } from './use-photo-view';
+import { useCompositionOverview } from './use-composition-overview';
 import {
   HistoryInteractions,
   type HistoryActions,
@@ -110,7 +114,14 @@ import {
 } from '../caption/caption-controls';
 import { Button } from '@/components/ui/button';
 import { captionConfig, exportName } from '../caption/render';
-import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+} from 'react';
 import {
   Stage,
   Layer,
@@ -151,6 +162,7 @@ function PhotoWorkspaceContent({
   sessionDocument,
   onDocumentChange,
   documentKey,
+  viewKeys,
   filmRoll,
   batchBusy = false,
   onExportAll,
@@ -174,6 +186,7 @@ function PhotoWorkspaceContent({
     options?: EditOptions,
   ) => void;
   documentKey?: string;
+  viewKeys?: readonly string[];
   filmRoll?: ReactNode;
   batchBusy?: boolean;
   onExportAll?: (options: RollExportOptions) => void;
@@ -195,6 +208,7 @@ function PhotoWorkspaceContent({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const host = useRef<HTMLDivElement>(null);
+  const sceneRef = useRef<Konva.Group>(null);
   const editorRef = useRef<Editor | null>(null);
   const editorReady = useCallback((editor: Editor | null) => {
     editorRef.current = editor;
@@ -568,12 +582,78 @@ function PhotoWorkspaceContent({
     };
   }, [photo, previewReady, onPreviewReady]);
   const { width, height } = dimensions;
-  const scale = Math.min(
-    Math.max(1, size.width - 56) / width,
-    Math.max(1, size.height - 56) / height,
-    1,
+  const viewport = useMemo(
+    () => ({
+      width: Math.max(1, size.width - 56),
+      height: Math.max(1, size.height - 56),
+    }),
+    [size.width, size.height],
   );
-  const previewY = (size.height - height * scale) / 2;
+  const overviewIdentity = useMemo(
+    () => ({ photo, composition }),
+    [photo, composition],
+  );
+  const overview = useCompositionOverview(
+    sceneRef,
+    dimensions,
+    !!photo && previewReady && !loading,
+    overviewIdentity,
+    iconImages,
+    glassPreview.tiles,
+    photo,
+  );
+  const navigation = usePhotoView({
+    host,
+    photo: dimensions,
+    viewport,
+    documentKey: documentKey ?? photo?.image.src ?? 'empty',
+    disabled:
+      !photo ||
+      loading ||
+      exporting ||
+      !previewReady ||
+      !!assetError ||
+      !!fontError ||
+      !!overview.error ||
+      !overview.preview,
+    liveKeys: viewKeys,
+  });
+  const { scale, x: viewX, y: viewY } = navigation.state.view;
+  const stopLayerDrag = useCallback(() => {
+    let stopped = false;
+    sceneRef.current?.find('Group').forEach((node) => {
+      if (node.isDragging()) {
+        node.stopDrag();
+        stopped = true;
+      }
+    });
+    if (stopped) {
+      historyActions?.finishEdit();
+    }
+  }, [historyActions]);
+  useLayoutEffect(() => {
+    stopLayerDrag();
+  }, [stopLayerDrag, documentKey, size.width, size.height, loading, exporting]);
+  useEffect(() => {
+    const node = host.current;
+    window.addEventListener('blur', stopLayerDrag);
+    node?.addEventListener('pointercancel', stopLayerDrag);
+    return () => {
+      window.removeEventListener('blur', stopLayerDrag);
+      node?.removeEventListener('pointercancel', stopLayerDrag);
+    };
+  }, [stopLayerDrag]);
+  useLayoutEffect(() => {
+    const layer = sceneRef.current?.getLayer();
+    if (layer) {
+      layer.getCanvas().setPixelRatio(navigation.pixelRatio);
+      layer.batchDraw();
+    }
+    stopLayerDrag();
+  }, [navigation.pixelRatio, photo, stopLayerDrag]);
+  const previewX = 28 + viewX;
+  const previewY = 28 + viewY;
+  const overviewStart = useRef<{ x: number; y: number } | null>(null);
   const preparingExport =
     !!photo && !prepared.blob && !prepared.error && !fontError && !assetError;
   const exportLabel =
@@ -625,8 +705,16 @@ function PhotoWorkspaceContent({
         <div
           ref={host}
           data-photo-canvas
+          data-view-pan-intent={!!navigation.cursor}
+          data-view-scale={scale}
+          data-view-x={viewX}
+          data-view-y={viewY}
+          data-view-mode={navigation.state.setting === 'fit' ? 'fit' : 'manual'}
+          tabIndex={photo ? 0 : undefined}
+          aria-label="Photo viewport"
+          style={{ cursor: navigation.cursor, overflow: 'hidden' }}
           data-glass-ready={glassPreview.tiles ? 'true' : 'false'}
-          className="relative flex min-h-[40vh] min-w-0 flex-1 flex-col bg-workspace-base md:min-h-0"
+          className="relative flex min-h-[40vh] min-w-0 flex-1 flex-col bg-workspace-base outline-none md:min-h-0"
         >
           {settingsFeedback && (
             <div
@@ -657,9 +745,15 @@ function PhotoWorkspaceContent({
                 aria-label={`Photo preview: ${photo.document.photo.name}`}
               >
                 <Stage width={size.width} height={size.height}>
-                  <Layer>
+                  <Layer
+                    clipX={28}
+                    clipY={28}
+                    clipWidth={viewport.width}
+                    clipHeight={viewport.height}
+                  >
                     <Group
-                      x={(size.width - width * scale) / 2}
+                      ref={sceneRef}
+                      x={previewX}
                       y={previewY}
                       scaleX={scale}
                       scaleY={scale}
@@ -675,7 +769,15 @@ function PhotoWorkspaceContent({
                         listening={false}
                       />
                       <CanvasImage
-                        image={photo.previewImage ?? photo.image}
+                        image={
+                          scale * navigation.pixelRatio >
+                          Math.min(
+                            (photo.previewImage?.width ?? width) / width,
+                            (photo.previewImage?.height ?? height) / height,
+                          )
+                            ? photo.image
+                            : (photo.previewImage ?? photo.image)
+                        }
                         width={width}
                         height={height}
                       />
@@ -743,7 +845,12 @@ function PhotoWorkspaceContent({
                                   height,
                                 });
                             return (
-                              <Group key={id}>
+                              <Group
+                                key={id}
+                                name={
+                                  placeholder ? 'editor-placeholder' : undefined
+                                }
+                              >
                                 {!placeholder &&
                                   (text.trim() || caption.logo) &&
                                   caption.background?.type !== 'none' &&
@@ -768,7 +875,7 @@ function PhotoWorkspaceContent({
                                     placeholder ? 0.4 : caption.style.opacity
                                   }
                                   listening
-                                  draggable={!exporting}
+                                  draggable={!exporting && !navigation.cursor}
                                   onDragStart={() => {
                                     selectContainer(id);
                                     setDraggingId(id);
@@ -869,6 +976,7 @@ function PhotoWorkspaceContent({
                                   draggingId === id) &&
                                   (text || placeholder || caption.logo) && (
                                     <Rect
+                                      name="navigator-decoration"
                                       x={decoration.x - 4 / scale}
                                       y={decoration.y - 4 / scale}
                                       width={decoration.width + 8 / scale}
@@ -887,6 +995,7 @@ function PhotoWorkspaceContent({
                                   !draggingId &&
                                   (text || placeholder || caption.logo) && (
                                     <Group
+                                      name="navigator-decoration"
                                       listening={false}
                                       x={Math.max(
                                         0,
@@ -948,7 +1057,9 @@ function PhotoWorkspaceContent({
                 </Stage>
               </div>
               <MarginRulers
-                disabled={exporting}
+                key={`${documentKey ?? photo.image.src}:${navigation.pixelRatio}`}
+                disabled={exporting || loading}
+                viewport={{ x: 28, y: 28, ...viewport }}
                 onChange={(margins) =>
                   setLayout((value) => ({ ...value, margins }))
                 }
@@ -957,7 +1068,7 @@ function PhotoWorkspaceContent({
                 margins={layout.margins}
                 linkMode={layout.marginLinkMode}
                 scale={scale}
-                x={(size.width - width * scale) / 2}
+                x={previewX}
                 y={previewY}
               />
             </>
@@ -1103,6 +1214,40 @@ function PhotoWorkspaceContent({
           )}
           inert={exporting || undefined}
         >
+          <PhotoNavigator
+            photo={dimensions}
+            viewport={viewport}
+            view={navigation.state.view}
+            preview={overview.preview}
+            mode={navigation.state.setting === 'fit' ? 'fit' : 'manual'}
+            status={
+              !photo
+                ? loading
+                  ? 'busy'
+                  : 'empty'
+                : assetError || fontError || overview.error
+                  ? 'error'
+                  : loading || exporting || !previewReady || !overview.preview
+                    ? 'busy'
+                    : 'ready'
+            }
+            onZoom={(setting, manual) => {
+              if (!draggingId && !navigation.editingDrag.current)
+                navigation.zoom(setting, manual);
+            }}
+            onPan={navigation.session.pan}
+            onPanStart={() => {
+              navigation.beginOverviewPan();
+              overviewStart.current = { x: viewX, y: viewY };
+            }}
+            onPanCancel={() => {
+              if (overviewStart.current)
+                navigation.session.pan(
+                  overviewStart.current.x,
+                  overviewStart.current.y,
+                );
+            }}
+          />
           <SidebarSection
             id="photo"
             title="Photo info"

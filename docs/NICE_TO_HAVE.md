@@ -38,7 +38,10 @@ Wpływ: web/desktop, model warstw, podgląd i eksport seryjny.
 
 ### Powiększanie i przesuwanie widoku
 
-Status: **zakres 1.0** (decyzja 2026-11-04).
+Status: **zakres 1.0 — integracja do oceny** (2026-11-04).
+Stan etapów i wyniki weryfikacji: [plan Navigatora](plans/photo-navigator.md).
+Makieta zaakceptowana; Navigator jest podłączony do edytora web/desktop.
+Końcowy odbiór funkcji pozostaje otwarty.
 
 Decyzja: 2026-11-04, burza mózgów o ramkach do zdjęć. Osobny pomysł na
 powiększanie i przesuwanie widoku zdjęcia, z suwakiem powiększenia podobnym

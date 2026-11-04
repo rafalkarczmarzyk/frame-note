@@ -50,6 +50,7 @@ test('prepared photo session', async ({ page }) => {
   await page.getByRole('button', { name: 'Undo', exact: true }).click();
   for (let i = 0; i < 2; i++)
     await page.getByRole('button', { name: 'Add layer', exact: true }).click();
+  await page.locator('[data-photo-view-controls]').scrollIntoViewIfNeeded();
   await ready(page);
   await shot(page, 'window');
 });
@@ -107,6 +108,9 @@ test('graphic settings', async ({ page }) => {
   await expect(
     page.getByLabel('Selected image settings', { exact: true }),
   ).toBeVisible();
+  await page
+    .getByLabel('Selected image settings', { exact: true })
+    .scrollIntoViewIfNeeded();
   await editor.focus();
   await shot(page, 'window');
 });

@@ -610,6 +610,7 @@
     color: var(--segment-selected-text);
   }
   .control-segment[data-state='on'],
+  .control-segment[aria-pressed='true'],
   .control-segment.control-selected {
     background-color: var(--segment-selected);
     background-image: var(--segment-reflection);
@@ -618,6 +619,7 @@
   }
 
   .control-segment[data-state='on']:hover:not(:disabled),
+  .control-segment[aria-pressed='true']:hover:not(:disabled),
   .control-segment.control-selected:hover:not(:disabled) {
     background-color: var(--segment-selected-hover);
   }

@@ -27,8 +27,10 @@ metadanymi aparatów, profilami kolorów ani dowolnym SVG.
 
 Nie ma edycji RAW, integracji uruchamianej z Lightroom, synchronizacji chmurowej,
 odtwarzania niezapisanej sesji ani automatycznego zawijania/zmniejszania tekstu.
-Styl jest wspólny dla całej warstwy. Zoom/pan i formatowanie fragmentów tekstu
-nie należą do obecnych możliwości. Rozmyte tło całego edytora i przezroczystość
+Styl jest wspólny dla całej warstwy; formatowanie fragmentów tekstu nie należy
+do obecnych możliwości. Navigator powiększa i przesuwa wyłącznie widok edytora,
+bez zmiany kompozycji i eksportu. Stan widoku jest niezależny dla zdjęć
+i pozostaje w pamięci otwartej sesji. Rozmyte tło całego edytora i przezroczystość
 całego edytora odrzucono jako rozpraszające; nie przywracać bez nowej decyzji.
 
 ## Gdzie szukać szczegółów

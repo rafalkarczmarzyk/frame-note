@@ -113,6 +113,17 @@ zaznaczenia samym kolorem tekstu ani nie powielaj osobnej palety w feature.
 Przykłady: `packages/editor/src/features/layers/layer-list.tsx`, `packages/editor/src/components/ui/picker-list.tsx`
 i kompozycje `Screens/TestPhotos`.
 
+### Navigator
+
+`features/photo/photo-navigator.tsx` składa SidebarSection, Button w wariancie `segment`,
+InlineInputGroup, NumberField z jednostką %, IconButton i Slider. Fit, 100% oraz
+pole zoomu dzielą powierzchnię grupy; `aria-pressed` wyróżnia aktywne przyciski. Sekcja na początku sidebara zachowuje miejsce miniatury
+w stanach empty/busy/error. Kontrolki nawigacji nie należą do historii dokumentu.
+Miniatura pochodzi z tego samego drzewa kompozycji co podgląd, bez zaznaczeń;
+zoom i pan aktualizują wyłącznie obrys. Ruler przyjmuje `startUnit`, aby rysować
+widoczny zakres bez rozbudowywania powierzchni canvasu.
+Story: **Photo session/Photo Navigator**; pełny edytor: **Screens/TestPhotos**.
+
 ### Film roll i sesja zdjęć
 
 Film roll jest nawigacją po zdjęciach otwartej sesji. Klatka wskazuje aktywne
