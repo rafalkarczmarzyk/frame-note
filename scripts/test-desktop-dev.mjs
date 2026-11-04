@@ -63,7 +63,7 @@ try {
     ],
     {
       cwd: process.cwd(),
-      env: process.env,
+      env: { ...process.env, FRAMENOTE_TEST_UPDATE_FEED: '1' },
       stdio: ['ignore', 'pipe', 'pipe'],
     },
   );
@@ -137,7 +137,7 @@ try {
     ],
     {
       cwd: process.cwd(),
-      env: process.env,
+      env: { ...process.env, FRAMENOTE_TEST_UPDATE_FEED: '1' },
       stdio: ['ignore', 'pipe', 'pipe'],
     },
   );

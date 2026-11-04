@@ -38,7 +38,7 @@ menu. Web opens About only when requested.
 
 ## Updates
 
-Desktop checks GitHub releases at startup by default; turn this off in Settings. A newer version produces a persistent,
+Desktop checks the public GitHub releases Atom feed at every startup by default; turn this off in Settings. A newer version produces a persistent,
 dismissible notice at the top of the workspace. **View release** opens that
 release in the system browser; download and replace the app manually.
 **FrameNote → Check for Updates…** also starts a check. There is no automatic

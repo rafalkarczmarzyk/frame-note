@@ -15,7 +15,7 @@ const { pathToFileURL } = require('node:url');
 const fs = require('node:fs');
 const { execFile } = require('node:child_process');
 const runFile = require('node:util').promisify(execFile);
-const { checkForUpdates } = require('./update-check.cjs');
+const { requestUpdate } = require('./update-check.cjs');
 const { restoreWindowGeometry } = require('./window-geometry.cjs');
 let systemFonts;
 app.setName('FrameNote');
@@ -174,23 +174,7 @@ app.whenReady().then(async () => {
   });
   ipcMain.handle('updates-check', async (event) => {
     if (!trusted(event)) throw Error('Untrusted update request.');
-    try {
-      const response = await fetch(
-        'https://api.github.com/repos/rafalkarczmarzyk/frame-note/releases?per_page=30',
-        {
-          headers: {
-            Accept: 'application/vnd.github+json',
-            'X-GitHub-Api-Version': '2022-11-28',
-          },
-          signal: AbortSignal.timeout(8000),
-        },
-      );
-      if (!response.ok) return { status: 'error' };
-      const release = checkForUpdates(await response.json(), app.getVersion());
-      return release ? { status: 'available', release } : { status: 'current' };
-    } catch {
-      return { status: 'error' };
-    }
+    return requestUpdate(app.getVersion());
   });
   ipcMain.handle('updates-open-release', (event, url) => {
     if (

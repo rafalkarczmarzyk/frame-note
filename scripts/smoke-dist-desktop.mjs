@@ -13,7 +13,7 @@ const executables = {
   linux: 'release/ci/linux-unpacked/framenote',
 };
 const profile = await mkdtemp(join(tmpdir(), 'framenote-dist-smoke-'));
-const env = { ...process.env };
+const env = { ...process.env, FRAMENOTE_TEST_UPDATE_FEED: '1' };
 delete env.ELECTRON_RUN_AS_NODE;
 let app;
 try {

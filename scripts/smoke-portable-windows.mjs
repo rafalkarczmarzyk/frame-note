@@ -18,7 +18,7 @@ const server = createServer();
 await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
 const port = server.address().port;
 await new Promise((resolve) => server.close(resolve));
-const env = { ...process.env };
+const env = { ...process.env, FRAMENOTE_TEST_UPDATE_FEED: '1' };
 delete env.ELECTRON_RUN_AS_NODE;
 const child = spawn(
   exe,

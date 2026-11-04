@@ -11,6 +11,12 @@ see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 
 ## Unreleased
 
+### Fixed
+
+- Desktop update checks use the public GitHub Atom feed instead of the rate-limited
+  REST API, with validated release links and version ordering. Automated desktop
+  tests use a local feed without contacting GitHub for updates.
+
 ## [0.6.0-beta] - 2026-11-04
 
 ### Added

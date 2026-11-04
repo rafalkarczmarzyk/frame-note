@@ -9,7 +9,7 @@ import { resolve } from 'node:path';
 assertDesktopTestEnvironment(process.platform, process.env);
 const executable =
   process.env.FRAMENOTE_PACKAGED || (await desktopExecutable());
-const env = { ...process.env };
+const env = { ...process.env, FRAMENOTE_TEST_UPDATE_FEED: '1' };
 delete env.ELECTRON_RUN_AS_NODE;
 delete env.FRAMENOTE_DEV_SERVER_URL;
 const profileRoot = await mkdtemp(resolve(tmpdir(), 'framenote-profile-'));
@@ -46,6 +46,9 @@ try {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.waitForLoadState('networkidle');
+  expect(
+    await page.evaluate(() => window.frameNoteDesktop.checkUpdates()),
+  ).toEqual({ status: 'current' });
   const startupAboutClose = page.getByRole('button', {
     name: 'Close about FrameNote',
     exact: true,

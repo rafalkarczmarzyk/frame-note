@@ -24,7 +24,7 @@ export async function checkDesktopConfiguration({ executable, env }) {
         ...(process.env.FRAMENOTE_PACKAGED ? [] : [resolve('apps/desktop')]),
         `--user-data-dir=${profile}`,
       ],
-      env,
+      env: { ...env, FRAMENOTE_TEST_UPDATE_FEED: '1' },
     });
     const page = await app.firstWindow();
     await page.waitForLoadState('networkidle');
@@ -212,10 +212,17 @@ export async function checkDesktopConfiguration({ executable, env }) {
     // Manual update checking remains available with startup checking disabled.
     await app.evaluate(() => {
       globalThis.updateRequests = 0;
+      // Exercise transport counting using this local stub, never the network.
       globalThis.fetch = async () => {
         globalThis.updateRequests++;
-        return { ok: true, json: async () => [] };
+        return {
+          ok: true,
+          text: async () => '<feed xmlns="http://www.w3.org/2005/Atom"/>',
+        };
       };
+    });
+    await app.evaluate(() => {
+      process.env.FRAMENOTE_TEST_UPDATE_FEED = '0';
     });
     await page.reload();
     await page.waitForLoadState('networkidle');

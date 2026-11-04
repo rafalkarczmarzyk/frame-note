@@ -160,6 +160,11 @@ pnpm desktop:compile
 pnpm test:desktop
 ```
 
+Native test launchers set `FRAMENOTE_TEST_UPDATE_FEED=1` before application startup,
+including restarts and distribution smoke tests. The update checker then uses a
+local empty Atom feed and never sends update requests to GitHub. Unit tests inject
+local feed responses for available versions, malformed data and network errors.
+
 Run desktop and browser tests sequentially. In Codex the first desktop test
 attempt requires elevated execution; never remove environment markers to bypass
 the guard. See [desktop test requirements](../AGENTS.md#uruchamianie-desktopu-w-testach).
