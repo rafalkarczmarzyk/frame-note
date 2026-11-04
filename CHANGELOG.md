@@ -11,18 +11,22 @@ see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 
 ## Unreleased
 
+## [0.6.0-beta] - 2026-11-04
+
 ### Added
 
-- Show About once on the first desktop launch of each product version, remembering
-  the displayed version in the application profile without a Settings option.
-
-- Desktop configuration in `~/FrameNote/config.json` (format v1), preserving
-  export quality and metadata removal preferences, configurable undo history,
-  optional startup update checks, and opt-in window position, size and maximization restoration (off by default). Invalid or unsupported files are preserved.
-- Desktop Settings dialog in the application menu (Cmd+, on macOS), with draft
-  editing, validation, defaults restoration and configuration file reveal. Settings
-  uses grouped option rows, info tooltips, a draggable numeric history control,
-  and an X button that discards changes like Cancel.
+- Desktop Settings in the application menu (Cmd+, on macOS), with grouped options,
+  info tooltips, a draggable undo-step control, draft editing, save validation,
+  defaults restoration, and X/Cancel/Escape to discard changes.
+- Desktop configuration in `~/FrameNote/config.json` (format v1), remembering JPG
+  quality and metadata removal, a configurable 1–1000-step history limit, startup
+  update checks, and optional window position, size and maximization restoration
+  (off by default). Existing JPG quality is imported from the desktop profile
+  when the file is first created. Invalid or unsupported files are preserved;
+  replacing an invalid file requires confirmation and keeps a backup.
+- About appears once on the first desktop launch of each product version. The
+  displayed version is remembered in the profile, independently of build IDs
+  and configuration settings. Manual About remains available.
 
 ## [0.5.0-beta] - 2026-11-04
 
