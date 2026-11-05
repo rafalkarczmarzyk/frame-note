@@ -1,3 +1,4 @@
+import { isPresetModified } from './preset-modified';
 import { platform } from '@/lib/platform';
 import { AsyncPresetStore } from './async-preset-store';
 import { createId } from '@/lib/create-id';
@@ -5,8 +6,9 @@ import { PresetToolbar } from './preset-toolbar';
 import { CategoryFilter } from '@/components/ui/category-filter';
 import { PickerList } from '@/components/ui/picker-list';
 import { builtinPresets } from '@/domain/builtin-presets';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import {
+  RotateCcw,
   Download,
   Upload,
   Save,
@@ -16,6 +18,7 @@ import {
   Pencil,
   X,
 } from 'lucide-react';
+import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Field } from '@/components/ui/field';
@@ -65,6 +68,9 @@ export function PresetControls({
   const actionHost = toolbarHost ?? document.getElementById('preset-actions');
   const importInput = useRef<HTMLInputElement>(null);
   const [error, setError] = useState('');
+  const [pendingPreset, setPendingPreset] = useState<LayoutPreset | null>(null);
+  const discardTitle = useId();
+  const discardDescription = useId();
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('all');
   const revealPresets = () => {
@@ -131,16 +137,7 @@ export function PresetControls({
     .filter((group) => group.presets.length > 0);
   const current = allPresets.find((preset) => preset.id === selected);
   const builtin = builtinPresets.some((preset) => preset.id === selected);
-  const dirty =
-    current &&
-    JSON.stringify(
-      createPreset(
-        current.id,
-        current.name,
-        { ...layout, activeId: current.layout.activeId },
-        icons,
-      ),
-    ) !== JSON.stringify(current);
+  const dirty = isPresetModified(current, layout, icons);
   const startCopy = () => {
     setRenameId(null);
     setName(current ? copyPresetName(current.name) : '');
@@ -190,6 +187,10 @@ export function PresetControls({
     setNaming(false);
     setError('');
     onApply(structuredClone(preset));
+  };
+  const requestApply = (preset: LayoutPreset) => {
+    if (dirty) setPendingPreset(preset);
+    else apply(preset);
   };
   const form = naming && (
     <form
@@ -261,13 +262,21 @@ export function PresetControls({
               separatorBefore: index === builtinPresets.length,
             }))}
             onSelect={(id) =>
-              apply(allPresets.find((preset) => preset.id === id)!)
+              requestApply(allPresets.find((preset) => preset.id === id)!)
             }
             modified={!!dirty}
             disabled={disabled}
             saveDisabled={!!current && !builtin && !dirty}
             onSave={() => (current && !builtin ? save(true) : startCopy())}
             items={[
+              {
+                label: 'Reset to saved',
+                icon: <RotateCcw />,
+                disabled: disabled || !current || !dirty,
+                onSelect: () => {
+                  if (current) requestApply(current);
+                },
+              },
               {
                 label: 'Save as new',
                 icon: <Save />,
@@ -534,7 +543,8 @@ export function PresetControls({
                     ),
                   }))}
                   onChoose={(id) => {
-                    if (!disabled) apply(allPresets.find((p) => p.id === id)!);
+                    if (!disabled)
+                      requestApply(allPresets.find((p) => p.id === id)!);
                   }}
                 />
               </section>
@@ -542,6 +552,43 @@ export function PresetControls({
           </FloatingPanel>,
           panelHost,
         )}
+      {pendingPreset && (
+        <Modal
+          titleId={discardTitle}
+          descriptionId={discardDescription}
+          onClose={() => setPendingPreset(null)}
+        >
+          <div className="space-y-4 p-8">
+            <h2
+              id={discardTitle}
+              className="font-display text-xl font-semibold"
+            >
+              Discard unsaved changes?
+            </h2>
+            <p
+              id={discardDescription}
+              className="text-sm text-content-secondary"
+            >
+              Unsaved changes will be lost. Apply “{pendingPreset.name}” from
+              its saved version?
+            </p>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setPendingPreset(null)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  const preset = pendingPreset;
+                  setPendingPreset(null);
+                  apply(preset);
+                }}
+              >
+                Discard changes
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
       <input
         ref={importInput}
         type="file"
@@ -567,7 +614,7 @@ export function PresetControls({
             );
             if (await store((latest) => [...latest, preset])) {
               revealPresets();
-              apply(preset);
+              requestApply(preset);
             }
           } catch (cause) {
             setError(

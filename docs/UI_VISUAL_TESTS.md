@@ -69,3 +69,19 @@ Otwarte kontrole ręczne, nieweryfikowane przez opublikowane paczki CI:
 - Osobna ocena motywów i profili poza obecnym UI i profilem Chromium desktop.
 
 Bieżące zachowanie opisuje [instrukcja użytkownika](USER_GUIDE.md#navigating-the-photo).
+
+## Presets — weryfikacja 0.7.1-beta
+
+Ochrona niezapisanych zmian: 496 testów Vitest, eksport JPG, sześć scen Chromium,
+build web/desktop i Storybook oraz natywny smoke macOS przeszły przed wydaniem.
+Kontrole interakcji Chromium objęły gwiazdkę, zapis nowego i istniejącego presetu,
+reset własnego i wbudowanego presetu, wybór z selecta i panelu oraz zachowanie
+zmian po Cancel/Escape. Użytkownik zaakceptował etap i zlecił wydanie.
+
+Wzorzec prepared photo session zmienia tylko pasek presetów: gwiazdka przy nazwie
+zastępuje Modified. Expected/actual/diff obejrzano przed aktualizacją.
+Przy wydaniu wzorce empty editor i About zaktualizowano po obejrzeniu
+expected/actual/diff: zmienił się wyłącznie numer wersji w stopce.
+Nie rozszerzono zestawu testów ani profili. Nowy dialog obejrzano w Chromium;
+natywny smoke potwierdza ogólne działanie desktopu, bez osobnego sprawdzenia
+nowego przepływu w natywnym oknie. Zachowanie opisuje instrukcja użytkownika.

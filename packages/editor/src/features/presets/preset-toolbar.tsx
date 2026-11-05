@@ -1,5 +1,5 @@
 import { Tooltip } from '@/components/ui/tooltip';
-import type { ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
 import { Save } from 'lucide-react';
 import { Select, type SelectOption } from '@/components/ui/select';
 import { SplitButton } from '@/components/ui/split-button';
@@ -29,6 +29,16 @@ export function PresetToolbar({
   warning?: ReactNode;
   live?: boolean;
 }) {
+  const descriptionId = useId();
+  const selectedName =
+    options.find((item) => item.value === selected)?.label ?? 'Presets';
+  const displayOptions = options.map((option) => ({
+    ...option,
+    label:
+      option.value === selected && modified
+        ? `${option.label} *`
+        : option.label,
+  }));
   return (
     <div
       className="flex min-w-0 items-center gap-2"
@@ -37,15 +47,16 @@ export function PresetToolbar({
     >
       <div className="w-28 min-w-0 sm:w-44 lg:w-56 [&_button>span:first-child]:truncate">
         <Tooltip
-          overflowOnly
+          overflowOnly={!modified}
           content={
-            options.find((item) => item.value === selected)?.label ?? 'Presets'
+            modified ? `${selectedName} — Unsaved changes` : selectedName
           }
         >
           <Select
             aria-label="Saved preset"
             value={selected}
-            options={options}
+            aria-describedby={modified ? descriptionId : undefined}
+            options={displayOptions}
             onValueChange={onSelect}
             disabled={disabled}
             placeholder="Presets…"
@@ -53,17 +64,9 @@ export function PresetToolbar({
         </Tooltip>
       </div>
       {modified && (
-        <Tooltip content="The current layout has unsaved changes">
-          <span
-            role="status"
-            className="shrink-0 text-xs text-content-secondary"
-          >
-            <span className="hidden lg:inline">Modified</span>
-            <span className="lg:hidden" aria-label="Modified">
-              •
-            </span>
-          </span>
-        </Tooltip>
+        <span id={descriptionId} role="status" className="sr-only">
+          Unsaved changes
+        </span>
       )}
       <SplitButton
         variant="outline"

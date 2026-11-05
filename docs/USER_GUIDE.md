@@ -195,6 +195,13 @@ Glass preview and full-resolution JPG may differ slightly through rasterization
 and JPG compression. Performance with many overlapping Glass layers on slower
 devices has not been broadly measured.
 
+A `*` after the selected preset name means the layout has unsaved changes.
+Save the preset or use **Save as new** to keep them. Switching presets (including
+applying an imported preset) asks before discarding changes. **Cancel** keeps
+the current layout. **Reset to saved** in Preset actions restores the selected
+preset after confirmation, including built-in presets. Selection of a layer alone
+does not mark a preset as changed; undoing all edits clears the asterisk.
+
 ## Limits and export behavior
 
 | Input        | Limits                                                       |

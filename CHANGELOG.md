@@ -11,6 +11,12 @@ see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 
 ## Unreleased
 
+## [0.7.1-beta] - 2026-11-05
+
+### Changed
+
+- Mark edited presets with an asterisk, confirm before discarding unsaved layout changes, and offer Reset to saved for built-in and user presets.
+
 ## [0.7.0-beta] - 2026-11-04
 
 ### Added

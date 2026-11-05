@@ -292,7 +292,7 @@ export const Presets: Story = {
     docs: {
       description: {
         story:
-          'Save, update and transfer full layouts, including SVG logos. Presets in this story stay in memory so examples do not modify application storage.',
+          'Save, update and transfer full layouts, including SVG logos. Select a preset and edit its layout to see the unsaved asterisk. Switching presets or choosing Reset to saved asks before discarding edits; Cancel keeps them. Presets in this story stay in memory so examples do not modify application storage.',
       },
     },
   },
