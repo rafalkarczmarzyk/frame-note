@@ -1,3 +1,5 @@
+export type ExportFormat = 'jpg' | 'png';
+
 /** UI percentage to browser encoder quality. Never let out-of-range values
  * silently select the browser's default JPEG quality. */
 export function jpegQuality(percent: number): number {

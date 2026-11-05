@@ -98,6 +98,36 @@ describe('export metadata', () => {
     expect(tags.xmp?.ExposureTime?.description).toBe('1/250');
     expect(tags.xmp?.GPSLatitude?.description).toBeDefined();
   });
+  it('round-trips selected PNG metadata without leaking disabled groups', async () => {
+    const source = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLttAAAAABJRU5ErkJggg==',
+      'base64',
+    );
+    const blob = new Blob([source], { type: 'image/png' });
+    for (const camera of [true, false]) {
+      const result = await addExportMetadata(
+        blob,
+        [...fields, field('ISOSpeedRatings', 400)],
+        {
+          ...all,
+          groups: { ...all.groups, camera, location: false },
+        },
+      );
+      expect(result.type).toBe('image/png');
+      const bytes = new Uint8Array(await result.arrayBuffer());
+      expect(bytes.slice(0, 33)).toEqual(new Uint8Array(source.slice(0, 33)));
+      expect(bytes.slice(-12)).toEqual(new Uint8Array(source.slice(-12)));
+      const tags = ExifReader.load(await result.arrayBuffer(), {
+        expanded: true,
+      });
+      expect(tags.xmp?.creator?.description).toContain('A & <B>');
+      expect(tags.xmp?.Model?.description).toBe(camera ? 'Camera' : undefined);
+      expect(tags.xmp?.ISOSpeedRatings?.description).toBe(
+        camera ? '400' : undefined,
+      );
+      expect(tags.xmp?.GPSLatitude).toBeUndefined();
+    }
+  });
   it('rejects oversized metadata instead of silently losing it', async () => {
     await expect(
       addExportMetadata(

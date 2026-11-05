@@ -88,7 +88,7 @@ license reader. It does not open automatically at startup.
    through **Content → Add image**.
 3. Add layers as needed, then adjust typography, margins, stacking, and position.
 4. Save the layout as a preset if you want to reuse it with other photos.
-5. Choose JPG quality and select **Export JPG**, or **Export all** from its menu for a ZIP of the roll.
+5. Choose JPG or PNG in **Export settings**, then select **Export JPG** or **Export PNG**. JPG quality is retained when switching formats. **Export all (JPG)** creates a JPG ZIP of the roll.
 
 A caption can combine plain text and metadata tokens:
 
@@ -215,8 +215,7 @@ SVG uploads must be self-contained vector artwork. Scripts, external resources,
 embedded images, stylesheets, and text elements are rejected; convert text to
 paths before importing. The editor limits active image content to 100 images.
 
-- Export produces `*-framenote.jpg` at the decoded source dimensions, with
-  orientation applied to the pixels. JPG is re-encoded, so export is not lossless.
+- Individual export produces `*-framenote.jpg` or `*-framenote.png` at the decoded source dimensions. The format choice lasts for the current editor session; PNG preserves uncovered source transparency and has no quality slider. Orientation is applied to the pixels. JPG is re-encoded, so export is not lossless.
 - **Remove all metadata** is on by default. Turning it off exposes five groups:
   Author & copyright (initially selected), Camera & exposure, Date & time,
   Location, and Descriptions & keywords. Supported fields are written as XMP;

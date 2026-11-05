@@ -303,6 +303,7 @@ export async function addExportMetadata(
 ): Promise<Blob> {
   const xml = exportXmp(fields, options);
   if (!xml) return blob;
+  if (blob.type === 'image/png') return addPngXmp(blob, xml);
   const packet = new TextEncoder().encode(
     `http://ns.adobe.com/xap/1.0/\0${xml}`,
   );
@@ -328,4 +329,34 @@ export async function addExportMetadata(
     ],
     { type: 'image/jpeg' },
   );
+}
+
+/** PNG iTXt uses the standard uncompressed Adobe XMP keyword. */
+async function addPngXmp(blob: Blob, xml: string): Promise<Blob> {
+  const bytes = new Uint8Array(await blob.arrayBuffer());
+  const signature = [137, 80, 78, 71, 13, 10, 26, 10];
+  if (!signature.every((value, index) => bytes[index] === value))
+    throw new Error('Could not attach metadata to this PNG.');
+  const payload = new TextEncoder().encode(`XML:com.adobe.xmp\0\0\0\0\0${xml}`);
+  const chunk = new Uint8Array(payload.length + 12);
+  const view = new DataView(chunk.buffer);
+  view.setUint32(0, payload.length);
+  chunk.set(new TextEncoder().encode('iTXt'), 4);
+  chunk.set(payload, 8);
+  let crc = 0xffffffff;
+  for (const byte of chunk.subarray(4, -4)) {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit++)
+      crc = (crc >>> 1) ^ (crc & 1 ? 0xedb88320 : 0);
+  }
+  view.setUint32(chunk.length - 4, (crc ^ 0xffffffff) >>> 0);
+  // Insert immediately after IHDR, before image data and IEND.
+  if (
+    bytes.length < 33 ||
+    new TextDecoder().decode(bytes.subarray(12, 16)) !== 'IHDR'
+  )
+    throw new Error('Could not attach metadata to this PNG.');
+  return new Blob([bytes.slice(0, 33), chunk, bytes.slice(33)], {
+    type: 'image/png',
+  });
 }

@@ -9,7 +9,7 @@ import { logoLayout } from './logo-layout';
 import { inlineLayout, tintedIcon } from './inline-layout';
 import { loadIcon } from './svg-icons';
 import { toPixels } from '../../../../core/src/sizing';
-import { jpegQuality } from './export-settings';
+import { jpegQuality, type ExportFormat } from './export-settings';
 import { anchoredPosition, customPosition } from './layout';
 import Konva from 'konva';
 import type { Caption, ImageDimensions } from '../../../../core/src/document';
@@ -85,12 +85,14 @@ export async function exportPhoto(
   text: string,
   color: string,
   qualityPercent = 95,
+  format: ExportFormat = 'jpg',
 ): Promise<Blob> {
   return exportPhotoCaptions(
     image,
     dimensions,
     [{ caption, text, color }],
     qualityPercent,
+    format,
   );
 }
 
@@ -110,9 +112,10 @@ export function exportPhotoCaptions(
   dimensions: ImageDimensions,
   captions: readonly RenderedCaption[],
   qualityPercent = 95,
+  format: ExportFormat = 'jpg',
 ): Promise<Blob> {
   const job = exportChain.then(() =>
-    renderPhotoCaptions(image, dimensions, captions, qualityPercent),
+    renderPhotoCaptions(image, dimensions, captions, qualityPercent, format),
   );
   exportChain = job.then(
     () => {},
@@ -126,17 +129,26 @@ async function renderPhotoCaptions(
   dimensions: ImageDimensions,
   captions: readonly RenderedCaption[],
   qualityPercent = 95,
+  format: ExportFormat = 'jpg',
 ): Promise<Blob> {
-  return withPhotoStage(image, dimensions, captions, async (stage) => {
-    const blob = await stage.toBlob({
-      mimeType: 'image/jpeg',
-      quality: jpegQuality(qualityPercent),
-      pixelRatio: 1,
-    });
-    if (!blob || blob.size === 0 || blob.type !== 'image/jpeg')
-      throw new Error('The browser could not export this photo.');
-    return blob;
-  });
+  const mimeType = format === 'png' ? 'image/png' : 'image/jpeg';
+  return withPhotoStage(
+    image,
+    dimensions,
+    captions,
+    async (stage) => {
+      const blob = await stage.toBlob({
+        mimeType,
+        quality: format === 'jpg' ? jpegQuality(qualityPercent) : undefined,
+        pixelRatio: 1,
+      });
+      if (!blob || blob.size === 0 || blob.type !== mimeType)
+        throw new Error('The browser could not export this photo.');
+      return blob;
+    },
+    undefined,
+    format === 'jpg',
+  );
 }
 
 type BackgroundTile = NonNullable<ReturnType<typeof renderBackgroundTile>>;
@@ -180,6 +192,7 @@ async function withPhotoStage<T>(
   captions: readonly RenderedCaption[],
   consume: (stage: Konva.Stage) => T | Promise<T>,
   onDecoration?: (index: number, tile: BackgroundTile) => void,
+  matte = true,
 ): Promise<T> {
   const alphaMatte = getComputedStyle(document.documentElement)
     .getPropertyValue('--color-caption-white')
@@ -197,16 +210,17 @@ async function withPhotoStage<T>(
   try {
     const layer = new Konva.Layer();
     stage.add(layer);
-    layer.add(
-      new Konva.Rect({
-        x: 0,
-        y: 0,
-        width: dimensions.width,
-        height: dimensions.height,
-        fill: alphaMatte,
-        listening: false,
-      }),
-    );
+    if (matte)
+      layer.add(
+        new Konva.Rect({
+          x: 0,
+          y: 0,
+          width: dimensions.width,
+          height: dimensions.height,
+          fill: alphaMatte,
+          listening: false,
+        }),
+      );
     layer.add(
       new Konva.Image({
         image,
@@ -313,6 +327,6 @@ async function withPhotoStage<T>(
   }
 }
 
-export function exportName(name: string): string {
-  return name.replace(/\.(?:jpe?g|png)$/iu, '') + '-framenote.jpg';
+export function exportName(name: string, format: ExportFormat = 'jpg'): string {
+  return name.replace(/\.(?:jpe?g|png)$/iu, '') + `-framenote.${format}`;
 }

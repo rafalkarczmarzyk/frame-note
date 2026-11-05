@@ -1,3 +1,4 @@
+import type { ExportFormat } from './export-settings';
 import type { MetadataField } from '../../../../core/src/metadata';
 import {
   addExportMetadata,
@@ -13,6 +14,7 @@ export interface ExportRequest {
   dimensions: ImageDimensions;
   captions: readonly RenderedCaption[];
   quality: number;
+  format?: ExportFormat;
   metadata: readonly MetadataField[];
   metadataOptions: ExportMetadataOptions;
 }
@@ -31,6 +33,7 @@ export function usePreparedExport(
               input.dimensions,
               input.captions,
               input.quality,
+              input.format,
             ),
             input.metadata,
             input.metadataOptions,
@@ -39,6 +42,7 @@ export function usePreparedExport(
       ),
     [],
   );
+  const [attempt, setAttempt] = useState(0);
   const [result, setResult] = useState<{
     request: ExportRequest;
     blob: Blob;
@@ -51,7 +55,7 @@ export function usePreparedExport(
   if (!request && result) setResult(null);
   if (!request && failure) setFailure(null);
   useEffect(() => {
-    if (enabled && request)
+    if (enabled && request) {
       queue.schedule(
         request,
         (blob) => setResult({ request, blob }),
@@ -64,9 +68,17 @@ export function usePreparedExport(
                 : 'Could not prepare export.',
           }),
       );
+    }
     return () => queue.cancel();
-  }, [request, enabled, queue]);
+  }, [request, enabled, queue, attempt]);
   const blob = enabled && result?.request === request ? result.blob : null;
   const error = enabled && failure?.request === request ? failure.message : '';
-  return { blob, error };
+  return {
+    blob,
+    error,
+    retry: () => {
+      setFailure(null);
+      setAttempt((value) => value + 1);
+    },
+  };
 }

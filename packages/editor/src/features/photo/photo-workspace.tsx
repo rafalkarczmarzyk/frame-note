@@ -1,3 +1,4 @@
+import type { ExportFormat } from '../caption/export-settings';
 import type Konva from 'konva';
 import { PhotoNavigator } from './photo-navigator';
 import { usePhotoView } from './use-photo-view';
@@ -402,6 +403,7 @@ function PhotoWorkspaceContent({
   };
   const [singleExporting, setExporting] = useState(false);
   const exporting = singleExporting || batchBusy;
+  const [format, setFormat] = useState<ExportFormat>('jpg');
   const [quality, setQuality] = useState(readExportQuality);
   useEffect(() => storeExportQuality(quality), [quality]);
   const [metadataOptions, setMetadataOptions] = useState(() => ({
@@ -475,11 +477,12 @@ function PhotoWorkspaceContent({
             dimensions: photo.document.photo.dimensions,
             captions: exportCaptions,
             quality,
+            format,
             metadata: photo.document.photo.metadata,
             metadataOptions,
           }
         : null,
-    [photo, exportCaptions, quality, metadataOptions],
+    [photo, exportCaptions, quality, format, metadataOptions],
   );
   const fontKey = JSON.stringify(
     exportCaptions.map(({ caption, text }) => ({
@@ -542,7 +545,7 @@ function PhotoWorkspaceContent({
     try {
       await platform().saveFile(
         prepared.blob,
-        exportName(photo.document.photo.name),
+        exportName(photo.document.photo.name, format),
       );
     } catch (cause) {
       window.alert(
@@ -662,8 +665,8 @@ function PhotoWorkspaceContent({
       : loading
         ? 'Opening photos…'
         : preparingExport
-          ? 'Preparing JPG…'
-          : 'Export JPG';
+          ? `Preparing ${format.toUpperCase()}…`
+          : `Export ${format.toUpperCase()}`;
   return (
     <EditorWorkspace>
       {exportTarget &&
@@ -671,17 +674,19 @@ function PhotoWorkspaceContent({
           <span data-export-live className="inline-flex">
             <SplitButton
               size="sm"
-              aria-label="Export JPG"
+              aria-label={`Export ${format.toUpperCase()}`}
               menuLabel="Export actions"
               primaryTooltip={
-                !photo ? 'Open a photo to export a JPG' : exportLabel
+                !photo
+                  ? `Open a photo to export a ${format.toUpperCase()}`
+                  : exportLabel
               }
               primaryDisabled={!photo || !prepared.blob || exporting || loading}
               aria-busy={preparingExport || exporting || undefined}
               onClick={download}
               items={[
                 {
-                  label: 'Export all',
+                  label: format === 'png' ? 'Export all (JPG)' : 'Export all',
                   icon: <Download />,
                   disabled: !onExportAll || exporting || loading,
                   onSelect: () => onExportAll?.({ quality, metadataOptions }),
@@ -1609,50 +1614,64 @@ function PhotoWorkspaceContent({
                 </InlineNotice>
               )}
             <fieldset disabled={exporting}>
-              <h3 className="mb-3 text-xs font-semibold">Image quality</h3>
-              <label
-                className="mt-2 flex items-center justify-between text-xs"
-                htmlFor="jpeg-quality"
-              >
-                JPEG quality <span>{quality}%</span>
-              </label>
-              <div className="mt-3">
-                <SegmentedControl
-                  label="JPEG quality presets"
-                  value={String(quality)}
-                  onValueChange={(value) => setQuality(Number(value))}
-                  disabled={exporting}
-                  options={[
-                    {
-                      value: '60',
-                      label: 'Small',
-                      tooltip: 'JPEG quality · 60%',
-                    },
-                    {
-                      value: '75',
-                      label: 'Balanced',
-                      tooltip: 'JPEG quality · 75%',
-                    },
-                    {
-                      value: '95',
-                      label: 'Best',
-                      tooltip: 'JPEG quality · 95%',
-                    },
-                  ]}
-                />
-              </div>
-              <div className="mt-3">
-                <Slider
-                  id="jpeg-quality"
-                  label="JPEG quality"
-                  min={1}
-                  max={100}
-                  step={1}
-                  value={quality}
-                  onValueChange={setQuality}
-                  disabled={exporting}
-                />
-              </div>
+              <SegmentedControl
+                label="Export format"
+                value={format}
+                onValueChange={(value) => setFormat(value as ExportFormat)}
+                disabled={exporting}
+                options={[
+                  { value: 'jpg', label: 'JPG' },
+                  { value: 'png', label: 'PNG' },
+                ]}
+              />
+              {format === 'jpg' && (
+                <div className="mt-3">
+                  <h3 className="mb-3 text-xs font-semibold">Image quality</h3>
+                  <label
+                    className="mt-2 flex items-center justify-between text-xs"
+                    htmlFor="jpeg-quality"
+                  >
+                    JPEG quality <span>{quality}%</span>
+                  </label>
+                  <div className="mt-3">
+                    <SegmentedControl
+                      label="JPEG quality presets"
+                      value={String(quality)}
+                      onValueChange={(value) => setQuality(Number(value))}
+                      disabled={exporting}
+                      options={[
+                        {
+                          value: '60',
+                          label: 'Small',
+                          tooltip: 'JPEG quality · 60%',
+                        },
+                        {
+                          value: '75',
+                          label: 'Balanced',
+                          tooltip: 'JPEG quality · 75%',
+                        },
+                        {
+                          value: '95',
+                          label: 'Best',
+                          tooltip: 'JPEG quality · 95%',
+                        },
+                      ]}
+                    />
+                  </div>
+                  <div className="mt-3">
+                    <Slider
+                      id="jpeg-quality"
+                      label="JPEG quality"
+                      min={1}
+                      max={100}
+                      step={1}
+                      value={quality}
+                      onValueChange={setQuality}
+                      disabled={exporting}
+                    />
+                  </div>
+                </div>
+              )}
               <div className="mt-5 space-y-3 border-t border-border-subtle pt-4">
                 <h3 className="text-xs font-semibold">Metadata</h3>
                 <Switch
@@ -1729,13 +1748,20 @@ function PhotoWorkspaceContent({
                   prepared.blob &&
                   prepared.blob.size > photo.document.photo.byteLength && (
                     <InlineNotice tone="warning" className="mt-2">
-                      Output is larger than the original. Try a lower JPEG
-                      quality.
+                      Output is larger than the original.
+                      {format === 'jpg' && ' Try a lower JPEG quality.'}
                     </InlineNotice>
                   )}
                 {prepared.error && (
                   <p role="alert" className="mt-2 text-xs">
                     {prepared.error}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={prepared.retry}
+                    >
+                      Retry export
+                    </Button>
                   </p>
                 )}
                 <p className="mt-3 text-xs leading-5 text-content-secondary">
