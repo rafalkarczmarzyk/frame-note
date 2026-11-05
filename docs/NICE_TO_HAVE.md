@@ -3,8 +3,7 @@
 Pomysły zgłoszone przez użytkownika; nie są kolejką do automatycznej
 realizacji. Wpisy identyfikujemy nazwami, bez numeracji. Wykonane wpisy usuwamy;
 historia pozostaje w Git i changelogu. Domyślny status: **odłożone**.
-Wybrane pozycje należą do [zakresu 1.0](plans/release-1.0.md); plan opisuje
-stan realizacji i pozostałą pracę.
+Aktualny [zakres 1.0](plans/release-1.0.md) jest opisany osobno.
 
 ## Kompozycja zdjęcia
 
@@ -36,7 +35,7 @@ Wpływ: web/desktop, model warstwy, presety i eksport; brak zgody na implementac
 
 ### Zapisywanie sesji
 
-Status: **zakres 1.0** (decyzja 2026-11-04).
+Status: **odłożone poza 1.0** (decyzja 2026-11-05 po ocenie przydatności sesji).
 
 Decyzja: 2026-11-04, rozmowa o zapamiętywaniu otwartych plików i ich ustawień.
 Możliwość zapisania i przywrócenia sesji obejmującej otwarte pliki oraz ustawienia
