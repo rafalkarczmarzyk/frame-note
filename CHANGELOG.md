@@ -11,6 +11,8 @@ see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 
 ## Unreleased
 
+## [0.9.0-beta] - 2026-11-05
+
 ### Added
 
 - Repeat a whole text/artwork layer as a Grid or Staggered watermark. Set angle, spacing and photo-axis offsets, drag the pattern as one layer, and restore single-mark positioning. Preview, JPG, PNG and batch ZIP share the pattern geometry. Highlight the pattern on canvas or layer-list hover, with a distinct origin outline also available while hovering the offset fields.

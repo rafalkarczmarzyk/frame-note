@@ -38,6 +38,36 @@ Wzorce każdej sceny i profilu wymagają obejrzenia przed zaakceptowaniem zmiany
 Brak wzorca powoduje niezaliczoną weryfikację; aktualizuj go wyłącznie jawnie
 wybraną sceną i po obejrzeniu pełnego obrazu.
 
+## Tiled watermark — weryfikacja 0.9.0-beta
+
+Funkcja zaakceptowana 2026-11-05; implementacja: `27ca322`.
+Trwałe zachowanie opisują [USER_GUIDE](USER_GUIDE.md),
+[DESIGN_SYSTEM](DESIGN_SYSTEM.md) i [PRESET_FORMATS](PRESET_FORMATS.md).
+
+Przy przygotowaniu 0.9.0-beta przeszły `pnpm check`: 521 testów Vitest,
+JPG smoke, sześć scen Chromium oraz build web. Zaliczone także buildy
+Storybooka i desktopu, kontrola 96 plików fontów/licencji oraz natywny smoke
+macOS z JPG/ZIP i konfiguracją. Zależności i lockfile nie zmieniły się.
+Cztery wzorce (empty editor, font panel, metadata panel, About) zaktualizowano
+po obejrzeniu expected/actual/diff i zgodzie na publikację. Obejmują trzy tryby
+Position, prześwitywanie pod stopką i numer wersji 0.9.0-beta.
+
+Kontrole Chromium objęły domyślne Staggered/30°/12%, reset, drag przy 45°,
+offset w osiach zdjęcia, wybieranie kopii i przerwy między nimi, błąd limitu
+2000 kopii oraz hover canvasu/listy warstw/pól offsetu. Samo zaznaczenie
+nie pokazuje zielonej ramki; dekoracje nie trafiają do eksportu ani Navigatora.
+Natywny macOS potwierdził drag Tiled i jeden krok Undo/Redo bez zmiany trybu/kąta.
+
+Porównanie podglądu bez dekoracji i PNG dało identyczne piksele; pierwszy PNG
+w dwuplikowym ZIP był identyczny z pojedynczym eksportem. Sprawdzono tekst
+z SVG i PNG przy ujemnym offsecie, obecność Glass w podglądzie i PNG,
+regresję lokalnego pozycjonowania tła, migrację v1 → v2 i kopie oryginałów.
+Konwerter zachowuje źródło i odrzuca istniejący plik docelowy.
+
+Nie potwierdzono osobno ręcznego Copy/Paste między różnymi zdjęciami ani
+oceny bardzo gęstego Glass na dużych zdjęciach. Akceptacja funkcji nie jest
+potwierdzeniem wykonania tych prób. Odbiór na Windows/Linux pozostaje ręczny.
+
 ## Navigator — weryfikacja 0.7.0-beta
 
 Wydany kod: `716f083`, tag `v0.7.0-beta`. [Proces wydania](https://github.com/rafalkarczmarzyk/frame-note/actions/runs/41985599461)

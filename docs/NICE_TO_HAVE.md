@@ -24,12 +24,15 @@ zachowanie w serii. Wpływ: web/desktop, geometria zdjęcia i eksport.
 
 ### Mieszanie warstw
 
-Status: **odłożone** (2026-11-05, rozmowa przy wdrożeniu Tiled).
-Użytkownik chce na razie omówić opcje mieszania (m.in. Add, Subtract,
-Multiply), a najpierw dokończyć powtarzany watermark. Przy powrocie ustalić
-zestaw trybów, zakres działania wobec tła Glass i zgodność podglądu/eksportu.
+Status: **odłożone** (2026-11-05, decyzja po wdrożeniu Tiled).
+Tryby mieszania jako osobna zmiana dla wszystkich rodzajów warstw: tekstu,
+grafik i wzoru Tiled. Użytkownik odłożył implementację do NTH.
+Przy powrocie ustalić zestaw trybów (rozważano m.in. Add, Subtract i Multiply),
+zakres mieszania całej warstwy wobec tła Color/Glass, kontrolkę przy Opacity,
+zgodność podglądu z JPG/PNG/ZIP i wpływ na format presetów.
 Canvas ma Add (`lighter`) i Multiply, ale nie ma bezpośredniego Subtract.
-Wpływ: web/desktop, model warstwy, presety i eksport; brak zgody na implementację.
+Szczegóły i zestaw trybów nie są zatwierdzonym zakresem implementacji.
+Wpływ: web/desktop, model wszystkich warstw, presety i eksport.
 
 ## Desktop
 
