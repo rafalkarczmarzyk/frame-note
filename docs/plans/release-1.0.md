@@ -31,8 +31,9 @@ odłożone poza ten zakres.
 
 ## Eksport JPG/PNG
 
-[Wybór formatu eksportu JPG/PNG](export-formats.md) dla pojedynczego zdjęcia
-i serii do ZIP: zaimplementowany, oczekuje na odbiór użytkownika.
+Eksport JPG/PNG pojedynczych zdjęć i serii ZIP zaakceptowany do wydania
+0.8.0-beta. [Zachowanie](../USER_GUIDE.md),
+[weryfikacja](../UI_VISUAL_TESTS.md#eksport-jpgpng--weryfikacja-080-beta).
 
 ## Dalsza praca
 

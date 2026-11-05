@@ -34,14 +34,6 @@ Przy powrocie ustalić relację liczby powtórzeń do gęstości, skalowanie wzo
 do wymiarów zdjęcia oraz zapis w presetach.
 Wpływ: web/desktop, model warstw, podgląd i eksport seryjny.
 
-## Eksport
-
-### Wybór formatu eksportu
-
-Status: **zaimplementowane, czeka na odbiór do 1.0** (2026-11-05).
-
-Eksport pojedynczy i seryjny na webie i desktopie. Zakres i wyniki weryfikacji opisuje [plan eksportu JPG/PNG](plans/export-formats.md).
-
 ## Desktop
 
 ### Zapisywanie sesji

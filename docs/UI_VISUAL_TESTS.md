@@ -107,3 +107,38 @@ kontrola tokenów i zgodność manifestów przeszły.
 
 Dla przygotowanego 0.7.2-beta pełne `pnpm check` po aktualizacji wzorców oraz
 natywny smoke po ponownej kompilacji desktopu zakończyły się sukcesem.
+
+## Eksport JPG/PNG — weryfikacja 0.8.0-beta
+
+Użytkownik zlecił wydanie obu etapów eksportu 2026-11-05. Implementacja na
+`codex/export-formats`: `29d43b3` (pojedyncze zdjęcie) i `4bb7a00` (ZIP).
+Metadane PNG działają tak jak JPG: te same grupy i zapis XMP; bez dodatkowego
+natywnego eXIf. PNG zachowuje przezroczystość, bez opcji jej usuwania.
+Presety v1 pozostają bez migracji. Zachowanie opisuje instrukcja użytkownika.
+
+Przed przygotowaniem numeru wydania przeszło `pnpm check`: 74 pliki / 508 testów
+Vitest, dotychczasowy eksport JPG, sześć scen wizualnych bez zmian wzorców,
+format, lint, typy, tokeny, manifesty i build web. Build desktop i natywny smoke
+macOS również przeszły. Nowe testy obejmują odczyt XMP PNG przez ExifReader
+(model/ISO i pomijanie wyłączonych grup), nazwy PNG oraz format ustalony przy
+starcie ZIP dla mieszanych wejść i powtarzających się nazw.
+
+Kontrole rzeczywistego edytora w Chromium i macOS potwierdziły import
+`tests/fixtures/presets/v1.json`, oba formaty pojedynczo i w ZIP, poprawne
+sygnatury, rozszerzenia i nazwy z sufiksem -2. Pierwszy plik ZIP był identyczny
+bajtowo z eksportem pojedynczym; średnia różnica kanałów zdekodowanego JPG i PNG
+wyniosła 0,008/255 dla kontrolnej kompozycji. Natywny zapis PNG zachował wymiary
+5964×3976. Syntetyczne PNG 32×24 zachowało alfa=0 w nieprzykrytym pikselu.
+
+W Chromium opóźniono kodowanie canvas i zmieniono format w trakcie pracy:
+pobrano aktualne PNG, a liczba bajtów odpowiadała rozmiarowi w UI. Jednorazowy
+błąd kodera zablokował eksport; Retry przywróciło przygotowanie i przycisk.
+Przełączanie formatów w webie i desktopie zachowało wybraną jakość JPG 75%.
+Nie rozszerzono zestawu testów przeglądarkowych ani profili.
+
+Dla przygotowanego numeru 0.8.0-beta ponownie przeszły pełne `pnpm check`,
+build desktop, kontrola 96 zasobów fontów/licencji i natywny smoke macOS.
+Obejrzano expected/actual/diff empty editor i About: zmieniał się wyłącznie
+numer wersji w stopce. Zaktualizowano tylko te dwa wzorce Darwin/Chromium desktop;
+wszystkie sześć scen następnie przeszło. Manifesty i changelog zweryfikowano
+względem `v0.7.2-beta`. Publikacja wymaga dalszego kroku wydania.
