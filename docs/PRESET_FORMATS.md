@@ -1,62 +1,53 @@
-# Preset formats
+# Preset format
 
-New presets and exports use **v2**. The app reads official v1 and v2 files;
-v1 is migrated in memory without changing its layout, IDs or artwork. Older
-FrameNote versions reject v2 files. Pre-v1 development JSON remains unsupported.
-The format version is independent of the product version.
+New presets and exports use **`version: 1`**. One current
+[Zod schema](../packages/core/src/preset-schema.ts) validates every preset;
+[parsePreset](../packages/core/src/presets.ts) then normalizes missing optional
+capabilities. The schema number is independent of the application version.
+Historical development labels 2 and 3 are accepted by this same schema and
+normalized to 1 on read. No separate version schemas, migrations or file
+converter are maintained. Pre-v1 development JSON remains unsupported.
 
-The frozen schemas are [v1](../packages/core/src/preset-formats/v1.ts) and
-[v2](../packages/core/src/preset-formats/v2.ts); the v2 module also defines the
-shared v1 → v2 migration. Both paths validate embedded SVG/PNG data, colors,
-unique identifiers and the 5 MB limit. Unknown fields and future versions are
-rejected rather than silently discarded.
+## Optional capabilities and defaults
 
-## Tiled position in v2
+Missing `blending` becomes `{ "mode": "normal", "opacity": 1 }`.
+Missing `position.tiled` becomes a disabled Staggered pattern at 30°, spacing 12%,
+and zero offsets. Existing style opacity, artwork, positioning and retained
+Tiled/Blending values are preserved. New saves include both capabilities.
+Defaults apply only when a capability is absent: incomplete objects, unknown
+blend modes and invalid known values are rejected with a field path. Additional
+fields are accepted at every object level, ignored by the editor and retained
+through ordinary reads and saves, including root metadata and embedded assets.
+Current readers tolerate additional fields; historical readers may still reject
+them. A shared version number does not guarantee support for every new value
+of an existing field (for example a new blend mode).
 
-A container may include `position.tiled`:
+`blending.mode` is `normal`, `multiply`, `screen`, `soft-light` or `add`;
+`blending.opacity` is 0–1. Blending affects the entire composed layer,
+including every Tiled copy, against the photo and visible layers below.
 
-```json
-{
-  "enabled": true,
-  "pattern": "staggered",
-  "angle": -30,
-  "spacing": 12,
-  "offset": { "x": 0, "y": 0 }
-}
-```
+`position.tiled` contains `enabled`, `pattern` (`grid` or `staggered`),
+`angle` (−180 to 180 degrees), `spacing` (0–100% of the shorter photo side),
+and `offset: { x, y }` (−100–100% of that side in photo axes).
+Disabled settings are retained independently of Anchor/Manual positioning.
+Sizing-unit changes do not alter these normalized pattern values.
 
-Angle is in degrees (−180 to 180, editor step 0.1). Spacing is 0–100% of the
-shorter photo side; offsets are −100–100% of that side, always in photo axes.
-`enabled: false` retains the pattern settings while Anchor/Manual is active.
-`position.anchor` and optional `position.custom` remain independent, preserving
-the single-mark position while the pattern is enabled. Global sizing-unit
-changes do not alter these normalized pattern settings. The v1 migration adds
-no tiled settings, preserving its original positioning.
+## Reading and saving
 
-## Conversion and original data
-
-Importing a file does not modify the source. To convert files separately:
-
-```sh
-node scripts/convert-preset.mjs path/to/preset.json
-```
-
-The converter uses the application's parser and migration, validates artwork,
-and writes `preset.v2.json` next to the source. It never overwrites the source
-or an existing destination. No downgrade converter is provided.
-
-Desktop preserves a v1 file in `presets/v1-originals` before its first saved
-replacement as v2. Browser storage retains the original v1 collection under
-`framenote.presets.v1.original` before the first migrated write; the active
-storage key remains `framenote.presets.v1`. A failed backup prevents replacement.
+Import does not modify its source file. Reading a saved library normalizes it
+in memory; later saves write the current v1 shape through the ordinary storage
+path. There are no version-specific backup directories or storage keys.
+Existing recovery/backup files are not deleted. The browser key remains
+`framenote.presets.v1`; desktop files remain in `~/FrameNote/presets`.
+Validation still covers artwork, colors, unique identifiers and the 5 MB limit.
+Normal write failures preserve prior data; see recovery below.
 
 ## Example preset
 
-This complete v1 JSON represents one visible caption layer anchored at the
+This minimal v1 JSON represents one visible caption layer anchored at the
 bottom right. Save it as `photo-details.framenote.json` and import it through
 the preset controls. This is an example document, not a JSON Schema definition;
-the authoritative validation schema is [presetV1](../packages/core/src/preset-formats/v1.ts),
-with field definitions in [fields.ts](../packages/core/src/preset-formats/fields.ts).
+the authoritative validation schema is [presetSchema](../packages/core/src/preset-schema.ts).
 
 ```json
 {
@@ -117,25 +108,18 @@ embedded artwork and the 5 MB size limit in addition to the Zod structure.
 
 ## Font-name compatibility
 
-By explicit product decision, v1 accepts arbitrary nonempty font family names.
-Earlier v1 readers with a fixed family list may reject them. An unavailable family
-retains its saved name and renders with Montserrat until explicitly replaced;
-font files and system paths are not embedded. This exception does not authorize
-other schema changes without a new format version.
+Nonempty font family names are retained. An unavailable family renders with
+Montserrat until explicitly replaced; font files and system paths are not
+embedded. Earlier readers with a fixed family list may reject unknown names.
 
-## Future format changes
+## Schema evolution
 
-From now on, every new format version requires:
-
-- Its own frozen Zod schema and parser; do not change v1 to accept a new format.
-- An explicit sequential migration from the previous supported version.
-- A file conversion script using the same migration code as the application.
-- Tests with fixtures from each supported format, including full-chain migration.
-- Preservation of originals before persistent conversion, with clear errors for
-  unsupported or lossy conversions. No automatic downgrade guarantee.
-
-There is no pre-v1 migration. Future versions must extend the sequential
-migration chain without changing the frozen contracts.
+Additive optional fields stay in v1 and receive safe defaults after validation.
+Test omitted fields, preserved supplied values and unknown fields, invalid known
+data, and save/read round trips. Change the format number only when structure or meaning changes
+in a way that requires actual conversion. Decide compatibility and data
+protection for that concrete change, rather than adding a migration chain for
+every new option.
 
 ## Stored libraries and recovery
 

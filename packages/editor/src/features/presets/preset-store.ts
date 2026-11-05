@@ -6,22 +6,6 @@ import {
 import type { SvgAsset } from '../../../../core/src/svg-asset';
 
 type StoragePort = Pick<Storage, 'getItem' | 'setItem'>;
-export const presetV1BackupKey = presetStorageKey + '.original';
-/** Preserve the pre-migration library before the first persistent v2 write. */
-export function writePresetStorage(storage: StoragePort, source: string) {
-  const original = storage.getItem(presetStorageKey);
-  if (original && !storage.getItem(presetV1BackupKey)) {
-    const values: unknown = JSON.parse(original);
-    if (
-      Array.isArray(values) &&
-      values.some(
-        (value) => value && typeof value === 'object' && value.version === 1,
-      )
-    )
-      storage.setItem(presetV1BackupKey, original);
-  }
-  storage.setItem(presetStorageKey, source);
-}
 /** Synchronous commit boundary: async callers always update the latest collection. */
 export class PresetStore {
   presets: LayoutPreset[] = [];
@@ -90,8 +74,8 @@ export class PresetStore {
       throw Error('Preset identifiers must be unique.');
     try {
       if (this.storage)
-        writePresetStorage(
-          this.storage,
+        this.storage.setItem(
+          presetStorageKey,
           JSON.stringify([...next, ...this.rejected]),
         );
     } catch {

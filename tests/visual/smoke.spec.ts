@@ -53,6 +53,26 @@ test('prepared photo session', async ({ page }) => {
   await page.locator('[data-photo-view-controls]').scrollIntoViewIfNeeded();
   await ready(page);
   await shot(page, 'window');
+  const multiply = page.getByRole('radio', { name: 'Multiply', exact: true });
+  const normal = page.getByRole('radio', { name: 'Normal', exact: true });
+  await multiply.click();
+  await expect(multiply).toHaveAttribute('aria-checked', 'true');
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(normal).toHaveAttribute('aria-checked', 'true');
+  await page.getByRole('button', { name: 'Redo', exact: true }).click();
+  await expect(multiply).toHaveAttribute('aria-checked', 'true');
+  const layerOpacity = page.getByRole('spinbutton', {
+    name: 'Layer opacity value',
+    exact: true,
+  });
+  await layerOpacity.fill('50');
+  await layerOpacity.press('Enter');
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(layerOpacity).toHaveValue('100');
+  await page.getByRole('button', { name: 'Redo', exact: true }).click();
+  await expect(layerOpacity).toHaveValue('50');
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await normal.click();
 });
 
 test('font panel', async ({ page }) => {

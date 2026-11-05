@@ -38,6 +38,42 @@ Wzorce każdej sceny i profilu wymagają obejrzenia przed zaakceptowaniem zmiany
 Brak wzorca powoduje niezaliczoną weryfikację; aktualizuj go wyłącznie jawnie
 wybraną sceną i po obejrzeniu pełnego obrazu.
 
+## Layer blending i presety — 0.10.0-beta
+
+Zakres wdrożony: pięć trybów mieszania i krycie całej warstwy, również Color,
+Glass i wszystkie kopie Tiled. Trwałe zasady opisują USER_GUIDE, DESIGN_SYSTEM
+oraz PRESET_FORMATS. Przyciski trybów zajmują całą szerokość inspektora.
+
+Przy przygotowaniu wydania przeszły `pnpm check` (526 testów Vitest, JPG smoke,
+sześć scen Chromium i build web), build Storybooka, build desktopu, kontrola
+96 plików fontów/licencji i natywny smoke macOS z JPG/ZIP oraz konfiguracją.
+Wszystkie manifesty wskazują 0.10.0-beta; zależności i lockfile nie zmieniły się.
+
+Kontrole funkcjonalne obejmują 15 próbek koloru (pięć trybów × 0/50/100%,
+odchylenie maks. 1/255), zgodność podglądu i PNG na małym zdjęciu, SVG/PNG
+z Glass/Tiled i częściowo przezroczystym źródłem. Navigator jest identyczny
+ze sceną w zgodnej skali 240 × 160; osobne skalowanie pełnego PNG powoduje
+różnice interpolacji na drobnych krawędziach. Pierwszy PNG w ZIP był identyczny
+bajtowo z pojedynczym eksportem. PNG zachowuje alfa, a JPG otrzymuje biały
+podkład po mieszaniu. macOS potwierdził eksport Screen/50% z Glass/Tiled,
+klawiaturę i Undo/Redo; Chromium także duplikację i Copy/Paste między zdjęciami.
+
+Preset zapisuje się jako v1 przez jeden schemat. Brak blending daje Normal/100%,
+brak Tiled — wyłączony wzór. Etykiety 1/2/3 są odczytywane tym samym walidatorem.
+Przeglądarka zachowała dodatkowe pola root, layoutu, warstwy, stylu, blending,
+offsetu i grafiki przez import, edycję, zapis, eksport JSON i reload. Natywna
+konfiguracja zachowała dodatkowe pola root/window po zapisie i restarcie.
+
+Obejrzano expected/actual/diff i zaktualizowano cztery sceny macOS Chromium:
+font panel i metadata panel obejmują nową sekcję Blending; empty editor i About
+zmieniają wyłącznie numer produktu na 0.10.0-beta. Zestaw pozostaje sześcioscenowy,
+a test historii mieszania jest częścią istniejącej sceny prepared photo session.
+
+Ograniczenia: pełny eksport działa na głównym wątku. Pomiar próbki Glass/Tiled
+wynosił 354 ms przy 1200 × 1800 i 2749 ms przy 4000 × 6000, bez kodowania.
+Gęsty Glass może powodować przerwę; nie jest to gwarancja płynności. Ręczny
+odbiór nowej funkcji na Windows/Linux pozostaje niewykonany.
+
 ## Tiled watermark — weryfikacja 0.9.0-beta
 
 Funkcja zaakceptowana 2026-11-05; implementacja: `27ca322`.

@@ -1,7 +1,7 @@
 {
-  "version": 2,
+  "version": 1,
   "id": "v1-example",
-  "name": "Format v1 example",
+  "name": "Complete preset example",
   "layout": {
     "sizingUnit": "short-edge",
     "margins": {
@@ -46,7 +46,11 @@
             "width": 2,
             "height": 1
           }
-        ]
+        ],
+        "blending": {
+          "mode": "soft-light",
+          "opacity": 0.5
+        }
       }
     ],
     "activeId": "caption-1"

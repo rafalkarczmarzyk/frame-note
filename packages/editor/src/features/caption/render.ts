@@ -1,3 +1,7 @@
+import {
+  blendOperation,
+  hasLayerBlending,
+} from '../../../../core/src/layer-blending';
 import { tiledCopies } from '../../../../core/src/tiled-watermark';
 import { captionBackgroundRect } from './background-render';
 import { tiledBackground } from './tiled-background';
@@ -189,6 +193,22 @@ export async function renderPhotoBackgrounds(
   }
 }
 
+/** Raster composition for preview; shares the export scene and layer ordering. */
+export function renderPhotoComposition(
+  image: CanvasImageSource,
+  dimensions: ImageDimensions,
+  captions: readonly RenderedCaption[],
+): Promise<HTMLCanvasElement> {
+  return withPhotoStage(
+    image,
+    dimensions,
+    captions,
+    (stage) => stage.toCanvas({ pixelRatio: 1 }),
+    undefined,
+    false,
+  );
+}
+
 async function withPhotoStage<T>(
   image: CanvasImageSource,
   dimensions: ImageDimensions,
@@ -210,10 +230,12 @@ async function withPhotoStage<T>(
     height: dimensions.height,
   });
   const decorations: HTMLCanvasElement[] = [];
+  const postMatte =
+    matte && captions.some(({ caption }) => hasLayerBlending(caption));
   try {
     const layer = new Konva.Layer();
     stage.add(layer);
-    if (matte)
+    if (matte && !postMatte)
       layer.add(
         new Konva.Rect({
           x: 0,
@@ -236,6 +258,25 @@ async function withPhotoStage<T>(
       { caption, text, color, icons = [] },
     ] of captions.entries()) {
       if (caption.visible === false) continue;
+      const firstChild = layer.children.length;
+      const compositeLayer = () => {
+        if (!hasLayerBlending(caption)) return;
+        const blending = caption.blending!;
+        const group = new Konva.Group({ listening: false });
+        const nodes = layer.children.slice(firstChild);
+        layer.add(group);
+        nodes.forEach((node) => node.moveTo(group));
+        // Cache before opacity/blend: overlapping motifs receive opacity once.
+        group.cache({
+          x: 0,
+          y: 0,
+          width: dimensions.width,
+          height: dimensions.height,
+          pixelRatio: 1,
+        });
+        group.opacity(blending.opacity);
+        group.globalCompositeOperation(blendOperation(blending.mode));
+      };
       const geometry = caption.logo
         ? logoLayout(dimensions, caption)
         : inlineLayout(dimensions, caption, text, icons);
@@ -310,6 +351,7 @@ async function withPhotoStage<T>(
           );
         }
         motif.destroy();
+        compositeLayer();
         continue;
       }
       const background =
@@ -326,8 +368,33 @@ async function withPhotoStage<T>(
       const node = await captionNode(dimensions, caption, text, color, icons);
       node.position({ x: geometry.x, y: geometry.y });
       layer.add(node);
+      compositeLayer();
     }
     layer.draw();
+    if (postMatte) {
+      // Blend against the original alpha, then flatten for JPG. A white matte
+      // below Screen/Add would otherwise change the effect in transparent areas.
+      const composite = stage.toCanvas({ pixelRatio: 1 });
+      decorations.push(composite);
+      layer.destroyChildren();
+      layer.add(
+        new Konva.Rect({
+          width: dimensions.width,
+          height: dimensions.height,
+          fill: alphaMatte,
+          listening: false,
+        }),
+      );
+      layer.add(
+        new Konva.Image({
+          image: composite,
+          width: dimensions.width,
+          height: dimensions.height,
+          listening: false,
+        }),
+      );
+      layer.draw();
+    }
     return await consume(stage);
   } finally {
     stage.destroy();

@@ -1,16 +1,16 @@
 import { z } from 'zod';
 
-// Frozen wire primitives for official v1. Do not derive these from live UI catalogs.
+// One current preset schema. Optional additions are normalized after validation.
 const nonnegative = z.number().min(0).max(1e7);
 const fraction = z.number().min(0).max(1);
 const signed = z.number().min(-1e7).max(1e7);
 const color = z.string().max(64);
-export const asset = z.strictObject({
+const asset = z.looseObject({
   name: z.string().max(255),
   svg: z.string().max(256_000),
   aspect: z.number().positive().max(100),
 });
-export const image = z.strictObject({
+const image = z.looseObject({
   id: z.string().regex(/^[a-zA-Z0-9-]{1,100}$/u),
   name: z.string().max(255),
   format: z.enum(['svg', 'png']),
@@ -18,8 +18,8 @@ export const image = z.strictObject({
   width: z.number().positive().max(16384),
   height: z.number().positive().max(16384),
 });
-export const style = z.strictObject({
-  // Explicit v1 extension: preserve unknown names and resolve at runtime.
+const style = z.looseObject({
+  // Preserve unknown font names and resolve availability at runtime.
   fontFamily: z
     .string()
     .min(1)
@@ -33,7 +33,21 @@ export const style = z.strictObject({
   lineHeight: z.number().min(0.1).max(10),
   textAlign: z.enum(['auto', 'left', 'center', 'right']),
 });
-export const position = z.strictObject({
+const tiledPosition = z.looseObject({
+  enabled: z.boolean(),
+  pattern: z.enum(['grid', 'staggered']),
+  angle: z.number().min(-180).max(180),
+  spacing: z.number().min(0).max(100),
+  offset: z.looseObject({
+    x: z.number().min(-100).max(100),
+    y: z.number().min(-100).max(100),
+  }),
+});
+const blending = z.looseObject({
+  mode: z.enum(['normal', 'multiply', 'screen', 'soft-light', 'add']),
+  opacity: fraction,
+});
+const position = z.looseObject({
   anchor: z.enum([
     'top-left',
     'top-center',
@@ -45,21 +59,22 @@ export const position = z.strictObject({
     'bottom-center',
     'bottom-right',
   ]),
+  tiled: tiledPosition.optional(),
   custom: z
-    .strictObject({
+    .looseObject({
       x: z.number().min(0).max(100),
       y: z.number().min(0).max(100),
     })
     .optional(),
 });
-export const margins = z.strictObject({
+const margins = z.looseObject({
   top: nonnegative,
   right: nonnegative,
   bottom: nonnegative,
   left: nonnegative,
 });
-export const link = z.enum(['none', 'pairs', 'all']);
-export const background = z.strictObject({
+const link = z.enum(['none', 'pairs', 'all']);
+const background = z.looseObject({
   type: z.enum(['none', 'color', 'glass']),
   color,
   opacity: fraction,
@@ -67,7 +82,7 @@ export const background = z.strictObject({
   paddingLinkMode: link,
   radius: nonnegative,
   blur: nonnegative,
-  shadow: z.strictObject({
+  shadow: z.looseObject({
     enabled: z.boolean(),
     color,
     opacity: fraction,
@@ -77,7 +92,8 @@ export const background = z.strictObject({
     y: signed,
   }),
 });
-export const container = z.strictObject({
+const container = z.looseObject({
+  blending: blending.optional(),
   id: z.string().min(1).max(100),
   template: z.string().max(100_000),
   style,
@@ -86,14 +102,25 @@ export const container = z.strictObject({
   background: background.optional(),
   images: z.array(image).max(100).optional(),
 });
-export const header = {
+const header = {
   id: z.string().min(1).max(100),
   name: z.string().max(80).trim().min(1),
   icons: z.array(asset).max(100),
 };
-export const layoutFields = {
+const layoutFields = {
   sizingUnit: z.enum(['px', 'short-edge', 'long-edge']),
   margins,
   marginLinkMode: link,
   activeId: z.string().max(100).nullable(),
 };
+
+/** 2 and 3 are historical development labels, validated by the same schema.
+ * New output always uses 1; missing optional capabilities get safe defaults. */
+export const presetSchema = z.looseObject({
+  ...header,
+  version: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+  layout: z.looseObject({
+    ...layoutFields,
+    containers: z.array(container).max(100),
+  }),
+});

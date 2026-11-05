@@ -72,7 +72,7 @@ describe('inline images', () => {
     });
     expect(migrated.position).toEqual(caption.position);
     const preset = createPreset('id', 'Old', createCaptionLayout(caption), []);
-    expect(preset.version).toBe(2);
+    expect(preset.version).toBe(1);
     expect(
       parsePreset(JSON.stringify(preset), validate).layout.containers[0]
         ?.template,

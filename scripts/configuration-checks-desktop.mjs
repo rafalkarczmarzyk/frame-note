@@ -187,6 +187,19 @@ export async function checkDesktopConfiguration({ executable, env }) {
     // Pending external edits are not reloaded by opening Settings.
     const external = {
       ...(await read()),
+      future: { nested: [true, { mode: 'next' }] },
+      window: {
+        x: 0,
+        y: 0,
+        width: 1000,
+        height: 700,
+        displayId: await app.evaluate(
+          ({ screen }) => screen.getPrimaryDisplay().id,
+        ),
+        maximized: false,
+        ...(await read()).window,
+        future: { scale: 2 },
+      },
       historyLimit: 42,
       exportQuality: 60,
       removeMetadata: false,
@@ -261,6 +274,10 @@ export async function checkDesktopConfiguration({ executable, env }) {
         height: 700,
       }),
     );
+    expect(await read()).toMatchObject({
+      future: external.future,
+      window: { future: { scale: 2 } },
+    });
     const normal = await app.evaluate(({ BrowserWindow }) =>
       BrowserWindow.getAllWindows()[0].getBounds(),
     );

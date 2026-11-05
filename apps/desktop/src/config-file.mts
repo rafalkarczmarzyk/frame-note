@@ -93,7 +93,13 @@ export class ConfigFile {
           throw Error('A newer configuration format cannot be replaced.');
         await copyFile(this.file, this.file + '.' + randomUUID() + '.backup');
       }
-      const next = parseDesktopConfig({ ...this.value, ...patch });
+      const next = parseDesktopConfig({
+        ...this.value,
+        ...patch,
+        ...(patch.window
+          ? { window: { ...this.value.window, ...patch.window } }
+          : {}),
+      });
       await this.publish(next);
       this.blocked = false;
       this.issue = null;

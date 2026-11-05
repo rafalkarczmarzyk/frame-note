@@ -160,9 +160,9 @@ describe('partial library recovery', () => {
   });
 });
 
-it('loads and persists the frozen official v1 through the async repository', async () => {
+it('loads and persists the supported preset shape through the async repository', async () => {
   const fixture = readPreset(
-    readFileSync('tests/fixtures/presets/v1.json', 'utf8'),
+    readFileSync('tests/fixtures/presets/minimal.json', 'utf8'),
   );
   let source = JSON.stringify([fixture]);
   const validateAsset = (name: string, svg: string) =>

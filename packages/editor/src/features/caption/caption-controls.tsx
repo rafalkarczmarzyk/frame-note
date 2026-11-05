@@ -1,3 +1,4 @@
+import { BlendingControls } from './blending-controls';
 import { useSyncExternalStore } from 'react';
 import {
   isFontAvailable,
@@ -373,6 +374,11 @@ export function CaptionControls({
               </fieldset>
             </InspectorSection>
           )}
+          <BlendingControls
+            caption={caption}
+            onChange={onChange}
+            disabled={disabled}
+          />
         </>
       )}
     </>

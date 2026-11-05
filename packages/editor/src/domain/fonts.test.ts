@@ -29,7 +29,7 @@ it('uses only supplied weights and styles', () => {
   expect(supportsItalic('Manrope')).toBe(false);
 });
 
-it('preserves an unknown font in v2 without replacing its saved name', () => {
+it('preserves an unknown font in v1 without replacing its saved name', () => {
   const layout = createCaptionLayout();
   layout.containers[0]!.style.fontFamily = 'Missing Studio Font';
   const preset = createPreset('unknown', 'Unknown', layout, []);
@@ -37,5 +37,5 @@ it('preserves an unknown font in v2 without replacing its saved name', () => {
     throw Error('Unexpected asset');
   });
   expect(parsed).toEqual(preset);
-  expect(parsed.version).toBe(2);
+  expect(parsed.version).toBe(1);
 });

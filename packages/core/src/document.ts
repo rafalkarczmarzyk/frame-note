@@ -1,3 +1,4 @@
+import { createLayerBlending, type LayerBlending } from './layer-blending';
 import type { TiledPosition } from './tiled-watermark';
 import type { LayerBackground } from './layer-background';
 import type { FontFamily } from './fonts';
@@ -32,6 +33,7 @@ export type Anchor =
   | 'bottom-right';
 
 export interface Caption {
+  blending?: LayerBlending;
   background?: LayerBackground;
   visible?: boolean;
   logo?: LogoContent;
@@ -68,6 +70,7 @@ export interface PhotoDocument {
 
 export function createCaption(): Caption {
   return {
+    blending: createLayerBlending(),
     template: '',
     sizingUnit: 'short-edge',
     style: {

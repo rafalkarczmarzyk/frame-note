@@ -11,6 +11,17 @@ see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 
 ## Unreleased
 
+## [0.10.0-beta] - 2026-11-05
+
+### Added
+
+- Per-layer Normal, Multiply, Screen, Soft Light and Add blending with whole-layer opacity, shared by preview, Navigator and JPG/PNG/ZIP export.
+
+### Changed
+
+- Save presets as v1 through one schema, filling absent blending and Tiled settings with safe defaults. Read historical development labels 2/3 through the same validator. Remove version-specific schemas, migrations, conversion tooling and migration backups; retain normal validation and write recovery. Historical applications may reject newly added fields despite the shared v1 label.
+- Accept and retain additional JSON fields in presets and desktop settings, including nested objects, while validating known values. Preserve future preferences when saving settings or window geometry.
+
 ## [0.9.0-beta] - 2026-11-05
 
 ### Added

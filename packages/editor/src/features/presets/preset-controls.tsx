@@ -1,4 +1,3 @@
-import { writePresetStorage } from './preset-store';
 import { isPresetModified } from './preset-modified';
 import { platform } from '@/lib/platform';
 import { AsyncPresetStore } from './async-preset-store';
@@ -86,7 +85,7 @@ export function PresetControls({
               read: async () =>
                 platform().storage.getItem(presetStorageKey) ?? '[]',
               write: async (source) => {
-                writePresetStorage(platform().storage, source);
+                platform().storage.setItem(presetStorageKey, source);
               },
             })
           : { read: async () => '[]', write: async () => {} },
@@ -171,6 +170,7 @@ export function PresetControls({
       title,
       layout,
       icons,
+      current,
     );
     const next = (latest: LayoutPreset[]) =>
       replace && current && !builtin
@@ -432,6 +432,7 @@ export function PresetControls({
                         current?.name ?? 'Untitled',
                         layout,
                         icons,
+                        current,
                       );
                       try {
                         parsePreset(JSON.stringify(preset), svgIcon);

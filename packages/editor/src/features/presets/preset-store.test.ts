@@ -130,6 +130,9 @@ it('identifies unreadable entries and the invalid field without printing their c
   expect(store.issues[0]).toContain('“Bad font” (entry 1)');
   expect(store.issues[0]).toContain('layout.containers.0.style.fontWeight');
   expect(store.issues[1]).toContain('Entry 2');
-  expect(store.issues[2]).toContain('Unknown fields');
+  expect(store.issues).toHaveLength(2);
+  expect(store.presets).toMatchObject([
+    { id: 'unknown', secretArtwork: '<svg/>' },
+  ]);
   expect(store.issues.join(' ')).not.toContain('<svg/>');
 });

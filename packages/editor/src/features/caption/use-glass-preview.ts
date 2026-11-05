@@ -1,7 +1,12 @@
+import { hasLayerBlending } from '../../../../core/src/layer-blending';
 import { useEffect, useState } from 'react';
 import type { LoadedPhoto } from '../photo/load-photo';
 import { convertSizing } from '../../../../core/src/sizing';
-import { renderPhotoBackgrounds, type RenderedCaption } from './render';
+import {
+  renderPhotoBackgrounds,
+  renderPhotoComposition,
+  type RenderedCaption,
+} from './render';
 import type { renderBackgroundTile } from './background-render';
 type Tile = NonNullable<ReturnType<typeof renderBackgroundTile>>;
 
@@ -16,20 +21,23 @@ export function useGlassPreview(
   const [result, setResult] = useState<{
     photo: LoadedPhoto;
     tiles: Map<string, Tile>;
+    composition?: Tile;
   } | null>(null);
   const [failure, setFailure] = useState<{
     photo: LoadedPhoto;
     message: string;
   } | null>(null);
+  const blended = captions.some((item) => hasLayerBlending(item.caption));
   const enabled =
     ready &&
-    captions.some(
-      (item) =>
-        item.caption.background?.type === 'glass' ||
-        (item.caption.position.tiled?.enabled &&
-          item.caption.background &&
-          item.caption.background.type !== 'none'),
-    );
+    (blended ||
+      captions.some(
+        (item) =>
+          item.caption.background?.type === 'glass' ||
+          (item.caption.position.tiled?.enabled &&
+            item.caption.background &&
+            item.caption.background.type !== 'none'),
+      ));
   if ((!photo || !enabled) && result) setResult(null);
   if ((!photo || !enabled) && failure) setFailure(null);
   useEffect(() => {
@@ -50,16 +58,34 @@ export function useGlassPreview(
         ...item,
         caption: convertSizing(item.caption, 'short-edge', original),
       }));
-      void renderPhotoBackgrounds(
+      void (blended ? renderPhotoComposition : renderPhotoBackgrounds)(
         photo.previewImage ?? photo.image,
         dimensions,
         scaled,
       ).then(
         (backgrounds) => {
           if (cancelled) {
-            backgrounds.forEach((tile) => {
-              tile.image.width = tile.image.height = 0;
+            if (backgrounds instanceof HTMLCanvasElement)
+              backgrounds.width = backgrounds.height = 0;
+            else
+              backgrounds.forEach((tile) => {
+                tile.image.width = tile.image.height = 0;
+              });
+            return;
+          }
+          if (backgrounds instanceof HTMLCanvasElement) {
+            setResult({
+              photo,
+              tiles: new Map(),
+              composition: {
+                image: backgrounds,
+                x: 0,
+                y: 0,
+                width: original.width,
+                height: original.height,
+              },
             });
+            setFailure(null);
             return;
           }
           const tiles = new Map<string, Tile>();
@@ -93,18 +119,23 @@ export function useGlassPreview(
       // React may still display this result until the next frame is ready;
       // let its canvas be collected after replacement rather than blanking it.
     };
-  }, [photo, captions, enabled, maxSide]);
+  }, [photo, captions, enabled, maxSide, blended]);
   // Release results when replaced or unmounted; effects don't clear a canvas
   // while it is still displayed by react-konva.
   useEffect(() => {
     const tiles = result?.tiles;
+    const composition = result?.composition;
     return () => {
+      if (composition) composition.image.width = composition.image.height = 0;
       tiles?.forEach((tile) => {
         tile.image.width = tile.image.height = 0;
       });
     };
   }, [result]);
   return {
+    blended,
+    composition:
+      blended && result?.photo === photo ? result.composition : undefined,
     tiles: enabled && result?.photo === photo ? result.tiles : null,
     error: enabled && failure?.photo === photo ? failure.message : '',
   };

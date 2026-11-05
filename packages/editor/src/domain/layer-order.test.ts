@@ -29,7 +29,7 @@ it('round trips hidden state and stacking in presets; absent visibility remains 
   const preset = createPreset('id', 'Layers', layout, []);
   const validate = (name: string, svg: string) => ({ name, svg, aspect: 1 });
   const restored = parsePreset(JSON.stringify(preset), validate);
-  expect(restored.layout).toEqual(layout);
+  expect(restored.layout).toEqual(preset.layout);
   expect(restored.layout.containers[0]?.visible).not.toBe(false);
   expect(toggleLayerVisibility(layout, 'second').containers[1]?.visible).toBe(
     true,

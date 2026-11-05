@@ -14,6 +14,7 @@ export function TiledPreview({
   decoration,
   children,
   draggable,
+  hideVisuals = false,
   layerHovered,
   offsetHovered,
   onSelect,
@@ -28,6 +29,7 @@ export function TiledPreview({
   decoration?: Tile;
   children: ReactNode;
   draggable: boolean;
+  hideVisuals?: boolean;
   layerHovered: boolean;
   offsetHovered: boolean;
   onSelect: () => void;
@@ -85,7 +87,9 @@ export function TiledPreview({
         onDragState(false);
       }}
     >
-      {decoration && <CanvasImage {...decoration} listening={false} />}
+      {!hideVisuals && decoration && (
+        <CanvasImage {...decoration} listening={false} />
+      )}
       {copies.map((copy) => (
         <Group
           name="tiled-motif"
@@ -105,7 +109,7 @@ export function TiledPreview({
           <Group
             x={-geometry.width / 2}
             y={-geometry.height / 2}
-            opacity={caption.style.opacity}
+            opacity={hideVisuals ? 0 : caption.style.opacity}
             listening={false}
           >
             {children}

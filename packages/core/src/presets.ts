@@ -1,9 +1,10 @@
-import { presetV2, migratePresetV1 } from './preset-formats/v2';
-import { presetV1 } from './preset-formats/v1';
+import { presetSchema } from './preset-schema';
+import { defaultTiledPosition } from './tiled-watermark';
+import { createLayerBlending } from './layer-blending';
 import { parseIconToken } from './inline-icon';
 import { migrateLogo, parseImageToken } from './inline-image';
 import { validateImageAssets } from './image-validation';
-import type { CaptionLayout } from './caption-layout';
+import type { CaptionLayout, CaptionContainer } from './caption-layout';
 import type { SvgAsset } from './svg-asset';
 import {
   captionColors,
@@ -12,7 +13,7 @@ import {
 } from './caption-colors';
 
 export interface LayoutPreset {
-  version: 2;
+  version: 1;
   id: string;
   name: string;
   layout: CaptionLayout;
@@ -23,6 +24,20 @@ export const presetByteLimit = 5_000_000;
 export const copyPresetName = (name: string) =>
   `${name.slice(0, presetNameLimit - 5).trimEnd()} copy`;
 export const presetStorageKey = 'framenote.presets.v1';
+/** Add defaults only for absent capabilities; supplied values are schema-validated. */
+function normalizeContainer(container: CaptionContainer): CaptionContainer {
+  return {
+    ...container,
+    blending: container.blending ?? createLayerBlending(),
+    position: {
+      ...container.position,
+      tiled: container.position.tiled ?? {
+        ...defaultTiledPosition(),
+        enabled: false,
+      },
+    },
+  };
+}
 /** Validate the official wire contract and all embedded artwork. */
 export function parsePreset(
   source: string,
@@ -36,31 +51,20 @@ export function parsePreset(
     typeof value === 'object' &&
     'version' in value &&
     typeof value.version === 'number' &&
-    value.version > 2
+    value.version > 3
   )
     throw Error('Preset version is newer than this application supports.');
-  const version =
-    value && typeof value === 'object' && 'version' in value
-      ? value.version
-      : undefined;
-  const parsed =
-    version === 1 ? presetV1.safeParse(value) : presetV2.safeParse(value);
+  const parsed = presetSchema.safeParse(value);
   if (!parsed.success) {
     const issue = parsed.error.issues[0]!;
     const path = issue.path.join('.') || 'preset';
     const reason =
-      issue.code === 'unrecognized_keys'
-        ? `Unknown fields are not supported: ${issue.keys
-            .slice(0, 3)
-            .map((key) => key.slice(0, 80))
-            .join(', ')}.`
-        : issue.code === 'invalid_type'
-          ? 'Missing field or incorrect value type.'
-          : 'Value does not match the supported preset format.';
+      issue.code === 'invalid_type'
+        ? 'Missing field or incorrect value type.'
+        : 'Value does not match the supported preset format.';
     throw Error(`Invalid FrameNote preset: ${path}. ${reason}`);
   }
-  const data =
-    parsed.data.version === 1 ? migratePresetV1(parsed.data) : parsed.data;
+  const data = parsed.data;
   const ids = new Set(data.layout.containers.map((c) => c.id));
   if (
     ids.size !== data.layout.containers.length ||
@@ -84,7 +88,10 @@ export function parsePreset(
     }
     if (c.images) {
       try {
-        c.images = validateImageAssets(c.images, validateSvg);
+        const originals = c.images;
+        c.images = validateImageAssets(c.images, validateSvg).map(
+          (image, index) => ({ ...originals[index], ...image }),
+        );
       } catch (cause) {
         throw Error(
           `${path}.images: ${cause instanceof Error ? cause.message : 'Invalid image asset.'}`,
@@ -95,7 +102,7 @@ export function parsePreset(
   }
   const icons = data.icons.map((icon, index) => {
     try {
-      return validateSvg(icon.name, icon.svg);
+      return { ...icon, ...validateSvg(icon.name, icon.svg) };
     } catch (cause) {
       throw Error(
         `icons.${index}: ${cause instanceof Error ? cause.message : 'Invalid SVG asset.'}`,
@@ -104,11 +111,13 @@ export function parsePreset(
     }
   });
   return {
-    version: 2,
+    ...data,
+    version: 1,
     id: data.id,
     name: data.name,
     layout: {
       ...data.layout,
+      containers: data.layout.containers.map(normalizeContainer),
       activeId:
         data.layout.activeId && ids.has(data.layout.activeId)
           ? data.layout.activeId
@@ -123,6 +132,7 @@ export function createPreset(
   name: string,
   layout: CaptionLayout,
   icons: SvgAsset[],
+  base?: LayoutPreset,
 ): LayoutPreset {
   const used = new Set([
     ...layout.containers.flatMap((c) =>
@@ -132,13 +142,14 @@ export function createPreset(
     ),
   ]);
   return structuredClone({
-    version: 2,
+    ...base,
+    version: 1,
     id,
     name: name.trim(),
     layout: {
       ...layout,
       containers: layout.containers.map((container) => {
-        const migrated = migrateLogo(container);
+        const migrated = normalizeContainer(migrateLogo(container));
         const ids = new Set(
           [...migrated.template.matchAll(/\{(image:[^{}]*)\}/gu)].map(
             (match) => parseImageToken(match[1]!)?.assetId,

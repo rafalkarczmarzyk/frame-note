@@ -18,6 +18,10 @@ An explicit user override wins.
 - Use a `codex/` task branch for new features, substantial UI changes, refactors,
   and work requiring several user-review iterations. Keep it until acceptance.
   Do not introduce a permanent `develop` branch.
+- After an authorized merge, delete completed local and remote feature branches;
+  do not retain historical task branches. Check worktrees and confirm their work
+  is included in master. Squash-merged branches may need deletion after checking
+  their corresponding master commit rather than relying only on ancestry.
 - PRs are optional. Prefer one for large or risky changes when a reviewable diff,
   validation summary and persistent discussion help. Do not create or publish a
   PR solely because a branch exists; remote actions need user authorization.
@@ -66,15 +70,21 @@ by their actual effect on the application. Never add filler entries.
   formats and application capabilities. An internal API or visual redesign alone
   is not automatically a MAJOR change. Define the stable compatibility contract
   before promoting to 1.0; do not invent data migration guarantees.
-- The first official preset format is v1, shared by web and desktop. Earlier
-  development JSON and storage are unsupported: do not add legacy parsers,
-  cleanup or migration of pre-v1 data. Do not change the web storage key for
-  this purpose. Preset schema versions are independent of application SemVer.
-  Every future format requires a separate frozen Zod schema, migration from the
-  previous supported version, a file-conversion script sharing that code, and
-  fixture tests. There is no migration or conversion script for initial v1.
-  Preserve originals during future conversions; report unsupported/lossy changes.
-  Forward conversion is the default; reverse conversion is not guaranteed.
+- Presets use one current Zod schema and write `version: 1`, shared by web and
+  desktop. Presets and desktop configuration accept and retain unknown fields
+  at every object level, without using them in the application. Known fields
+  retain their type/range validation. Additive optional fields stay in v1; validate supplied values and
+  normalize absent capabilities to safe defaults after reading. Test missing,
+  retained and invalid values plus read/write round trips. Historical development
+  labels 2/3 use the same schema and normalize to 1; do not restore separate
+  version schemas, migration chains, converters or migration backups for these
+  additive fields. Historical readers may reject newer fields despite the same
+  label; current readers tolerate additional fields. Unsupported format versions
+  and invalid known values still produce clear errors.
+  Change the format number only for structural/semantic changes requiring actual
+  conversion, and decide compatibility and data protection for that change.
+  Pre-v1 development data remains unsupported. Keep the existing storage key.
+  Schema numbering is independent of product SemVer; see docs/PRESET_FORMATS.md.
 - Use one product version for root, web, desktop, editor and core manifests.
   Root `package.json` is authoritative. Synchronize the other workspace manifests
   and affected lockfile metadata; inspect actual files rather than assuming a

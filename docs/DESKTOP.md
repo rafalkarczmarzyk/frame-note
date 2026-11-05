@@ -67,12 +67,13 @@ Build tools and signing requirements: [Development](DEVELOPMENT.md#xcode-detecti
 
 ## Data and presets
 
-Presets are individual v2 JSON files (v1 files are migrated on read) in `~/FrameNote/presets`, where `~` is the
+Presets are individual v1 JSON files in `~/FrameNote/presets`, where `~` is the
 user's home directory on each system. The directory is created on first use.
 Restart to load external file edits; no live folder watching, trash or revision history.
 Web instead uses localStorage. Transfer layouts with `.framenote.json` export/import;
-the two stores are not synchronized. Before replacing a v1 file with a saved v2
-preset, the app preserves its original in `presets/v1-originals`. See [preset format](PRESET_FORMATS.md).
+the two stores are not synchronized. One schema reads historical labels 1/2/3,
+fills missing optional settings, and saves the current shape as v1. There are no
+version-specific migrations or backups. See [preset format](PRESET_FORMATS.md).
 
 Filenames use ASCII kebab-case with Latin accents simplified, a 180-character
 base limit, reserved-name protection and case-insensitive collision suffixes.
@@ -112,10 +113,12 @@ invalid file from Settings requires explicit confirmation and preserves a
 `.backup` copy; newer formats cannot be overwritten by this app.
 
 The v1 schema requires `version: 1`; other preferences may be omitted and receive
-the documented defaults. Unknown fields, invalid types, out-of-range values and
-unsupported versions are rejected. Stored window geometry, when present, requires
-all bounds, display ID and maximization fields. Future schema changes require a
-new format number, a frozen schema and sequential migration preserving originals.
+the documented defaults. Additional fields at the root and in window geometry
+are accepted, ignored by the app and retained when saving known preferences or
+updated window bounds. Invalid known types, out-of-range values and unsupported
+format versions are rejected. Stored window geometry, when present, requires
+all known bounds, display ID and maximization fields. Additive settings stay in
+v1; change the format number only when structure or meaning requires conversion.
 Open photos and unsaved layouts are session-only: closing or quitting ends them
 without confirmation. Tests use isolated profiles and preset directories.
 

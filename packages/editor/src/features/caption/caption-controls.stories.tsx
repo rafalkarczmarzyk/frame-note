@@ -152,3 +152,26 @@ export const UnavailableFont: Story = {
     await expect(within(font).getByText('Unavailable')).toBeVisible();
   },
 };
+
+export const Blending: Story = {
+  args: {
+    scope: 'local',
+    caption: {
+      ...createCaption(),
+      blending: { mode: 'soft-light', opacity: 0.5 },
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Blend the complete layer with one-click mode buttons. The selected mode has a visible name; icons expose descriptive tooltips and keyboard navigation. Layer opacity includes text, artwork and background.',
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    await userEvent.click(c.getByRole('radio', { name: 'Multiply' }));
+    await expect(c.getByText('Blend mode · Multiply')).toBeVisible();
+  },
+};

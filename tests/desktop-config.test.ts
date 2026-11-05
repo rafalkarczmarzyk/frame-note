@@ -35,7 +35,7 @@ describe('desktop configuration v1', () => {
       parseDesktopConfig({ version: 1, rememberWindow: true }).rememberWindow,
     ).toBe(true);
   });
-  it('reads the frozen v1 fixture', async () => {
+  it('reads the v1 fixture', async () => {
     const value = parseDesktopConfig(
       JSON.parse(
         await readFile(
@@ -73,12 +73,11 @@ describe('desktop configuration v1', () => {
     );
     expect(await readFile(store.file, 'utf8')).toBe('{"version":2}');
   });
-  it('requires the format marker and rejects unknown fields, invalid types and ranges', () => {
+  it('requires the format marker and rejects invalid known types and ranges', () => {
     expect(parseDesktopConfig({ version: 1 })).toEqual(defaultDesktopConfig());
     for (const value of [
       {},
       { version: 2 },
-      { version: 1, extra: true },
       { version: 1, historyLimit: 0 },
       { version: 1, historyLimit: 1001 },
       { version: 1, historyLimit: 1.5 },
@@ -123,7 +122,7 @@ describe('desktop configuration v1', () => {
       (await readdir(directory)).filter((name) => name.endsWith('.tmp')),
     ).toEqual([]);
   });
-  it.each(['broken JSON', '{"version":2}', '{"version":1,"unknown":true}'])(
+  it.each(['broken JSON', '{"version":2}', '{"version":1,"historyLimit":0}'])(
     'preserves unreadable/unsupported source: %s',
     async (source) => {
       const { store } = await fixture();
@@ -166,5 +165,45 @@ describe('desktop configuration v1', () => {
     expect(
       (await readdir(directory)).filter((name) => name.endsWith('.tmp')),
     ).toEqual([]);
+  });
+  it('retains unknown root/window settings through save and restart', async () => {
+    const { directory, store } = await fixture();
+    const window = {
+      x: 10,
+      y: 20,
+      width: 900,
+      height: 700,
+      displayId: 1,
+      maximized: false,
+      future: { scale: 2 },
+    };
+    const future = { nested: [true, { mode: 'next' }] };
+    await writeFile(store.file, JSON.stringify({ version: 1, future, window }));
+    expect(await store.load()).toMatchObject({
+      warning: '',
+      config: { future, window },
+    });
+    await store.update({ historyLimit: 42 });
+    const { future: ignored, ...knownWindow } = window;
+    void ignored;
+    await store.update({ window: { ...knownWindow, width: 1000 } });
+    const expected = {
+      version: 1,
+      historyLimit: 42,
+      future,
+      window: { ...window, width: 1000 },
+    };
+    expect(JSON.parse(await readFile(store.file, 'utf8'))).toMatchObject(
+      expected,
+    );
+    const restarted = new ConfigFile(directory);
+    expect(await restarted.load()).toMatchObject({
+      warning: '',
+      config: expected,
+    });
+    expect(await readdir(directory)).toEqual(['config.json']);
+    expect(() =>
+      parseDesktopConfig({ version: 1, future, historyLimit: 'wrong' }),
+    ).toThrow();
   });
 });

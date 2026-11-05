@@ -96,16 +96,6 @@ export class PresetFiles {
           const old = oldName ? join(this.directory, oldName) : undefined;
           if (old) {
             await checkOld(id, old);
-            const original = await readFile(old, 'utf8');
-            if (JSON.parse(original).version === 1) {
-              const directory = join(this.directory, 'v1-originals');
-              await mkdir(directory, { recursive: true });
-              // Keep the original inode before the transactional replacement.
-              await link(
-                old,
-                join(directory, id + '-' + randomUUID() + '.json'),
-              );
-            }
           }
           // The preset can reuse its own name, including a prior collision suffix.
           const name = JSON.parse(json).name as string;

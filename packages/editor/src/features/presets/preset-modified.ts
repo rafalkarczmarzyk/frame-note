@@ -16,10 +16,11 @@ export function isPresetModified(
         preset.name,
         { ...layout, activeId: preset.layout.activeId },
         icons,
+        preset,
       ),
     ) !==
     JSON.stringify(
-      createPreset(preset.id, preset.name, preset.layout, preset.icons),
+      createPreset(preset.id, preset.name, preset.layout, preset.icons, preset),
     )
   );
 }

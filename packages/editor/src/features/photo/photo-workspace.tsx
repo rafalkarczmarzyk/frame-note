@@ -780,6 +780,7 @@ function PhotoWorkspaceContent({
                         listening={false}
                       />
                       <CanvasImage
+                        visible={!glassPreview.composition}
                         image={
                           scale * navigation.pixelRatio >
                           Math.min(
@@ -792,6 +793,12 @@ function PhotoWorkspaceContent({
                         width={width}
                         height={height}
                       />
+                      {glassPreview.composition && (
+                        <CanvasImage
+                          {...glassPreview.composition}
+                          listening={false}
+                        />
+                      )}
                       {fontReady &&
                         renderedCaptions.map(
                           ({
@@ -860,6 +867,7 @@ function PhotoWorkspaceContent({
                                 <TiledPreview
                                   key={id}
                                   caption={caption}
+                                  hideVisuals={glassPreview.blended}
                                   geometry={geometry}
                                   dimensions={{ width, height }}
                                   decoration={glassPreview.tiles?.get(id)}
@@ -942,7 +950,8 @@ function PhotoWorkspaceContent({
                                   placeholder ? 'editor-placeholder' : undefined
                                 }
                               >
-                                {!placeholder &&
+                                {!glassPreview.blended &&
+                                  !placeholder &&
                                   (text.trim() || caption.logo) &&
                                   caption.background?.type !== 'none' &&
                                   (glassPreview.tiles?.has(id) ? (
@@ -963,7 +972,11 @@ function PhotoWorkspaceContent({
                                   width={geometry.width}
                                   height={geometry.height}
                                   opacity={
-                                    placeholder ? 0.4 : caption.style.opacity
+                                    placeholder
+                                      ? 0.4
+                                      : glassPreview.blended
+                                        ? 0
+                                        : caption.style.opacity
                                   }
                                   listening
                                   draggable={!exporting && !navigation.cursor}

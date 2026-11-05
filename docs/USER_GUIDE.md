@@ -125,6 +125,27 @@ source precedence, formatting, and missing-data behavior.
 `{shutterDuration}` formats long exposures as minutes and hours, for example
 `600 s` → `10 min`; `{shutter}` keeps its original seconds format.
 
+## Layer blending
+
+The selected layer's **Blending** section sits between Typography and Background.
+Choose Normal, Multiply, Screen, Soft Light or Add with the five icon buttons;
+hover or focus for help. The active mode is named above the buttons. Keyboard
+arrows move between modes; Space selects a mode. **Layer opacity** affects the
+whole layer, including text, artwork, Color/Glass backgrounds and every Tiled
+copy. Typography opacity still controls text/artwork within the layer.
+
+New layers start at Normal and 100%. At 0% the layer is invisible; its settings
+remain editable. Glass samples the composition below the layer. Hover outlines
+and other editor decorations are excluded from blending, Navigator and export.
+Blending uses the original photo alpha; JPG adds its white matte after blending,
+while PNG retains transparency. The shared renderer provides the preview, Navigator
+and JPG/PNG/ZIP output; preview rasterization is bounded to 1600 pixels on the longest side while
+exports use full resolution. Dense Tiled Glass can take longer to render.
+
+Presets save as v1 with blending settings. Missing blending settings receive
+Normal and 100% layer opacity. Historical labels 2/3 are also readable; older
+applications may reject fields they do not understand. See [Preset format](PRESET_FORMATS.md).
+
 ## Undo and Redo
 
 Use the header arrows or the desktop **Edit → Undo / Redo** menu. On macOS,
@@ -164,9 +185,10 @@ source photo, resolved metadata values, and export settings.
 Saved presets persist in the same browser at the same origin. Clearing site data
 removes them; export a `.framenote.json` file to back them up or transfer them.
 Preset imports are validated and added as new presets without overwriting
-existing entries. New presets use v2, shared by web and desktop. Official v1 files are migrated
-without changing their layout. Older FrameNote versions reject v2; pre-v1
-development files remain unsupported. See [preset format](PRESET_FORMATS.md).
+existing entries. New presets use v1, shared by web and desktop. Missing optional
+settings receive safe defaults; historical labels 2/3 use the same reader. Earlier
+applications may reject newer fields. Pre-v1 development files remain unsupported.
+See [preset format](PRESET_FORMATS.md).
 
 Desktop saves presets as individual JSON files in `~/FrameNote/presets` (inside
 the user's home directory). Export/import `.framenote.json` files to transfer

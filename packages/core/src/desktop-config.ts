@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-/** Frozen configuration format v1. Additions require a new format version. */
-export const desktopConfigV1 = z.strictObject({
+/** Additive settings stay in v1; retain unknown fields without interpreting them. */
+export const desktopConfigSchema = z.looseObject({
   version: z.literal(1),
   exportQuality: z.number().int().min(1).max(100).default(95),
   removeMetadata: z.boolean().default(true),
@@ -9,7 +9,7 @@ export const desktopConfigV1 = z.strictObject({
   rememberWindow: z.boolean().default(false),
   checkUpdatesAtStartup: z.boolean().default(true),
   window: z
-    .strictObject({
+    .looseObject({
       x: z.number().int(),
       y: z.number().int(),
       width: z.number().int().positive(),
@@ -19,13 +19,16 @@ export const desktopConfigV1 = z.strictObject({
     })
     .optional(),
 });
-export type DesktopConfig = z.infer<typeof desktopConfigV1>;
+export type DesktopConfig = Pick<
+  z.infer<typeof desktopConfigSchema>,
+  keyof typeof desktopConfigSchema.shape
+>;
 export type SettingsValues = Pick<
   DesktopConfig,
   'historyLimit' | 'rememberWindow' | 'checkUpdatesAtStartup'
 >;
 export const defaultDesktopConfig = (): DesktopConfig =>
-  desktopConfigV1.parse({ version: 1 });
+  desktopConfigSchema.parse({ version: 1 });
 export function parseDesktopConfig(value: unknown): DesktopConfig {
-  return desktopConfigV1.parse(value);
+  return desktopConfigSchema.parse(value);
 }

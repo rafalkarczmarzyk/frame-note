@@ -22,18 +22,6 @@ proporcji ma działać niezależnie od ramek; ramka nie wymusza cropu.
 Przy powrocie ustalić zapis kadru per zdjęcie, wpływ na warstwy i presety oraz
 zachowanie w serii. Wpływ: web/desktop, geometria zdjęcia i eksport.
 
-### Mieszanie warstw
-
-Status: **odłożone** (2026-11-05, decyzja po wdrożeniu Tiled).
-Tryby mieszania jako osobna zmiana dla wszystkich rodzajów warstw: tekstu,
-grafik i wzoru Tiled. Użytkownik odłożył implementację do NTH.
-Przy powrocie ustalić zestaw trybów (rozważano m.in. Add, Subtract i Multiply),
-zakres mieszania całej warstwy wobec tła Color/Glass, kontrolkę przy Opacity,
-zgodność podglądu z JPG/PNG/ZIP i wpływ na format presetów.
-Canvas ma Add (`lighter`) i Multiply, ale nie ma bezpośredniego Subtract.
-Szczegóły i zestaw trybów nie są zatwierdzonym zakresem implementacji.
-Wpływ: web/desktop, model wszystkich warstw, presety i eksport.
-
 ## Desktop
 
 ### Zapisywanie sesji

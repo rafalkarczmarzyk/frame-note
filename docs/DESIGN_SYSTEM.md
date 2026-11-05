@@ -113,6 +113,14 @@ zaznaczenia samym kolorem tekstu ani nie powielaj osobnej palety w feature.
 Przykłady: `packages/editor/src/features/layers/layer-list.tsx`, `packages/editor/src/components/ui/picker-list.tsx`
 i kompozycje `Screens/TestPhotos`.
 
+### Blending warstwy
+
+`features/caption/blending-controls.tsx` składa InspectorSection, pełnej szerokości
+InlineInputGroup + SegmentedControl z pięcioma ikonami i tooltipami oraz RangeField.
+Nazwa aktywnego trybu jest widoczna nad przyciskami. Sekcja między Typography a
+Background dotyczy całej warstwy. Story: **Pickers/CaptionControls/Blending**;
+kompozycja produkcyjna: **Screens/TestPhotos**. Krycie tekstu pozostaje w Typography.
+
 ### Position warstwy
 
 `features/caption/position-controls.tsx` pokazuje Anchor / Manual / Tiled
