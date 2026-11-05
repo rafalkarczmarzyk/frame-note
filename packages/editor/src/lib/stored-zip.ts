@@ -101,11 +101,12 @@ export function uniqueExportName(name: string, used: Set<string>): string {
       ? '_'
       : character,
   ).join('');
-  const stem = safe.replace(/\.jpg$/iu, '');
+  const extension = /\.(?:jpg|png)$/iu.exec(safe)?.[0] ?? '';
+  const stem = extension ? safe.slice(0, -extension.length) : safe;
   let candidate = safe;
   let suffix = 2;
   while (used.has(candidate.toLocaleLowerCase('en-US')))
-    candidate = `${stem}-${suffix++}.jpg`;
+    candidate = `${stem}-${suffix++}${extension}`;
   used.add(candidate.toLocaleLowerCase('en-US'));
   return candidate;
 }

@@ -88,7 +88,7 @@ license reader. It does not open automatically at startup.
    through **Content → Add image**.
 3. Add layers as needed, then adjust typography, margins, stacking, and position.
 4. Save the layout as a preset if you want to reuse it with other photos.
-5. Choose JPG or PNG in **Export settings**, then select **Export JPG** or **Export PNG**. JPG quality is retained when switching formats. **Export all (JPG)** creates a JPG ZIP of the roll.
+5. Choose JPG or PNG in **Export settings**, then select **Export JPG** or **Export PNG**. JPG quality is retained when switching formats. **Export all** creates a ZIP of the roll in the selected format.
 
 A caption can combine plain text and metadata tokens:
 
@@ -233,7 +233,7 @@ paths before importing. The editor limits active image content to 100 images.
   or MakerNote is supported.
 - Large photos may briefly block the main thread. Import limits do not guarantee
   sufficient memory on every device.
-- **Export all** processes photos sequentially and downloads `framenote-roll.zip`.
+- **Export all** processes photos sequentially in the format selected when export starts and downloads `framenote-roll.zip`.
   Missing metadata/token warnings are confirmed once for the series; failed photos
   are listed and successful outputs remain downloadable. Duplicate output names
   receive numerical suffixes. ZIP output is limited to 1 GB of accumulated entries.

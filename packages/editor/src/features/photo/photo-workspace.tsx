@@ -686,10 +686,11 @@ function PhotoWorkspaceContent({
               onClick={download}
               items={[
                 {
-                  label: format === 'png' ? 'Export all (JPG)' : 'Export all',
+                  label: 'Export all',
                   icon: <Download />,
                   disabled: !onExportAll || exporting || loading,
-                  onSelect: () => onExportAll?.({ quality, metadataOptions }),
+                  onSelect: () =>
+                    onExportAll?.({ quality, metadataOptions, format }),
                 },
               ]}
             >

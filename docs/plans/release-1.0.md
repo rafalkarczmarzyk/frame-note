@@ -29,6 +29,11 @@ Szczegóły i otwarte kwestie pozostałych funkcji pozostają w
 Ramki i polaroidy, niezależny crop oraz powtarzany watermark pozostają
 odłożone poza ten zakres.
 
+## Eksport JPG/PNG
+
+[Wybór formatu eksportu JPG/PNG](export-formats.md) dla pojedynczego zdjęcia
+i serii do ZIP: zaimplementowany, oczekuje na odbiór użytkownika.
+
 ## Dalsza praca
 
 Przed implementacją pozostałych funkcji ustalić etapy, kolejność, kryteria

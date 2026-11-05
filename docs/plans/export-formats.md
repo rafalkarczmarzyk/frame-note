@@ -1,7 +1,7 @@
 # Wybór formatu eksportu
 
-Stan na 2026-11-05: etap 1 zaimplementowany i zweryfikowany, czeka na odbiór użytkownika.
-Gałąź: `codex/export-formats`, baza 0.7.2-beta; zmiany bez commita.
+Stan na 2026-11-05: oba etapy zaimplementowane i zweryfikowane; oczekują na odbiór użytkownika.
+Gałąź: `codex/export-formats`, wersja 0.7.2-beta; etap 1: commit `29d43b3`.
 Użytkownik zlecił dokończenie obu etapów na osobnej gałęzi i osobny commit
 każdego etapu. Zgoda obejmuje kontynuację etapu 2; odbiór działania pozostaje
 odrębny od commitów.
@@ -11,7 +11,8 @@ przezroczystość PNG, unieważnianie starego wyniku oraz ponowną próbę kodow
 Zapis XMP w PNG ma test niezależnego odczytu ExifReader (model, ISO,
 wyłączona lokalizacja). Użytkownik potwierdził zachowanie takie jak JPG: te same
 grupy i zapis XMP; natywny blok eXIf nie jest wymagany.
-ZIP pozostaje JPG i jest tak oznaczony w menu do realizacji etapu 2.
+Etap 1 zapisany w commicie `29d43b3`. Etap 2 dodaje wybrany format do ZIP,
+ustala go przy starcie serii i zachowuje rozwiązywanie kolizji nazw.
 
 ## Zachowanie
 
@@ -60,7 +61,7 @@ różnice i wykonać test JPG. Kontrole przeglądarkowe i desktopowe uruchamiać
 kolejno, desktop w sesji graficznej macOS. Uzupełnić instrukcję użytkownika
 i Unreleased przy implementacji. Każdy etap wymaga oceny użytkownika.
 AC-01–03: kontrole automatyczne i przepływy zaliczone; odbiór użytkownika otwarty.
-AC-04–05: etap 2, nierozpoczęty.
+AC-04–05: testy jednostkowe i kontrole web/desktop zaliczone; odbiór użytkownika otwarty.
 
 ## Weryfikacja etapu 1
 
@@ -92,11 +93,31 @@ Baza 0.7.2-beta. Dla osobnego wydania z tą funkcją prognoza to 0.8.0-beta
 (nowa funkcja zgodna z istniejącymi presetami). Przy wspólnym wydaniu wersja
 wynika z łącznego zakresu. Docelowy kamień milowy: 1.0.
 
-## Odbiór etapu 1
+## Weryfikacja etapu 2
 
-Build do oceny: 0.7.2-beta, baza `5659802`, lokalne zmiany (`dirty`),
-gałąź `codex/export-formats`. Bez commita, zmiany wersji i publikacji.
+- `pnpm check`: pozytywnie; 74 pliki / 508 testów Vitest, dotychczasowy eksport
+  JPG, sześć scen wizualnych bez zmian wzorców, lint, typy, format, tokeny,
+  zgodność wersji i build web.
+- Nowe testy ZIP sprawdzają JPG i PNG dla mieszanych wejść, powtarzające się
+  nazwy oraz zachowanie formatu z początku serii mimo zmiany opcji przez wywołującego.
+- Kontrola Chromium: import istniejącego `tests/fixtures/presets/v1.json`, zapis
+  pojedynczy i ZIP dla obu formatów, mieszane wejścia JPG/PNG o wspólnej nazwie.
+  Potwierdzone rozszerzenia, sygnatury i nazwy z sufiksem -2. Pierwszy plik ZIP
+  jest identyczny bajtowo z eksportem pojedynczym w tym samym formacie.
+  Średnia różnica kanałów zdekodowanego JPG i PNG wyniosła 0,008/255;
+  kompozycja presetu pozostaje wspólna. Bez migracji presetów v1.
+- Build desktop: pozytywnie. Analogiczny przepływ macOS zaliczony: preset v1,
+  oba formaty pojedynczo i w ZIP, mieszane wejścia, duplikaty nazw, sygnatury
+  oraz identyczność bajtów eksportu pojedynczego i pierwszego pliku ZIP.
+  Średnia różnica JPG/PNG również 0,008/255. Ponowny natywny smoke macOS
+  (JPG/ZIP, konfiguracja, błędy, odzyskiwanie i geometria): pozytywnie.
+
+## Odbiór całości
+
+Build do oceny: 0.7.2-beta na gałęzi `codex/export-formats`. Każdy etap ma
+osobny commit; bez zmiany wersji, merge i publikacji. Zlecenie kontynuacji
+obejmuje oba etapy i ich commity; odbiór użytkownika pozostaje otwarty.
 
 W webie i desktopie: wybierz PNG w Export settings, zapisz zdjęcie z podpisem,
 sprawdź układ i wybrane grupy metadanych; wróć do JPG i sprawdź zachowaną jakość.
-Odbiór użytkownika dotyczy AC-01–03. Po nim można zlecić etap 2 (ZIP).
+Zapisz serię przez Export all w obu formatach i oceń pliki po rozpakowaniu ZIP.

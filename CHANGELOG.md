@@ -13,7 +13,7 @@ see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 
 ### Added
 
-- Choose JPG or PNG for individual photo exports, preserving PNG transparency and the selected metadata as XMP. Retry preparation after encoding errors. Batch ZIP export remains JPG.
+- Choose JPG or PNG for individual and batch ZIP exports, preserving PNG transparency and the selected metadata as XMP. Keep one selected format throughout a batch and resolve duplicate output names. Retry preparation after encoding errors.
 
 ## [0.7.2-beta] - 2026-11-05
 

@@ -1,7 +1,7 @@
 # FrameNote — kontekst produktu
 
 FrameNote przygotowuje zdjęcia do publikacji: nakłada tekst, oznaczenia autora,
-grafiki i parametry fotograficzne, a wynik zapisuje jako JPG. Punktem wyjścia
+grafiki i parametry fotograficzne, a wynik zapisuje jako JPG lub PNG. Punktem wyjścia
 jest praca na eksportach z Lightroom Classic i potrzeba wygodniejszego podpisywania
 niż w LR/Mogrify: podgląd na żywo, metadane i powtarzalne układy.
 
@@ -22,7 +22,7 @@ niż w LR/Mogrify: podgląd na żywo, metadane i powtarzalne układy.
 ## Granice produktu
 
 Obecny zakres obejmuje JPG/PNG, warstwy tekstu i grafik, presety oraz eksport
-JPG i serii do ZIP. Nie obiecujemy pełnej zgodności z LR/Mogrify, wszystkimi
+JPG/PNG i serii do ZIP w wybranym formacie. Nie obiecujemy pełnej zgodności z LR/Mogrify, wszystkimi
 metadanymi aparatów, profilami kolorów ani dowolnym SVG.
 
 Nie ma edycji RAW, integracji uruchamianej z Lightroom, synchronizacji chmurowej,

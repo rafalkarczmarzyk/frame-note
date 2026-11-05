@@ -25,7 +25,7 @@
 ---
 
 FrameNote adds watermarks, logos and photo metadata to your images. Compose
-layers with text and graphics, save reusable presets, and export JPGs individually
+layers with text and graphics, save reusable presets, and export JPGs or PNGs individually
 or as a ZIP. Processing stays on your device; no account or backend is required.
 
 **Beta:** web and Electron desktop share the same editor. Desktop packages target
@@ -38,7 +38,7 @@ limitations](docs/DESKTOP.md).
 - Independent layers, positioning, margins, color and Glass backgrounds.
 - Bundled fonts plus installed system fonts in the desktop app.
 - Local presets with shared v1 JSON import/export across web and desktop.
-- JPG quality and metadata controls, with batch export to ZIP.
+- JPG/PNG export, JPG quality and metadata controls, with batch export to ZIP.
 - Desktop Settings with local configuration, undo limits and window restoration.
 
 ## Quick start

@@ -1,3 +1,4 @@
+import type { ExportFormat } from '@/features/caption/export-settings';
 import { StoredZip, uniqueExportName } from '@/lib/stored-zip';
 import { resolveLayout } from '@/features/caption/resolve-layout';
 import { exportPhotoCaptions, exportName } from '@/features/caption/render';
@@ -10,6 +11,7 @@ import type { SessionPhoto } from './session-state';
 
 export interface RollExportOptions {
   quality: number;
+  format?: ExportFormat;
   metadataOptions: ExportMetadataOptions;
 }
 
@@ -38,6 +40,7 @@ export async function exportRoll(
   signal: AbortSignal,
   onProgress: (completed: number, name: string) => void,
 ) {
+  const { format = 'jpg', quality, metadataOptions } = options;
   const zip = new StoredZip();
   const names = new Set<string>();
   const failures: string[] = [];
@@ -58,16 +61,17 @@ export async function exportRoll(
         loaded.image,
         loaded.document.photo.dimensions,
         captions,
-        options.quality,
+        quality,
+        format,
       );
       signal.throwIfAborted();
       const blob = await addExportMetadata(
         image,
         loaded.document.photo.metadata,
-        options.metadataOptions,
+        metadataOptions,
       );
       await zip.add(
-        uniqueExportName(exportName(item.photo.name), names),
+        uniqueExportName(exportName(item.photo.name, format), names),
         blob,
         signal,
       );
