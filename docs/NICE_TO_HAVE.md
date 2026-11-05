@@ -34,25 +34,6 @@ Przy powrocie ustalić relację liczby powtórzeń do gęstości, skalowanie wzo
 do wymiarów zdjęcia oraz zapis w presetach.
 Wpływ: web/desktop, model warstw, podgląd i eksport seryjny.
 
-## Widok edytora
-
-### Powiększanie i przesuwanie widoku
-
-Status: **zakres 1.0 — integracja do oceny** (2026-11-04).
-Stan etapów i wyniki weryfikacji: [plan Navigatora](plans/photo-navigator.md).
-Makieta zaakceptowana; Navigator jest podłączony do edytora web/desktop.
-Końcowy odbiór funkcji pozostaje otwarty.
-
-Decyzja: 2026-11-04, burza mózgów o ramkach do zdjęć. Osobny pomysł na
-powiększanie i przesuwanie widoku zdjęcia, z suwakiem powiększenia podobnym
-do Lightroom Classic oraz miniaturą Navigator wskazującą aktualnie oglądany
-obszar. Szybkie przełączanie na dopasowanie całego zdjęcia do widoku i zoom 100%.
-Funkcja dotyczy widoku edytora, nie zmiany rozmiaru zdjęcia ani eksportu.
-Przy powrocie ustalić interakcje przesuwania widoku i warstw, znaczenie 100%
-na ekranach HiDPI oraz dopasowanie całej kompozycji po dodaniu ramki.
-Wpływ: wspólny edytor web/desktop. Niezależne od pomysłu ramek;
-nie ustalono zależności ani kolejności implementacji.
-
 ## Desktop
 
 ### Zapisywanie sesji

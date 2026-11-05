@@ -1,6 +1,6 @@
 # Regresja wizualna UI — smoke tests
 
-Stan: 3 listopada 2026. Zestaw sprawdza widoki prawdziwej aplikacji w jednym profilu Chromium desktop. Storybook nie jest uruchamiany przez `test:visual`.
+Stan: 5 listopada 2026. Zestaw sprawdza widoki prawdziwej aplikacji w jednym profilu Chromium desktop. Storybook nie jest uruchamiany przez `test:visual`.
 
 ## Sceny
 
@@ -15,7 +15,7 @@ uruchomić zestaw na innym porcie, gdy domyślny 4184 jest zajęty.
 | Test                   | Co obejmuje                                             |
 | ---------------------- | ------------------------------------------------------- |
 | Empty editor           | Puste okno, akcje i układ początkowy.                   |
-| Prepared photo session | Zdjęcie, trzy warstwy i podstawowy inspektor.           |
+| Prepared photo session | Zdjęcie, Navigator i trzy warstwy.                      |
 | Font panel             | Prawdziwy panel fontów i próbki gotowe do renderowania. |
 | Metadata panel         | Kategorie i wyszukiwanie metadanych.                    |
 | Graphic settings       | Grafika SVG i jej ustawienia.                           |
@@ -37,3 +37,35 @@ Wzorce każdej sceny i profilu wymagają obejrzenia przed zaakceptowaniem zmiany
 
 Brak wzorca powoduje niezaliczoną weryfikację; aktualizuj go wyłącznie jawnie
 wybraną sceną i po obejrzeniu pełnego obrazu.
+
+## Navigator — weryfikacja 0.7.0-beta
+
+Wydany kod: `716f083`, tag `v0.7.0-beta`. [Proces wydania](https://github.com/rafalkarczmarzyk/frame-note/actions/runs/41985599461)
+zakończył się sukcesem 2026-11-05: walidacja, źródła, paczki macOS/Windows/Linux,
+testy gotowych aplikacji i launchera Windows oraz publikacja.
+
+Przed wydaniem przeszły `pnpm check` (493 testy Vitest, w tym 21 testów
+geometrii/stanu zoomu/adaptera OS, istniejący eksport JPG, sześć scen Chromium
+i build web), build Storybooka oraz natywny smoke macOS z JPG/ZIP i konfiguracją.
+Nie dodano testu ani profilu przeglądarkowego. Zmiany wzorców obejrzano jako
+expected/actual/diff; dotyczyły zaakceptowanego Navigatora, scrolla sidebara,
+stanu strzałki przy ułamkowym Fit i numeru wersji w stopce empty/About.
+
+Kontrole interaktywne Chromium objęły Fit/100%, całkowite procenty ręcznego
+zoomu, Z (także powrót do dokładnego Fit), akumulację małych delt wheel,
+Spację/MMB, scroll, Cmd-wheel, Escape podczas pan, pole % i jego strzałki,
+niezależne widoki dwóch zdjęć, fokus tekstu, drag marginesu w Fit oraz drag
+warstwy i Undo na DPR 2. Zoom/pan nie zmieniały rastra miniatury ani Undo. Małe zdjęcie
+w Fit zachowało skalę 100% na DPR 2; przy 800% canvas miał nadal 2112×1704 px
+dla viewportu 1056×852 CSS px. Nie ma własnych skrótów +/− do zoomu zdjęcia.
+
+Otwarte kontrole ręczne, nieweryfikowane przez opublikowane paczki CI:
+
+- Fizyczny trackpad/pinch i sterowanie na Windows/Linux; test adaptera OS nie
+  potwierdza sposobu dostarczania gestów przez konkretny sprzęt i przeglądarkę.
+- Odbiór skali 100% na fizycznej Retinie (definicja pozostaje 1 piksel CSS).
+- Pełna macierz jednostek/link modes marginesów przy zoom, uchwyty na brzegach
+  oraz pointercancel/blur podczas różnych rodzajów drag.
+- Osobna ocena motywów i profili poza obecnym UI i profilem Chromium desktop.
+
+Bieżące zachowanie opisuje [instrukcja użytkownika](USER_GUIDE.md#navigating-the-photo).

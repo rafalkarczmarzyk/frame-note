@@ -1,6 +1,6 @@
 # Zakres do wersji 1.0
 
-Stan: częściowo zrealizowany. Aktualizacja: 2026-11-04.
+Stan: częściowo zrealizowany. Aktualizacja: 2026-11-05.
 Cel: domknięcie pracy z edytorem przed wydaniem 1.0.
 
 ## Dostarczone
@@ -12,6 +12,10 @@ Cel: domknięcie pracy z edytorem przed wydaniem 1.0.
   Dowody weryfikacji i nadal otwarte kontrole ręczne pozostają w
   [planie historii edycji](edit-history.md).
 
+- **Navigator — 0.7.0-beta.** Powiększanie i przesuwanie widoku we wspólnym
+  edytorze web/desktop. [Zachowanie](../USER_GUIDE.md#navigating-the-photo),
+  [dowody i otwarte kontrole ręczne](../UI_VISUAL_TESTS.md#navigator--weryfikacja-070-beta).
+
 ## Pozostały zakres
 
 - Zapisywanie sesji desktopu: otwarte pliki i bieżące ustawienia zdjęć,
@@ -19,7 +23,6 @@ Cel: domknięcie pracy z edytorem przed wydaniem 1.0.
   Zapis sesji nie obejmuje historii Undo/Redo.
 - Plik konfiguracyjny desktop: preferencje, limit kroków historii, geometria
   okna i ustawienie sprawdzania aktualizacji przy starcie.
-- Powiększanie i przesuwanie widoku zdjęcia we wspólnym edytorze web/desktop.
 
 Szczegóły i otwarte kwestie pozostałych funkcji pozostają w
 [rejestrze pomysłów](../NICE_TO_HAVE.md). Ich implementacja nie została rozpoczęta.
