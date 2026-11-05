@@ -1,3 +1,4 @@
+import { presetV2, migratePresetV1 } from './preset-formats/v2';
 import { presetV1 } from './preset-formats/v1';
 import { parseIconToken } from './inline-icon';
 import { migrateLogo, parseImageToken } from './inline-image';
@@ -11,7 +12,7 @@ import {
 } from './caption-colors';
 
 export interface LayoutPreset {
-  version: 1;
+  version: 2;
   id: string;
   name: string;
   layout: CaptionLayout;
@@ -35,10 +36,15 @@ export function parsePreset(
     typeof value === 'object' &&
     'version' in value &&
     typeof value.version === 'number' &&
-    value.version > 1
+    value.version > 2
   )
     throw Error('Preset version is newer than this application supports.');
-  const parsed = presetV1.safeParse(value);
+  const version =
+    value && typeof value === 'object' && 'version' in value
+      ? value.version
+      : undefined;
+  const parsed =
+    version === 1 ? presetV1.safeParse(value) : presetV2.safeParse(value);
   if (!parsed.success) {
     const issue = parsed.error.issues[0]!;
     const path = issue.path.join('.') || 'preset';
@@ -50,10 +56,11 @@ export function parsePreset(
             .join(', ')}.`
         : issue.code === 'invalid_type'
           ? 'Missing field or incorrect value type.'
-          : 'Value does not match the v1 preset format.';
-    throw Error(`Invalid FrameNote v1 preset: ${path}. ${reason}`);
+          : 'Value does not match the supported preset format.';
+    throw Error(`Invalid FrameNote preset: ${path}. ${reason}`);
   }
-  const data = parsed.data;
+  const data =
+    parsed.data.version === 1 ? migratePresetV1(parsed.data) : parsed.data;
   const ids = new Set(data.layout.containers.map((c) => c.id));
   if (
     ids.size !== data.layout.containers.length ||
@@ -97,7 +104,7 @@ export function parsePreset(
     }
   });
   return {
-    version: 1,
+    version: 2,
     id: data.id,
     name: data.name,
     layout: {
@@ -125,7 +132,7 @@ export function createPreset(
     ),
   ]);
   return structuredClone({
-    version: 1,
+    version: 2,
     id,
     name: name.trim(),
     layout: {

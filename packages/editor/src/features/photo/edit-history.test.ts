@@ -249,3 +249,30 @@ it('applies a lower limit immediately to past and future without restoring prune
   expect(history.status('b').canUndo).toBe(false);
   expect(() => history.setLimit(0)).toThrow();
 });
+
+it('keeps a tiled drag in one undo step and restores the original single-mark position', () => {
+  const history = new EditHistorySession();
+  const initial = document('Proof');
+  initial.layout.containers[0]!.position.custom = { x: 25, y: 75 };
+  initial.layout.containers[0]!.position.tiled = {
+    enabled: true,
+    pattern: 'grid',
+    angle: 45,
+    spacing: 12,
+    offset: { x: 0, y: 0 },
+  };
+  history.reset('tiled', initial);
+  history.begin('tiled', 'Move pattern');
+  for (const x of [1, 2, 10]) {
+    const next = structuredClone(initial);
+    next.layout.containers[0]!.position.tiled!.offset = { x, y: -x };
+    history.update('tiled', next);
+  }
+  history.commit('tiled');
+  expect(history.undo('tiled')).toEqual(initial);
+  expect(history.status('tiled').canUndo).toBe(false);
+  expect(history.redo('tiled')!.layout.containers[0]!.position).toMatchObject({
+    custom: { x: 25, y: 75 },
+    tiled: { angle: 45, spacing: 12, offset: { x: 10, y: -10 } },
+  });
+});

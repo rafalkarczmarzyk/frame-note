@@ -45,6 +45,7 @@ export function renderBackgroundTile(
   caption: Caption,
   dimensions: ImageDimensions,
   capture?: (rect: ContentRect) => HTMLCanvasElement,
+  effectDimensions = dimensions,
 ) {
   const background = pixelBackground(caption, dimensions);
   if (
@@ -56,7 +57,7 @@ export function renderBackgroundTile(
     return null;
   const rect = backgroundRect(content, background);
   const glass = background.type === 'glass';
-  const scale = Math.min(dimensions.width, dimensions.height) / 800;
+  const scale = Math.min(effectDimensions.width, effectDimensions.height) / 800;
   const shadow = glass
     ? {
         ...background.shadow,

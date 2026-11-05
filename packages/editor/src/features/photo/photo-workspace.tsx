@@ -1,3 +1,4 @@
+import { TiledPreview } from '../caption/tiled-preview';
 import type { ExportFormat } from '../caption/export-settings';
 import type Konva from 'konva';
 import { PhotoNavigator } from './photo-navigator';
@@ -207,6 +208,7 @@ function PhotoWorkspaceContent({
   );
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [hoveredOffsetId, setHoveredOffsetId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const host = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<Konva.Group>(null);
@@ -657,6 +659,9 @@ function PhotoWorkspaceContent({
   const previewX = 28 + viewX;
   const previewY = 28 + viewY;
   const overviewStart = useRef<{ x: number; y: number } | null>(null);
+  const patternError = prepared.error.startsWith('Pattern is too dense.')
+    ? prepared.error
+    : '';
   const preparingExport =
     !!photo && !prepared.blob && !prepared.error && !fontError && !assetError;
   const exportLabel =
@@ -850,6 +855,86 @@ function PhotoWorkspaceContent({
                                   width,
                                   height,
                                 });
+                            if (caption.position.tiled?.enabled)
+                              return (
+                                <TiledPreview
+                                  key={id}
+                                  caption={caption}
+                                  geometry={geometry}
+                                  dimensions={{ width, height }}
+                                  decoration={glassPreview.tiles?.get(id)}
+                                  draggable={!exporting && !navigation.cursor}
+                                  scale={scale}
+                                  layerHovered={hoveredId === id}
+                                  offsetHovered={
+                                    hoveredOffsetId === id &&
+                                    layout.activeId === id
+                                  }
+                                  stroke={getComputedStyle(
+                                    document.documentElement,
+                                  )
+                                    .getPropertyValue('--color-porcelain')
+                                    .trim()}
+                                  onSelect={() => selectContainer(id)}
+                                  onDragState={(active) =>
+                                    setDraggingId(active ? id : null)
+                                  }
+                                  onChange={(tiled) =>
+                                    setLayout((value) => ({
+                                      ...value,
+                                      containers: value.containers.map(
+                                        (container) =>
+                                          container.id === id
+                                            ? {
+                                                ...container,
+                                                position: {
+                                                  ...container.position,
+                                                  tiled,
+                                                },
+                                              }
+                                            : container,
+                                      ),
+                                    }))
+                                  }
+                                >
+                                  {caption.logo && logoGeometry ? (
+                                    <CanvasImage
+                                      listening={false}
+                                      width={logoGeometry.width}
+                                      height={logoGeometry.height}
+                                      image={
+                                        caption.logo.colorMode === 'single'
+                                          ? tintedIcon(
+                                              caption.logo.asset,
+                                              iconImages.get(
+                                                caption.logo.asset.svg,
+                                              )!,
+                                              logoGeometry.height,
+                                              color,
+                                            )
+                                          : iconImages.get(
+                                              caption.logo.asset.svg,
+                                            )
+                                      }
+                                    />
+                                  ) : scene ? (
+                                    <InlinePreview
+                                      scene={scene}
+                                      caption={caption}
+                                      color={visualColor}
+                                      images={iconImages}
+                                    />
+                                  ) : (
+                                    <Text
+                                      {...config}
+                                      x={0}
+                                      y={0}
+                                      opacity={1}
+                                      listening={false}
+                                    />
+                                  )}
+                                </TiledPreview>
+                              );
                             return (
                               <Group
                                 key={id}
@@ -1355,9 +1440,15 @@ function PhotoWorkspaceContent({
               iconTone="caption"
               icon={<Layers />}
             >
-              {(assetError || fontError || glassPreview.error) && (
+              {(assetError ||
+                fontError ||
+                glassPreview.error ||
+                patternError) && (
                 <p role="alert" className="px-4 pt-2 pb-3 text-xs">
-                  {assetError || fontError || glassPreview.error}
+                  {assetError ||
+                    fontError ||
+                    glassPreview.error ||
+                    patternError}
                 </p>
               )}
               <LayerList
@@ -1589,6 +1680,9 @@ function PhotoWorkspaceContent({
                     glassEnabled
                   />
                   <CaptionPositionControls
+                    onOffsetHover={(hovered) =>
+                      setHoveredOffsetId(hovered ? layout.activeId : null)
+                    }
                     caption={settings}
                     dimensions={dimensions}
                     onChange={setSettings}
@@ -1753,7 +1847,7 @@ function PhotoWorkspaceContent({
                       {format === 'jpg' && ' Try a lower JPEG quality.'}
                     </InlineNotice>
                   )}
-                {prepared.error && (
+                {prepared.error && !patternError && (
                   <p role="alert" className="mt-2 text-xs">
                     {prepared.error}
                     <Button

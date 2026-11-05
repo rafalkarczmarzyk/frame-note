@@ -1,3 +1,6 @@
+import { tiledCopies } from '../../../../core/src/tiled-watermark';
+import { captionBackgroundRect } from './background-render';
+import { tiledBackground } from './tiled-background';
 import { resolvedFontFamily } from '../../../../core/src/fonts';
 import { resolvedColor } from './resolve-color';
 import { renderBackgroundTile } from './background-render';
@@ -236,6 +239,79 @@ async function withPhotoStage<T>(
       const geometry = caption.logo
         ? logoLayout(dimensions, caption)
         : inlineLayout(dimensions, caption, text, icons);
+      if (caption.position.tiled?.enabled) {
+        if (!text.trim() && !caption.logo) continue;
+        const decorated = captionBackgroundRect(
+          { x: 0, y: 0, width: geometry.width, height: geometry.height },
+          caption,
+          dimensions,
+        );
+        const copies = tiledCopies(
+          dimensions,
+          decorated,
+          caption.position.tiled,
+        );
+        const motif = await captionNode(
+          dimensions,
+          caption,
+          text,
+          color,
+          icons,
+        );
+        const backgrounds = new Konva.Group({ listening: false });
+        // Every glass sample sees the layers below this layer, not sibling copies.
+        for (const copy of copies) {
+          const tile = tiledBackground(
+            layer,
+            dimensions,
+            caption,
+            geometry,
+            copy,
+          );
+          if (tile) {
+            decorations.push(tile.image);
+            const group = new Konva.Group({
+              x: copy.x,
+              y: copy.y,
+              rotation: caption.position.tiled.angle,
+              listening: false,
+            });
+            group.add(new Konva.Image({ ...tile, listening: false }));
+            backgrounds.add(group);
+          }
+        }
+        layer.add(backgrounds);
+        if (onDecoration && backgrounds.children.length) {
+          const canvas = backgrounds.toCanvas({
+            x: 0,
+            y: 0,
+            width: dimensions.width,
+            height: dimensions.height,
+            pixelRatio: 1,
+          });
+          decorations.push(canvas);
+          onDecoration(index, {
+            image: canvas,
+            x: 0,
+            y: 0,
+            width: dimensions.width,
+            height: dimensions.height,
+          });
+        }
+        for (const copy of copies) {
+          layer.add(
+            motif.clone({
+              x: copy.x,
+              y: copy.y,
+              rotation: caption.position.tiled.angle,
+              offsetX: geometry.width / 2,
+              offsetY: geometry.height / 2,
+            }),
+          );
+        }
+        motif.destroy();
+        continue;
+      }
       const background =
         text.trim() || caption.logo
           ? renderBackgroundTile(geometry, caption, dimensions, (rect) =>
@@ -247,75 +323,9 @@ async function withPhotoStage<T>(
         onDecoration?.(index, background);
         layer.add(new Konva.Image({ ...background, listening: false }));
       }
-      if (caption.logo) {
-        const scene = logoLayout(dimensions, caption);
-        const raw = await loadIcon(caption.logo.asset);
-        const image =
-          caption.logo.colorMode === 'single'
-            ? tintedIcon(caption.logo.asset, raw, scene.height, color)
-            : raw;
-        layer.add(
-          new Konva.Image({ ...scene, image, opacity: caption.style.opacity }),
-        );
-        continue;
-      }
-      if (!icons.length) {
-        layer.add(
-          new Konva.Text(captionConfig(dimensions, caption, text, color)),
-        );
-        continue;
-      }
-      const scene = inlineLayout(dimensions, caption, text, icons);
-      const group = new Konva.Group({
-        x: scene.x,
-        y: scene.y,
-        opacity: caption.style.opacity,
-      });
-      layer.add(group);
-      for (const run of scene.runs) {
-        if (run.separator) {
-          group.add(
-            new Konva.Rect({
-              x: run.x,
-              y: run.y + (run.height - (run.thickness ?? 0)) / 2,
-              width: run.width,
-              height: run.thickness,
-              fill: resolvedColor(run.separator.color),
-              opacity: run.separator.opacity,
-            }),
-          );
-        } else if (run.icon) {
-          const image = await loadIcon(run.icon);
-          group.add(
-            new Konva.Image({
-              x: run.x,
-              y:
-                run.y +
-                (run.icon.image || run.icon.sizing
-                  ? 0
-                  : (scene.lineHeight - scene.fontSize) / 2),
-              width: run.width,
-              height: run.height,
-              image: run.original
-                ? image
-                : tintedIcon(run.icon, image, run.height, color),
-            }),
-          );
-        } else
-          group.add(
-            new Konva.Text({
-              x: run.x,
-              y: run.y,
-              text: run.text,
-              fontSize: scene.fontSize,
-              fontFamily: resolvedFontFamily(caption.style.fontFamily),
-              fontStyle: canvasFontStyle(caption),
-              lineHeight: caption.style.lineHeight,
-              fill: color,
-              wrap: 'none',
-            }),
-          );
-      }
+      const node = await captionNode(dimensions, caption, text, color, icons);
+      node.position({ x: geometry.x, y: geometry.y });
+      layer.add(node);
     }
     layer.draw();
     return await consume(stage);
@@ -325,6 +335,93 @@ async function withPhotoStage<T>(
       canvas.width = canvas.height = 0;
     });
   }
+}
+
+async function captionNode(
+  dimensions: ImageDimensions,
+  caption: Caption,
+  text: string,
+  color: string,
+  icons: readonly InlineAsset[],
+) {
+  const scene = caption.logo
+    ? logoLayout(dimensions, caption)
+    : inlineLayout(dimensions, caption, text, icons);
+  const group = new Konva.Group({
+    opacity: caption.style.opacity,
+    listening: false,
+  });
+  if (caption.logo) {
+    const raw = await loadIcon(caption.logo.asset);
+    group.add(
+      new Konva.Image({
+        width: scene.width,
+        height: scene.height,
+        image:
+          caption.logo.colorMode === 'single'
+            ? tintedIcon(caption.logo.asset, raw, scene.height, color)
+            : raw,
+      }),
+    );
+    return group;
+  }
+  if (!icons.length) {
+    group.add(
+      new Konva.Text({
+        ...captionConfig(dimensions, caption, text, color),
+        x: 0,
+        y: 0,
+        opacity: 1,
+      }),
+    );
+    return group;
+  }
+  const inline = inlineLayout(dimensions, caption, text, icons);
+  for (const run of inline.runs) {
+    if (run.separator)
+      group.add(
+        new Konva.Rect({
+          x: run.x,
+          y: run.y + (run.height - (run.thickness ?? 0)) / 2,
+          width: run.width,
+          height: run.thickness,
+          fill: resolvedColor(run.separator.color),
+          opacity: run.separator.opacity,
+        }),
+      );
+    else if (run.icon) {
+      const image = await loadIcon(run.icon);
+      group.add(
+        new Konva.Image({
+          x: run.x,
+          y:
+            run.y +
+            (run.icon.image || run.icon.sizing
+              ? 0
+              : (inline.lineHeight - inline.fontSize) / 2),
+          width: run.width,
+          height: run.height,
+          image: run.original
+            ? image
+            : tintedIcon(run.icon, image, run.height, color),
+        }),
+      );
+    } else
+      group.add(
+        new Konva.Text({
+          x: run.x,
+          y: run.y,
+          text: run.text,
+          fontSize: inline.fontSize,
+          fontFamily: resolvedFontFamily(caption.style.fontFamily),
+          fontStyle: canvasFontStyle(caption),
+          lineHeight: caption.style.lineHeight,
+          fill: color,
+          wrap: 'none',
+        }),
+      );
+  }
+  return group;
 }
 
 export function exportName(name: string, format: ExportFormat = 'jpg'): string {

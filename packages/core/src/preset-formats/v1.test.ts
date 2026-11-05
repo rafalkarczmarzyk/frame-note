@@ -8,7 +8,7 @@ describe('first official preset format', () => {
   it('reads the frozen v1 fixture independently of current defaults', () => {
     const source = readFileSync('tests/fixtures/presets/v1.json', 'utf8');
     const value = readPreset(source);
-    expect(value.version).toBe(1);
+    expect(value.version).toBe(2);
     expect(value.layout.containers[0]!.template).toBe(
       '{author}\n{image:signature:2:font:original}',
     );
@@ -17,9 +17,9 @@ describe('first official preset format', () => {
   });
   const preset = () =>
     createPreset('preset-1', 'Test', createCaptionLayout(), []);
-  it('writes and reads v1 without conversion', () => {
+  it('writes and reads v2 after v1 migration', () => {
     const value = preset();
-    expect(value.version).toBe(1);
+    expect(value.version).toBe(2);
     const parsed = readPreset(JSON.stringify(value));
     expect(parsed).toEqual(value);
     expect(
@@ -30,7 +30,7 @@ describe('first official preset format', () => {
   });
   it('rejects unknown versions and fields without silently dropping data', () => {
     expect(() =>
-      readPreset(JSON.stringify({ ...preset(), version: 2 })),
+      readPreset(JSON.stringify({ ...preset(), version: 3 })),
     ).toThrow('newer');
     expect(() =>
       readPreset(JSON.stringify({ ...preset(), version: 0 })),

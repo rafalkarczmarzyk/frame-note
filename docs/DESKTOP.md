@@ -67,11 +67,12 @@ Build tools and signing requirements: [Development](DEVELOPMENT.md#xcode-detecti
 
 ## Data and presets
 
-Presets are individual v1 JSON files in `~/FrameNote/presets`, where `~` is the
+Presets are individual v2 JSON files (v1 files are migrated on read) in `~/FrameNote/presets`, where `~` is the
 user's home directory on each system. The directory is created on first use.
 Restart to load external file edits; no live folder watching, trash or revision history.
 Web instead uses localStorage. Transfer layouts with `.framenote.json` export/import;
-the two stores are not synchronized. See [preset format](PRESET_FORMATS.md).
+the two stores are not synchronized. Before replacing a v1 file with a saved v2
+preset, the app preserves its original in `presets/v1-originals`. See [preset format](PRESET_FORMATS.md).
 
 Filenames use ASCII kebab-case with Latin accents simplified, a 180-character
 base limit, reserved-name protection and case-insensitive collision suffixes.

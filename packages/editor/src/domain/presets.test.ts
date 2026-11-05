@@ -75,7 +75,7 @@ describe('layout presets', () => {
   it('rejects invalid fields and unsupported versions', () => {
     for (const change of [
       (p: ReturnType<typeof example>) => {
-        p.version = 99 as 1;
+        p.version = 99 as 2;
       },
       (p: ReturnType<typeof example>) => {
         p.layout.containers[0]!.style.color = 'url(unsafe)';

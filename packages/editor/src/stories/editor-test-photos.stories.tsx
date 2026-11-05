@@ -502,3 +502,21 @@ export const GlassPortraitBackground: Story = {
     initialLayout: backgroundExample('glass'),
   },
 };
+
+export const TiledWatermark: Story = {
+  args: {
+    initialLayout: (() => {
+      const caption = createCaption();
+      caption.template = 'FrameNote · Proof';
+      caption.style.opacity = 0.35;
+      caption.position.tiled = {
+        enabled: true,
+        pattern: 'staggered',
+        angle: 30,
+        spacing: 12,
+        offset: { x: 0, y: 0 },
+      };
+      return createCaptionLayout(caption);
+    })(),
+  },
+};

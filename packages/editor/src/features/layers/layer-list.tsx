@@ -9,6 +9,7 @@ import {
   Eye,
   EyeOff,
   Move,
+  Grid2X2,
   Trash2,
 } from 'lucide-react';
 import { PickerList } from '@/components/ui/picker-list';
@@ -116,21 +117,27 @@ export function LayerList({
               <>
                 <Tooltip
                   content={
-                    container.position.custom
-                      ? `Manual position · X ${Number(container.position.custom.x.toFixed(2))}%, Y ${Number(container.position.custom.y.toFixed(2))}%`
-                      : `Anchor · ${container.position.anchor.replaceAll('-', ' ')}`
+                    container.position.tiled?.enabled
+                      ? `Tiled · ${container.position.tiled.pattern} · ${container.position.tiled.angle}°`
+                      : container.position.custom
+                        ? `Manual position · X ${Number(container.position.custom.x.toFixed(2))}%, Y ${Number(container.position.custom.y.toFixed(2))}%`
+                        : `Anchor · ${container.position.anchor.replaceAll('-', ' ')}`
                   }
                 >
                   <span
                     className="flex size-6 items-center justify-center text-content-secondary"
                     role="img"
                     aria-label={
-                      container.position.custom
-                        ? 'Manual position'
-                        : `Anchor: ${container.position.anchor.replaceAll('-', ' ')}`
+                      container.position.tiled?.enabled
+                        ? 'Tiled position'
+                        : container.position.custom
+                          ? 'Manual position'
+                          : `Anchor: ${container.position.anchor.replaceAll('-', ' ')}`
                     }
                   >
-                    {container.position.custom ? (
+                    {container.position.tiled?.enabled ? (
+                      <Grid2X2 aria-hidden="true" className="size-3.5" />
+                    ) : container.position.custom ? (
                       <Move aria-hidden="true" className="size-3.5" />
                     ) : (
                       <AnchorIcon

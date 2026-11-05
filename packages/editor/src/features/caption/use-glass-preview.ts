@@ -22,7 +22,14 @@ export function useGlassPreview(
     message: string;
   } | null>(null);
   const enabled =
-    ready && captions.some((item) => item.caption.background?.type === 'glass');
+    ready &&
+    captions.some(
+      (item) =>
+        item.caption.background?.type === 'glass' ||
+        (item.caption.position.tiled?.enabled &&
+          item.caption.background &&
+          item.caption.background.type !== 'none'),
+    );
   if ((!photo || !enabled) && result) setResult(null);
   if ((!photo || !enabled) && failure) setFailure(null);
   useEffect(() => {

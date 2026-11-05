@@ -1,3 +1,4 @@
+import type { TiledPosition } from './tiled-watermark';
 import type { LayerBackground } from './layer-background';
 import type { FontFamily } from './fonts';
 import type { ImageAsset } from './inline-image';
@@ -51,6 +52,7 @@ export interface Caption {
   };
   position: {
     anchor: Anchor;
+    tiled?: TiledPosition;
     /** Anchor reference point as percentages of the full photo. */
     custom?: { x: number; y: number };
     margins: Margins;

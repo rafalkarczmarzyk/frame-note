@@ -17,8 +17,6 @@ import { AlignAuto } from '@/components/icons/align-auto';
 import { InspectorSection } from '@/components/layout/inspector-section';
 import { IconButton } from '@/components/ui/icon-button';
 import { ColorControls } from './color-controls';
-import { toPixels } from '../../../../core/src/sizing';
-import { anchoredPosition, customPoint } from './layout';
 import { SidebarSection } from '@/components/layout/sidebar-section';
 import {
   AlignLeft,
@@ -37,7 +35,6 @@ import { Field } from '@/components/ui/field';
 import { NumberField } from '@/components/ui/number-field';
 import { InlineInputGroup } from '@/components/ui/inline-input-group';
 import { SegmentedControl } from '@/components/ui/segmented-control';
-import { AnchorPicker } from '@/components/ui/anchor-picker';
 import { MarginEditor } from '@/components/ui/margin-editor';
 import { RangeField } from '@/components/ui/range-field';
 import { Blend } from 'lucide-react';
@@ -382,137 +379,4 @@ export function CaptionControls({
   );
 }
 
-export function CaptionPositionControls({
-  caption,
-  dimensions,
-  onChange,
-  disabled,
-}: Pick<
-  CaptionControlsProps,
-  'caption' | 'dimensions' | 'onChange' | 'disabled'
->) {
-  const position = (patch: Partial<Caption['position']>) =>
-    onChange({ ...caption, position: { ...caption.position, ...patch } });
-  const anchorCoordinates = customPoint(
-    dimensions,
-    { width: 0, height: 0 },
-    caption.position.anchor,
-    anchoredPosition(
-      dimensions,
-      { width: 0, height: 0 },
-      caption.position.anchor,
-      {
-        top: toPixels(
-          caption.position.margins.top,
-          caption.sizingUnit,
-          dimensions,
-        ),
-        right: toPixels(
-          caption.position.margins.right,
-          caption.sizingUnit,
-          dimensions,
-        ),
-        bottom: toPixels(
-          caption.position.margins.bottom,
-          caption.sizingUnit,
-          dimensions,
-        ),
-        left: toPixels(
-          caption.position.margins.left,
-          caption.sizingUnit,
-          dimensions,
-        ),
-      },
-    ),
-  );
-  const coordinates = caption.position.custom ?? anchorCoordinates;
-
-  return (
-    <InspectorSection title="Position">
-      <fieldset disabled={disabled} className="space-y-2 disabled:opacity-70">
-        <SegmentedControl
-          label="Position mode"
-          value={caption.position.custom ? 'custom' : 'anchor'}
-          disabled={disabled}
-          options={[
-            {
-              value: 'anchor',
-              label: 'Anchor',
-              tooltip: 'Position the layer within the photo margins',
-            },
-            {
-              value: 'custom',
-              label: 'Manual',
-              tooltip:
-                'Position the layer anywhere on the photo; margins do not apply',
-            },
-          ]}
-          onValueChange={(mode) =>
-            position({
-              custom: mode === 'anchor' ? undefined : anchorCoordinates,
-            })
-          }
-        />
-        <div className="grid grid-cols-2 divide-x divide-border-subtle">
-          <Tooltip
-            disabled={!caption.position.custom}
-            content="Switch to Anchor to use the position grid"
-          >
-            <fieldset
-              disabled={disabled || !!caption.position.custom}
-              tabIndex={caption.position.custom ? 0 : undefined}
-              aria-label="Anchor position"
-              className="min-w-0 pr-3 disabled:opacity-50"
-            >
-              <AnchorPicker
-                value={caption.position.anchor}
-                onValueChange={(anchor) =>
-                  position({ anchor, custom: undefined })
-                }
-                disabled={disabled || !!caption.position.custom}
-              />
-            </fieldset>
-          </Tooltip>
-          <Tooltip
-            disabled={!!caption.position.custom}
-            content="Switch to Manual to edit X and Y"
-          >
-            <fieldset
-              disabled={disabled || !caption.position.custom}
-              tabIndex={!caption.position.custom ? 0 : undefined}
-              aria-label="Manual position"
-              className="min-w-0 space-y-2 pl-3 disabled:opacity-50"
-            >
-              <NumberField
-                label="X position"
-                tooltip="Horizontal position of the layer reference point · % of photo width"
-                unit="%"
-                value={coordinates.x}
-                min={0}
-                max={100}
-                step={0.1}
-                disabled={disabled || !caption.position.custom}
-                onValueChange={(x) =>
-                  position({ custom: { ...coordinates, x } })
-                }
-              />
-              <NumberField
-                label="Y position"
-                tooltip="Vertical position of the layer reference point · % of photo height"
-                unit="%"
-                value={coordinates.y}
-                min={0}
-                max={100}
-                step={0.1}
-                disabled={disabled || !caption.position.custom}
-                onValueChange={(y) =>
-                  position({ custom: { ...coordinates, y } })
-                }
-              />
-            </fieldset>
-          </Tooltip>
-        </div>
-      </fieldset>
-    </InspectorSection>
-  );
-}
+export { CaptionPositionControls } from './position-controls';

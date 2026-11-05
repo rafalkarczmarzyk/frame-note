@@ -35,9 +35,9 @@ limitations](docs/DESKTOP.md).
 ## Features
 
 - EXIF/IPTC/XMP metadata tokens mixed with text, SVG/PNG graphics and icons.
-- Independent layers, positioning, margins, color and Glass backgrounds.
+- Independent layers, anchored/manual/tiled positioning, margins, color and Glass backgrounds.
 - Bundled fonts plus installed system fonts in the desktop app.
-- Local presets with shared v1 JSON import/export across web and desktop.
+- Local presets with v2 JSON export and v1/v2 import across web and desktop.
 - JPG/PNG export, JPG quality and metadata controls, with batch export to ZIP.
 - Desktop Settings with local configuration, undo limits and window restoration.
 
@@ -66,7 +66,7 @@ Choose the app you want to run. For environment setup, builds and tests, see
 - [Desktop: installation, storage, packaging and GitHub Releases](docs/DESKTOP.md)
 - [Development: commands, tests, workspace and versioning](docs/DEVELOPMENT.md)
 - [Caption metadata tokens](docs/CAPTION_TAGS.md)
-- [Preset format v1](docs/PRESET_FORMATS.md)
+- [Preset formats v1/v2](docs/PRESET_FORMATS.md)
 - [Fonts and licenses](docs/FONT_LIBRARY.md)
 - [Design system](docs/DESIGN_SYSTEM.md)
 - [Product context](docs/PRODUCT.md) · [Deferred ideas](docs/NICE_TO_HAVE.md)

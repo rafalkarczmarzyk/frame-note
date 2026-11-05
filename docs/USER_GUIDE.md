@@ -15,6 +15,21 @@
   editable and are excluded from the preview and export.
 - **Flexible positioning.** Use nine anchors within shared margins, or drag a
   layer into Manual positioning with X/Y coordinates relative to the photo.
+  Tiled repeats the whole layer as Grid or Staggered (alternate rows shifted by
+  half a step). New patterns default to Staggered, 30°, 12% spacing and zero
+  offsets. Angle rotates the grid and its motifs together; spacing and
+  offsets use percentages of the shorter photo side, independently of document
+  sizing units. Positive offsets move right/down at every angle. With zero
+  offsets, a motif is centered. Drag any copy to move the pattern as one Undo
+  action; gaps let you select lower layers. Hovering any copy outlines the whole
+  pattern; hovering its layer-list entry does the same. The origin motif has a
+  green outline during these hovers or while hovering the Offset X/Y fields.
+  Selection alone does not display outlines. These guides appear only in the editor.
+  Reset offset leaves angle and spacing intact.
+  Switching back restores the retained single-mark coordinates. Backgrounds are
+  repeated per copy, with Glass sampling the photo and lower layers at each copy.
+  Patterns above 2000 intersecting copies require more spacing or a larger motif;
+  the app reports the limit and blocks export rather than dropping copies.
 - **Consistent styling.** Choose from 25 Google Fonts families, supported Bold/Italic variants,
   alignment, line spacing, opacity, quick colors, or a custom HEX color. Size
   content in pixels or as a percentage of the short or long image edge.
@@ -149,9 +164,9 @@ source photo, resolved metadata values, and export settings.
 Saved presets persist in the same browser at the same origin. Clearing site data
 removes them; export a `.framenote.json` file to back them up or transfer them.
 Preset imports are validated and added as new presets without overwriting
-existing entries. The supported format is v1, shared by web and desktop. Older
-pre-v1 development files are unsupported; future format changes require explicit
-migrations. See [preset format](PRESET_FORMATS.md).
+existing entries. New presets use v2, shared by web and desktop. Official v1 files are migrated
+without changing their layout. Older FrameNote versions reject v2; pre-v1
+development files remain unsupported. See [preset format](PRESET_FORMATS.md).
 
 Desktop saves presets as individual JSON files in `~/FrameNote/presets` (inside
 the user's home directory). Export/import `.framenote.json` files to transfer

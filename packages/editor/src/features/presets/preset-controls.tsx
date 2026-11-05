@@ -1,3 +1,4 @@
+import { writePresetStorage } from './preset-store';
 import { isPresetModified } from './preset-modified';
 import { platform } from '@/lib/platform';
 import { AsyncPresetStore } from './async-preset-store';
@@ -85,7 +86,7 @@ export function PresetControls({
               read: async () =>
                 platform().storage.getItem(presetStorageKey) ?? '[]',
               write: async (source) => {
-                platform().storage.setItem(presetStorageKey, source);
+                writePresetStorage(platform().storage, source);
               },
             })
           : { read: async () => '[]', write: async () => {} },

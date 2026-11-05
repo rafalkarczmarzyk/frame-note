@@ -1,16 +1,54 @@
-# Preset format v1
+# Preset formats
 
-[![Preset format: v1](https://img.shields.io/badge/preset_format-v1-14CC60?style=plastic)](../packages/core/src/preset-formats/v1.ts)
+New presets and exports use **v2**. The app reads official v1 and v2 files;
+v1 is migrated in memory without changing its layout, IDs or artwork. Older
+FrameNote versions reject v2 files. Pre-v1 development JSON remains unsupported.
+The format version is independent of the product version.
 
-The first supported preset format is **v1**, introduced with `0.1.0-beta`.
-Previous development JSON and storage are unsupported. No legacy parsers,
-converters or transfer of old libraries are provided.
+The frozen schemas are [v1](../packages/core/src/preset-formats/v1.ts) and
+[v2](../packages/core/src/preset-formats/v2.ts); the v2 module also defines the
+shared v1 → v2 migration. Both paths validate embedded SVG/PNG data, colors,
+unique identifiers and the 5 MB limit. Unknown fields and future versions are
+rejected rather than silently discarded.
 
-`packages/core/src/preset-formats/v1.ts` defines the Zod contract. All imports,
-stored presets and exports pass this schema and SVG/PNG validation. Unknown
-versions or fields are rejected rather than silently losing data. The preset
-version is independent of application SemVer and is not a revision counter for
-user edits. New files and exports have `version: 1`.
+## Tiled position in v2
+
+A container may include `position.tiled`:
+
+```json
+{
+  "enabled": true,
+  "pattern": "staggered",
+  "angle": -30,
+  "spacing": 12,
+  "offset": { "x": 0, "y": 0 }
+}
+```
+
+Angle is in degrees (−180 to 180, editor step 0.1). Spacing is 0–100% of the
+shorter photo side; offsets are −100–100% of that side, always in photo axes.
+`enabled: false` retains the pattern settings while Anchor/Manual is active.
+`position.anchor` and optional `position.custom` remain independent, preserving
+the single-mark position while the pattern is enabled. Global sizing-unit
+changes do not alter these normalized pattern settings. The v1 migration adds
+no tiled settings, preserving its original positioning.
+
+## Conversion and original data
+
+Importing a file does not modify the source. To convert files separately:
+
+```sh
+node scripts/convert-preset.mjs path/to/preset.json
+```
+
+The converter uses the application's parser and migration, validates artwork,
+and writes `preset.v2.json` next to the source. It never overwrites the source
+or an existing destination. No downgrade converter is provided.
+
+Desktop preserves a v1 file in `presets/v1-originals` before its first saved
+replacement as v2. Browser storage retains the original v1 collection under
+`framenote.presets.v1.original` before the first migrated write; the active
+storage key remains `framenote.presets.v1`. A failed backup prevents replacement.
 
 ## Example preset
 
@@ -96,12 +134,12 @@ From now on, every new format version requires:
 - Preservation of originals before persistent conversion, with clear errors for
   unsupported or lossy conversions. No automatic downgrade guarantee.
 
-There are no migrations or migration scripts for v1: there is no previous
-supported format. They are added when v2 is introduced.
+There is no pre-v1 migration. Future versions must extend the sequential
+migration chain without changing the frozen contracts.
 
 ## Stored libraries and recovery
 
-The web library validates each saved entry independently. Valid v1 presets remain
+The web library validates each saved entry independently. Valid supported presets remain
 available when another entry cannot be read; saves and imports preserve unreadable
 entries alongside the valid presets. The preset panel lists the rejected entry's
 name or position and the reason, including schema field paths where available.
@@ -110,4 +148,4 @@ The recovery download contains the original library loaded at startup.
 Malformed JSON or a non-array library blocks overwriting the whole collection.
 Desktop file libraries retain their existing stricter behavior: an unreadable file
 blocks loading and saving until resolved, leaving the original files untouched.
-Recovery does not convert unsupported development formats into official v1.
+Recovery does not convert unsupported development formats into a supported preset format.

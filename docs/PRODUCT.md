@@ -27,7 +27,8 @@ metadanymi aparatów, profilami kolorów ani dowolnym SVG.
 
 Nie ma edycji RAW, integracji uruchamianej z Lightroom, synchronizacji chmurowej,
 odtwarzania niezapisanej sesji ani automatycznego zawijania/zmniejszania tekstu.
-Styl jest wspólny dla całej warstwy; formatowanie fragmentów tekstu nie należy
+Powtarzany watermark powiela całą warstwę jako Grid lub Staggered;
+kąt, odstęp i offset są wspólne dla wzoru. Styl jest wspólny dla całej warstwy; formatowanie fragmentów tekstu nie należy
 do obecnych możliwości. Navigator powiększa i przesuwa wyłącznie widok edytora,
 bez zmiany kompozycji i eksportu. Stan widoku jest niezależny dla zdjęć
 i pozostaje w pamięci otwartej sesji. Rozmyte tło całego edytora i przezroczystość

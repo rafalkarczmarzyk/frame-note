@@ -23,16 +23,14 @@ proporcji ma działać niezależnie od ramek; ramka nie wymusza cropu.
 Przy powrocie ustalić zapis kadru per zdjęcie, wpływ na warstwy i presety oraz
 zachowanie w serii. Wpływ: web/desktop, geometria zdjęcia i eksport.
 
-### Powtarzany watermark
+### Mieszanie warstw
 
-Decyzja: 2026-11-04, rozmowa o watermarkach pokrywających całe zdjęcie.
-Nakładka powtarzana według wzoru na całej powierzchni zdjęcia, jak kafelkowana
-tekstura. Edycja jako jedna warstwa, w edytorze tekstowym z możliwością dodania
-własnej grafiki; własna grafika jest preferowaną formą watermarku.
-Opcje wzoru: kąt (np. 45°), liczba powtórzeń, gęstość/odstępy i krycie.
-Przy powrocie ustalić relację liczby powtórzeń do gęstości, skalowanie wzoru
-do wymiarów zdjęcia oraz zapis w presetach.
-Wpływ: web/desktop, model warstw, podgląd i eksport seryjny.
+Status: **odłożone** (2026-11-05, rozmowa przy wdrożeniu Tiled).
+Użytkownik chce na razie omówić opcje mieszania (m.in. Add, Subtract,
+Multiply), a najpierw dokończyć powtarzany watermark. Przy powrocie ustalić
+zestaw trybów, zakres działania wobec tła Glass i zgodność podglądu/eksportu.
+Canvas ma Add (`lighter`) i Multiply, ale nie ma bezpośredniego Subtract.
+Wpływ: web/desktop, model warstwy, presety i eksport; brak zgody na implementację.
 
 ## Desktop
 

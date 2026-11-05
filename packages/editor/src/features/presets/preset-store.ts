@@ -6,6 +6,22 @@ import {
 import type { SvgAsset } from '../../../../core/src/svg-asset';
 
 type StoragePort = Pick<Storage, 'getItem' | 'setItem'>;
+export const presetV1BackupKey = presetStorageKey + '.original';
+/** Preserve the pre-migration library before the first persistent v2 write. */
+export function writePresetStorage(storage: StoragePort, source: string) {
+  const original = storage.getItem(presetStorageKey);
+  if (original && !storage.getItem(presetV1BackupKey)) {
+    const values: unknown = JSON.parse(original);
+    if (
+      Array.isArray(values) &&
+      values.some(
+        (value) => value && typeof value === 'object' && value.version === 1,
+      )
+    )
+      storage.setItem(presetV1BackupKey, original);
+  }
+  storage.setItem(presetStorageKey, source);
+}
 /** Synchronous commit boundary: async callers always update the latest collection. */
 export class PresetStore {
   presets: LayoutPreset[] = [];
@@ -73,10 +89,11 @@ export class PresetStore {
     if (new Set(next.map((preset) => preset.id)).size !== next.length)
       throw Error('Preset identifiers must be unique.');
     try {
-      this.storage?.setItem(
-        presetStorageKey,
-        JSON.stringify([...next, ...this.rejected]),
-      );
+      if (this.storage)
+        writePresetStorage(
+          this.storage,
+          JSON.stringify([...next, ...this.rejected]),
+        );
     } catch {
       throw Error(
         'Could not save presets. Browser storage may be full or unavailable. Export your preset to keep a copy.',

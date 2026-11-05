@@ -6,6 +6,7 @@ import {
   writeFile,
   mkdir,
 } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -26,7 +27,7 @@ afterEach(async () => {
   );
 });
 describe('macOS preset files', () => {
-  it('creates a library and preserves the identical v1 JSON after restart and rename', async () => {
+  it('creates a library and preserves the identical v2 JSON after restart and rename', async () => {
     const { root, files } = await setup();
     expect(await files.read()).toBe('[]');
     const value = preset();
@@ -48,7 +49,7 @@ describe('macOS preset files', () => {
     for (const input of [
       [preset('../escape')],
       [preset(), preset()],
-      [{ ...preset(), version: 2 }],
+      [{ ...preset(), version: 3 }],
     ])
       await expect(files.write(JSON.stringify(input))).rejects.toThrow();
     expect(await readFile(join(root, 'presets/name.json'), 'utf8')).toBe(
@@ -156,4 +157,20 @@ it('keeps desktop originals when the async editor cannot load a malformed file',
   expect(await readFile(join(root, 'presets/name.json'), 'utf8')).toBe(
     original,
   );
+});
+
+it('backs up original v1 bytes before saving a changed migrated preset', async () => {
+  const { root, files } = await setup();
+  const original = readFileSync('tests/fixtures/presets/v1.json', 'utf8');
+  await mkdir(join(root, 'presets'), { recursive: true });
+  await writeFile(join(root, 'presets/old.json'), original);
+  const values = JSON.parse(await files.read());
+  values[0].name = 'Changed';
+  await files.write(JSON.stringify(values), [values[0].id]);
+  const backups = await readdir(join(root, 'presets/v1-originals'));
+  expect(backups).toHaveLength(1);
+  expect(
+    await readFile(join(root, 'presets/v1-originals', backups[0]!), 'utf8'),
+  ).toBe(original);
+  expect(JSON.parse(await new PresetFiles(root).read())[0].version).toBe(2);
 });

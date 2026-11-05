@@ -113,6 +113,19 @@ zaznaczenia samym kolorem tekstu ani nie powielaj osobnej palety w feature.
 Przykłady: `packages/editor/src/features/layers/layer-list.tsx`, `packages/editor/src/components/ui/picker-list.tsx`
 i kompozycje `Screens/TestPhotos`.
 
+### Position warstwy
+
+`features/caption/position-controls.tsx` pokazuje Anchor / Manual / Tiled
+z ikonami i tylko aktywne pola. Anchor centruje AnchorPicker w całej sekcji.
+Tiled składa SegmentedControl dla wzoru i skrótów kąta oraz NumberField dla
+kąta, spacingu i offsetu. Reset offsetu nie zmienia reszty wzoru.
+Story: **Layers/Position**; pełna kompozycja: **Screens/TestPhotos/TiledWatermark**.
+Wszystkie kopie są jedną warstwą. Najazd na dowolną kopię pokazuje obrysy całego
+wzoru, rysowane jednym Shape; samo zaznaczenie nie pokazuje obrysów.
+Zielona ramka kopii odniesienia pojawia się tylko przy hover kopii, wpisu
+warstwy albo pól Offset X/Y, bez dodatkowej ikony i bez stałego wyróżnienia
+zaznaczonej warstwy. Hover pól offsetu pokazuje tylko ramkę odniesienia. Te dekoracje nie trafiają do eksportu ani Navigatora.
+
 ### Navigator
 
 `features/photo/photo-navigator.tsx` składa SidebarSection, Button w wariancie `segment`,
