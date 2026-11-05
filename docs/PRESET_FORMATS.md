@@ -98,3 +98,16 @@ From now on, every new format version requires:
 
 There are no migrations or migration scripts for v1: there is no previous
 supported format. They are added when v2 is introduced.
+
+## Stored libraries and recovery
+
+The web library validates each saved entry independently. Valid v1 presets remain
+available when another entry cannot be read; saves and imports preserve unreadable
+entries alongside the valid presets. The preset panel lists the rejected entry's
+name or position and the reason, including schema field paths where available.
+The recovery download contains the original library loaded at startup.
+
+Malformed JSON or a non-array library blocks overwriting the whole collection.
+Desktop file libraries retain their existing stricter behavior: an unreadable file
+blocks loading and saving until resolved, leaving the original files untouched.
+Recovery does not convert unsupported development formats into official v1.

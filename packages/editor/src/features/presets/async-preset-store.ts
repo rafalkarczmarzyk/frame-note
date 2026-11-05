@@ -10,6 +10,7 @@ export interface PresetRepository {
 export class AsyncPresetStore {
   presets: LayoutPreset[] = [];
   warning = '';
+  issues: string[] = [];
   original: string | null = null;
   readonly ready: Promise<void>;
   private queue: Promise<unknown>;
@@ -18,7 +19,9 @@ export class AsyncPresetStore {
     repository: PresetRepository,
     validate: (name: string, svg: string) => SvgAsset,
   ) {
+    let originalSource = '[]';
     this.ready = repository.read().then((source) => {
+      originalSource = source;
       this.store = new PresetStore(
         { getItem: () => source, setItem: () => {} },
         validate,
@@ -26,22 +29,25 @@ export class AsyncPresetStore {
       this.presets = this.store.presets;
       this.original = this.store.original;
       this.warning = this.store.warning;
+      this.issues = this.store.issues;
     });
     this.queue = this.ready;
     this.commit = (update) => {
       const result = this.queue.then(async () => {
         // Validate using a temporary store; publish only after persistence succeeds.
         let source = '';
+        // Re-read the original snapshot to retain rejected entries and the
+        // collection-level write block, then apply changes to the latest valid state.
         const candidate = new PresetStore(
           {
-            getItem: () => JSON.stringify(this.presets),
+            getItem: () => originalSource,
             setItem: (_key, value) => {
               source = value;
             },
           },
           validate,
         );
-        if (this.warning) throw Error(this.warning);
+        candidate.presets = this.presets;
         const before = new Map(
           candidate.presets.map((preset) => [preset.id, preset]),
         );

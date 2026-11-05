@@ -10,6 +10,7 @@ type StoragePort = Pick<Storage, 'getItem' | 'setItem'>;
 export class PresetStore {
   presets: LayoutPreset[] = [];
   private rejected: unknown[] = [];
+  readonly issues: string[] = [];
   readonly original: string | null;
   readonly warning: string;
   private blocked = false;
@@ -30,19 +31,30 @@ export class PresetStore {
       const values: unknown = JSON.parse(original ?? '[]');
       if (!Array.isArray(values)) throw Error('Invalid collection');
       const ids = new Set<string>();
-      for (const value of values) {
+      for (const [index, value] of values.entries()) {
         try {
           const preset = parsePreset(JSON.stringify(value), validateSvg);
-          if (!preset.id || ids.has(preset.id)) throw Error('Duplicate ID');
+          if (!preset.id || ids.has(preset.id))
+            throw Error('Duplicate preset identifier.');
           ids.add(preset.id);
           this.presets.push(preset);
-        } catch {
+        } catch (cause) {
           this.rejected.push(value);
+          const label =
+            value &&
+            typeof value === 'object' &&
+            'name' in value &&
+            typeof value.name === 'string'
+              ? `“${value.name.slice(0, 80)}” (entry ${index + 1})`
+              : `Entry ${index + 1}`;
+          this.issues.push(
+            `${label}: ${cause instanceof Error ? cause.message : 'Invalid preset.'}`,
+          );
         }
       }
       if (this.rejected.length)
         warning =
-          'Some saved presets could not be read. Their original data is preserved. Download a recovery copy.';
+          'Some saved presets could not be read. You can save other presets. Unreadable entries are preserved in storage and in the recovery copy.';
     } catch {
       this.blocked = true;
       warning =

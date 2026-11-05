@@ -9,14 +9,17 @@ import { PlatformProvider } from '../platform-provider';
 import type { Platform } from '@/lib/platform-context';
 import { Button } from '../ui/button';
 import { PresetControls } from '@/features/presets/preset-controls';
+import { configurePlatform, platform as currentPlatform } from '@/lib/platform';
 import { builtinPresets } from '@/domain/builtin-presets';
 
 function HeaderPreview({
   width = 1100,
   platform = 'web',
+  recovery = false,
 }: {
   width?: number;
   platform?: Platform;
+  recovery?: boolean;
 }) {
   const [toolbarHost, setToolbarHost] = useState<HTMLElement | null>(null);
   const [panelHost, setPanelHost] = useState<HTMLDivElement | null>(null);
@@ -77,7 +80,7 @@ function HeaderPreview({
           layout={layout}
           icons={[]}
           onApply={(preset) => setLayout(preset.layout)}
-          persist={false}
+          persist={recovery}
           toolbarHost={toolbarHost}
           panelHost={open ? panelHost : null}
           onBrowse={() => setOpen(true)}
@@ -149,4 +152,27 @@ export const PresetBrowser: Story = {
       await page.findByRole('menuitem', { name: 'Manage presets' }),
     );
   },
+};
+
+/** Isolated in-memory repository: never reads or changes the browser library. */
+export const UnreadablePresets: Story = {
+  beforeEach: () => {
+    const previous = currentPlatform();
+    let source = JSON.stringify([
+      builtinPresets[0],
+      { version: 2, name: 'Future preset' },
+    ]);
+    configurePlatform({
+      ...previous,
+      presets: {
+        read: async () => source,
+        write: async (value) => {
+          source = value;
+        },
+      },
+    });
+    return () => configurePlatform(previous);
+  },
+  args: { recovery: true },
+  play: PresetBrowser.play,
 };

@@ -39,7 +39,20 @@ export function parsePreset(
   )
     throw Error('Preset version is newer than this application supports.');
   const parsed = presetV1.safeParse(value);
-  if (!parsed.success) throw Error('Invalid FrameNote v1 preset.');
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0]!;
+    const path = issue.path.join('.') || 'preset';
+    const reason =
+      issue.code === 'unrecognized_keys'
+        ? `Unknown fields are not supported: ${issue.keys
+            .slice(0, 3)
+            .map((key) => key.slice(0, 80))
+            .join(', ')}.`
+        : issue.code === 'invalid_type'
+          ? 'Missing field or incorrect value type.'
+          : 'Value does not match the v1 preset format.';
+    throw Error(`Invalid FrameNote v1 preset: ${path}. ${reason}`);
+  }
   const data = parsed.data;
   const ids = new Set(data.layout.containers.map((c) => c.id));
   if (
@@ -47,23 +60,42 @@ export function parsePreset(
     new Set(data.icons.map((i) => i.name)).size !== data.icons.length
   )
     throw Error('Preset identifiers must be unique.');
-  const validColor = (color: string) => {
+  const validColor = (color: string, path: string) => {
     if (
       !normalizeHex(color) &&
       !captionColors.some((item) => item.value === color) &&
       !legacyCaptionColors.some((item) => item === color)
     )
-      throw Error('Invalid preset color.');
+      throw Error(`Invalid preset color at ${path}.`);
   };
-  for (const c of data.layout.containers) {
-    validColor(c.style.color);
+  for (const [index, c] of data.layout.containers.entries()) {
+    const path = `layout.containers.${index}`;
+    validColor(c.style.color, `${path}.style.color`);
     if (c.background) {
-      validColor(c.background.color);
-      validColor(c.background.shadow.color);
+      validColor(c.background.color, `${path}.background.color`);
+      validColor(c.background.shadow.color, `${path}.background.shadow.color`);
     }
-    if (c.images) c.images = validateImageAssets(c.images, validateSvg);
+    if (c.images) {
+      try {
+        c.images = validateImageAssets(c.images, validateSvg);
+      } catch (cause) {
+        throw Error(
+          `${path}.images: ${cause instanceof Error ? cause.message : 'Invalid image asset.'}`,
+          { cause },
+        );
+      }
+    }
   }
-  const icons = data.icons.map((icon) => validateSvg(icon.name, icon.svg));
+  const icons = data.icons.map((icon, index) => {
+    try {
+      return validateSvg(icon.name, icon.svg);
+    } catch (cause) {
+      throw Error(
+        `icons.${index}: ${cause instanceof Error ? cause.message : 'Invalid SVG asset.'}`,
+        { cause },
+      );
+    }
+  });
   return {
     version: 1,
     id: data.id,

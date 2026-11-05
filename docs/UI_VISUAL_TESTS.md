@@ -85,3 +85,25 @@ expected/actual/diff: zmienił się wyłącznie numer wersji w stopce.
 Nie rozszerzono zestawu testów ani profili. Nowy dialog obejrzano w Chromium;
 natywny smoke potwierdza ogólne działanie desktopu, bez osobnego sprawdzenia
 nowego przepływu w natywnym oknie. Zachowanie opisuje instrukcja użytkownika.
+
+## Preset recovery — weryfikacja 0.7.2-beta
+
+Poprawka zapisu częściowo czytelnej biblioteki i diagnostyka odrzuconych wpisów
+zostały zaakceptowane przez użytkownika 2026-11-05. Testy Vitest: 73 pliki,
+504 testy; obejmują zachowanie oryginałów, błędy zapisu, kolejkę operacji,
+zamrożony oficjalny v1 oraz ochronę plików desktopu.
+
+Kontrola rzeczywistego panelu Chromium potwierdziła import desktopowego
+`stack.json` przy nieczytelnym wpisie, zachowanie tego wpisu po zapisie i reload,
+pobranie oryginalnej kopii oraz rozwijane szczegóły błędu. Story
+`Sidebar & panels/AppHeader/UnreadablePresets` używa izolowanej biblioteki w pamięci.
+
+Przed podniesieniem wersji przeszło sześć scen wizualnych, test JPG i natywny
+smoke macOS. Dla numeru 0.7.2-beta obejrzano expected/actual/diff; jedyne różnice
+(422 piksele w każdej scenie) dotyczyły numeru wersji w stopce pustego okna i About.
+Zaktualizowano wyłącznie te dwa wzorce Darwin/Chromium desktop. Nie rozszerzono
+zestawu ani profili przeglądarkowych. Build Storybooka, lint, typy, format,
+kontrola tokenów i zgodność manifestów przeszły.
+
+Dla przygotowanego 0.7.2-beta pełne `pnpm check` po aktualizacji wzorców oraz
+natywny smoke po ponownej kompilacji desktopu zakończyły się sukcesem.

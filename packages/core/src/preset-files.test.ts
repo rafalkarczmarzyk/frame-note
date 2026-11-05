@@ -132,3 +132,28 @@ it('rejects external modifications instead of overwriting them', async () => {
     JSON.parse(await readFile(join(root, 'presets/name.json'), 'utf8')),
   ).toEqual(external);
 });
+
+it('keeps desktop originals when the async editor cannot load a malformed file', async () => {
+  const { root, files } = await setup();
+  await files.read();
+  await files.write(JSON.stringify([preset()]));
+  const original = await readFile(join(root, 'presets/name.json'), 'utf8');
+  const broken = join(root, 'presets/broken.json');
+  await writeFile(broken, '{broken');
+  const { AsyncPresetStore } =
+    await import('../../editor/src/features/presets/async-preset-store');
+  const { readPreset } = await import('../../../scripts/preset-node');
+  const store = new AsyncPresetStore(
+    new PresetFiles(root),
+    (name, svg) =>
+      readPreset(
+        JSON.stringify({ ...preset(), icons: [{ name, svg, aspect: 1 }] }),
+      ).icons[0]!,
+  );
+  await expect(store.ready).rejects.toThrow();
+  await expect(store.commit(() => [])).rejects.toThrow();
+  expect(await readFile(broken, 'utf8')).toBe('{broken');
+  expect(await readFile(join(root, 'presets/name.json'), 'utf8')).toBe(
+    original,
+  );
+});

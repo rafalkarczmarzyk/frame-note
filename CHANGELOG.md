@@ -11,6 +11,12 @@ see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 
 ## Unreleased
 
+## [0.7.2-beta] - 2026-11-05
+
+### Fixed
+
+- Allow saving and importing web presets when some saved entries are unreadable, preserving those entries and the original recovery copy. Show which presets were rejected and why.
+
 ## [0.7.1-beta] - 2026-11-05
 
 ### Changed

@@ -113,3 +113,23 @@ describe('preset commit boundary', () => {
     expect(store.presets).toEqual([]);
   });
 });
+
+it('identifies unreadable entries and the invalid field without printing their contents', () => {
+  const invalid = preset('bad', 'Bad font');
+  invalid.layout.containers[0]!.style.fontWeight = 999 as 400;
+  const store = new PresetStore(
+    storage(
+      JSON.stringify([
+        invalid,
+        null,
+        { ...preset('unknown'), secretArtwork: '<svg/>' },
+      ]),
+    ),
+    validate,
+  );
+  expect(store.issues[0]).toContain('“Bad font” (entry 1)');
+  expect(store.issues[0]).toContain('layout.containers.0.style.fontWeight');
+  expect(store.issues[1]).toContain('Entry 2');
+  expect(store.issues[2]).toContain('Unknown fields');
+  expect(store.issues.join(' ')).not.toContain('<svg/>');
+});

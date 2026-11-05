@@ -386,6 +386,18 @@ export function PresetControls({
                     <p role="alert" className="text-xs text-content-secondary">
                       {collection.warning}
                     </p>
+                    {collection.issues.length > 0 && (
+                      <details className="text-xs text-content-secondary">
+                        <summary>
+                          Unreadable presets ({collection.issues.length})
+                        </summary>
+                        <ul className="max-h-40 space-y-2 overflow-auto pt-2">
+                          {collection.issues.map((issue, index) => (
+                            <li key={index}>{issue}</li>
+                          ))}
+                        </ul>
+                      </details>
+                    )}
                     {collection.original !== null && (
                       <Button
                         variant="outline"
@@ -461,7 +473,7 @@ export function PresetControls({
                     Import preset
                   </Button>
                 </div>
-                {error && (
+                {error && error !== collection.warning && (
                   <p role="alert" className="text-xs text-content-secondary">
                     {error}
                   </p>
