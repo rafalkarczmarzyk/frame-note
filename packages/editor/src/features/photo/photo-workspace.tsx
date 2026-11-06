@@ -154,7 +154,6 @@ export function PhotoWorkspace(
 function PhotoWorkspaceContent({
   photo,
   loading = false,
-  onChoosePhoto,
   initialLayout,
   initialPresetId,
   initialIcons = [],
@@ -175,7 +174,6 @@ function PhotoWorkspaceContent({
 }: {
   photo: LoadedPhoto | null;
   loading?: boolean;
-  onChoosePhoto?: () => void;
   initialLayout?: CaptionLayout;
   initialPresetId?: string;
   initialIcons?: SvgIcon[];
@@ -1191,10 +1189,7 @@ function PhotoWorkspaceContent({
               />
             </>
           ) : (
-            <EmptyPhotoCanvas
-              loading={loading}
-              onChoosePhoto={onChoosePhoto ?? (() => {})}
-            />
+            <EmptyPhotoCanvas />
           )}
         </div>
         {filmRoll}

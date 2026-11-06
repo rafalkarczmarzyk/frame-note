@@ -1,4 +1,5 @@
-import { Download, Layers, LockKeyhole, Plus, Scan } from 'lucide-react';
+import { Download, Layers, Plus, Scan } from 'lucide-react';
+import { FrameNoteLogo } from '@/components/brand/frame-note-logo';
 import { PhotoDropOverlay } from './photo-drop-overlay';
 import { PhotoLoadingIndicator } from './photo-loading-indicator';
 import { appVersion as version } from '@/lib/build-info';
@@ -70,17 +71,13 @@ function EmptyTools() {
 }
 
 export function EmptyPhotoCanvas({
-  loading = false,
   loadingLabel,
   onCancelLoading,
   draggingPhoto = false,
-  onChoosePhoto,
 }: {
-  loading?: boolean;
   loadingLabel?: string;
   onCancelLoading?: () => void;
   draggingPhoto?: boolean;
-  onChoosePhoto: () => void;
 }) {
   return (
     <div
@@ -99,25 +96,15 @@ export function EmptyPhotoCanvas({
           className="flex max-w-sm flex-col items-center text-center"
           aria-labelledby="empty-workspace-title"
         >
-          <PhotoIcon
-            className="mb-5 size-9 text-content-muted"
-            aria-hidden="true"
-          />
-          <h1 id="empty-workspace-title" className="text-sm font-medium">
+          <FrameNoteLogo className="mb-6 h-auto w-80 max-w-full text-content-muted" />
+          <h1
+            id="empty-workspace-title"
+            className="text-sm font-medium text-content-muted"
+          >
             Drop photos here
           </h1>
-          <p className="mt-2 text-xs text-content-muted">JPG or PNG</p>
-          <Button
-            className="mt-6"
-            variant="default"
-            disabled={loading}
-            onClick={onChoosePhoto}
-          >
-            Choose photos
-          </Button>
-          <p className="mt-8 flex items-center gap-1.5 text-[11px] text-content-muted">
-            <LockKeyhole className="size-3" aria-hidden="true" />
-            Photos stay on your device.
+          <p className="mt-2 text-xs text-content-muted">
+            JPG or PNG · or use Add photos above
           </p>
         </section>
       </div>

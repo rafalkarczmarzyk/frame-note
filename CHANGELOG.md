@@ -20,6 +20,8 @@ see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 
 ### Changed
 
+- Simplify the empty workspace with the FrameNote logo and a drag-and-drop hint pointing to Add photos in the toolbar, removing the duplicate photo chooser and privacy note.
+
 - Sort font picker results alphabetically by display name across bundled and system fonts, categories and searches.
 - Identify bundled and installed fonts with App/System badges and source tooltips in the desktop font picker; retain row highlighting without a redundant Selected badge on web and desktop.
 - Frame the preset naming form separately, with a full-width name field. Duplicate creates a draft until Save; Cancel discards the draft without adding a preset.

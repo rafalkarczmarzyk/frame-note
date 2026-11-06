@@ -242,3 +242,17 @@ wobec starego podpisu — identyczna jak przed naprawą podglądu. Wzorców nie
 aktualizowano; ich akceptacja pozostaje osobnym zadaniem presetów. Raporty:
 playwright-visual-report i playwright-report. Weryfikacja obrazów ręcznych:
 /tmp/framenote-sharp-1.png, /tmp/framenote-sharp-2.png, /tmp/framenote-sharp-glass.png.
+
+## Pusty ekran — 2026-11-06
+
+Zaakceptowany wygląd: logo 320 px (ograniczone szerokością obszaru), teksty
+muted i wskazówka kierująca do Add photos; bez dodatkowego przycisku i informacji
+o prywatności w centrum. Web i desktop współdzielą ten ekran.
+Typy, lint, tokeny, zgodność wersji i build web przeszły.
+Sześć scen Chromium uruchomiono; wszystkie wykazały różnice wobec starych
+wzorców. Obejrzano expected/actual/diff: empty editor obejmuje nowy środek,
+pozostałe różnice dotyczą istniejących zmian presetów, fontów i kontrolek.
+Wzorców nie aktualizowano. JPG smoke wykonał eksport i dekodowanie, ale
+porównanie obrazu nie przeszło (39651 pikseli różnicy). Raporty pozostają w
+playwright-visual-report oraz playwright-report; aktualizacja wzorców wymaga
+osobnej oceny całości zmian przed 1.0. Natywnego desktopu osobno nie testowano.

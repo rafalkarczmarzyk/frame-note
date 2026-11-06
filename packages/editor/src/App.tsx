@@ -514,11 +514,9 @@ export default function App() {
         <Suspense
           fallback={
             <EmptyWorkspace
-              loading
               loadingLabel={loadingLabel}
               onCancelLoading={cancelLoading}
               draggingPhoto={isDragging}
-              onChoosePhoto={() => input.current?.click()}
             />
           }
         >
@@ -602,7 +600,6 @@ export default function App() {
               ) : undefined
             }
             loading={loading}
-            onChoosePhoto={() => input.current?.click()}
             onPreviewReady={previewReady}
             loadingLabel={loadingLabel}
             onCancelLoading={cancelLoading}
