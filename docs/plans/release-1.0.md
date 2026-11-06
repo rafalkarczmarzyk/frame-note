@@ -4,6 +4,11 @@ Stan: etap 1 wykonany, zweryfikowany i zaakceptowany, 2026-11-06.
 Baza: master `19314e8`, manifesty `0.10.0-beta`.
 Docelowa wersja stabilna: **1.0.0**, wskazana przez użytkownika.
 
+Bieżący krok: na osobne polecenie użytkownika przygotowywana jest kolejna beta
+**0.11.0-beta**, przed stabilnym 1.0.0. Wersja obejmuje dotychczasowe Unreleased,
+w tym efekty, presety i stos powiadomień. Nie zamyka niewykonanych kontroli
+ręcznych. Stan przygotowania: [release beta](release-0.11.0-beta.md).
+
 Roboczy opis pełnych możliwości produktu: [FrameNote 1.0.0 — feature overview](../RELEASE_1.0.0.md).
 Dokument jest szkicem do redakcji i nie oznacza rozpoczęcia wydania.
 

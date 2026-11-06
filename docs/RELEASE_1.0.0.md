@@ -1,9 +1,9 @@
 # FrameNote 1.0.0 — feature overview
 
 **Draft for the planned first stable release.** This document describes the
-current implementation, including Unreleased changes. It does not announce a
+current implementation selected for 0.11.0-beta. It does not announce a
 published 1.0.0 release or completion of every platform check. The product
-version remains 0.10.0-beta. Outstanding acceptance and release work is tracked
+version is being prepared as 0.11.0-beta. Outstanding acceptance and release work is tracked
 in the [release plan](plans/release-1.0.md).
 
 FrameNote prepares photos for sharing by adding watermarks, author credits,
@@ -177,8 +177,8 @@ Compatibility and recovery: [Preset format](PRESET_FORMATS.md).
 - macOS automated checks do not establish complete Windows/Linux manual acceptance.
   Current platform checks and remaining items are recorded in the release plan.
 
-Full usage and limits: [User guide](USER_GUIDE.md). Changes since the last beta:
-[Unreleased](../CHANGELOG.md#unreleased).
+Full usage and limits: [User guide](USER_GUIDE.md). Changes selected for this beta:
+[0.11.0-beta](../CHANGELOG.md#0110-beta---2026-11-06).
 
 ## Licensing
 

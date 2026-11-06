@@ -2,6 +2,12 @@
 
 Stan: 6 listopada 2026. Zestaw sprawdza widoki prawdziwej aplikacji w jednym profilu Chromium desktop. Storybook nie jest uruchamiany przez `test:visual`.
 
+Przy przygotowaniu **0.11.0-beta** obejrzano expected/actual/diff i zmieniono
+wyłącznie numer wersji w stopkach scen Empty editor i About. Pozostałe cztery
+sceny oraz JPG zachowały referencje; zwykły przebieg UI 6/6 i JPG 1/1 przeszedł.
+Pełne kontrole i brak końcowych testów użytkowych opisuje
+[przygotowanie bety](plans/release-0.11.0-beta.md).
+
 ## Sceny
 
 ### Aktualizacja wzorców przed 1.0 — 2026-11-06
