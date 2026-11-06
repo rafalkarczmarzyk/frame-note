@@ -44,6 +44,10 @@ const definitions = {
     'iptc:DateCreated',
     'xmp:DateCreated',
   ],
+  time: ['exif:DateTimeOriginal', 'xmp:DateTimeOriginal'],
+  // Retained for existing presets and formatted date tokens; hidden from the picker.
+  dateTime: ['exif:DateTimeOriginal', 'xmp:DateTimeOriginal'],
+  heliconStackSummary: ['exif:UserComment', 'xmp:UserComment'],
   heliconStack: ['exif:UserComment', 'xmp:UserComment'],
   heliconStackCount: ['exif:UserComment', 'xmp:UserComment'],
   copyright: [
@@ -182,6 +186,12 @@ function format(name: string, field: MetadataField): string {
       : null;
   const value = number ?? textNumber;
   switch (name) {
+    case 'heliconStackSummary': {
+      const details = heliconDetails(text);
+      return details
+        ? `Stacked ${details.count} ${details.count === 1 ? 'frame' : 'frames'}`
+        : '';
+    }
     case 'heliconStackCount': {
       const details = heliconDetails(text);
       return details ? String(details.count) : '';
@@ -237,6 +247,24 @@ function format(name: string, field: MetadataField): string {
         ? `${Number(value.toFixed(2))} mm`
         : '';
     }
+    case 'time':
+    case 'dateTime': {
+      const day = formattedDate(text);
+      const time = text
+        .trim()
+        .match(
+          /^\d{4}[:-]?\d{2}[:-]?\d{2}[ T](\d{2}):(\d{2})(?::(\d{2})(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?$/u,
+        );
+      return day &&
+        time &&
+        Number(time[1]) < 24 &&
+        Number(time[2]) < 60 &&
+        (!time[3] || Number(time[3]) < 60)
+        ? name === 'time'
+          ? `${time[1]}:${time[2]}`
+          : `${day} ${time[1]}:${time[2]}`
+        : '';
+    }
     case 'date': {
       return formattedDate(text);
     }
@@ -265,7 +293,13 @@ export function captionTags(fields: readonly MetadataField[]): CaptionTag[] {
         const field = byKey.get(source);
         if (!field || !field.displayValue.trim()) continue;
         const selected = sourceField(
-          name === 'shutterDuration' ? 'shutter' : name,
+          name === 'shutterDuration'
+            ? 'shutter'
+            : name === 'dateTime' || name === 'time'
+              ? 'date'
+              : name === 'heliconStackSummary'
+                ? 'heliconStack'
+                : name,
           source,
           field,
         );
@@ -313,7 +347,7 @@ export function metadataGroups(
 ) {
   const text = query.trim().toLowerCase();
   const items = [
-    ...captionTags(fields),
+    ...captionTags(fields).filter((field) => field.key !== 'dateTime'),
     ...fields.map((field) => ({ ...field, sources: [] as readonly string[] })),
   ].filter((field) =>
     `${field.key} ${field.group} ${field.displayValue} ${'sources' in field ? field.sources.join(' ') : ''}`

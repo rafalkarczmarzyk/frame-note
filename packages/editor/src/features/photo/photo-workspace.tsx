@@ -75,6 +75,7 @@ import { resolveCaptionContent } from '../caption/inline-content';
 import { inlineLayout } from '../caption/inline-layout';
 import { InlinePreview } from '../caption/inline-preview';
 import { customPoint, customPosition } from '../caption/layout';
+import { EffectsControls } from '../caption/effects-controls';
 import { LayerList } from '../layers/layer-list';
 import {
   addCaption,
@@ -235,8 +236,21 @@ function PhotoWorkspaceContent({
     ReadonlyMap<string, HTMLImageElement>
   >(new Map());
   const [activePanel, setActivePanel] = useState<
-    'content' | 'fonts' | 'colors' | 'separator-colors' | 'presets' | null
+    | 'content'
+    | 'fonts'
+    | 'colors'
+    | 'effect-colors'
+    | 'separator-colors'
+    | 'presets'
+    | null
   >(null);
+  const [effectColorSources, setEffectColorSources] = useState<
+    Record<string, { value: string; source: ColorSelectionSource }>
+  >({});
+  const [effectColorTarget, setEffectColorTarget] = useState<{
+    layerId: string;
+    effectId: string;
+  } | null>(null);
   const [separatorColors, setSeparatorColors] =
     useState<SeparatorColorActions | null>(null);
   const [graphicsActions, setGraphicsActions] =
@@ -498,12 +512,6 @@ function PhotoWorkspaceContent({
   );
   const fontReady = loadedFont === fontKey;
   const fontError = fontFailure?.key === fontKey ? fontFailure.message : '';
-  const glassPreview = useGlassPreview(
-    photo,
-    exportCaptions,
-    fontReady && iconsReady && !loading,
-    Math.max(size.width, size.height),
-  );
   const prepared = usePreparedExport(
     exportRequest,
     !!photo && fontReady && iconsReady && !batchBusy && !loading,
@@ -594,6 +602,27 @@ function PhotoWorkspaceContent({
     }),
     [size.width, size.height],
   );
+  const navigation = usePhotoView({
+    host,
+    photo: dimensions,
+    viewport,
+    documentKey: documentKey ?? photo?.image.src ?? 'empty',
+    disabled:
+      !photo ||
+      loading ||
+      exporting ||
+      !previewReady ||
+      !!assetError ||
+      !!fontError,
+    liveKeys: viewKeys,
+  });
+  const { scale, x: viewX, y: viewY } = navigation.state.view;
+  const glassPreview = useGlassPreview(
+    photo,
+    exportCaptions,
+    fontReady && iconsReady && !loading,
+    Math.min(1, scale * navigation.pixelRatio),
+  );
   const overviewIdentity = useMemo(
     () => ({ photo, composition }),
     [photo, composition],
@@ -607,23 +636,6 @@ function PhotoWorkspaceContent({
     glassPreview.tiles,
     photo,
   );
-  const navigation = usePhotoView({
-    host,
-    photo: dimensions,
-    viewport,
-    documentKey: documentKey ?? photo?.image.src ?? 'empty',
-    disabled:
-      !photo ||
-      loading ||
-      exporting ||
-      !previewReady ||
-      !!assetError ||
-      !!fontError ||
-      !!overview.error ||
-      !overview.preview,
-    liveKeys: viewKeys,
-  });
-  const { scale, x: viewX, y: viewY } = navigation.state.view;
   const stopLayerDrag = useCallback(() => {
     let stopped = false;
     sceneRef.current?.find('Group').forEach((node) => {
@@ -724,6 +736,8 @@ function PhotoWorkspaceContent({
           tabIndex={photo ? 0 : undefined}
           aria-label="Photo viewport"
           style={{ cursor: navigation.cursor, overflow: 'hidden' }}
+          data-effect-preview-width={glassPreview.composition?.image.width}
+          data-effect-preview-height={glassPreview.composition?.image.height}
           data-glass-ready={glassPreview.tiles ? 'true' : 'false'}
           className="relative flex min-h-[40vh] min-w-0 flex-1 flex-col bg-workspace-base outline-none md:min-h-0"
         >
@@ -1233,6 +1247,38 @@ function PhotoWorkspaceContent({
           className="max-h-[40vh] w-full shrink-0 rounded-none shadow-none md:max-h-none md:w-80"
         />
       )}
+      {activePanel === 'effect-colors' &&
+        effectColorTarget?.layerId === activeContainer?.id &&
+        settings.effects?.some(
+          (effect) => effect.id === effectColorTarget?.effectId,
+        ) && (
+          <ColorPickerPanel
+            value={
+              settings.effects.find(
+                (effect) => effect.id === effectColorTarget?.effectId,
+              )!.color
+            }
+            onChange={(color) => {
+              if (effectColorTarget)
+                setEffectColorSources((entries) => ({
+                  ...entries,
+                  [`${documentKey}:${effectColorTarget.layerId}:${effectColorTarget.effectId}`]:
+                    { value: color, source: 'palette' },
+                }));
+              setSettings((value) => ({
+                ...value,
+                effects: value.effects?.map((effect) =>
+                  effect.id === effectColorTarget?.effectId
+                    ? { ...effect, color }
+                    : effect,
+                ),
+              }));
+            }}
+            onClose={() => setActivePanel(null)}
+            surface="solid"
+            className="max-h-[40vh] w-full shrink-0 rounded-none shadow-none md:max-h-none md:w-80"
+          />
+        )}
       {activePanel === 'colors' && (
         <ColorPickerPanel
           value={settings.style.color}
@@ -1510,7 +1556,7 @@ function PhotoWorkspaceContent({
                     from the list to change its anchor.
                   </InlineNotice>
                 )}
-              <div className="flex flex-wrap gap-2 px-4 pt-3 pb-4">
+              <div className="grid grid-cols-2 gap-2 px-4 pt-3 pb-4">
                 <Button
                   variant="outline"
                   size="sm"
@@ -1684,6 +1730,49 @@ function PhotoWorkspaceContent({
                         value === 'fonts' ? null : 'fonts',
                       )
                     }
+                  />
+                  <EffectsControls
+                    colorSources={Object.fromEntries(
+                      (settings.effects ?? [])
+                        .map((effect) => [
+                          effect.id,
+                          effectColorSources[
+                            `${documentKey}:${activeContainer.id}:${effect.id}`
+                          ],
+                        ])
+                        .filter((entry) => entry[1]),
+                    )}
+                    onColorSourceChange={(id, source, value) =>
+                      setEffectColorSources((entries) => ({
+                        ...entries,
+                        [`${documentKey}:${activeContainer.id}:${id}`]: {
+                          source,
+                          value,
+                        },
+                      }))
+                    }
+                    onSelectionChange={() =>
+                      setActivePanel((panel) =>
+                        panel === 'effect-colors' ? null : panel,
+                      )
+                    }
+                    key={`${documentKey}:${activeContainer.id}`}
+                    caption={settings}
+                    dimensions={dimensions}
+                    onChange={setSettings}
+                    disabled={exporting}
+                    onBrowseColors={(effectId) => {
+                      setEffectColorTarget({
+                        layerId: activeContainer.id,
+                        effectId,
+                      });
+                      setActivePanel((value) =>
+                        value === 'effect-colors' &&
+                        effectColorTarget?.effectId === effectId
+                          ? null
+                          : 'effect-colors',
+                      );
+                    }}
                   />
                   <BackgroundControls
                     caption={settings}

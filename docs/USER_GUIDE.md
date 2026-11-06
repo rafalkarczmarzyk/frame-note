@@ -127,7 +127,7 @@ source precedence, formatting, and missing-data behavior.
 
 ## Layer blending
 
-The selected layer's **Blending** section sits between Typography and Background.
+The selected layer's **Blending** section sits after Typography; Effects follows Blending.
 Choose Normal, Multiply, Screen, Soft Light or Add with the five icon buttons;
 hover or focus for help. The active mode is named above the buttons. Keyboard
 arrows move between modes; Space selects a mode. **Layer opacity** affects the
@@ -139,12 +139,36 @@ remain editable. Glass samples the composition below the layer. Hover outlines
 and other editor decorations are excluded from blending, Navigator and export.
 Blending uses the original photo alpha; JPG adds its white matte after blending,
 while PNG retains transparency. The shared renderer provides the preview, Navigator
-and JPG/PNG/ZIP output; preview rasterization is bounded to 1600 pixels on the longest side while
-exports use full resolution. Dense Tiled Glass can take longer to render.
+and JPG/PNG/ZIP output; effect preview resolution follows zoom and display density up to the original photo resolution. At 100% it uses the original image and full-resolution effects. Fit uses a smaller composition; zoom above 100% magnifies the exported pixels. Dense Tiled Glass can take longer to render.
 
 Presets save as v1 with blending settings. Missing blending settings receive
 Normal and 100% layer opacity. Historical labels 2/3 are also readable; older
 applications may reject fields they do not understand. See [Preset format](PRESET_FORMATS.md).
+
+Typography also provides **Letter spacing** in em (relative to font size), with
+a 0.01 step and a default of 0. Negative values tighten the text.
+
+## Layer effects
+
+Use **Effects → Add effect** in the selected layer inspector. Outline, Shadow and
+Glow decorate the complete content: text and resolved metadata, icons, SVG/PNG
+graphics and separators. Each uses the same original alpha mask, so transparent
+PNG areas are respected. The background and its shadow stay separate. Outline thickness is
+nonnegative; Shadow and Glow allow negative spread. Outline exposes thickness, color and opacity and always stays sharp and centered.
+Shadow and Glow also expose offset and blur.
+
+**Blur** softens the entire layer content, including icons, graphics and text
+effects. The background and its shadow stay separate. Blur opacity mixes the
+sharp and softened content; multiple Blur entries run from the bottom upwards.
+
+Drag rows or use their action menus to reorder, duplicate or delete effects.
+The eye hides an effect while preserving its settings. Color controls use the
+same quick colors, palette sidebar and custom HEX picker as Typography.
+Spread/thickness and blur step by 0.02 in percentage units or 0.1 px; manual
+values can be more precise. Effects use the document unit and do not move anchors
+or change Tiled spacing. They are included in Navigator, presets and export.
+Very large effects can exceed the local render buffer limit and require a smaller
+radius or content size.
 
 ## Undo and Redo
 
@@ -239,6 +263,13 @@ the current layout. **Reset to saved** in Preset actions restores the selected
 preset after confirmation, including built-in presets. Selection of a layer alone
 does not mark a preset as changed; undoing all edits clears the asterisk.
 
+In **Manage presets**, **Duplicate** opens a draft name form. **Save** adds a copy
+of the saved source preset; **Cancel** discards the draft. Duplicating does not
+change the current photo layout or preset selection. Creating and renaming use a
+separate framed form with a full-width name field. Deleting a saved preset asks
+for confirmation; Cancel or Escape keeps it. Deletion leaves the current photo
+layout intact and selects Photo Details when the deleted preset was active.
+
 ## Limits and export behavior
 
 | Input        | Limits                                                       |
@@ -280,3 +311,23 @@ paths before importing. The editor limits active image content to 100 images.
 - Session copies of source photos remain until closed or the app reloads.
   Large rolls can consume substantial memory/storage; no unlimited-series guarantee.
 - For desktop installation and update notifications, see [desktop setup and packaging](DESKTOP.md).
+
+## Built-in starting presets
+
+Photo Details is the default: author, lens and exposure icons. Signature uses an
+italic serif author credit. Focus Stack adds a second corner with a concise Helicon
+stack count. Glass Caption demonstrates a glass background; Proof Watermark repeats
+a translucent proof mark; Quartz Date stamps a short capture date in
+orange italic segment digits with Add blending, a warm glow and subtle blur; Digital Date uses regular Oswald, a black 80% outline (0.06% of the shorter edge) and Normal blending. Missing metadata follows the normal export warning flow.
+Quartz Date does not substitute today's date. Saved custom presets remain independent
+of built-in updates.
+
+Select a date token in Content to choose its Date format. Custom patterns accept
+YYYY/YY (year), MM/M (month), DD/D (day), HH:mm (24-hour capture time), spaces, dots, slashes, hyphens, underscores
+and apostrophes. Include each date part once. Apply format or Enter saves a valid
+pattern; invalid drafts do not change the photo. The preview uses the photo date,
+or a clearly labeled example when missing. Formats are independent for each token.
+
+Digital Date defaults to YYYY/MM/DD in golden orange. Select its date token and choose
+YYYY/MM/DD HH:mm for the version with capture time. Time comes from EXIF/XMP
+DateTimeOriginal with no timezone conversion; absent times are never replaced by midnight.

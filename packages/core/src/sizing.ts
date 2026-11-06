@@ -1,3 +1,4 @@
+import { mapEffectLengths } from './layer-effects';
 import { parseSeparatorToken, separatorToken } from './inline-separator';
 import { mapBackgroundLengths } from './layer-background';
 import { iconToken, parseIconToken } from './inline-icon';
@@ -60,6 +61,13 @@ export function convertSizing(
   return {
     ...caption,
     sizingUnit: unit,
+    ...(caption.effects
+      ? {
+          effects: caption.effects.map((effect) =>
+            mapEffectLengths(effect, convert),
+          ),
+        }
+      : {}),
     ...(caption.background
       ? { background: mapBackgroundLengths(caption.background, convert) }
       : {}),

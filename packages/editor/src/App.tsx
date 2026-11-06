@@ -24,6 +24,7 @@ import { PhotoSettingsActions } from '@/features/photo/photo-settings-actions';
 import { ToolSidebarFooter } from '@/components/layout/editor-workspace';
 import type { SessionDocument } from '@/features/photo/session-document';
 import { Button } from '@/components/ui/button';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 
 const loadWorkspace = () => import('@/features/photo/photo-workspace');
 const PhotoWorkspace = lazy(() =>
@@ -32,6 +33,7 @@ const PhotoWorkspace = lazy(() =>
 
 export default function App() {
   const [isDragging, setIsDragging] = useState(false);
+  const [pendingDisposeRoll, setPendingDisposeRoll] = useState(false);
   const [configWarning, setConfigWarning] = useState(() =>
     platform().configuration?.warning(),
   );
@@ -237,14 +239,7 @@ export default function App() {
   };
   const discardRoll = () => {
     if (batchAbort.current || !session.items.length) return;
-    if (
-      window.confirm(
-        `Close all ${session.items.length} photos and discard their individual edits? Source files and saved presets will not be deleted.`,
-      )
-    ) {
-      disposeRoll();
-      setIsDragging(false);
-    }
+    setPendingDisposeRoll(true);
   };
 
   useEffect(() => {
@@ -387,6 +382,20 @@ export default function App() {
 
   return (
     <div className="flex h-svh flex-col overflow-hidden bg-app-base text-content-primary">
+      {pendingDisposeRoll && (
+        <ConfirmationDialog
+          title="Dispose roll?"
+          description={`Close all ${session.items.length} photos and discard their individual edits? Source files and saved presets will not be deleted.`}
+          confirmLabel="Dispose roll"
+          onCancel={() => setPendingDisposeRoll(false)}
+          onConfirm={() => {
+            if (batchAbort.current) return;
+            disposeRoll();
+            setIsDragging(false);
+            setPendingDisposeRoll(false);
+          }}
+        />
+      )}
       {configWarning && (
         <div
           role="alert"

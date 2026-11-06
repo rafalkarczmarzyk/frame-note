@@ -202,6 +202,46 @@ try {
   await page.getByRole('button', { name: 'Undo', exact: true }).click();
   await page.getByRole('button', { name: 'Undo', exact: true }).click();
   await expect.poll(layerCount).toBe(initialLayerCount);
+  const tracking = page.getByRole('spinbutton', {
+    name: 'Letter spacing',
+    exact: true,
+  });
+  await tracking.fill('0.03');
+  await tracking.press('ArrowUp');
+  await tracking.press('Enter');
+  await expect(tracking).toHaveValue('0.04');
+  // Text effects use the shared controls and extra color sidebar offline too.
+  await page.getByRole('button', { name: 'Add effect', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Outline', exact: true }).click();
+  await expect(
+    page.getByRole('spinbutton', { name: 'Thickness', exact: true }),
+  ).toBeVisible();
+  const effectSettings = page.getByRole('region', {
+    name: 'Outline settings',
+    exact: true,
+  });
+  await effectSettings
+    .getByRole('button', { name: 'Color', exact: true })
+    .click();
+  await page.getByRole('button', { name: 'Sage', exact: true }).click();
+  await page.getByRole('dialog', { name: 'Choose a color' }).press('Escape');
+  await page
+    .getByRole('button', { name: 'Hide effect 1', exact: true })
+    .click();
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: 'Hide effect 1', exact: true }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Add effect', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Blur', exact: true }).click();
+  const contentBlur = page.getByRole('spinbutton', {
+    name: 'Blur',
+    exact: true,
+  });
+  await contentBlur.fill('0.2');
+  await contentBlur.press('ArrowUp');
+  await contentBlur.press('Enter');
+  await expect(contentBlur).toHaveValue('0.22');
   const exportButton = page.getByRole('button', {
     name: 'Export JPG',
     exact: true,

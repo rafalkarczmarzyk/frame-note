@@ -1,104 +1,133 @@
+import { dateToken } from '../../../core/src/date-format';
 import {
-  createCaption,
-  type Anchor,
-  type Caption,
-} from '../../../core/src/document';
-import {
-  createCaptionLayout,
-  addCaption,
-} from '../../../core/src/caption-layout';
+  dateStampColor,
+  quartzDateGlowColor,
+  digitalDateStampColor,
+} from '../../../core/src/caption-colors';
+import { type Anchor, type Caption } from '../../../core/src/document';
+import { createCaptionLayout } from '../../../core/src/caption-layout';
+import { createLayerBackground } from '../../../core/src/layer-background';
+import { defaultTiledPosition } from '../../../core/src/tiled-watermark';
 import { createPreset } from '../../../core/src/presets';
 import { builtinIcons } from '../features/caption/builtin-icons';
 
-export const defaultTemplate = '{author}\n{lens}\n{exposure}';
-const defaultLayout = createCaptionLayout({
-  ...createCaption(),
-  template: defaultTemplate,
-});
-const darkLayout = structuredClone(defaultLayout);
-darkLayout.containers.forEach((container) => {
-  container.style.color = 'charcoal';
-});
-// Keep the original Macro ID and geometry; only its displayed name changes.
-const stackLayout = addCaption(defaultLayout, 'helicon-stack');
-stackLayout.containers[1]!.template = '{heliconStack}';
-stackLayout.containers[1]!.style.textAlign = 'right';
+export const defaultTemplate =
+  '{author}\n{lens}\n{icon:shutter} {shutterDuration}   {icon:aperture} {aperture}   {icon:iso} {iso}';
 
-function layoutFor(
-  blocks: {
-    template: string;
-    anchor: Anchor;
-    style?: Partial<Caption['style']>;
-  }[],
+function layer(
+  template: string,
+  anchor: Anchor,
+  style: Partial<Caption['style']> = {},
 ) {
-  const layout = createCaptionLayout();
-  layout.containers = blocks.map(({ template, anchor, style }, index) => {
-    const caption = createCaptionLayout().containers[0]!;
-    return {
-      ...caption,
-      id: `caption-${index + 1}`,
-      template,
-      style: { ...caption.style, ...style },
-      position: { anchor },
-    };
-  });
-  layout.activeId = layout.containers[0]?.id ?? null;
-  return layout;
+  const caption = createCaptionLayout().containers[0]!;
+  return {
+    ...caption,
+    template,
+    position: { anchor },
+    style: { ...caption.style, ...style },
+  };
 }
-const signature = layoutFor([
-  { template: '{author}', anchor: 'bottom-right', style: { fontSize: 1.5 } },
-]);
-const compact = layoutFor([
-  { template: '{exposure}', anchor: 'bottom-left', style: { fontSize: 1.6 } },
-]);
-const cameraLens = layoutFor([
-  { template: '{author}', anchor: 'bottom-left', style: { fontSize: 1.6 } },
-  {
-    template: '{camera}\n{lens}\n{exposure}',
-    anchor: 'bottom-right',
-    style: { fontSize: 1.6 },
-  },
-]);
-const iconLayout = layoutFor([
-  {
-    template:
-      '{icon:shutter} {shutter}   {icon:aperture} {aperture}   {icon:iso} {iso}',
-    anchor: 'bottom-left',
-    style: { fontSize: 1.7 },
-  },
-]);
-const astrophotography = layoutFor([
-  { template: '{author}', anchor: 'bottom-left', style: { fontSize: 1.5 } },
-  {
-    template:
-      '{camera}\n{lens}\n{focalLength}\n{shutterDuration} · {aperture} · {iso}',
-    anchor: 'bottom-right',
-    style: { fontSize: 1.5 },
-  },
-]);
-const longExposure = layoutFor([
-  { template: '{author}', anchor: 'bottom-left', style: { fontSize: 1.5 } },
-  {
-    template: '{shutterDuration} · {aperture} · {iso}',
-    anchor: 'bottom-right',
-    style: { fontSize: 1.6 },
-  },
-]);
+function preset(id: string, name: string, layers: ReturnType<typeof layer>[]) {
+  const layout = createCaptionLayout();
+  layout.containers = layers.map((caption, index) => ({
+    ...caption,
+    id: `caption-${index + 1}`,
+  }));
+  layout.activeId = layout.containers[0]!.id;
+  return createPreset(id, name, layout, [...builtinIcons]);
+}
+const details = () => layer(defaultTemplate, 'bottom-left');
+const glass = layer('{author}\n{camera}\n{exposure}', 'bottom-left', {
+  fontFamily: 'Inter',
+  fontSize: 1.6,
+});
+glass.background = { ...createLayerBackground(), type: 'glass', opacity: 0.35 };
+const proof = layer('PROOF\n{author}', 'center', {
+  fontSize: 2.5,
+  fontWeight: 700,
+  textAlign: 'center',
+});
+const proofLayer = {
+  ...proof,
+  position: { ...proof.position, tiled: defaultTiledPosition() },
+  blending: { mode: 'normal' as const, opacity: 0.22 },
+};
+
+/** Retain existing IDs for surviving presets; user-saved copies remain independent. */
 export const builtinPresets = [
-  createPreset('builtin-default', 'Default', defaultLayout, []),
-  createPreset('builtin-default-dark', 'Default dark', darkLayout, []),
-  createPreset('builtin-signature', 'Signature', signature, []),
-  createPreset('builtin-compact-exif', 'Compact EXIF', compact, []),
-  createPreset('builtin-camera-lens', 'Camera & Lens', cameraLens, []),
-  createPreset('builtin-macro', 'Focus Stack', stackLayout, []),
-  createPreset('builtin-exif-icons', 'EXIF Icons', iconLayout, [
-    ...builtinIcons,
+  preset('builtin-default', 'Photo Details', [details()]),
+  preset('builtin-signature', 'Signature', [
+    layer('{author}', 'bottom-right', {
+      fontFamily: 'Cormorant Garamond',
+      fontStyle: 'italic',
+      fontSize: 2.5,
+    }),
   ]),
-  createPreset(
-    'builtin-astrophotography',
-    'Astrophotography',
-    astrophotography,
-    [],
-  ),
-  createPreset('builtin-long-exposure', 'Long Exposure', longExposure, []),
+  preset('builtin-macro', 'Focus Stack', [
+    details(),
+    layer('{icon:stack} {heliconStackSummary}', 'bottom-right', {
+      color: 'caption-white',
+    }),
+  ]),
+  preset('builtin-glass-caption', 'Glass Caption', [glass]),
+  preset('builtin-proof-watermark', 'Proof Watermark', [proofLayer]),
+  preset('builtin-quartz-date', 'Quartz Date', [
+    {
+      ...layer(`{${dateToken("'YY MM DD")}}`, 'bottom-right', {
+        fontFamily: 'DSEG7 Classic',
+        fontWeight: 700,
+        fontStyle: 'italic',
+        fontSize: 2.5,
+        color: dateStampColor,
+      }),
+      blending: { mode: 'add', opacity: 1 },
+      effects: [
+        {
+          id: 'quartz-date-glow',
+          type: 'glow',
+          enabled: true,
+          color: quartzDateGlowColor,
+          opacity: 1,
+          x: 0,
+          y: 0,
+          spread: 0,
+          blur: 0.24,
+        },
+        {
+          id: 'quartz-date-blur',
+          type: 'blur',
+          enabled: true,
+          color: 'caption-black',
+          opacity: 1,
+          x: 0,
+          y: 0,
+          spread: 0,
+          blur: 0.02,
+        },
+      ],
+    },
+  ]),
+  preset('builtin-digital-date', 'Digital Date', [
+    {
+      ...layer(`{${dateToken('YYYY/MM/DD')}}`, 'bottom-right', {
+        fontFamily: 'Oswald',
+        fontWeight: 400,
+        fontSize: 2.2,
+        color: digitalDateStampColor,
+      }),
+      effects: [
+        {
+          id: 'digital-date-outline',
+          type: 'outline',
+          enabled: true,
+          color: 'caption-black',
+          opacity: 0.8,
+          x: 0,
+          y: 0,
+          spread: 0.06,
+          blur: 0,
+        },
+      ],
+    },
+  ]),
 ];

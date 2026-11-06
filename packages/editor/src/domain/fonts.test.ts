@@ -26,6 +26,12 @@ it('uses only supplied weights and styles', () => {
     }),
   ).toBe(400);
   expect(supportsItalic('Inter')).toBe(true);
+  expect(supportsItalic('DSEG7 Classic')).toBe(true);
+  expect(
+    effectiveFontWeight({
+      style: { ...style, fontFamily: 'DSEG7 Classic', fontWeight: 700 },
+    }),
+  ).toBe(700);
   expect(supportsItalic('Manrope')).toBe(false);
 });
 

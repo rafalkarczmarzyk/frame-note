@@ -432,3 +432,33 @@ describe('readable shutter duration', () => {
     ).toBe('');
   });
 });
+
+it('offers separate date and time while retaining legacy dateTime resolution', () => {
+  const fields = [field('exif:DateTimeOriginal', '2026:11:06 23:42:59-10:00')];
+  expect(resolveTemplate('{date} {time}', fields).text).toBe(
+    '2026-11-06 23:42',
+  );
+  expect(resolveTemplate('{dateTime}', fields).text).toBe('2026-11-06 23:42');
+  const keys = metadataGroups(fields, '').flatMap((group) =>
+    group.fields.map((item) => item.key),
+  );
+  expect(keys).toContain('time');
+  expect(keys).not.toContain('dateTime');
+  for (const source of [
+    '2026:11:06',
+    '2026:11:06 24:00:00',
+    '2026:02:30 12:30:00',
+    '2026:11:06 12:60:00',
+  ]) {
+    const result = resolveTemplate('{time}', [
+      field('exif:DateTimeOriginal', source),
+    ]);
+    expect(result.text).toBe('');
+    expect(result.missing).toContain('time');
+  }
+  expect(
+    resolveTemplate('{time}', [
+      field('xmp:DateTimeOriginal', '2026-11-06T08:15:00Z'),
+    ]).text,
+  ).toBe('08:15');
+});

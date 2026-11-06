@@ -1,3 +1,7 @@
+import {
+  parseDateToken,
+  dateTokenValue,
+} from '../../../../core/src/date-format';
 import { parseSeparatorToken } from '../../../../core/src/inline-separator';
 import { Badge } from '@/components/ui/badge';
 import { parseIconToken } from '../../../../core/src/inline-icon';
@@ -69,13 +73,17 @@ export function LayerContentPreview({
         );
         const isGraphic =
           token.startsWith('image:') || token.startsWith('icon:');
-        const missing = isGraphic ? !graphic && !icon : !values[token]?.trim();
+        const missing = isGraphic
+          ? !graphic && !icon
+          : !dateTokenValue(token, values)?.trim();
         const name =
           graphic?.name ??
           icon?.name ??
           (token.startsWith('image:')
             ? 'Missing image'
-            : token.replace(/^icon:/u, ''));
+            : parseDateToken(token)
+              ? 'date'
+              : token.replace(/^icon:/u, ''));
         const Token = isGraphic ? 'span' : Badge;
         return (
           <Token

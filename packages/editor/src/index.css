@@ -1168,6 +1168,14 @@ fieldset:disabled .glass-switch {
   box-shadow: var(--segment-shadow);
 }
 
+/* Shared surface for the selected editor element or effect. */
+.selected-settings-panel {
+  border: 1px solid var(--container-settings-border);
+  border-radius: var(--radius);
+  background: var(--selected-element-base);
+  padding: 12px;
+}
+
 /* Compact layer selector: shared recessed tray and raised active row. */
 .layer-selector {
   margin-inline: 8px;
@@ -1175,6 +1183,9 @@ fieldset:disabled .glass-switch {
   border-radius: 12px;
   background: var(--segment-base);
   box-shadow: var(--shadow-inset);
+}
+.layer-selector-full {
+  margin-inline: 0;
 }
 .layer-selector [data-picker-row] {
   margin-block: 0;

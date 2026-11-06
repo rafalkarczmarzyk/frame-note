@@ -1,3 +1,7 @@
+import {
+  parseDateToken,
+  dateTokenValue,
+} from '../../../../../core/src/date-format';
 import { parseSeparatorToken } from '../../../../../core/src/inline-separator';
 import { Badge } from '@/components/ui/badge';
 import { parseIconToken } from '../../../../../core/src/inline-icon';
@@ -50,7 +54,7 @@ export function TokenView({
         ? icons
           ? !asset
           : !['aperture', 'camera'].includes(iconRef?.name ?? '')
-        : hasPhoto && !values[token]?.trim();
+        : hasPhoto && !dateTokenValue(token, values)?.trim();
   const status =
     separator || icon || !hasPhoto
       ? undefined
@@ -69,7 +73,7 @@ export function TokenView({
                 ? `{${token}}`
                 : !hasPhoto
                   ? 'Open a photo to preview this value'
-                  : values[token]
+                  : dateTokenValue(token, values)
       }
     >
       <Badge
@@ -173,7 +177,7 @@ export function TokenView({
               {graphic?.name ?? (imageRef ? token : token.slice(5))}
             </span>
           ) : (
-            <span>{token}</span>
+            <span>{parseDateToken(token) ? 'date' : token}</span>
           )}
           {missing && <span className="sr-only"> (missing)</span>}
         </NodeViewWrapper>

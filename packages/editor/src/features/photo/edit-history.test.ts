@@ -1,3 +1,5 @@
+import { createLayerEffect } from '../../../../core/src/layer-effects';
+import { createCaption } from '../../../../core/src/document';
 import {
   addCaption,
   moveLayer,
@@ -15,6 +17,27 @@ function document(text = '') {
 }
 
 describe('session edit history', () => {
+  it('keeps effect stacks detached across undo, redo and photo documents', () => {
+    const history = new EditHistorySession();
+    const before = document();
+    history.reset('a', before);
+    history.reset('b', before);
+    const after = structuredClone(before);
+    after.layout.containers[0]!.effects = [
+      createLayerEffect('glow', createCaption(), { width: 1000, height: 600 }),
+    ];
+    history.record('a', after, 'Add effect');
+    after.layout.containers[0]!.effects![0]!.enabled = false;
+    expect(history.undo('a')).toEqual(before);
+    const redone = history.redo('a');
+    expect(redone.layout.containers[0]!.effects![0]!.enabled).toBe(true);
+    expect(history.document('b')).toEqual(before);
+    redone.layout.containers[0]!.effects![0]!.color = 'caption-black';
+    expect(history.document('a').layout.containers[0]!.effects![0]!.color).toBe(
+      'caption-muted-gold',
+    );
+  });
+
   it('groups live updates and undoes a pending edit as one step', () => {
     const history = new EditHistorySession();
     history.reset('a', document());

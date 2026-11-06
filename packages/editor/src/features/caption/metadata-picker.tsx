@@ -1,3 +1,4 @@
+import { parseDateToken } from '../../../../core/src/date-format';
 import { filterByCategory } from '@/lib/category-filter';
 import {
   Layers,
@@ -10,6 +11,7 @@ import {
   UserRound,
   Copyright,
   CalendarDays,
+  Clock,
   SlidersHorizontal,
 } from 'lucide-react';
 import { PickerList } from '@/components/ui/picker-list';
@@ -26,6 +28,7 @@ const helperIcons = {
   iso: Sun,
   focalLength: Ruler,
   date: CalendarDays,
+  time: Clock,
   copyright: Copyright,
   exposure: SlidersHorizontal,
   heliconStack: SlidersHorizontal,
@@ -79,7 +82,10 @@ export function MetadataPicker({
               label: field.key,
               leading:
                 group.name === 'FrameNote' ? helperIcon(field.key) : undefined,
-              selected: used.has(field.key),
+              selected:
+                used.has(field.key) ||
+                (field.key === 'date' &&
+                  [...used].some((token) => !!parseDateToken(token))),
               description: field.displayValue || 'No data in this photo.',
               preview:
                 'sources' in field && field.sources.length > 0 ? (

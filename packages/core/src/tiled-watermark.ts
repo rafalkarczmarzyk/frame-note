@@ -21,12 +21,15 @@ export function tiledCopies(
   dimensions: ImageDimensions,
   motif: ImageDimensions,
   tiled: TiledPosition,
+  bleed = 0,
 ) {
   if (motif.width <= 0 || motif.height <= 0) return [];
   const short = Math.min(dimensions.width, dimensions.height) / 100;
   const stepX = motif.width + tiled.spacing * short;
   const stepY = motif.height + tiled.spacing * short;
   if (![stepX, stepY].every((v) => Number.isFinite(v) && v > 0)) return [];
+  const visibleWidth = motif.width + bleed * 2;
+  const visibleHeight = motif.height + bleed * 2;
   const angle = (tiled.angle * Math.PI) / 180;
   const cos = Math.cos(angle),
     sin = Math.sin(angle);
@@ -43,13 +46,13 @@ export function tiledCopies(
     x: (x! - origin.x) * cos + (y! - origin.y) * sin,
     y: -(x! - origin.x) * sin + (y! - origin.y) * cos,
   }));
-  const minX = Math.min(...corners.map((p) => p.x)) - motif.width / 2;
-  const maxX = Math.max(...corners.map((p) => p.x)) + motif.width / 2;
+  const minX = Math.min(...corners.map((p) => p.x)) - visibleWidth / 2;
+  const maxX = Math.max(...corners.map((p) => p.x)) + visibleWidth / 2;
   const minRow = Math.ceil(
-    (Math.min(...corners.map((p) => p.y)) - motif.height / 2) / stepY,
+    (Math.min(...corners.map((p) => p.y)) - visibleHeight / 2) / stepY,
   );
   const maxRow = Math.floor(
-    (Math.max(...corners.map((p) => p.y)) + motif.height / 2) / stepY,
+    (Math.max(...corners.map((p) => p.y)) + visibleHeight / 2) / stepY,
   );
   const copies: { x: number; y: number; row: number; column: number }[] = [];
   if (maxRow - minRow > tiledCopyLimit)
@@ -72,23 +75,23 @@ export function tiledCopies(
       if (
         Math.abs(dx) >
           dimensions.width / 2 +
-            (Math.abs(cos) * motif.width) / 2 +
-            (Math.abs(sin) * motif.height) / 2 +
+            (Math.abs(cos) * visibleWidth) / 2 +
+            (Math.abs(sin) * visibleHeight) / 2 +
             1e-7 ||
         Math.abs(dy) >
           dimensions.height / 2 +
-            (Math.abs(sin) * motif.width) / 2 +
-            (Math.abs(cos) * motif.height) / 2 +
+            (Math.abs(sin) * visibleWidth) / 2 +
+            (Math.abs(cos) * visibleHeight) / 2 +
             1e-7 ||
         Math.abs(dx * cos + dy * sin) >
           (Math.abs(cos) * dimensions.width) / 2 +
             (Math.abs(sin) * dimensions.height) / 2 +
-            motif.width / 2 +
+            visibleWidth / 2 +
             1e-7 ||
         Math.abs(-dx * sin + dy * cos) >
           (Math.abs(sin) * dimensions.width) / 2 +
             (Math.abs(cos) * dimensions.height) / 2 +
-            motif.height / 2 +
+            visibleHeight / 2 +
             1e-7
       )
         continue;

@@ -226,3 +226,31 @@ describe('preset read/write', () => {
     expect(readPreset(JSON.stringify(saved))).toEqual(parsed);
   });
 });
+
+describe('letter spacing compatibility', () => {
+  it('round-trips em tracking and rejects invalid supplied tracking', () => {
+    const preset = createPreset(
+      'tracking',
+      'Tracking',
+      createCaptionLayout(),
+      [],
+    );
+    for (const letterSpacing of [-0.1, 0, 0.05, 1]) {
+      preset.layout.containers[0]!.style.letterSpacing = letterSpacing;
+      expect(
+        readPreset(JSON.stringify(preset)).layout.containers[0]!.style
+          .letterSpacing,
+      ).toBe(letterSpacing);
+    }
+    for (const letterSpacing of [-0.11, 1.01, '0.1', null]) {
+      const wire = JSON.parse(JSON.stringify(preset));
+      wire.layout.containers[0].style.letterSpacing = letterSpacing;
+      expect(() => readPreset(JSON.stringify(wire))).toThrow('letterSpacing');
+    }
+    delete preset.layout.containers[0]!.style.letterSpacing;
+    expect(
+      readPreset(JSON.stringify(preset)).layout.containers[0]!.style
+        .letterSpacing ?? 0,
+    ).toBe(0);
+  });
+});

@@ -1,3 +1,4 @@
+import type { LayerEffect } from './layer-effects';
 import { createLayerBlending, type LayerBlending } from './layer-blending';
 import type { TiledPosition } from './tiled-watermark';
 import type { LayerBackground } from './layer-background';
@@ -34,6 +35,7 @@ export type Anchor =
 
 export interface Caption {
   blending?: LayerBlending;
+  effects?: LayerEffect[];
   background?: LayerBackground;
   visible?: boolean;
   logo?: LogoContent;
@@ -50,6 +52,8 @@ export interface Caption {
     opacity: number;
     /** Unitless multiplier of the font size. */
     lineHeight: number;
+    /** Tracking in em; missing means zero. */
+    letterSpacing?: number;
     textAlign: 'auto' | 'left' | 'center' | 'right';
   };
   position: {

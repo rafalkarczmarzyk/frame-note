@@ -1,3 +1,4 @@
+import { hasLayerEffects } from '../../../../core/src/layer-effects';
 import { hasLayerBlending } from '../../../../core/src/layer-blending';
 import { useEffect, useState } from 'react';
 import type { LoadedPhoto } from '../photo/load-photo';
@@ -16,7 +17,7 @@ export function useGlassPreview(
   photo: LoadedPhoto | null,
   captions: readonly RenderedCaption[],
   ready: boolean,
-  maxSide: number,
+  resolutionScale: number,
 ) {
   const [result, setResult] = useState<{
     photo: LoadedPhoto;
@@ -27,7 +28,9 @@ export function useGlassPreview(
     photo: LoadedPhoto;
     message: string;
   } | null>(null);
-  const blended = captions.some((item) => hasLayerBlending(item.caption));
+  const blended = captions.some(
+    (item) => hasLayerBlending(item.caption) || hasLayerEffects(item.caption),
+  );
   const enabled =
     ready &&
     (blended ||
@@ -45,11 +48,7 @@ export function useGlassPreview(
     let cancelled = false;
     const timer = requestAnimationFrame(() => {
       const original = photo.document.photo.dimensions;
-      const ratio = Math.min(
-        1,
-        Math.max(320, Math.min(1600, maxSide)) /
-          Math.max(original.width, original.height),
-      );
+      const ratio = Math.max(0.001, Math.min(1, resolutionScale));
       const dimensions = {
         width: Math.max(1, Math.round(original.width * ratio)),
         height: Math.max(1, Math.round(original.height * ratio)),
@@ -59,7 +58,11 @@ export function useGlassPreview(
         caption: convertSizing(item.caption, 'short-edge', original),
       }));
       void (blended ? renderPhotoComposition : renderPhotoBackgrounds)(
-        photo.previewImage ?? photo.image,
+        photo.previewImage &&
+          photo.previewImage.width >= dimensions.width &&
+          photo.previewImage.height >= dimensions.height
+          ? photo.previewImage
+          : photo.image,
         dimensions,
         scaled,
       ).then(
@@ -119,7 +122,7 @@ export function useGlassPreview(
       // React may still display this result until the next frame is ready;
       // let its canvas be collected after replacement rather than blanking it.
     };
-  }, [photo, captions, enabled, maxSide, blended]);
+  }, [photo, captions, enabled, resolutionScale, blended]);
   // Release results when replaced or unmounted; effects don't clear a canvas
   // while it is still displayed by react-konva.
   useEffect(() => {

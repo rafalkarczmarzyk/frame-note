@@ -32,6 +32,27 @@ and `offset: { x, y }` (−100–100% of that side in photo axes).
 Disabled settings are retained independently of Anchor/Manual positioning.
 Sizing-unit changes do not alter these normalized pattern values.
 
+`style.letterSpacing` is optional tracking in em, from -0.1 to 1. Missing means
+zero; document unit conversion leaves this relative value unchanged.
+
+### Text and content effects
+
+An optional top-first `effects` array belongs to each layer. Missing effects
+normalize to `[]`. Each entry has a unique layer-local `id`, `type` (`outline`,
+`shadow`, `glow`, `blur`), `enabled`, `color`, `opacity` (0–1), and document-unit
+`x`, `y`, `spread`, `blur`. Blur and Outline thickness cannot be negative;
+Shadow/Glow spread can. At most 100 effects per layer are accepted. Known fields
+are validated and unknown fields retained through editing and saving.
+
+Outline/Shadow/Glow draw independent copies of the original content alpha mask
+below text, icons, SVG/PNG graphics and separators. Backgrounds are excluded.
+Outline ignores stored `x`, `y` and `blur`: it always uses zero offset and blur.
+These legacy fields remain readable and retained without a file migration.
+Blur uses only its blur radius and opacity, softening the complete content after
+text decorations, without the background. Multiple Blur entries run back to front.
+Current older readers retain additive fields but do not render these effects.
+The format remains v1 and the library key is unchanged.
+
 ## Reading and saving
 
 Import does not modify its source file. Reading a saved library normalizes it

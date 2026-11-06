@@ -1,6 +1,6 @@
 # Caption font library
 
-The picker includes 25 Google Fonts families. Stable family identifiers live in
+The picker includes 25 Google Fonts families and DSEG7 Classic. Stable family identifiers live in
 `packages/core/src/fonts.ts`; presets never store font delivery URLs.
 `Montserrat Variable` retains its existing identifier. Preset v1 now accepts arbitrary nonempty family names by explicit product
 decision. Unknown/unloadable families retain their saved name, show Unavailable
@@ -56,10 +56,27 @@ python scripts/verify-fonts.py
 
 ## System fonts
 
+The picker sorts all results alphabetically by display name, including category
+and search results. Bundled and system families share one order; selection does
+not move a family to the top.
+
 Desktop adds a System category; All includes installed and bundled families.
+Desktop font rows show a muted App or System badge. Hovering a source badge
+explains whether the font is included with FrameNote or installed on this computer;
+system fonts may be unavailable on another device or in the web app. Web hides source badges.
+Selection uses the row highlight without a separate Selected badge on either platform.
 On macOS the native catalog is read at startup; restart after installing fonts.
 Only actual installed faces are used. Bundled families take precedence on name
 collisions. Web does not enumerate local fonts or request font permissions.
 
 Stories: `Pickers/FontPicker`; shared category control:
 `Selection & feedback/CategoryFilter`.
+
+## Segment date font
+
+DSEG7 Classic Regular, Italic, Bold and Bold Italic (DSEG 0.46.0, keshikan) are bundled unchanged in
+`public/fonts/dseg`, with SIL OFL 1.1. Source: https://github.com/keshikan/DSEG
+(package https://registry.npmjs.org/dseg/-/dseg-0.46.0.tgz).
+It is intended for segment digits and limited symbols, not general text or Polish
+letters. Regular, Italic, Bold and Bold Italic are supplied. Quartz Date defaults to Bold Italic. The Quartz Date preset uses it locally in web
+and desktop; older applications fall back to Montserrat if the font is unavailable.

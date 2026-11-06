@@ -1,4 +1,4 @@
-import { Layers } from 'lucide-react';
+import { Blend } from 'lucide-react';
 import type { Caption } from '../../../../core/src/document';
 import {
   createLayerBlending,
@@ -46,7 +46,7 @@ export function BlendingControls({
         </Field>
         <RangeField
           label="Layer opacity"
-          icon={<Layers className="size-4" aria-hidden="true" />}
+          icon={<Blend className="size-4" aria-hidden="true" />}
           tooltip="Opacity of the complete layer, including its background"
           value={Math.round(blending.opacity * 100)}
           unit="%"

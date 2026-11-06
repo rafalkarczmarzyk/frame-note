@@ -6,7 +6,7 @@ import { PresetToolbar } from './preset-toolbar';
 import { CategoryFilter } from '@/components/ui/category-filter';
 import { PickerList } from '@/components/ui/picker-list';
 import { builtinPresets } from '@/domain/builtin-presets';
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   RotateCcw,
   Download,
@@ -18,7 +18,7 @@ import {
   Pencil,
   X,
 } from 'lucide-react';
-import { Modal } from '@/components/ui/modal';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Field } from '@/components/ui/field';
@@ -69,8 +69,7 @@ export function PresetControls({
   const importInput = useRef<HTMLInputElement>(null);
   const [error, setError] = useState('');
   const [pendingPreset, setPendingPreset] = useState<LayoutPreset | null>(null);
-  const discardTitle = useId();
-  const discardDescription = useId();
+  const [pendingDelete, setPendingDelete] = useState<LayoutPreset | null>(null);
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('all');
   const revealPresets = () => {
@@ -121,6 +120,7 @@ export function PresetControls({
   const [name, setName] = useState('');
   const [naming, setNaming] = useState(false);
   const [renameId, setRenameId] = useState<string | null>(null);
+  const [draftPreset, setDraftPreset] = useState<LayoutPreset | null>(null);
   const allPresets = [...builtinPresets, ...presets];
   const search = query.trim().toLocaleLowerCase();
   const visibleGroups = [
@@ -139,9 +139,18 @@ export function PresetControls({
   const builtin = builtinPresets.some((preset) => preset.id === selected);
   const dirty = isPresetModified(current, layout, icons);
   const startCopy = () => {
+    setDraftPreset(null);
     setRenameId(null);
     setName(current ? copyPresetName(current.name) : '');
     setNaming(true);
+    onBrowse();
+  };
+  const startDuplicate = (preset: LayoutPreset) => {
+    setDraftPreset(structuredClone(preset));
+    setRenameId(null);
+    setName(copyPresetName(preset.name));
+    setNaming(true);
+    setError('');
     onBrowse();
   };
   const store = async (update: (current: LayoutPreset[]) => LayoutPreset[]) => {
@@ -168,16 +177,17 @@ export function PresetControls({
     const preset = createPreset(
       replace && current && !builtin ? current.id : createId(),
       title,
-      layout,
-      icons,
-      current,
+      draftPreset && !replace ? draftPreset.layout : layout,
+      draftPreset && !replace ? draftPreset.icons : icons,
+      draftPreset && !replace ? draftPreset : current,
     );
     const next = (latest: LayoutPreset[]) =>
       replace && current && !builtin
         ? latest.map((item) => (item.id === current.id ? preset : item))
         : [...latest, preset];
     if (await store(next)) {
-      setSelected(preset.id);
+      if (!draftPreset || replace) setSelected(preset.id);
+      setDraftPreset(null);
       setNaming(false);
       if (!replace) revealPresets();
     }
@@ -185,6 +195,7 @@ export function PresetControls({
   const apply = (preset: LayoutPreset) => {
     if (!onSelectedPresetChange) setSelected(preset.id);
     setName(preset.name);
+    setDraftPreset(null);
     setNaming(false);
     setError('');
     onApply(structuredClone(preset));
@@ -195,7 +206,7 @@ export function PresetControls({
   };
   const form = naming && (
     <form
-      className="space-y-2"
+      className="selected-settings-panel space-y-2"
       onSubmit={async (event) => {
         event.preventDefault();
         if (renameId) {
@@ -221,6 +232,7 @@ export function PresetControls({
         {(id) => (
           <Input
             id={id}
+            className="w-full"
             value={name}
             maxLength={presetNameLimit}
             autoFocus
@@ -241,6 +253,7 @@ export function PresetControls({
           onClick={() => {
             setNaming(false);
             setRenameId(null);
+            setDraftPreset(null);
             setError('');
           }}
         >
@@ -291,20 +304,8 @@ export function PresetControls({
                   : undefined,
                 icon: <Copy />,
                 disabled: disabled || !current,
-                onSelect: async () => {
-                  if (!current) return;
-                  const copy = {
-                    ...structuredClone(current),
-                    id: createId(),
-                    name: copyPresetName(current.name),
-                  };
-                  if (await store((latest) => [...latest, copy])) {
-                    revealPresets();
-                    setRenameId(copy.id);
-                    setName(copy.name);
-                    setNaming(true);
-                    onBrowse();
-                  }
+                onSelect: () => {
+                  if (current) startDuplicate(current);
                 },
               },
               {
@@ -318,6 +319,7 @@ export function PresetControls({
                 disabled: disabled || !current || builtin,
                 onSelect: () => {
                   if (!current || builtin) return;
+                  setDraftPreset(null);
                   setRenameId(current.id);
                   setName(current.name);
                   setNaming(true);
@@ -333,6 +335,7 @@ export function PresetControls({
                 onSelect: () => {
                   setNaming(false);
                   setRenameId(null);
+                  setDraftPreset(null);
                   onBrowse();
                 },
               },
@@ -505,19 +508,7 @@ export function PresetControls({
                         <IconButton
                           label={`Duplicate ${preset.name}`}
                           disabled={disabled}
-                          onClick={async () => {
-                            const copy = {
-                              ...structuredClone(preset),
-                              id: createId(),
-                              name: copyPresetName(preset.name),
-                            };
-                            if (await store((latest) => [...latest, copy])) {
-                              revealPresets();
-                              setRenameId(copy.id);
-                              setName(copy.name);
-                              setNaming(true);
-                            }
-                          }}
+                          onClick={() => startDuplicate(preset)}
                         >
                           <Copy />
                         </IconButton>
@@ -527,6 +518,7 @@ export function PresetControls({
                               label={`Rename ${preset.name}`}
                               disabled={disabled}
                               onClick={() => {
+                                setDraftPreset(null);
                                 setRenameId(preset.id);
                                 setName(preset.name);
                                 setNaming(true);
@@ -538,16 +530,7 @@ export function PresetControls({
                             <IconButton
                               label={`Delete ${preset.name}`}
                               disabled={disabled}
-                              onClick={async () => {
-                                if (
-                                  await store((latest) =>
-                                    latest.filter((p) => p.id !== preset.id),
-                                  )
-                                ) {
-                                  if (selected === preset.id) setSelected('');
-                                  if (renameId === preset.id) setNaming(false);
-                                }
-                              }}
+                              onClick={() => setPendingDelete(preset)}
                             >
                               <Trash2 />
                             </IconButton>
@@ -567,41 +550,59 @@ export function PresetControls({
           panelHost,
         )}
       {pendingPreset && (
-        <Modal
-          titleId={discardTitle}
-          descriptionId={discardDescription}
-          onClose={() => setPendingPreset(null)}
-        >
-          <div className="space-y-4 p-8">
-            <h2
-              id={discardTitle}
-              className="font-display text-xl font-semibold"
-            >
-              Discard unsaved changes?
-            </h2>
-            <p
-              id={discardDescription}
-              className="text-sm text-content-secondary"
-            >
+        <ConfirmationDialog
+          title="Discard unsaved changes?"
+          description={
+            <>
               Unsaved changes will be lost. Apply “{pendingPreset.name}” from
               its saved version?
-            </p>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setPendingPreset(null)}>
-                Cancel
-              </Button>
-              <Button
-                onClick={() => {
-                  const preset = pendingPreset;
-                  setPendingPreset(null);
-                  apply(preset);
-                }}
-              >
-                Discard changes
-              </Button>
-            </div>
-          </div>
-        </Modal>
+            </>
+          }
+          confirmLabel="Discard changes"
+          onCancel={() => setPendingPreset(null)}
+          onConfirm={() => {
+            const preset = pendingPreset;
+            setPendingPreset(null);
+            apply(preset);
+          }}
+        />
+      )}
+      {pendingDelete && (
+        <ConfirmationDialog
+          title="Delete preset?"
+          description={
+            <>
+              Delete “{pendingDelete.name}” from your saved presets? This cannot
+              be undone. The current photo layout will be kept.
+            </>
+          }
+          confirmLabel="Delete preset"
+          busy={saving}
+          onCancel={() => setPendingDelete(null)}
+          onConfirm={async () => {
+            if (saving) return;
+            const preset = pendingDelete;
+            if (
+              await store((latest) => latest.filter((p) => p.id !== preset.id))
+            ) {
+              if (selected === preset.id) setSelected(builtinPresets[0]!.id);
+              if (renameId === preset.id) {
+                setNaming(false);
+                setRenameId(null);
+              }
+              setPendingDelete(null);
+              requestAnimationFrame(() =>
+                panelHost
+                  ?.querySelector<HTMLInputElement>(
+                    '[aria-label="Search presets"]',
+                  )
+                  ?.focus(),
+              );
+            } else {
+              setPendingDelete(null);
+            }
+          }}
+        />
       )}
       <input
         ref={importInput}

@@ -28,6 +28,7 @@ export const presetStorageKey = 'framenote.presets.v1';
 function normalizeContainer(container: CaptionContainer): CaptionContainer {
   return {
     ...container,
+    effects: container.effects ?? [],
     blending: container.blending ?? createLayerBlending(),
     position: {
       ...container.position,
@@ -81,6 +82,16 @@ export function parsePreset(
   };
   for (const [index, c] of data.layout.containers.entries()) {
     const path = `layout.containers.${index}`;
+    if (
+      new Set(c.effects?.map((effect) => effect.id)).size !==
+      (c.effects?.length ?? 0)
+    )
+      throw Error(
+        `Preset effect identifiers must be unique at ${path}.effects.`,
+      );
+    c.effects?.forEach((effect, effectIndex) =>
+      validColor(effect.color, `${path}.effects.${effectIndex}.color`),
+    );
     validColor(c.style.color, `${path}.style.color`);
     if (c.background) {
       validColor(c.background.color, `${path}.background.color`);

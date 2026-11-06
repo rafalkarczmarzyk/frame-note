@@ -11,9 +11,33 @@ see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 
 ## Unreleased
 
+### Fixed
+
+- Confirm Dispose roll with the shared in-app dialog on web and desktop instead of a system alert.
+
+- Confirm saved preset deletion with a shared dialog, also used when discarding unsaved preset changes. Deleting the active preset selects Photo Details while preserving the photo layout.
+- Scale effect preview resolution with zoom and display density, using the original photo when needed instead of enlarging a 1600-pixel composition.
+
 ### Changed
 
+- Sort font picker results alphabetically by display name across bundled and system fonts, categories and searches.
+- Identify bundled and installed fonts with App/System badges and source tooltips in the desktop font picker; retain row highlighting without a redundant Selected badge on web and desktop.
+- Frame the preset naming form separately, with a full-width name field. Duplicate creates a draft until Save; Cancel discards the draft without adding a preset.
+- Replace the built-in preset collection with seven distinct starting points: Photo Details (default), Signature, Focus Stack, Glass Caption, Proof Watermark, Quartz Date and Digital Date. User-saved presets remain unchanged.
+- Omit standalone decorative icons when their metadata line is empty, retaining missing-data warnings.
 - Choose layer blend modes from a dropdown with full text labels.
+
+### Added
+
+- Letter spacing in em, shared by text measurement, preview and export, saved in preset v1 with zero spacing for older presets.
+- A standalone capture-time helper (`{time}`) to compose with `{date}`. The picker replaces `dateTime` with `time`; existing `dateTime` tokens remain supported.
+
+- Ordered Outline, Shadow and Glow effects for text, icons, SVG/PNG graphics and separators, plus Blur for the complete layer content. Outline uses thickness, color and opacity; Shadow/Glow also support offset, spread and blur. Backgrounds stay separate. Preview, Navigator and JPG/PNG exports share the effects. Effects support visibility, duplication, reordering, Undo/Redo and preset v1; missing effects retain the original appearance.
+
+- Bundled DSEG7 Classic segment font for the orange Quartz Date preset, using italic segment digits, a short capture date, additive blending, warm glow and subtle text blur. Digital Date uses regular Oswald with a golden orange color, a thin black outline and normal blending.
+- Capture-time formatting with `HH:mm`, plus ready-made `YYYY/MM/DD` and `YYYY/MM/DD HH:mm` formats. Missing capture times remain explicitly unavailable.
+- Per-token date formatting with ready-made formats, validated custom patterns and a live preview, saved in preset v1. Older readers do not understand formatted date tokens.
+- `heliconStackSummary` caption helper for concise stack counts.
 
 ## [0.10.0-beta] - 2026-11-05
 

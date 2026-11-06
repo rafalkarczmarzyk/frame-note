@@ -24,6 +24,7 @@ describe.each([
     'preserves font size and asymmetric margins when converting to %s and back',
     (unit) => {
       const original = createCaption();
+      original.style.letterSpacing = 0.03;
       original.position.margins = {
         top: 1.25,
         right: 2.5,
@@ -54,6 +55,7 @@ describe.each([
       );
       expect(restored.style.fontSize).toBeCloseTo(original.style.fontSize, 10);
       expect(original.sizingUnit).toBe('short-edge');
+      expect(converted.style.letterSpacing).toBe(0.03);
       expect(converted.style.lineHeight).toBe(original.style.lineHeight);
       expect(converted.style.opacity).toBe(original.style.opacity);
     },

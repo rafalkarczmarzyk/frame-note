@@ -10,6 +10,27 @@ test('exports representative composition', async ({ page }) => {
   await expect(
     page.getByRole('button', { name: 'Export JPG', exact: true }),
   ).toBeEnabled();
+  // Exercise text effects in the existing representative JPG, without adding
+  // another browser scenario or snapshot profile.
+  for (const name of ['Outline', 'Shadow', 'Glow', 'Blur']) {
+    await page.getByRole('button', { name: 'Add effect', exact: true }).click();
+    await page.getByRole('menuitem', { name, exact: true }).click();
+  }
+  const blur = page.getByRole('spinbutton', {
+    name: 'Blur',
+    exact: true,
+  });
+  await blur.fill('0');
+  await blur.press('ArrowUp');
+  await blur.press('Enter');
+  await expect(blur).toHaveValue('0.02');
+  await page
+    .getByRole('button', { name: 'Hide effect 1', exact: true })
+    .click();
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: 'Hide effect 1', exact: true }),
+  ).toBeVisible();
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Export JPG', exact: true }).click();
   const download = await downloadPromise;

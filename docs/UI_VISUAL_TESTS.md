@@ -4,6 +4,23 @@ Stan: 5 listopada 2026. Zestaw sprawdza widoki prawdziwej aplikacji w jednym pro
 
 ## Sceny
 
+### Źródła i sortowanie fontów — kontrola 2026-11-06
+
+Na źródłach 0.10.0-beta (niezacommitowane) sprawdzono w Chromium story
+Pickers/FontPicker/Desktop: App/System, wybór Arial, tooltip wyłącznie po
+najechaniu na badge oraz brak badge źródła i Selected w webie. Typy, lint
+zmienionych komponentów, formatowanie i tokeny — PASS. Natywnego desktopu
+nie uruchamiano; odbiór użytkownika pozostaje otwarty.
+
+Sześć scen wizualnych zgłosiło różnice; obejrzano expected/actual/diff.
+Po dodaniu sortowania A–Z ponownie uruchomiono sześć scen (6 różnic);
+obejrzano expected/actual/diff panelu fontów, potwierdzając kolejność po nazwie.
+Oprócz sortowania i usuniętego Selected w panelu fontów widoczne są zmiany istniejącego
+presetu Photo Details, DSEG7 i inspektora poza zakresem badge. Eksport JPG
+wykonano, lecz porównanie nie przeszło (39651 pikseli różnicy w podpisie).
+Raporty: playwright-visual-report i playwright-report. Wzorców nie zmieniano.
+Podglądy badge: /tmp/framenote-font-source.png i /tmp/framenote-font-system.png.
+
 Numer kompilacji (`data-build-info`) jest ukrywany wyłącznie na screenshotach
 przez `tests/visual/screenshot.css`, aby wzorce nie zależały od commita.
 W aplikacji pozostaje widoczny.
@@ -208,3 +225,20 @@ Obejrzano expected/actual/diff empty editor i About: zmieniał się wyłącznie
 numer wersji w stopce. Zaktualizowano tylko te dwa wzorce Darwin/Chromium desktop;
 wszystkie sześć scen następnie przeszło. Manifesty i changelog zweryfikowano
 względem `v0.7.2-beta`. Publikacja wymaga dalszego kroku wydania.
+
+## Ostrość podglądu efektów — 2026-11-06
+
+Poprawka zaakceptowana przez użytkownika 2026-11-06 na bazie 23f45f5.
+Podgląd Add/Glass dobiera rozdzielczość do zoomu i DPR, do rozmiaru oryginału;
+100% sprawdzono w Chromium przy DPR 1 i 2, wraz z przesuwaniem do datownika.
+Glass przy 100% sprawdzony wizualnie. Istniejąca scena graphic settings sprawdza
+bitmapę Add 5964×3976 przy 100% oraz zmniejszenie po powrocie do Fit — PASS.
+530 testów jednostkowych, lint, typecheck, formatowanie, kontrola wersji, build web,
+kompilacja i test natywnego desktopu macOS — PASS. Windows/Linux nie sprawdzono ręcznie.
+
+Otwarte wzorce po zmianie presetów: sześć scen uruchomione, 1 PASS / 5 różnic;
+obejrzano diffy. JPG wygenerowany i odczytany w 5964×3976, różnica 24990 pikseli
+wobec starego podpisu — identyczna jak przed naprawą podglądu. Wzorców nie
+aktualizowano; ich akceptacja pozostaje osobnym zadaniem presetów. Raporty:
+playwright-visual-report i playwright-report. Weryfikacja obrazów ręcznych:
+/tmp/framenote-sharp-1.png, /tmp/framenote-sharp-2.png, /tmp/framenote-sharp-glass.png.

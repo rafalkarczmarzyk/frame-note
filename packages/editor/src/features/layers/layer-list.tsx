@@ -1,21 +1,8 @@
 import { Tooltip } from '@/components/ui/tooltip';
 import { useMemo, useRef } from 'react';
-import {
-  ArrowUp,
-  ArrowDown,
-  ArrowUpToLine,
-  ArrowDownToLine,
-  Copy,
-  Eye,
-  EyeOff,
-  Move,
-  Grid2X2,
-  Trash2,
-} from 'lucide-react';
+import { Move, Grid2X2 } from 'lucide-react';
 import { PickerList } from '@/components/ui/picker-list';
-import { IconButton } from '@/components/ui/icon-button';
-import { InlineInputGroup } from '@/components/ui/inline-input-group';
-import { ActionMenu } from '@/components/ui/action-menu';
+import { OrderedListActions } from '@/components/ui/ordered-list-actions';
 import { AnchorIcon } from '@/components/ui/anchor-picker';
 import { captionTags } from '../../../../core/src/caption-tags';
 import type { CaptionLayout } from '../../../../core/src/caption-layout';
@@ -54,16 +41,6 @@ export function LayerList({
   onDelete: (id: string) => void;
 }) {
   const root = useRef<HTMLDivElement>(null);
-  const moveFromMenu = (id: string, index: number) => {
-    onMove(id, index);
-    requestAnimationFrame(() => {
-      const trigger = root.current?.querySelector<HTMLButtonElement>(
-        `[data-picker-row="${index}"] button[aria-haspopup="menu"]`,
-      );
-      trigger?.focus({ preventScroll: true });
-      trigger?.scrollIntoView({ block: 'nearest' });
-    });
-  };
   const values = useMemo(
     () =>
       Object.fromEntries(
@@ -171,89 +148,17 @@ export function LayerList({
             tooltip: layerContentLabel(container),
             selected: layout.activeId === container.id,
             actions: (
-              <InlineInputGroup
-                label={`Layer ${index + 1} actions`}
-                className="control-segments shrink-0 px-1"
-              >
-                <IconButton
-                  aria-pressed={container.visible !== false}
-                  className="control-segment layer-glass-button"
-                  label={`${container.visible === false ? 'Show' : 'Hide'} layer ${index + 1}`}
-                  onClick={() => onToggleVisibility(container.id)}
-                >
-                  {container.visible === false ? <EyeOff /> : <Eye />}
-                </IconButton>
-
-                <ActionMenu
-                  triggerClassName="control-segment layer-glass-button"
-                  label={`Layer ${index + 1} actions`}
-                  items={[
-                    {
-                      label: 'Duplicate',
-                      icon: <Copy aria-hidden="true" />,
-                      onSelect: () => onDuplicate(container.id),
-                    },
-                    {
-                      label: 'Move up',
-                      disabledReason: 'This layer is already at the front',
-                      icon: <ArrowUp aria-hidden="true" />,
-                      disabled: index === 0,
-                      separatorBefore: true,
-                      onSelect: () => moveFromMenu(container.id, index - 1),
-                    },
-                    {
-                      label: 'Move down',
-                      disabledReason: 'This layer is already at the back',
-                      icon: <ArrowDown aria-hidden="true" />,
-                      disabled: index === layout.containers.length - 1,
-                      onSelect: () => moveFromMenu(container.id, index + 1),
-                    },
-                    {
-                      label: 'Bring to front',
-                      disabledReason: 'This layer is already at the front',
-                      icon: <ArrowUpToLine aria-hidden="true" />,
-                      disabled: index === 0,
-                      onSelect: () => moveFromMenu(container.id, 0),
-                    },
-                    {
-                      label: 'Send to back',
-                      disabledReason: 'This layer is already at the back',
-                      icon: <ArrowDownToLine aria-hidden="true" />,
-                      disabled: index === layout.containers.length - 1,
-                      onSelect: () =>
-                        moveFromMenu(
-                          container.id,
-                          layout.containers.length - 1,
-                        ),
-                    },
-                    {
-                      label: 'Delete',
-                      separatorBefore: true,
-                      icon: <Trash2 aria-hidden="true" />,
-                      onSelect: () => {
-                        onDelete(container.id);
-                        requestAnimationFrame(() => {
-                          const target =
-                            root.current?.querySelector<HTMLButtonElement>(
-                              '[data-picker-choice][aria-pressed="true"]',
-                            ) ??
-                            root.current?.querySelector<HTMLButtonElement>(
-                              '[data-picker-choice]',
-                            );
-                          if (target) target.focus({ preventScroll: true });
-                          else
-                            root.current
-                              ?.closest('details')
-                              ?.querySelector<HTMLButtonElement>(
-                                '[data-add-layer]',
-                              )
-                              ?.focus({ preventScroll: true });
-                        });
-                      },
-                    },
-                  ]}
-                />
-              </InlineInputGroup>
+              <OrderedListActions
+                noun="Layer"
+                index={index}
+                count={layout.containers.length}
+                visible={container.visible !== false}
+                root={root}
+                onMove={(target) => onMove(container.id, target)}
+                onToggleVisibility={() => onToggleVisibility(container.id)}
+                onDuplicate={() => onDuplicate(container.id)}
+                onDelete={() => onDelete(container.id)}
+              />
             ),
           };
         })}

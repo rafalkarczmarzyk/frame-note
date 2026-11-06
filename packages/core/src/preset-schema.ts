@@ -31,6 +31,7 @@ const style = z.looseObject({
   color,
   opacity: fraction,
   lineHeight: z.number().min(0.1).max(10),
+  letterSpacing: z.number().min(-0.1).max(1).optional(),
   textAlign: z.enum(['auto', 'left', 'center', 'right']),
 });
 const tiledPosition = z.looseObject({
@@ -92,8 +93,24 @@ const background = z.looseObject({
     y: signed,
   }),
 });
+const effect = z
+  .looseObject({
+    id: z.string().min(1).max(100),
+    type: z.enum(['outline', 'shadow', 'glow', 'blur']),
+    enabled: z.boolean(),
+    color,
+    opacity: fraction,
+    x: signed,
+    y: signed,
+    spread: signed,
+    blur: nonnegative,
+  })
+  .refine((value) => value.type !== 'outline' || value.spread >= 0, {
+    message: 'Outline thickness must be nonnegative.',
+  });
 const container = z.looseObject({
   blending: blending.optional(),
+  effects: z.array(effect).max(100).optional(),
   id: z.string().min(1).max(100),
   template: z.string().max(100_000),
   style,

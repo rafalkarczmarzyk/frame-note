@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { PickerList } from '@/components/ui/picker-list';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip } from '@/components/ui/tooltip';
+import { platform } from '@/lib/platform';
 import {
   availableFonts,
   isFontAvailable,
@@ -59,7 +62,10 @@ export function FontPicker({
   query,
   onChoose,
   category = 'all',
+  showSources = !!platform().systemFonts,
 }: {
+  /** Desktop mixes bundled and installed fonts; web keeps the list uncluttered. */
+  showSources?: boolean;
   category?: string;
   value: string;
   query: string;
@@ -71,15 +77,32 @@ export function FontPicker({
     (font) => [font.category],
     query,
     (font) => font.label,
+  ).sort((a, b) =>
+    a.label.localeCompare(b.label, 'en', {
+      sensitivity: 'base',
+      numeric: true,
+    }),
   );
   return (
     <div className="space-y-3">
       <PickerList
         density="dense"
+        selectedLabel=""
         items={fonts.map((font) => ({
           id: font.id,
           label: font.label,
           selected: font.id === value,
+          trailing: showSources ? (
+            <Tooltip
+              content={
+                font.category === 'System'
+                  ? 'Installed on this computer. May be unavailable on another device or in the web app.'
+                  : 'Included with FrameNote.'
+              }
+            >
+              <Badge>{font.category === 'System' ? 'System' : 'App'}</Badge>
+            </Tooltip>
+          ) : undefined,
           preview: <FontPreview font={font} />,
         }))}
         onChoose={onChoose}

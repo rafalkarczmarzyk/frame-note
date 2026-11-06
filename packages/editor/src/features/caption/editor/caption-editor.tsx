@@ -1,3 +1,5 @@
+import { parseDateToken, dateToken } from '../../../../../core/src/date-format';
+import { DateSettings } from './date-settings';
 import type {
   EditOptions,
   EditorSelection,
@@ -699,6 +701,7 @@ export function CaptionEditor({
     selectedPosition === null
       ? null
       : String(editor?.state.doc.nodeAt(selectedPosition)?.attrs.token ?? '');
+  const selectedDate = selectedToken ? parseDateToken(selectedToken) : null;
   const selectedSeparator = selectedToken
     ? parseSeparatorToken(selectedToken)
     : null;
@@ -794,7 +797,7 @@ export function CaptionEditor({
             </span>
           )}
         </div>
-        <div className="mt-2 flex items-center justify-between gap-2">
+        <div className="mt-3 flex items-center justify-between gap-2">
           {actions ?? (
             <Tooltip content="Browse metadata, icons, graphics and separators">
               <Button
@@ -872,7 +875,7 @@ export function CaptionEditor({
             aria-label={
               token ? 'Selected image settings' : 'Selected element settings'
             }
-            className="mt-3 space-y-3 rounded-lg border border-container-settings-border bg-selected-element-base p-3"
+            className="selected-settings-panel mt-3 space-y-3"
             onPointerDownCapture={() => {
               inSettings.current = true;
             }}
@@ -909,7 +912,7 @@ export function CaptionEditor({
                     : (selectedAsset?.name ??
                       selectedIconAsset?.name ??
                       selectedIcon?.name ??
-                      selectedToken)}
+                      (selectedDate ? 'date' : selectedToken))}
                 </p>
               </div>
             </div>
@@ -927,6 +930,24 @@ export function CaptionEditor({
                     .setNodeSelection(selectedPosition)
                     .updateAttributes('captionToken', {
                       token: separatorToken(next),
+                    })
+                    .setNodeSelection(selectedPosition)
+                    .run();
+                }}
+              />
+            ) : selectedDate ? (
+              <DateSettings
+                key={`${selectedPosition}:${selectedDate.format}`}
+                format={selectedDate.format}
+                date={values.dateTime || values.date || ''}
+                hasPhoto={hasPhoto}
+                onChange={(format) => {
+                  if (!editor || selectedPosition === null) return;
+                  editor
+                    .chain()
+                    .setNodeSelection(selectedPosition)
+                    .updateAttributes('captionToken', {
+                      token: dateToken(format),
                     })
                     .setNodeSelection(selectedPosition)
                     .run();

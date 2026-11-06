@@ -30,8 +30,10 @@ export function ActionMenu({
   triggerClassName,
   disabled,
   triggerAppearance,
+  tooltip = label,
 }: {
   label: string;
+  tooltip?: string;
   triggerIcon?: ReactNode;
   triggerClassName?: string;
   disabled?: boolean;
@@ -112,7 +114,7 @@ export function ActionMenu({
   const Trigger = triggerAppearance ? Button : IconButton;
   return (
     <>
-      <Tooltip content={label} disabled={open}>
+      <Tooltip content={tooltip} disabled={open}>
         <Trigger
           {...triggerAppearance}
           ref={trigger}

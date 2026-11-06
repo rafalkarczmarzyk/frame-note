@@ -26,7 +26,7 @@ it('does not interpret unrelated or incomplete comments as Helicon', () => {
     captionTags([]).find((tag) => tag.key === 'heliconStack')?.displayValue,
   ).toBe('');
 });
-it('provides Default and Focus Stack without changing the default caption', () => {
+it('provides Photo Details and Focus Stack with the shared default caption', () => {
   expect(builtinPresets[0]!.layout.containers[0]!.template).toBe(
     defaultTemplate,
   );
@@ -37,7 +37,7 @@ it('provides Default and Focus Stack without changing the default caption', () =
   expect(
     builtinPresets.find((preset) => preset.id === 'builtin-macro')!.layout
       .containers[1]!.template,
-  ).toBe('{heliconStack}');
+  ).toBe('{icon:stack} {heliconStackSummary}');
 });
 
 it('falls back to a recognized XMP comment and records its source', () => {

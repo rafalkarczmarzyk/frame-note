@@ -30,6 +30,7 @@ import {
   ArrowDownUp,
   Type,
   ALargeSmall,
+  LetterSpacing,
 } from 'lucide-react';
 import { Select } from '@/components/ui/select';
 import { Field } from '@/components/ui/field';
@@ -191,7 +192,7 @@ export function CaptionControls({
                     )}
                   </Field>
                 </div>
-                <div className="grid grid-cols-2 items-center gap-2">
+                <div className="grid grid-cols-3 items-center gap-2">
                   <InlineInputGroup
                     label="Font size"
                     className="grid min-w-0 grid-cols-[1rem_minmax(0,1fr)]"
@@ -203,6 +204,7 @@ export function CaptionControls({
                       />
                     </Tooltip>
                     <NumberField
+                      className="px-1"
                       key={caption.sizingUnit}
                       label="Font size"
                       tooltip="Font size"
@@ -229,6 +231,7 @@ export function CaptionControls({
                       />
                     </Tooltip>
                     <NumberField
+                      className="px-1"
                       label="Line spacing"
                       tooltip="Line spacing · multiple of font size"
                       hideLabel
@@ -239,6 +242,32 @@ export function CaptionControls({
                       max={3}
                       disabled={disabled}
                       onValueChange={(lineHeight) => style({ lineHeight })}
+                    />
+                  </InlineInputGroup>
+                  <InlineInputGroup
+                    label="Letter spacing"
+                    className="grid min-w-0 grid-cols-[1rem_minmax(0,1fr)]"
+                  >
+                    <Tooltip content="Letter spacing · relative to font size">
+                      <LetterSpacing
+                        className="size-4 shrink-0 text-content-secondary"
+                        aria-hidden="true"
+                      />
+                    </Tooltip>
+                    <NumberField
+                      className="px-1"
+                      label="Letter spacing"
+                      tooltip="Letter spacing · relative to font size"
+                      hideLabel
+                      unit="em"
+                      value={caption.style.letterSpacing ?? 0}
+                      min={-0.1}
+                      max={1}
+                      step={0.01}
+                      disabled={disabled}
+                      onValueChange={(letterSpacing) =>
+                        style({ letterSpacing })
+                      }
                     />
                   </InlineInputGroup>
                 </div>

@@ -42,6 +42,7 @@ export function inlineLayout(
           ? new Konva.Text({
               text: run.text,
               fontSize,
+              letterSpacing: (caption.style.letterSpacing ?? 0) * fontSize,
               fontFamily: resolvedFontFamily(caption.style.fontFamily),
               fontStyle: canvasFontStyle(caption),
               wrap: 'none',

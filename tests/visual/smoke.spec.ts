@@ -9,6 +9,74 @@ test('empty editor', async ({ page }) => {
 
 test('prepared photo session', async ({ page }) => {
   await openPhoto(page);
+  // Confirm/cancel deletion and retain the current composition in the existing scene.
+  await page
+    .getByRole('button', { name: 'Preset actions', exact: true })
+    .click();
+  await page.getByRole('menuitem', { name: 'Duplicate', exact: true }).click();
+  const name = page.getByRole('textbox', { name: 'Preset name', exact: true });
+  await name.fill('Cancelled copy');
+  await expect(
+    page.getByRole('button', { name: 'Delete Cancelled copy', exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await expect(name).toHaveCount(0);
+  await expect(
+    page.getByRole('button', {
+      name: 'Delete Photo Details copy',
+      exact: true,
+    }),
+  ).toHaveCount(0);
+  await page
+    .getByRole('button', { name: 'Duplicate Photo Details', exact: true })
+    .click();
+  await name.fill('Confirmation check');
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await page
+    .getByRole('combobox', { name: 'Saved preset', exact: true })
+    .click();
+  await page
+    .getByRole('option', { name: 'Confirmation check', exact: true })
+    .click();
+  const templateBeforeDelete = await page
+    .getByRole('textbox', { name: 'Caption', exact: true })
+    .getAttribute('data-template');
+  const remove = page.getByRole('button', {
+    name: 'Delete Confirmation check',
+    exact: true,
+  });
+  await remove.click();
+  const confirmation = page.getByRole('dialog', {
+    name: 'Delete preset?',
+    exact: true,
+  });
+  await expect(confirmation).toContainText('Confirmation check');
+  await confirmation
+    .getByRole('button', { name: 'Cancel', exact: true })
+    .click();
+  await expect(remove).toBeVisible();
+  await expect(remove).toBeFocused();
+  await remove.click();
+  await page.keyboard.press('Escape');
+  await expect(remove).toBeFocused();
+  await remove.click();
+  await confirmation
+    .getByRole('button', { name: 'Delete preset', exact: true })
+    .click();
+  await expect(remove).toHaveCount(0);
+  await expect(
+    page.getByRole('combobox', { name: 'Saved preset', exact: true }),
+  ).toHaveText('Photo Details');
+  await expect(
+    page.getByRole('textbox', { name: 'Caption', exact: true }),
+  ).toHaveAttribute('data-template', templateBeforeDelete!);
+  await expect(
+    page.getByRole('textbox', { name: 'Search presets', exact: true }),
+  ).toBeFocused();
+  await page
+    .getByRole('button', { name: 'Close manage presets', exact: true })
+    .click();
+
   const editor = page.getByRole('textbox', { name: 'Caption', exact: true });
   const initial = await editor.getAttribute('data-template');
   await editor.click();
@@ -50,6 +118,34 @@ test('prepared photo session', async ({ page }) => {
   await page.getByRole('button', { name: 'Undo', exact: true }).click();
   for (let i = 0; i < 2; i++)
     await page.getByRole('button', { name: 'Add layer', exact: true }).click();
+  // Disposing the roll must use the app dialog and preserve edits on cancellation.
+  const openDispose = async () => {
+    await page
+      .getByRole('button', { name: 'Photo actions', exact: true })
+      .click();
+    await page
+      .getByRole('menuitem', { name: 'Dispose roll…', exact: true })
+      .click();
+  };
+  const disposeDialog = page.getByRole('dialog', {
+    name: 'Dispose roll?',
+    exact: true,
+  });
+  await openDispose();
+  await expect(disposeDialog).toContainText('Close all 1 photos');
+  await disposeDialog
+    .getByRole('button', { name: 'Cancel', exact: true })
+    .click();
+  await expect(disposeDialog).toHaveCount(0);
+  await ready(page);
+  await openDispose();
+  await page.keyboard.press('Escape');
+  await expect(disposeDialog).toHaveCount(0);
+  await ready(page);
+  await page.evaluate(() => {
+    if (document.activeElement instanceof HTMLElement)
+      document.activeElement.blur();
+  });
   await page.locator('[data-photo-view-controls]').scrollIntoViewIfNeeded();
   await ready(page);
   await shot(page, 'window');
@@ -77,6 +173,18 @@ test('prepared photo session', async ({ page }) => {
   await page.getByRole('button', { name: 'Undo', exact: true }).click();
   await blendMode.click();
   await page.getByRole('option', { name: 'Normal', exact: true }).click();
+  await page.getByRole('button', { name: 'Add effect', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Outline', exact: true }).click();
+  await expect(
+    page.getByRole('spinbutton', { name: 'Thickness', exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole('button', { name: 'Hide effect 1', exact: true })
+    .click();
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: 'Hide effect 1', exact: true }),
+  ).toBeVisible();
 });
 
 test('font panel', async ({ page }) => {
@@ -97,6 +205,95 @@ test('metadata panel', async ({ page }) => {
 
 test('graphic settings', async ({ page }) => {
   await openPhoto(page);
+  // Exercise per-token date settings inside the existing composition test.
+  await page
+    .getByRole('combobox', { name: 'Saved preset', exact: true })
+    .click();
+  await page.getByRole('option', { name: 'Quartz Date', exact: true }).click();
+  const dateEditor = page.getByRole('textbox', {
+    name: 'Caption',
+    exact: true,
+  });
+  const viewport = page.locator('[data-photo-canvas]');
+  await page.getByRole('button', { name: '100%', exact: true }).click();
+  await expect(viewport).toHaveAttribute('data-effect-preview-width', '5964');
+  await expect(viewport).toHaveAttribute('data-effect-preview-height', '3976');
+  await page.getByRole('button', { name: 'Fit', exact: true }).click();
+  await expect
+    .poll(async () =>
+      Number(await viewport.getAttribute('data-effect-preview-width')),
+    )
+    .toBeLessThan(5964);
+  const quartzTemplate = await dateEditor.getAttribute('data-template');
+  await dateEditor.locator('[data-token]').click();
+  const format = page.getByRole('combobox', {
+    name: 'Date format',
+    exact: true,
+  });
+  await expect(format).toHaveText("'YY MM DD");
+  await format.click();
+  await page
+    .getByRole('option', { name: 'YYYY/MM/DD HH:mm', exact: true })
+    .click();
+  await expect(dateEditor).toHaveAttribute(
+    'data-template',
+    '{date:YYYY%2FMM%2FDD%20HH%3Amm}',
+  );
+  await expect(
+    page
+      .getByLabel('Selected element settings')
+      .getByText(/^Preview: .* \d{2}:\d{2}$/),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await dateEditor.locator('[data-token]').click();
+
+  await format.click();
+  await expect(
+    page.getByRole('option', { name: 'MM/DD/YYYY', exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole('option', { name: 'DD.MM.YYYY', exact: true }).click();
+  await expect(dateEditor).toHaveAttribute(
+    'data-template',
+    '{date:DD.MM.YYYY}',
+  );
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(dateEditor).toHaveAttribute('data-template', quartzTemplate!);
+  await page.getByRole('button', { name: 'Redo', exact: true }).click();
+  await expect(dateEditor).toHaveAttribute(
+    'data-template',
+    '{date:DD.MM.YYYY}',
+  );
+  await dateEditor.locator('[data-token]').click();
+  await format.click();
+  await page.getByRole('option', { name: 'Custom', exact: true }).click();
+  const pattern = page.getByRole('textbox', {
+    name: 'Custom date format',
+    exact: true,
+  });
+  await pattern.fill('YYYY');
+  await expect(
+    page.getByRole('button', { name: 'Apply format', exact: true }),
+  ).toBeDisabled();
+  await expect(dateEditor).toHaveAttribute(
+    'data-template',
+    '{date:DD.MM.YYYY}',
+  );
+  await pattern.fill('D/M/YYYY');
+  await page.getByRole('button', { name: 'Apply format', exact: true }).click();
+  await expect(dateEditor).toHaveAttribute(
+    'data-template',
+    '{date:D%2FM%2FYYYY}',
+  );
+  await page
+    .getByRole('combobox', { name: 'Saved preset', exact: true })
+    .click();
+  await page
+    .getByRole('option', { name: 'Photo Details', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'Discard changes', exact: true })
+    .click();
+
   const initialTemplate = await page
     .getByRole('textbox', { name: 'Caption', exact: true })
     .getAttribute('data-template');

@@ -63,6 +63,7 @@ export function InlinePreview({
             y={run.y}
             text={run.text}
             fontSize={scene.fontSize}
+            letterSpacing={(caption.style.letterSpacing ?? 0) * scene.fontSize}
             fontFamily={resolvedFontFamily(caption.style.fontFamily)}
             fontStyle={canvasFontStyle(caption)}
             lineHeight={caption.style.lineHeight}

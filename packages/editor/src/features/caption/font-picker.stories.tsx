@@ -1,6 +1,10 @@
 import { FloatingPanel } from '@/components/layout/floating-panel';
 import { CategoryFilter } from '@/components/ui/category-filter';
-import { fontCategories } from '../../../../core/src/fonts';
+import {
+  availableFonts,
+  fontCategories,
+  setSystemFonts,
+} from '../../../../core/src/fonts';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
@@ -29,7 +33,10 @@ const meta = {
             <CategoryFilter
               label="Font categories"
               className="mt-2 -mb-3"
-              categories={fontCategories.map((value) => ({
+              categories={[
+                ...fontCategories,
+                ...(args.showSources ? ['System'] : []),
+              ].map((value) => ({
                 value,
                 label: value,
               }))}
@@ -54,6 +61,35 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
+export const Desktop: Story = {
+  args: { showSources: true },
+  beforeEach: () => {
+    const previous = availableFonts().filter(
+      (font) => font.category === 'System',
+    );
+    setSystemFonts([
+      {
+        id: 'Arial',
+        label: 'Arial',
+        category: 'System',
+        bold: true,
+        italic: true,
+        missingPolish: '',
+      },
+    ]);
+    return () => setSystemFonts(previous);
+  },
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    await expect(c.getAllByText('App').length).toBeGreaterThan(0);
+    await userEvent.click(c.getByRole('radio', { name: 'System' }));
+    await expect(
+      c.getByText('System', { selector: '[data-slot="badge"]' }),
+    ).toBeVisible();
+    await userEvent.click(c.getByRole('button', { name: /Arial/ }));
+    await expect(c.getByLabelText('Selected font')).toHaveTextContent('Arial');
+  },
+};
 export const Empty: Story = { args: { query: 'no such family' } };
 export const Prata: Story = {
   args: { query: 'Prata', value: 'Prata' },

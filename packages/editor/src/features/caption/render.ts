@@ -1,3 +1,5 @@
+import { effectBleed } from '../../../../core/src/layer-effects';
+import { renderContentEffects, renderContentBlur } from './effects-render';
 import {
   blendOperation,
   hasLayerBlending,
@@ -54,6 +56,7 @@ export function captionConfig(
   const metrics = new Konva.Text({
     text,
     fontSize,
+    letterSpacing: (caption.style.letterSpacing ?? 0) * fontSize,
     fontFamily: resolvedFontFamily(caption.style.fontFamily),
     fontStyle: canvasFontStyle(caption),
     lineHeight: caption.style.lineHeight,
@@ -74,6 +77,7 @@ export function captionConfig(
     ...position,
     width: block.width,
     fontSize,
+    letterSpacing: (caption.style.letterSpacing ?? 0) * fontSize,
     fontFamily: resolvedFontFamily(caption.style.fontFamily),
     fontStyle: canvasFontStyle(caption),
     lineHeight: caption.style.lineHeight,
@@ -291,6 +295,7 @@ async function withPhotoStage<T>(
           dimensions,
           decorated,
           caption.position.tiled,
+          effectBleed(caption, dimensions),
         );
         const motif = await captionNode(
           dimensions,
@@ -298,6 +303,7 @@ async function withPhotoStage<T>(
           text,
           color,
           icons,
+          decorations,
         );
         const backgrounds = new Konva.Group({ listening: false });
         // Every glass sample sees the layers below this layer, not sibling copies.
@@ -365,7 +371,14 @@ async function withPhotoStage<T>(
         onDecoration?.(index, background);
         layer.add(new Konva.Image({ ...background, listening: false }));
       }
-      const node = await captionNode(dimensions, caption, text, color, icons);
+      const node = await captionNode(
+        dimensions,
+        caption,
+        text,
+        color,
+        icons,
+        decorations,
+      );
       node.position({ x: geometry.x, y: geometry.y });
       layer.add(node);
       compositeLayer();
@@ -410,6 +423,7 @@ async function captionNode(
   text: string,
   color: string,
   icons: readonly InlineAsset[],
+  decorations: HTMLCanvasElement[],
 ) {
   const scene = caption.logo
     ? logoLayout(dimensions, caption)
@@ -418,6 +432,46 @@ async function captionNode(
     opacity: caption.style.opacity,
     listening: false,
   });
+  const addEffects = async () => {
+    try {
+      group.opacity(1);
+      const effect = await renderContentEffects(group, caption, dimensions);
+      if (effect) {
+        decorations.push(effect.image);
+        const node = new Konva.Image({ ...effect, listening: false });
+        group.add(node);
+        node.moveToBottom();
+      }
+      const blurred = renderContentBlur(group, caption, dimensions);
+      if (blurred || effect) {
+        const bounds = group.getClientRect();
+        const rect = blurred ?? {
+          x: Math.floor(bounds.x),
+          y: Math.floor(bounds.y),
+          width: Math.ceil(bounds.width) + 2,
+          height: Math.ceil(bounds.height) + 2,
+        };
+        const flattened =
+          blurred?.image ?? group.toCanvas({ ...rect, pixelRatio: 1 });
+        decorations.push(flattened);
+        group.destroyChildren();
+        group.add(
+          new Konva.Image({
+            x: rect.x,
+            y: rect.y,
+            width: rect.width,
+            height: rect.height,
+            image: flattened,
+            listening: false,
+          }),
+        );
+      }
+      group.opacity(caption.style.opacity);
+    } catch (error) {
+      group.destroy();
+      throw error;
+    }
+  };
   if (caption.logo) {
     const raw = await loadIcon(caption.logo.asset);
     group.add(
@@ -430,6 +484,7 @@ async function captionNode(
             : raw,
       }),
     );
+    await addEffects();
     return group;
   }
   if (!icons.length) {
@@ -441,6 +496,7 @@ async function captionNode(
         opacity: 1,
       }),
     );
+    await addEffects();
     return group;
   }
   const inline = inlineLayout(dimensions, caption, text, icons);
@@ -480,6 +536,7 @@ async function captionNode(
           y: run.y,
           text: run.text,
           fontSize: inline.fontSize,
+          letterSpacing: (caption.style.letterSpacing ?? 0) * inline.fontSize,
           fontFamily: resolvedFontFamily(caption.style.fontFamily),
           fontStyle: canvasFontStyle(caption),
           lineHeight: caption.style.lineHeight,
@@ -488,6 +545,7 @@ async function captionNode(
         }),
       );
   }
+  await addEffects();
   return group;
 }
 

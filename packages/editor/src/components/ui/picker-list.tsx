@@ -39,7 +39,9 @@ export function PickerList({
   appearance = 'default',
   density = 'default',
   reorderHandle = 'grip',
+  itemNoun = 'layer',
 }: {
+  itemNoun?: string;
   appearance?: 'default' | 'compact';
   density?: 'default' | 'dense';
   reorderHandle?: 'grip' | 'row';
@@ -231,7 +233,7 @@ export function PickerList({
           <button
             type="button"
             data-reorder-handle=""
-            aria-label={`Reorder layer ${index + 1}`}
+            aria-label={`Reorder ${itemNoun} ${index + 1}`}
             aria-describedby={helpId}
             className="control-button control-height inline-flex min-w-10 shrink-0 cursor-grab touch-none items-center justify-center rounded px-2 text-content-secondary active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-input-focus-ring"
             {...reorderProps}
@@ -279,7 +281,7 @@ export function PickerList({
             )}
             <Tooltip
               disabled={!item.tooltip || !!drag}
-              content={onMove ? 'Drag to reorder layers' : item.tooltip}
+              content={onMove ? `Drag to reorder ${itemNoun}s` : item.tooltip}
               overflowContent={onMove ? item.tooltip?.slice(0, 500) : undefined}
             >
               <button
@@ -364,7 +366,7 @@ export function PickerList({
       {onMove && (
         <span id={helpId} className="sr-only">
           Drag to reorder. Use Arrow Up, Arrow Down, Home or End to move. Escape
-          cancels dragging. Top layers appear in front.
+          cancels dragging. Top {itemNoun}s appear in front.
         </span>
       )}
       {items.length === 0 && (

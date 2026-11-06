@@ -69,6 +69,7 @@ export function legalFiles(directories = []) {
       `Font: ${name}\n${read(join(repositoryRoot, 'public/fonts/google', name, 'OFL.txt'))}`,
   );
   fonts.push(
+    `Font: DSEG7 Classic\n${read(join(repositoryRoot, 'public/fonts/dseg/OFL.txt'))}`,
     `Font: Montserrat\n${read(join(repositoryRoot, 'public/fonts/montserrat/OFL.txt'))}`,
   );
   const files = {

@@ -7,6 +7,17 @@ Aktualny [zakres 1.0](plans/release-1.0.md) jest opisany osobno.
 
 ## Kompozycja zdjęcia
 
+### Obrys i cień tekstu
+
+Status: **implementacja w aplikacji, odbiór w toku** — etap 2 dnia 2026-11-06.
+Outline/Shadow/Glow tekstu oraz Blur całej zawartości bez tła.
+Aktualna propozycja i otwarte decyzje: [efekty warstwy](plans/layer-effects.md).
+Pierwotna decyzja: 2026-11-06 podczas dopracowania Digital Date.
+Dodać opcje outline i drop shadow dla tekstu warstwy, inspirowane datownikiem
+wczesnych kompaktów. Osobne od istniejącego cienia tła. Przy powrocie ustalić
+jednostki, kolory, zakres warstwy i zgodność podglądu/eksportu oraz presetów.
+Wpływ: wspólne UI web/desktop, model warstwy, renderowanie i format v1.
+
 ### Ramki i polaroidy
 
 Decyzja: 2026-11-03, rozmowa o przyszłych funkcjach. Ramki wokół zdjęcia,

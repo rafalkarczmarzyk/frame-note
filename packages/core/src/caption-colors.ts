@@ -1,3 +1,8 @@
+/** Portable preset artwork color; stored as hex so older readers can render it. */
+export const dateStampColor = '#DA6E00';
+export const quartzDateGlowColor = '#B25F0B';
+export const digitalDateStampColor = '#DCA52C';
+
 export type ColorSelectionSource = 'quick' | 'palette' | 'custom';
 
 /** Caption colors are independent of interface accents. Existing token names stay valid. */

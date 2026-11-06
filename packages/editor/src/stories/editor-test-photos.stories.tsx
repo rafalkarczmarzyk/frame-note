@@ -403,16 +403,13 @@ export const BuiltinPresetLibrary: Story = {
     docs: {
       description: {
         story:
-          'Compare all nine production presets on the same photo. Buttons switch isolated layouts; changing the photo source lets you review portrait, bright and night fixtures. Does not write application preset storage.',
+          'Compare all seven production presets on the same photo. Buttons switch isolated layouts; changing the photo source lets you review portrait, bright and night fixtures. Does not write application preset storage.',
       },
     },
   },
 };
-export const PresetDefault: Story = {
+export const PresetPhotoDetails: Story = {
   args: { src: wildlifeUrl, name: 'Wildlife.jpg', presetId: 'builtin-default' },
-};
-export const PresetDefaultDark: Story = {
-  args: { presetId: 'builtin-default-dark' },
 };
 export const PresetSignature: Story = {
   args: {
@@ -421,45 +418,26 @@ export const PresetSignature: Story = {
     presetId: 'builtin-signature',
   },
 };
-export const PresetCompactEXIF: Story = {
-  args: {
-    src: wildlifeUrl,
-    name: 'Wildlife.jpg',
-    presetId: 'builtin-compact-exif',
-  },
-};
-export const PresetCameraAndLens: Story = {
-  args: {
-    src: wildlifeUrl,
-    name: 'Wildlife.jpg',
-    presetId: 'builtin-camera-lens',
-  },
-};
 export const PresetFocusStack: Story = {
   args: { src: heliconUrl, name: 'Helicon.jpg', presetId: 'builtin-macro' },
 };
-export const PresetEXIFIcons: Story = {
-  args: {
-    src: wildlifeUrl,
-    name: 'Wildlife.jpg',
-    presetId: 'builtin-exif-icons',
-  },
+export const PresetGlassCaption: Story = {
+  args: { presetId: 'builtin-glass-caption' },
 };
-export const PresetAstrophotography: Story = {
-  args: {
-    src: nightUrl,
-    name: 'Night.jpg',
-    presetId: 'builtin-astrophotography',
-  },
+export const PresetProofWatermark: Story = {
+  args: { presetId: 'builtin-proof-watermark' },
 };
-export const PresetLongExposure: Story = {
-  args: { src: nightUrl, name: 'Night.jpg', presetId: 'builtin-long-exposure' },
+export const PresetQuartzDate: Story = {
+  args: { src: nightUrl, name: 'Night.jpg', presetId: 'builtin-quartz-date' },
+};
+export const PresetDigitalDate: Story = {
+  args: { src: nightUrl, name: 'Night.jpg', presetId: 'builtin-digital-date' },
 };
 export const LongExposureTenMinutes: Story = {
   args: {
     src: nightUrl,
     name: 'Duration demo.jpg',
-    presetId: 'builtin-long-exposure',
+    presetId: 'builtin-default',
     exposureSeconds: 600,
   },
   parameters: {

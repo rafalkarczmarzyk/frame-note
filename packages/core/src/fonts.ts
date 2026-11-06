@@ -27,6 +27,7 @@ export const fontIds = [
   'Oswald',
   'Archivo Black',
   'Cinzel',
+  'DSEG7 Classic',
 ] as const;
 export type FontFamily = string;
 
@@ -53,6 +54,14 @@ export const captionFonts: readonly CaptionFont[] = [
     italic: true,
     bold: true,
     missingPolish: '',
+  },
+  {
+    id: 'DSEG7 Classic',
+    label: 'DSEG7 Classic',
+    category: 'Display',
+    italic: true,
+    bold: true,
+    missingPolish: 'ąćęłńóśźżĄĆĘŁŃÓŚŹŻ',
   },
   ...googleFonts.map((font) => ({
     id: fontIds.find((id) => id === font.id)!,

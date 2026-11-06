@@ -121,6 +121,34 @@ Nazwa aktywnego trybu jest widoczna w dropdownie. Sekcja między Typography a
 Background dotyczy całej warstwy. Story: **Pickers/CaptionControls/Blending**;
 kompozycja produkcyjna: **Screens/TestPhotos**. Krycie tekstu pozostaje w Typography.
 
+Typography łączy Font size, Line spacing i Letter spacing w jednym wierszu.
+Wszystkie pola korzystają z ikon i tooltipów, bez widocznych tekstowych etykiet;
+Letter spacing używa Lucide `LetterSpacing` i `NumberField` w em z krokiem 0,01.
+Pomiar i renderowanie używają tej samej wartości względem rozmiaru fontu.
+
+### Efekty warstwy
+
+`features/caption/effects-controls.tsx` składa istniejące kontrolki. Lista
+`PickerList` wykorzystuje kompaktowy wariant i `itemNoun="effect"`, a
+`OrderedListActions` współdzieli akcje i przywracanie fokusu z listą warstw.
+Wariant `.layer-selector-full` usuwa boczny margines tacki wewnątrz inspektora.
+Wiersze pokazują same nazwy. Pod listą jest wspólny wiersz Add effect / Remove
+effect (`ActionMenu` + `Button` outline/sm), jak w Layers. Remove usuwa aktywny
+efekt; opis zakresu efektów jest tooltipem Add effect. Usunięcie z menu i
+przycisku korzysta ze wspólnego `focusPickerAfterDelete`.
+Kolor korzysta z `ColorControls`; pełna paleta
+`ColorPickerPanel` zajmuje dodatkowy sidebar workspace, jak paleta Typography.
+Nie tworzymy osobnych pickerów ani pozycji popupu dla podobnych zastosowań.
+Ustawienia aktywnego efektu pozostają wewnątrz Effects w `InspectorSection`
+z `surface="selected"`. Wspólna klasa `selected-settings-panel` zapewnia
+dokładnie tło, border, radius i padding ustawień zaznaczonego elementu edytora.
+`CaptionEditor` korzysta z tej samej klasy.
+Spread/thickness i blur mają krok 0,02% lub 0,1 px. Pola efektu używają
+ikon ArrowRightLeft (Offset X), ArrowUpDown (Offset Y), Expand (Spread/Thickness)
+i lokalnej ikony OpacityIcon (Blur), z tooltipami i nazwami dostępności zamiast widocznych etykiet.
+Każda kontrolka krycia z ikoną używa Blend — Typography, Blending, Effects i Background. Blur pokazuje tylko promień
+oraz krycie i obejmuje zawartość bez tła. Tymczasowa próbka efektów została usunięta.
+
 ### Position warstwy
 
 `features/caption/position-controls.tsx` pokazuje Anchor / Manual / Tiled
@@ -198,3 +226,13 @@ interakcji.
 Przed oddaniem zmian interfejsu uruchom sześć scen Chromium desktop przez
 `pnpm test:visual`.
 Zobacz [katalog regresji wizualnej](UI_VISUAL_TESTS.md).
+
+### Potwierdzenia działań
+
+`components/ui/confirmation-dialog.tsx` składa Modal i Button: title, description,
+confirmLabel, opcjonalne cancelLabel/busy oraz onConfirm/onCancel. Montowany tylko
+w stanie oczekiwania na decyzję. Cancel/Escape anulują; busy blokuje akcje
+i zamknięcie podczas zapisu. Modal zapewnia fokus, etykiety i obsługę klawiatury.
+Feature odpowiada za zapis, błędy i fokus po usunięciu elementu. Używany przy
+usuwaniu presetów i odrzucaniu niezapisanych zmian. Story: Sidebar & panels/ConfirmationDialog.
+Formularz nazwy presetu ma osobną ramkę selected-settings-panel i input pełnej szerokości.

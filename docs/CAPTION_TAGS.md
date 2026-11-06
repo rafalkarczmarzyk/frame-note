@@ -78,3 +78,35 @@ Zasoby i ustawienia zapisuje preset; sam token bez zasobu nie przenosi grafiki.
 - [Ekstrakcja](../packages/editor/src/features/photo/extract-metadata.ts).
 - [Resolver treści](../packages/editor/src/features/caption/template.ts).
 - [Fixture zdjęć](../tests/fixtures/README.md).
+
+## Concise stack captions
+
+`{heliconStackSummary}` uses the same validated Helicon comment as `{heliconStack}`,
+returning `Stacked 15 frames` or `Stacked 1 frame`. Missing data stays empty.
+A line containing only decorative inline icons and empty metadata is omitted;
+missing-data warnings remain. Literal labels and intentional empty lines are preserved.
+This helper uses preset v1; older applications may report it as an unknown token.
+
+## Date formatting
+
+`{date}` remains YYYY-MM-DD. `{date:DD.MM.YYYY}` formats the same validated capture
+date differently. The editor stores custom patterns with URI encoding, e.g.
+`{date:'YY%20MM%20DD}`. Use YYYY or YY, MM or M, DD or D exactly once, with spaces,
+dots, slashes, hyphens, underscores or apostrophes. Patterns are limited to 64
+characters; unsupported fields and malformed encodings are invalid. No locale or
+timezone conversion occurs. Missing dates stay missing, never replaced by today.
+The format belongs to each token and survives preset v1 export/import. Older readers
+cannot resolve parameterized date tokens. Configure patterns by selecting the date
+in Content; the preview distinguishes actual values from examples.
+
+### Capture time
+
+`{time}` reads EXIF DateTimeOriginal then standard XMP exif:DateTimeOriginal,
+validates the calendar day and time, and returns HH:mm without timezone
+conversion. Compose `{date} {time}` for a date and time together. The picker offers
+these separate helpers; legacy `{dateTime}` still resolves YYYY-MM-DD HH:mm for
+existing presets. Date-only IPTC sources are not used for time. The date format picker
+includes YYYY/MM/DD and YYYY/MM/DD HH:mm; custom patterns can include HH and mm
+once each, together. A formatted token requesting time resolves only from a valid
+capture timestamp; a date alone never implies midnight. Missing capture time keeps
+the normal missing-data export warning. `MM` means month; `mm` means minutes.
