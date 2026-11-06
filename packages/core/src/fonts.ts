@@ -1,3 +1,4 @@
+import { segmentYearMark } from './date-format';
 import googleFonts from './google-fonts.json';
 
 /** Stable identifiers are independent of font delivery and preserve legacy presets. */
@@ -27,7 +28,7 @@ export const fontIds = [
   'Oswald',
   'Archivo Black',
   'Cinzel',
-  'DSEG7 Classic',
+  '7-Segment',
 ] as const;
 export type FontFamily = string;
 
@@ -56,11 +57,11 @@ export const captionFonts: readonly CaptionFont[] = [
     missingPolish: '',
   },
   {
-    id: 'DSEG7 Classic',
-    label: 'DSEG7 Classic',
+    id: '7-Segment',
+    label: '7-Segment',
     category: 'Display',
-    italic: true,
-    bold: true,
+    italic: false,
+    bold: false,
     missingPolish: 'ąćęłńóśźżĄĆĘŁŃÓŚŹŻ',
   },
   ...googleFonts.map((font) => ({
@@ -78,7 +79,12 @@ export const captionFonts: readonly CaptionFont[] = [
       font.faces.map((face) => face.missingPolish).find(Boolean) ?? '',
   })),
 ];
+/** Retain legacy preset names while resolving the retired bundled font to its replacement. */
+function currentFontId(id: string) {
+  return id === 'DSEG7 Classic' ? '7-Segment' : id;
+}
 export function captionFont(id: string) {
+  id = currentFontId(id);
   return (
     (unavailable.has(id)
       ? undefined
@@ -103,7 +109,8 @@ function notify() {
 }
 export function setSystemFonts(fonts: readonly CaptionFont[]) {
   systemFonts = fonts.filter(
-    (font) => !captionFonts.some((builtIn) => builtIn.id === font.id),
+    (font) =>
+      !captionFonts.some((builtIn) => builtIn.id === currentFontId(font.id)),
   );
   notify();
 }
@@ -111,19 +118,36 @@ export function availableFonts() {
   return [...captionFonts, ...systemFonts];
 }
 export function fontLabel(id: string) {
+  id = currentFontId(id);
   return availableFonts().find((font) => font.id === id)?.label ?? id;
 }
 export function isFontAvailable(id: string) {
+  id = currentFontId(id);
   return (
     !unavailable.has(id) && availableFonts().some((font) => font.id === id)
   );
 }
 export function markFontUnavailable(id: string) {
+  id = currentFontId(id);
   if (!unavailable.has(id)) {
     unavailable.add(id);
     notify();
   }
 }
 export function resolvedFontFamily(id: string) {
+  id = currentFontId(id);
   return isFontAvailable(id) ? id : 'Montserrat Variable';
+}
+
+/** Explicit local fallback for symbols and letters absent from segment displays. */
+export function captionRenderFont(id: string) {
+  const family = resolvedFontFamily(id);
+  return family === '7-Segment' ? '"7-Segment", "Montserrat Variable"' : family;
+}
+
+/** Keep the font-specific year mark readable when changing to another family. */
+export function captionRenderText(id: string, text: string) {
+  return resolvedFontFamily(id) === '7-Segment'
+    ? text.replace(/['’](?=\d{2}(?!\d))/gu, segmentYearMark)
+    : text.replaceAll(segmentYearMark, "'");
 }

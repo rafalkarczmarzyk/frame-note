@@ -6,9 +6,12 @@ import { platform } from '@/lib/platform';
 import {
   availableFonts,
   isFontAvailable,
+  captionRenderFont,
+  resolvedFontFamily,
   type CaptionFont,
   type FontFamily,
 } from '../../../../core/src/fonts';
+import { segmentYearMark } from '../../../../core/src/date-format';
 import { createCaption } from '../../../../core/src/document';
 import { filterByCategory } from '@/lib/category-filter';
 import { ensureCaptionFont } from './font-loading';
@@ -16,7 +19,8 @@ import { ensureCaptionFont } from './font-loading';
 function FontPreview({ font }: { font: CaptionFont }) {
   const host = useRef<HTMLSpanElement>(null);
   const [status, setStatus] = useState('loading');
-  const sample = 'Leave your mark.';
+  const sample =
+    font.id === '7-Segment' ? `${segmentYearMark}26 07 06` : 'Leave your mark.';
   useEffect(() => {
     let active = true;
     const observer = new IntersectionObserver((entries) => {
@@ -45,7 +49,11 @@ function FontPreview({ font }: { font: CaptionFont }) {
       data-font-preview={font.id}
       data-font-preview-status={status}
       className="block h-7 truncate text-xl leading-7"
-      style={status === 'ready' ? { fontFamily: `"${font.id}"` } : undefined}
+      style={
+        status === 'ready'
+          ? { fontFamily: captionRenderFont(font.id) }
+          : undefined
+      }
     >
       {status === 'ready' ? (
         sample
@@ -91,7 +99,7 @@ export function FontPicker({
         items={fonts.map((font) => ({
           id: font.id,
           label: font.label,
-          selected: font.id === value,
+          selected: font.id === resolvedFontFamily(value),
           trailing: showSources ? (
             <Tooltip
               content={

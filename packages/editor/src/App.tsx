@@ -431,7 +431,7 @@ export default function App() {
               aria-label="Export JPG"
               className="px-2 sm:px-3"
             >
-              <Download className="md:hidden" aria-hidden="true" />
+              <Download className="size-4 shrink-0" aria-hidden="true" />
               <span className="hidden md:inline">Export JPG</span>
             </Button>
           </div>

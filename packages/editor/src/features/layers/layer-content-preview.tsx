@@ -82,7 +82,7 @@ export function LayerContentPreview({
           (token.startsWith('image:')
             ? 'Missing image'
             : parseDateToken(token)
-              ? 'date'
+              ? (parseDateToken(token)?.kind ?? 'date')
               : token.replace(/^icon:/u, ''));
         const Token = isGraphic ? 'span' : Badge;
         return (

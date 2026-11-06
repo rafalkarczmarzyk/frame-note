@@ -38,7 +38,7 @@ This README describes the current source, including [Unreleased changes](CHANGEL
 
 - EXIF/IPTC/XMP metadata tokens mixed with text, SVG/PNG graphics and icons.
 - Independent layers, blend modes and opacity, anchored/manual/tiled positioning, margins, color and Glass backgrounds.
-- Typography with letter spacing, 25 Google Fonts families and DSEG7 Classic; installed system fonts in the desktop app.
+- Typography with letter spacing, 25 Google Fonts families and 7-Segment; installed system fonts in the desktop app.
 - Ordered Outline, Shadow, Glow and Blur effects for layer content.
 - Per-photo Undo/Redo and Navigator zoom/pan without changing the export.
 - Capture-date formats and capture-time helpers, including retro date-stamp presets.

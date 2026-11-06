@@ -94,24 +94,42 @@ This helper uses preset v1; older applications may report it as an unknown token
 
 ## Date formatting
 
-`{date}` remains YYYY-MM-DD. `{date:DD.MM.YYYY}` formats the same validated capture
-date differently. The editor stores custom patterns with URI encoding, e.g.
-`{date:'YY%20MM%20DD}`. Use YYYY or YY, MM or M, DD or D exactly once, with spaces,
-dots, slashes, hyphens, underscores or apostrophes. Patterns are limited to 64
-characters; unsupported fields and malformed encodings are invalid. No locale or
-timezone conversion occurs. Missing dates stay missing, never replaced by today.
-The format belongs to each token and survives preset v1 export/import. Older readers
-cannot resolve parameterized date tokens. Configure patterns by selecting the date
-in Content; the preview distinguishes actual values from examples.
+`{date}` remains YYYY-MM-DD. Select a date token in Content to choose its format,
+month style (MM, M, MMM or MMMM), and language (English or Polish).
+Use YYYY or YY and DD or D exactly once; month names use the grammatical form
+appropriate to a date, e.g. `6 July 2026` or `6 lipca 2026`.
+Language belongs to the token, not the system or application UI.
+
+Patterns are URI-encoded, e.g. `{date:D%20MMMM%20YYYY|pl}`. The optional language
+suffix is `|en` or `|pl`; absent language defaults to English, with existing numeric
+formats unchanged. Spaces, dots, slashes, hyphens, underscores, colons and
+apostrophes are supported separators. U+F062 is also supported as the native
+7-Segment short-year mark; an explicitly entered mark is encoded as `%EF%81%A2`. The editor labels
+it with a readable apostrophe. 7-Segment renders its native glyph, while other
+font families render a regular apostrophe in its place. Saved literal apostrophes remain unchanged in the template; 7-Segment renders
+an apostrophe before a two-digit year with its upper-right segment. Other font
+families keep their ordinary apostrophe. Date format is the single picker: YYYY-MM-DD, DD.MM.YYYY, D MMM YYYY,
+'YY MM DD, and Custom. Full month names and other orders/separators remain available
+through Custom. Previously saved patterns continue to resolve and open as Custom
+when absent from the short list. Language is separate. Patterns are limited to 64 characters;
+unsupported fields, languages and malformed encodings are invalid.
+No timezone conversion occurs. Missing dates stay missing, never replaced by today.
+Settings survive preset v1 export/import; older readers cannot resolve newer
+patterns or language suffixes. The preview distinguishes actual values from examples.
 
 ### Capture time
 
 `{time}` reads EXIF DateTimeOriginal then standard XMP exif:DateTimeOriginal,
 validates the calendar day and time, and returns HH:mm without timezone
-conversion. Compose `{date} {time}` for a date and time together. The picker offers
-these separate helpers; legacy `{dateTime}` still resolves YYYY-MM-DD HH:mm for
-existing presets. Date-only IPTC sources are not used for time. The date format picker
-includes YYYY/MM/DD and YYYY/MM/DD HH:mm; custom patterns can include HH and mm
-once each, together. A formatted token requesting time resolves only from a valid
-capture timestamp; a date alone never implies midnight. Missing capture time keeps
-the normal missing-data export warning. `MM` means month; `mm` means minutes.
+conversion. Select the time token to choose 24-hour (`15:05`), 12-hour (`3:05 PM`),
+or padded 12-hour (`03:05 PM`) formatting. Custom time patterns use HH or h/hh,
+mm, and A exactly once; A is required for 12-hour time and excluded for 24-hour time.
+Midnight is 12:00 AM; noon is 12:00 PM. Example token: `{time:h%3Amm%20A}`.
+AM/PM is an explicit marker in either date language.
+
+Compose `{date} {time}` for a date and time together. Date settings expose only
+date formats; time settings expose only time formats. Legacy `{dateTime}` and
+saved date patterns containing HH:mm continue to resolve for existing presets.
+A date alone never implies midnight; date-only IPTC sources are not used for time.
+Missing capture time keeps the normal missing-data export warning.
+`MM` means month; `mm` means minutes.

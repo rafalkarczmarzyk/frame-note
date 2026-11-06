@@ -177,7 +177,10 @@ export function TokenView({
               {graphic?.name ?? (imageRef ? token : token.slice(5))}
             </span>
           ) : (
-            <span>{parseDateToken(token) ? 'date' : token}</span>
+            <span>
+              {parseDateToken(token)?.kind ??
+                (parseDateToken(token) ? 'date' : token)}
+            </span>
           )}
           {missing && <span className="sr-only"> (missing)</span>}
         </NodeViewWrapper>

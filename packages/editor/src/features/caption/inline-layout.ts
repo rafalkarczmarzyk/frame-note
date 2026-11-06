@@ -1,4 +1,7 @@
-import { resolvedFontFamily } from '../../../../core/src/fonts';
+import {
+  captionRenderFont,
+  captionRenderText,
+} from '../../../../core/src/fonts';
 import { canvasFontStyle } from '../../../../core/src/font-style';
 import { resolvedTextAlign } from '../../../../core/src/document';
 import Konva from 'konva';
@@ -33,79 +36,84 @@ export function inlineLayout(
     dimensions,
   );
   const lineHeight = fontSize * caption.style.lineHeight;
-  const lines = text.split('\n').map((line) => {
-    let width = 0;
-    const runs = inlineRuns(line).map((run) => {
-      const icon = 'icon' in run ? icons[run.icon] : undefined;
-      const metrics =
-        'text' in run
-          ? new Konva.Text({
-              text: run.text,
-              fontSize,
-              letterSpacing: (caption.style.letterSpacing ?? 0) * fontSize,
-              fontFamily: resolvedFontFamily(caption.style.fontFamily),
-              fontStyle: canvasFontStyle(caption),
-              wrap: 'none',
-            })
-          : null;
-      const sizing = icon?.separator ?? icon?.image ?? icon?.sizing;
-      const measuredHeight = sizing
-        ? sizing.unit === 'font'
-          ? fontSize * sizing.height
-          : toPixels(sizing.height, caption.sizingUnit, dimensions)
-        : fontSize;
-      const thickness = icon?.separator
-        ? toPixels(icon.separator.thickness, caption.sizingUnit, dimensions)
-        : 0;
-      const height = Math.max(measuredHeight, thickness);
-      const size = icon?.separator
-        ? icon.separator.widthMode === 'fixed'
-          ? toPixels(icon.separator.width, caption.sizingUnit, dimensions)
-          : 0
-        : icon
-          ? height * icon.aspect
-          : (metrics?.width() ?? 0);
-      metrics?.destroy();
-      const result = {
-        x: width,
-        height,
-        original:
-          icon?.image?.colorMode === 'original' ||
-          icon?.image?.asset.format === 'png',
-        width: size,
-        text: 'text' in run ? run.text : undefined,
-        icon,
-        separator: icon?.separator,
-        thickness,
-      };
-      width += size;
-      return result;
+  const lines = captionRenderText(caption.style.fontFamily, text)
+    .split('\n')
+    .map((line) => {
+      let width = 0;
+      const runs = inlineRuns(line).map((run) => {
+        const icon = 'icon' in run ? icons[run.icon] : undefined;
+        const metrics =
+          'text' in run
+            ? new Konva.Text({
+                text: run.text,
+                fontSize,
+                letterSpacing: (caption.style.letterSpacing ?? 0) * fontSize,
+                fontFamily: captionRenderFont(caption.style.fontFamily),
+                fontStyle: canvasFontStyle(caption),
+                wrap: 'none',
+              })
+            : null;
+        const sizing = icon?.separator ?? icon?.image ?? icon?.sizing;
+        const measuredHeight = sizing
+          ? sizing.unit === 'font'
+            ? fontSize * sizing.height
+            : toPixels(sizing.height, caption.sizingUnit, dimensions)
+          : fontSize;
+        const thickness = icon?.separator
+          ? toPixels(icon.separator.thickness, caption.sizingUnit, dimensions)
+          : 0;
+        const height = Math.max(measuredHeight, thickness);
+        const size = icon?.separator
+          ? icon.separator.widthMode === 'fixed'
+            ? toPixels(icon.separator.width, caption.sizingUnit, dimensions)
+            : 0
+          : icon
+            ? height * icon.aspect
+            : (metrics?.width() ?? 0);
+        metrics?.destroy();
+        const result = {
+          x: width,
+          height,
+          original:
+            icon?.image?.colorMode === 'original' ||
+            icon?.image?.asset.format === 'png',
+          width: size,
+          text: 'text' in run ? run.text : undefined,
+          icon,
+          separator: icon?.separator,
+          thickness,
+        };
+        width += size;
+        return result;
+      });
+      const imageOnly =
+        runs.length > 0 &&
+        runs.every((run) => run.icon?.image || run.separator);
+      const referenceHeight = imageOnly ? 0 : lineHeight;
+      const positioned = runs.map((run) => {
+        const sizing = run.separator
+          ? { alignment: 'center' }
+          : (run.icon?.image ?? run.icon?.sizing);
+        const factor =
+          sizing?.alignment === 'top'
+            ? 0
+            : sizing?.alignment === 'bottom'
+              ? 1
+              : 0.5;
+        return {
+          ...run,
+          y: sizing ? (referenceHeight - run.height) * factor : 0,
+        };
+      });
+      const top = Math.min(0, ...positioned.map((run) => run.y));
+      const bottom = Math.max(
+        referenceHeight,
+        ...positioned.map(
+          (run) => run.y + (run.icon ? run.height : lineHeight),
+        ),
+      );
+      return { width, runs: positioned, height: bottom - top, top };
     });
-    const imageOnly =
-      runs.length > 0 && runs.every((run) => run.icon?.image || run.separator);
-    const referenceHeight = imageOnly ? 0 : lineHeight;
-    const positioned = runs.map((run) => {
-      const sizing = run.separator
-        ? { alignment: 'center' }
-        : (run.icon?.image ?? run.icon?.sizing);
-      const factor =
-        sizing?.alignment === 'top'
-          ? 0
-          : sizing?.alignment === 'bottom'
-            ? 1
-            : 0.5;
-      return {
-        ...run,
-        y: sizing ? (referenceHeight - run.height) * factor : 0,
-      };
-    });
-    const top = Math.min(0, ...positioned.map((run) => run.y));
-    const bottom = Math.max(
-      referenceHeight,
-      ...positioned.map((run) => run.y + (run.icon ? run.height : lineHeight)),
-    );
-    return { width, runs: positioned, height: bottom - top, top };
-  });
   // Flex items do not contribute to intrinsic width. With no intrinsic content,
   // use their stored fixed widths as a useful standalone fallback.
   const intrinsicWidth = Math.max(0, ...lines.map((line) => line.width));

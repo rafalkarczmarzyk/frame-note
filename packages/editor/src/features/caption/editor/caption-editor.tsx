@@ -912,7 +912,9 @@ export function CaptionEditor({
                     : (selectedAsset?.name ??
                       selectedIconAsset?.name ??
                       selectedIcon?.name ??
-                      (selectedDate ? 'date' : selectedToken))}
+                      (selectedDate
+                        ? (selectedDate.kind ?? 'date')
+                        : selectedToken))}
                 </p>
               </div>
             </div>
@@ -937,17 +939,19 @@ export function CaptionEditor({
               />
             ) : selectedDate ? (
               <DateSettings
-                key={`${selectedPosition}:${selectedDate.format}`}
+                key={`${selectedPosition}:${selectedToken}`}
                 format={selectedDate.format}
+                locale={selectedDate.locale}
+                timeOnly={selectedDate.kind === 'time'}
                 date={values.dateTime || values.date || ''}
                 hasPhoto={hasPhoto}
-                onChange={(format) => {
+                onChange={(format, locale) => {
                   if (!editor || selectedPosition === null) return;
                   editor
                     .chain()
                     .setNodeSelection(selectedPosition)
                     .updateAttributes('captionToken', {
-                      token: dateToken(format),
+                      token: dateToken(format, locale, selectedDate.kind),
                     })
                     .setNodeSelection(selectedPosition)
                     .run();

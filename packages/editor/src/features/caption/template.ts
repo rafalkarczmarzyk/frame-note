@@ -1,6 +1,7 @@
 import {
   parseDateToken,
   formatCaptureDate,
+  dateTokenSource,
 } from '../../../../core/src/date-format';
 import {
   captionTags,
@@ -33,21 +34,22 @@ export function resolveTemplate(
       let missingMetadata = false;
       const resolved = line.replace(/\{([^{}]*)\}/gu, (_, key: string) => {
         const date = parseDateToken(key);
-        if (key.startsWith('date:') && !date) invalidSyntax = true;
+        if (/^(date|time):/.test(key) && !date) invalidSyntax = true;
         if (!key || (!key.includes(':') && !captionTagNames.includes(key)))
           invalidSyntax = true;
-        const valueKey = date
-          ? date.format.includes('HH')
-            ? 'dateTime'
-            : 'date'
-          : key;
+        const valueKey = date ? dateTokenSource(date) : key;
         if (!values.has(valueKey)) {
           if (date || captionTagNames.includes(key)) missingMetadata = true;
           missing.add(key);
           return '';
         }
         return date
-          ? formatCaptureDate(values.get(valueKey) ?? '', date.format)
+          ? formatCaptureDate(
+              values.get(valueKey) ?? '',
+              date.format,
+              date.locale,
+              date.kind === 'time',
+            )
           : (values.get(key) ?? '');
       });
       // Do not leave decorative icons alone when their metadata line is empty.

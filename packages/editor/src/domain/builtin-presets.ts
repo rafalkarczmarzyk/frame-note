@@ -74,7 +74,7 @@ export const builtinPresets = [
   preset('builtin-quartz-date', 'Quartz Date', [
     {
       ...layer(`{${dateToken("'YY MM DD")}}`, 'bottom-right', {
-        fontFamily: 'DSEG7 Classic',
+        fontFamily: '7-Segment',
         fontWeight: 700,
         fontStyle: 'italic',
         fontSize: 2.5,

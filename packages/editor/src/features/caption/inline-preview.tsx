@@ -1,4 +1,4 @@
-import { resolvedFontFamily } from '../../../../core/src/fonts';
+import { captionRenderFont } from '../../../../core/src/fonts';
 import { resolvedColor } from './resolve-color';
 import { canvasFontStyle } from '../../../../core/src/font-style';
 import { Text, Rect, Image as CanvasImage } from 'react-konva';
@@ -64,7 +64,7 @@ export function InlinePreview({
             text={run.text}
             fontSize={scene.fontSize}
             letterSpacing={(caption.style.letterSpacing ?? 0) * scene.fontSize}
-            fontFamily={resolvedFontFamily(caption.style.fontFamily)}
+            fontFamily={captionRenderFont(caption.style.fontFamily)}
             fontStyle={canvasFontStyle(caption)}
             lineHeight={caption.style.lineHeight}
             fill={color}

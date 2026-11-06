@@ -84,8 +84,11 @@ export function MetadataPicker({
                 group.name === 'FrameNote' ? helperIcon(field.key) : undefined,
               selected:
                 used.has(field.key) ||
-                (field.key === 'date' &&
-                  [...used].some((token) => !!parseDateToken(token))),
+                (['date', 'time'].includes(field.key) &&
+                  [...used].some((token) => {
+                    const date = parseDateToken(token);
+                    return date && (date.kind ?? 'date') === field.key;
+                  })),
               description: field.displayValue || 'No data in this photo.',
               preview:
                 'sources' in field && field.sources.length > 0 ? (

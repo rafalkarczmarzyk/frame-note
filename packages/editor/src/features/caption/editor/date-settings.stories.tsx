@@ -4,12 +4,18 @@ import { CaptionEditor } from './caption-editor';
 import { createMetadataField } from '../../../../../core/src/metadata';
 import { dateToken } from '../../../../../core/src/date-format';
 const noop = () => {};
-function DatePreview({ missing = false }: { missing?: boolean }) {
-  const [value, setValue] = useState(`{${dateToken("'YY MM DD")}}`);
+function DatePreview({
+  missing = false,
+  template = `{${dateToken("'YY MM DD")}}`,
+}: {
+  missing?: boolean;
+  template?: string;
+}) {
+  const [value, setValue] = useState(template);
   return (
     <div className="w-80 bg-sidebar-base p-3 text-content-primary">
       <p className="mb-3 text-xs">
-        Select the date to choose a format or apply a custom pattern.
+        Select a date or time token to configure it independently.
       </p>
       <CaptionEditor
         value={value}
@@ -43,7 +49,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Capture-date formatting per token. Select a date to choose a preset or enter a validated year/month/day pattern. Missing metadata remains explicit.',
+          'Capture date and time formatting per token, with English/Polish month names and separate 12/24-hour time. Select a date to choose a preset or enter a validated year/month/day pattern. Missing metadata remains explicit.',
       },
     },
   },
@@ -52,3 +58,12 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 export const CaptureDate: Story = {};
 export const MissingDate: Story = { args: { missing: true } };
+
+export const LocalizedDateAndTime: Story = {
+  args: {
+    template: `{${dateToken('D MMMM YYYY', 'pl')}} {${dateToken('h:mm A', undefined, 'time')}}`,
+  },
+};
+export const MissingTime: Story = {
+  args: { missing: true, template: '{time}' },
+};

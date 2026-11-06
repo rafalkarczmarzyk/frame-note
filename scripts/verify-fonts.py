@@ -23,3 +23,18 @@ for style in ['normal', 'italic']:
         coverage.update(TTFont(path).getBestCmap())
     assert all(ord(c) in coverage for c in polish)
 print('Montserrat checked.')
+
+# The selected date-stamp font is a lossless repackaging, with native symbols.
+segment_root = root / 'public/fonts/7-segment'
+segment_ttf = TTFont(segment_root / '7segment.ttf')
+segment_woff = TTFont(segment_root / '7segment.woff2')
+segment_cmap = segment_woff.getBestCmap()
+assert segment_cmap == segment_ttf.getBestCmap()
+assert segment_woff['hmtx'].metrics == segment_ttf['hmtx'].metrics
+assert all(ord(c) in segment_cmap for c in '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+assert all(ord(c) not in segment_cmap for c in polish)
+assert segment_cmap[0x27] == segment_cmap[0x60] == segment_cmap[0x2032]
+assert segment_cmap[0xF062] != segment_cmap[0x27]
+assert all(segment_cmap[c] == segment_cmap[0x2D] for c in [0x2010, 0x2011, 0x2012, 0x2013, 0x2014, 0x2015, 0x2212])
+assert 'SIL OPEN FONT LICENSE' in (segment_root / 'OFL.txt').read_text()
+print('7-Segment checked: native symbols and metrics preserved; Polish requires fallback.')

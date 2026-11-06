@@ -1,4 +1,7 @@
-import { parseDateToken } from '../../../../core/src/date-format';
+import {
+  parseDateToken,
+  dateFormatLabel,
+} from '../../../../core/src/date-format';
 import { parseSeparatorToken } from '../../../../core/src/inline-separator';
 import { parseIconToken } from '../../../../core/src/inline-icon';
 import type { CaptionContainer } from '../../../../core/src/caption-layout';
@@ -15,7 +18,12 @@ export function layerContentLabel(layer: Content) {
         if (node.type === 'text') return node.text;
         const token = String(node.attrs?.token);
         const date = parseDateToken(token);
-        if (date) return token === 'date' ? 'date' : `date (${date.format})`;
+        if (date) {
+          const name = date.kind ?? 'date';
+          return token === name
+            ? name
+            : `${name} (${dateFormatLabel(date.format)})`;
+        }
         if (parseSeparatorToken(token)) return 'Separator';
         if (token.startsWith('image:')) {
           const image = parseImageToken(token);

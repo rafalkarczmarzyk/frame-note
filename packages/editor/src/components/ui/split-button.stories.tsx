@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Copy, Download, Pencil, Save, Settings2 } from 'lucide-react';
+import {
+  Copy,
+  Download,
+  LoaderCircle,
+  Pencil,
+  Save,
+  Settings2,
+} from 'lucide-react';
 import { SplitButton, type SplitButtonProps } from './split-button';
 
 const items = [
@@ -262,4 +269,33 @@ function SubmitExample(args: SplitButtonProps) {
 }
 export const FormSubmit: Story = {
   render: (args) => <SubmitExample {...args} />,
+};
+
+export const ExportStates: Story = {
+  render: () => (
+    <div className="flex flex-col items-start gap-3">
+      {[false, true].map((busy) => (
+        <SplitButton
+          key={String(busy)}
+          size="sm"
+          aria-label="Export JPG"
+          aria-busy={busy || undefined}
+          primaryDisabled={busy}
+          primaryTooltip={busy ? 'Preparing JPG…' : 'Export JPG'}
+          menuLabel="Export actions"
+          items={[{ label: 'Export all', onSelect: () => {} }]}
+        >
+          {busy ? (
+            <LoaderCircle
+              className="size-4 shrink-0 animate-spin motion-reduce:animate-none"
+              aria-hidden="true"
+            />
+          ) : (
+            <Download className="size-4 shrink-0" aria-hidden="true" />
+          )}
+          <span>Export JPG</span>
+        </SplitButton>
+      ))}
+    </div>
+  ),
 };

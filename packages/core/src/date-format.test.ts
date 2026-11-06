@@ -1,10 +1,12 @@
 import { expect, it } from 'vitest';
 import {
   dateToken,
+  segmentYearMark,
   parseDateToken,
   formatCaptureDate,
   validDateFormat,
 } from './date-format';
+import { layerContentLabel } from '../../editor/src/features/layers/layer-content-label';
 import { createCaptionLayout } from './caption-layout';
 import { createPreset, parsePreset } from './presets';
 import { resolveTemplate } from '../../editor/src/features/caption/template';
@@ -97,4 +99,102 @@ it('uses capture time without timezone conversion and never invents midnight', (
   expect(metadataTokenStatus(token, { date: '2007-04-06' })).toBe('empty');
   expect(validDateFormat('YYYY/MM/DD HH')).toBe(false);
   expect(validDateFormat('YYYY/MM/DD mm')).toBe(false);
+});
+
+it('formats contextual month names with a language stored per occurrence', () => {
+  expect(formatCaptureDate('2026-07-06', 'D MMMM YYYY', 'pl')).toBe(
+    '6 lipca 2026',
+  );
+  expect(formatCaptureDate('2026-07-06', 'D MMM YYYY', 'pl')).toBe(
+    '6 lip 2026',
+  );
+  expect(formatCaptureDate('2026-07-06', 'D MMMM YYYY', 'en')).toBe(
+    '6 July 2026',
+  );
+  expect(formatCaptureDate('2026-07-06', 'D MMM YYYY', 'en')).toBe(
+    '6 Jul 2026',
+  );
+  const layout = createCaptionLayout();
+  layout.containers[0]!.template = `{${dateToken('D MMMM YYYY', 'pl')}} / {${dateToken('D MMM YYYY', 'en')}} / {${dateToken('h:mm A', undefined, 'time')}}`;
+  const preset = createPreset('localized', 'Localized', layout, []);
+  const restored = parsePreset(JSON.stringify(preset), () => {
+    throw Error('No asset');
+  });
+  expect(restored).toEqual(preset);
+  const fields = [
+    createMetadataField({
+      group: 'exif',
+      name: 'DateTimeOriginal',
+      displayValue: '2026:07:06 15:05:00+12:00',
+      rawValue: null,
+    }),
+  ];
+  expect(
+    resolveTemplate(restored.layout.containers[0]!.template, fields),
+  ).toEqual({
+    text: '6 lipca 2026 / 6 Jul 2026 / 3:05 PM',
+    missing: [],
+    invalidSyntax: false,
+  });
+  expect(parseDateToken('date:D%20MMMM%20YYYY|de')).toBeNull();
+  expect(parseDateToken('date:D%20MMMM%20YYYY|pl|en')).toBeNull();
+});
+
+it('formats time-only tokens at midnight, noon and the end of the day', () => {
+  for (const [time, expected] of [
+    ['00:00', '12:00 AM'],
+    ['12:00', '12:00 PM'],
+    ['23:59', '11:59 PM'],
+    ['03:05', '3:05 AM'],
+  ]) {
+    expect(formatCaptureDate(time!, 'h:mm A', 'en', true)).toBe(expected);
+  }
+  expect(formatCaptureDate('03:05', 'hh:mm A', 'en', true)).toBe('03:05 AM');
+  expect(formatCaptureDate('2026-07-06', 'h:mm A', 'en', true)).toBe('');
+  expect(formatCaptureDate('24:00', 'HH:mm', 'en', true)).toBe('');
+  expect(formatCaptureDate('2026-02-30', 'D MMM YYYY')).toBe('');
+  expect(formatCaptureDate('2026-13-01', 'D MMM YYYY')).toBe('');
+  const token = dateToken('h:mm A', undefined, 'time');
+  expect(metadataTokenStatus(token, { time: '15:05' })).toBe('value');
+  expect(metadataTokenStatus(token, { date: '2026-07-06' })).toBe('empty');
+  expect(resolveTemplate(`{${token}}`, []).missing).toEqual([token]);
+  expect(resolveTemplate('{time:invalid}', []).invalidSyntax).toBe(true);
+  for (const format of [
+    'h:mm',
+    'HH:mm A',
+    'hh:mm A A',
+    'HH:mm HH:mm',
+    'MMMM MM D YYYY',
+  ]) {
+    expect(validDateFormat(format, !format.includes('YYYY'))).toBe(false);
+  }
+  expect(dateToken('HH:mm', undefined, 'time')).toBe('time');
+});
+
+it('round trips the selected upper-right year mark without changing legacy apostrophes', () => {
+  const format = `${segmentYearMark}YY-MM-DD`;
+  expect(validDateFormat(format)).toBe(true);
+  expect(validDateFormat('\uF063YY-MM-DD')).toBe(false);
+  const token = dateToken(format);
+  expect(token).toBe('date:%EF%81%A2YY-MM-DD');
+  expect(parseDateToken(token)).toEqual({ format });
+  expect(formatCaptureDate('2026-07-06', format)).toBe(
+    `${segmentYearMark}26-07-06`,
+  );
+  expect(formatCaptureDate('2026-07-06', "'YY-MM-DD")).toBe("'26-07-06");
+  const layout = createCaptionLayout();
+  layout.containers[0]!.template = `{${token}}`;
+  layout.containers[0]!.style.fontFamily = '7-Segment';
+  expect(layerContentLabel(layout.containers[0]!)).toBe("date ('YY-MM-DD)");
+  expect(
+    layerContentLabel({
+      template: `{${dateToken('h:mm A', undefined, 'time')}}`,
+    }),
+  ).toBe('time (h:mm A)');
+  const preset = createPreset('year-mark', 'Year mark', layout, []);
+  expect(
+    parsePreset(JSON.stringify(preset), () => {
+      throw Error('No asset');
+    }),
+  ).toEqual(preset);
 });

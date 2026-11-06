@@ -206,6 +206,33 @@ test('metadata panel', async ({ page }) => {
 test('graphic settings', async ({ page }) => {
   await openPhoto(page);
   // Exercise per-token date settings inside the existing composition test.
+  // Record every export-button state during preset preparation. Its label and
+  // dimensions must remain stable while aria-busy and the icon change.
+  await page.locator('#export-actions').evaluate((host) => {
+    const record = () => {
+      const button = host.querySelector<HTMLButtonElement>(
+        '[data-export-live] button[aria-label="Export JPG"]',
+      );
+      if (!button) return;
+      const widths = JSON.parse(
+        host.getAttribute('data-observed-widths') ?? '[]',
+      ) as number[];
+      widths.push(button.getBoundingClientRect().width);
+      host.setAttribute('data-observed-widths', JSON.stringify(widths));
+      if (button.getAttribute('aria-busy') === 'true')
+        host.setAttribute('data-observed-busy', 'true');
+      if (button.textContent !== 'Export JPG')
+        host.setAttribute('data-label-changed', 'true');
+    };
+    record();
+    new MutationObserver(record).observe(host, {
+      subtree: true,
+      childList: true,
+      characterData: true,
+      attributes: true,
+      attributeFilter: ['aria-busy'],
+    });
+  });
   await page
     .getByRole('combobox', { name: 'Saved preset', exact: true })
     .click();
@@ -224,6 +251,14 @@ test('graphic settings', async ({ page }) => {
       Number(await viewport.getAttribute('data-effect-preview-width')),
     )
     .toBeLessThan(5964);
+  await ready(page);
+  const exportStates = page.locator('#export-actions');
+  await expect(exportStates).toHaveAttribute('data-observed-busy', 'true');
+  await expect(exportStates).not.toHaveAttribute('data-label-changed', 'true');
+  const widths = JSON.parse(
+    (await exportStates.getAttribute('data-observed-widths'))!,
+  ) as number[];
+  expect(Math.max(...widths) - Math.min(...widths)).toBeLessThan(0.1);
   const quartzTemplate = await dateEditor.getAttribute('data-template');
   await dateEditor.locator('[data-token]').click();
   const format = page.getByRole('combobox', {
@@ -231,19 +266,52 @@ test('graphic settings', async ({ page }) => {
     exact: true,
   });
   await expect(format).toHaveText("'YY MM DD");
+  await expect(
+    page.getByRole('combobox', { name: 'Month style', exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole('combobox', { name: 'Time format', exact: true }),
+  ).toHaveCount(0);
   await format.click();
+  await expect(page.getByRole('option')).toHaveText([
+    'YYYY-MM-DD',
+    'DD.MM.YYYY',
+    'D MMM YYYY',
+    "'YY MM DD",
+    'Custom',
+  ]);
+  await page.getByRole('option', { name: 'D MMM YYYY', exact: true }).click();
   await page
-    .getByRole('option', { name: 'YYYY/MM/DD HH:mm', exact: true })
+    .getByRole('combobox', { name: 'Date language', exact: true })
     .click();
+  await page.getByRole('option', { name: 'Polski', exact: true }).click();
   await expect(dateEditor).toHaveAttribute(
     'data-template',
-    '{date:YYYY%2FMM%2FDD%20HH%3Amm}',
+    '{date:D%20MMM%20YYYY|pl}',
   );
   await expect(
     page
       .getByLabel('Selected element settings')
-      .getByText(/^Preview: .* \d{2}:\d{2}$/),
+      .getByText('Preview: 20 maj 2026', { exact: true }),
   ).toBeVisible();
+  // Removed quick choices remain available through Custom.
+  await format.click();
+  await page.getByRole('option', { name: 'Custom', exact: true }).click();
+  await page
+    .getByRole('textbox', { name: 'Custom date format', exact: true })
+    .fill('D MMMM YYYY');
+  await page.getByRole('button', { name: 'Apply format', exact: true }).click();
+  await expect(dateEditor).toHaveAttribute(
+    'data-template',
+    '{date:D%20MMMM%20YYYY|pl}',
+  );
+  await expect(
+    page
+      .getByLabel('Selected element settings')
+      .getByText('Preview: 20 maja 2026', { exact: true }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
   await page.getByRole('button', { name: 'Undo', exact: true }).click();
   await dateEditor.locator('[data-token]').click();
 
@@ -283,6 +351,33 @@ test('graphic settings', async ({ page }) => {
   await expect(dateEditor).toHaveAttribute(
     'data-template',
     '{date:D%2FM%2FYYYY}',
+  );
+  // Time has its own settings and must not expose month/language controls.
+  await page.getByRole('button', { name: 'Add content', exact: true }).click();
+  await page.getByRole('button', { name: /^time(?:\s|$)/ }).click();
+  await page
+    .getByRole('button', { name: 'Close add content', exact: true })
+    .click();
+  await dateEditor.locator('[data-token="time"]').click();
+  await expect(
+    page.getByRole('combobox', { name: 'Month style', exact: true }),
+  ).toHaveCount(0);
+  await page
+    .getByRole('combobox', { name: 'Time format', exact: true })
+    .click();
+  await page
+    .getByRole('option', { name: '12-hour · 3:05 PM', exact: true })
+    .click();
+  await expect(dateEditor).toHaveAttribute(
+    'data-template',
+    /\{time:h%3Amm%20A\}/,
+  );
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(dateEditor).toHaveAttribute('data-template', /\{time\}/);
+  await page.getByRole('button', { name: 'Redo', exact: true }).click();
+  await expect(dateEditor).toHaveAttribute(
+    'data-template',
+    /\{time:h%3Amm%20A\}/,
   );
   await page
     .getByRole('combobox', { name: 'Saved preset', exact: true })

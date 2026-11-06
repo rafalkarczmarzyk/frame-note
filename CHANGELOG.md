@@ -11,7 +11,19 @@ see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 
 ## Unreleased
 
+### Added
+
+- Replace the bundled DSEG7 Classic font with Jan Bobrowski’s 7-Segment Regular for Quartz Date. Existing DSEG7 preset names resolve to the replacement without changing saved family values; unsupported Bold/Italic are not synthesized. Quartz Date and short-year formats use its native upper-right segment as the year mark, with a regular apostrophe fallback when selecting another font.
+
+- Choose numeric, abbreviated or full month names and English/Polish date language per capture-date token; configure 12/24-hour formatting on the separate capture-time token. Settings round-trip in preset v1; existing numeric formats and legacy combined date/time patterns remain readable.
+
+### Fixed
+
+- Keep the export toolbar stable during preview preparation and export: retain the Export JPG/PNG label and replace its fixed-size download icon with a spinner.
+
 ### Changed
+
+- Shorten the capture-date format picker to four common choices plus Custom; saved patterns and full month names remain supported through Custom.
 
 - Show the version and build identifier below the empty workspace logo instead of the version footer.
 

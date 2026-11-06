@@ -18,6 +18,12 @@ export async function ensureCaptionFont(
       `${effectiveFontStyle({ style })} ${effectiveFontWeight({ style })} 16px ${JSON.stringify(family)}`,
       `${text} A`,
     );
+    if (family === '7-Segment') {
+      await document.fonts.load(
+        `${effectiveFontStyle({ style })} ${effectiveFontWeight({ style })} 16px "Montserrat Variable"`,
+        text,
+      );
+    }
     if (!loaded.length) throw new Error(`Could not load ${family}.`);
   } catch (error) {
     if (family === 'Montserrat Variable') throw error;

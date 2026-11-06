@@ -674,7 +674,7 @@ function PhotoWorkspaceContent({
     : '';
   const preparingExport =
     !!photo && !prepared.blob && !prepared.error && !fontError && !assetError;
-  const exportLabel =
+  const exportStatus =
     singleExporting || batchBusy
       ? 'Exporting…'
       : loading
@@ -694,10 +694,10 @@ function PhotoWorkspaceContent({
               primaryTooltip={
                 !photo
                   ? `Open a photo to export a ${format.toUpperCase()}`
-                  : exportLabel
+                  : exportStatus
               }
               primaryDisabled={!photo || !prepared.blob || exporting || loading}
-              aria-busy={preparingExport || exporting || undefined}
+              aria-busy={preparingExport || exporting || loading || undefined}
               onClick={download}
               items={[
                 {
@@ -709,15 +709,15 @@ function PhotoWorkspaceContent({
                 },
               ]}
             >
-              {preparingExport || exporting ? (
+              {preparingExport || exporting || loading ? (
                 <LoaderCircle
-                  className="animate-spin motion-reduce:animate-none"
+                  className="size-4 shrink-0 animate-spin motion-reduce:animate-none"
                   aria-hidden="true"
                 />
               ) : (
-                <Download className="md:hidden" aria-hidden="true" />
+                <Download className="size-4 shrink-0" aria-hidden="true" />
               )}
-              <span className="hidden md:inline">{exportLabel}</span>
+              <span className="hidden md:inline">{`Export ${format.toUpperCase()}`}</span>
             </SplitButton>
           </span>,
           exportTarget,

@@ -30,7 +30,7 @@
   repeated per copy, with Glass sampling the photo and lower layers at each copy.
   Patterns above 2000 intersecting copies require more spacing or a larger motif;
   the app reports the limit and blocks export rather than dropping copies.
-- **Consistent styling.** Choose from 25 Google Fonts families and DSEG7 Classic, supported Bold/Italic variants,
+- **Consistent styling.** Choose from 25 Google Fonts families and 7-Segment, supported Bold/Italic variants,
   alignment, line and letter spacing, opacity, quick colors, or a custom HEX color. Size
   content in pixels or as a percentage of the short or long image edge.
 - **Layer backgrounds.** Choose None, Color or Glass in the selected layer inspector.
@@ -331,16 +331,28 @@ Photo Details is the default: author, lens and exposure icons. Signature uses an
 italic serif author credit. Focus Stack adds a second corner with a concise Helicon
 stack count. Glass Caption demonstrates a glass background; Proof Watermark repeats
 a translucent proof mark; Quartz Date stamps a short capture date in
-orange italic segment digits with Add blending, a warm glow and subtle blur; Digital Date uses regular Oswald, a black 80% outline (0.06% of the shorter edge) and Normal blending. Missing metadata follows the normal export warning flow.
+orange segment digits with Add blending, a warm glow and subtle blur; Digital Date uses regular Oswald, a black 80% outline (0.06% of the shorter edge) and Normal blending. Missing metadata follows the normal export warning flow.
 Quartz Date does not substitute today's date. Saved custom presets remain independent
 of built-in updates.
 
-Select a date token in Content to choose its Date format. Custom patterns accept
-YYYY/YY (year), MM/M (month), DD/D (day), HH:mm (24-hour capture time), spaces, dots, slashes, hyphens, underscores
-and apostrophes. Include each date part once. Apply format or Enter saves a valid
-pattern; invalid drafts do not change the photo. The preview uses the photo date,
-or a clearly labeled example when missing. Formats are independent for each token.
+### Capture date and time formatting
 
-Digital Date defaults to YYYY/MM/DD in golden orange. Select its date token and choose
-YYYY/MM/DD HH:mm for the version with capture time. Time comes from EXIF/XMP
-DateTimeOriginal with no timezone conversion; absent times are never replaced by midnight.
+Select a date token in Content to choose one of four Date format shortcuts or
+Custom. Full month names and additional date arrangements are available in Custom. Date language separately selects English or Polish. Language is saved per token in the preset
+and does not follow the computer's language. Select a separate time token for
+24-hour or 12-hour time with AM/PM. Compose date and time tokens to show both;
+missing capture time is never replaced with midnight.
+Custom date patterns use YYYY/YY, MMMM/MMM/MM/M and DD/D with supported
+separators. Apply format or Enter saves a valid draft; invalid drafts do not change
+the photo. The preview uses the photo date or a labeled example when missing.
+Digital Date defaults to YYYY/MM/DD in golden orange; add a separate time token
+to show capture time. Existing combined date/time patterns remain readable.
+See [supported patterns and compatibility](CAPTION_TAGS.md#date-formatting).
+
+7-Segment offers segment-display dates in its original Regular face. Bold and
+Italic are unavailable for this font. Month styles remain available with every font; the app does not switch fonts
+automatically for month names. Evaluate names and other text in the live preview,
+because seven-segment fonts have limited letter shapes. The stamp uses the font’s native apostrophe.
+
+The Export JPG/PNG label stays fixed during preparation and export. A spinner
+replaces the download icon while the app is busy; the tooltip describes its state.

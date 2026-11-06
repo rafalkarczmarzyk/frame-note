@@ -61,7 +61,7 @@ export function SplitButton({
           size={size}
           color={color}
           disabled={disabled || primaryDisabled || loading}
-          aria-busy={loading || undefined}
+          aria-busy={loading || props['aria-busy'] || undefined}
           className={cn('min-w-0 rounded-r-none', fullWidth && 'flex-1')}
         >
           {loading && (
