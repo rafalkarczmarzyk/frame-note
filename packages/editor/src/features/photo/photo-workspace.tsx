@@ -620,6 +620,7 @@ function PhotoWorkspaceContent({
     exportCaptions,
     fontReady && iconsReady && !loading,
     Math.min(1, scale * navigation.pixelRatio),
+    draggingId !== null,
   );
   const overviewIdentity = useMemo(
     () => ({ photo, composition }),
@@ -628,7 +629,7 @@ function PhotoWorkspaceContent({
   const overview = useCompositionOverview(
     sceneRef,
     dimensions,
-    !!photo && previewReady && !loading,
+    !!photo && previewReady && !loading && !draggingId,
     overviewIdentity,
     iconImages,
     glassPreview.tiles,
@@ -880,6 +881,7 @@ function PhotoWorkspaceContent({
                                   key={id}
                                   caption={caption}
                                   hideVisuals={glassPreview.blended}
+                                  simplified={draggingId !== null}
                                   geometry={geometry}
                                   dimensions={{ width, height }}
                                   decoration={glassPreview.tiles?.get(id)}
@@ -974,6 +976,7 @@ function PhotoWorkspaceContent({
                                   ) : (
                                     <BackgroundPreview
                                       content={geometry}
+                                      simplified={draggingId !== null}
                                       caption={caption}
                                       dimensions={{ width, height }}
                                     />

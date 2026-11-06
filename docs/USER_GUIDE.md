@@ -141,7 +141,7 @@ remain editable. Glass samples the composition below the layer. Hover outlines
 and other editor decorations are excluded from blending, Navigator and export.
 Blending uses the original photo alpha; JPG adds its white matte after blending,
 while PNG retains transparency. The shared renderer provides the preview, Navigator
-and JPG/PNG/ZIP output; effect preview resolution follows zoom and display density up to the original photo resolution. At 100% it uses the original image and full-resolution effects. Fit uses a smaller composition; zoom above 100% magnifies the exported pixels. Dense Tiled Glass can take longer to render.
+and JPG/PNG/ZIP output; effect preview resolution follows zoom and display density up to the original photo resolution. At 100% it uses the original image and full-resolution effects. Fit uses a smaller composition; zoom above 100% magnifies the exported pixels. Dense Tiled Glass can take longer to render. While dragging a layer or Tiled pattern, the editor temporarily simplifies all layers: blending and content effects are suspended, backgrounds retain their color and opacity without Glass or shadows, and the Navigator thumbnail pauses. Full-quality rendering resumes on release; saved settings and exports are unchanged.
 
 Presets save as v1 with blending settings. Missing blending settings receive
 Normal and 100% layer opacity. Historical labels 2/3 are also readable; older

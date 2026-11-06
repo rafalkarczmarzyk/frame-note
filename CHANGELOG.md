@@ -19,6 +19,8 @@ see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 
 ### Fixed
 
+- Keep layer dragging responsive with a simplified preview that suspends Glass, blending, content effects and Navigator thumbnail updates until release; saved settings and exports retain full quality.
+
 - Keep the export toolbar stable during preview preparation and export: retain the Export JPG/PNG label and replace its fixed-size download icon with a spinner.
 
 ### Changed

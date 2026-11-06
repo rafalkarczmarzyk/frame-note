@@ -18,6 +18,7 @@ export function useGlassPreview(
   captions: readonly RenderedCaption[],
   ready: boolean,
   resolutionScale: number,
+  dragging = false,
 ) {
   const [result, setResult] = useState<{
     photo: LoadedPhoto;
@@ -33,6 +34,7 @@ export function useGlassPreview(
   );
   const enabled =
     ready &&
+    !dragging &&
     (blended ||
       captions.some(
         (item) =>
@@ -136,9 +138,11 @@ export function useGlassPreview(
     };
   }, [result]);
   return {
-    blended,
+    blended: blended && !dragging,
     composition:
-      blended && result?.photo === photo ? result.composition : undefined,
+      enabled && blended && result?.photo === photo
+        ? result.composition
+        : undefined,
     tiles: enabled && result?.photo === photo ? result.tiles : null,
     error: enabled && failure?.photo === photo ? failure.message : '',
   };

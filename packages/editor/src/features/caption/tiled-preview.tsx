@@ -3,6 +3,7 @@ import { Group, Rect, Shape, Image as CanvasImage } from 'react-konva';
 import type { Caption, ImageDimensions } from '../../../../core/src/document';
 import type { ContentRect } from '../../../../core/src/layer-background';
 import { offsetTiled, tiledCopies } from '../../../../core/src/tiled-watermark';
+import { BackgroundPreview } from './background-preview';
 import { captionBackgroundRect } from './background-render';
 import type { renderBackgroundTile } from './background-render';
 
@@ -15,6 +16,7 @@ export function TiledPreview({
   children,
   draggable,
   hideVisuals = false,
+  simplified = false,
   layerHovered,
   offsetHovered,
   onSelect,
@@ -30,6 +32,7 @@ export function TiledPreview({
   children: ReactNode;
   draggable: boolean;
   hideVisuals?: boolean;
+  simplified?: boolean;
   layerHovered: boolean;
   offsetHovered: boolean;
   onSelect: () => void;
@@ -98,6 +101,19 @@ export function TiledPreview({
           y={copy.y}
           rotation={caption.position.tiled!.angle}
         >
+          {simplified && (
+            <BackgroundPreview
+              content={{
+                x: -geometry.width / 2,
+                y: -geometry.height / 2,
+                width: geometry.width,
+                height: geometry.height,
+              }}
+              caption={caption}
+              dimensions={dimensions}
+              simplified
+            />
+          )}
           <Rect
             x={bounds.x - geometry.width / 2}
             y={bounds.y - geometry.height / 2}
