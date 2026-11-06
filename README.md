@@ -32,12 +32,17 @@ or as a ZIP. Processing stays on your device; no account or backend is required.
 macOS Apple Silicon, Windows x64 and Linux x64. See [installation and platform
 limitations](docs/DESKTOP.md).
 
+This README describes the current source, including [Unreleased changes](CHANGELOG.md#unreleased). Published downloads may have a smaller feature set.
+
 ## Features
 
 - EXIF/IPTC/XMP metadata tokens mixed with text, SVG/PNG graphics and icons.
 - Independent layers, blend modes and opacity, anchored/manual/tiled positioning, margins, color and Glass backgrounds.
-- Bundled fonts plus installed system fonts in the desktop app.
-- Local presets with v1 JSON export with defaults for missing options across web and desktop.
+- Typography with letter spacing, 25 Google Fonts families and DSEG7 Classic; installed system fonts in the desktop app.
+- Ordered Outline, Shadow, Glow and Blur effects for layer content.
+- Per-photo Undo/Redo and Navigator zoom/pan without changing the export.
+- Capture-date formats and capture-time helpers, including retro date-stamp presets.
+- Seven built-in starting presets and local custom presets; v1 JSON import/export with embedded artwork across web and desktop.
 - JPG/PNG export, JPG quality and metadata controls, with batch export to ZIP.
 - Desktop Settings with local configuration, undo limits and window restoration.
 
@@ -70,7 +75,7 @@ Choose the app you want to run. For environment setup, builds and tests, see
 - [Fonts and licenses](docs/FONT_LIBRARY.md)
 - [Design system](docs/DESIGN_SYSTEM.md)
 - [Product context](docs/PRODUCT.md) · [Deferred ideas](docs/NICE_TO_HAVE.md)
-- [Changelog](CHANGELOG.md)
+- [Changelog](CHANGELOG.md) · [Draft 1.0.0 feature overview](docs/RELEASE_1.0.0.md)
 
 Some internal planning documents are maintained in Polish.
 

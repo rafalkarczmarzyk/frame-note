@@ -1,5 +1,11 @@
 # Uproszczenie testów — wynik i odbiór
 
+Aktualny stan wzorców: sześć scen UI i JPG zaktualizowano, zweryfikowano
+i zaakceptowano 2026-11-06; commit `a3896b0`. Starsze opisy różnic i oczekiwania
+na akceptację wzorców poniżej są dowodami historycznymi. Odbiory funkcjonalne
+niewykonane ręcznie zachowują osobny status. Bieżący zakres i kontrole:
+[plan 1.0](release-1.0.md).
+
 Implementacja zapisana w commicie `2c3625b`, produkt 0.4.2-beta; bez zmiany
 zachowania aplikacji i numeru wersji. Aktualne komendy opisuje
 [DEVELOPMENT](../DEVELOPMENT.md), sceny [UI_VISUAL_TESTS](../UI_VISUAL_TESTS.md).

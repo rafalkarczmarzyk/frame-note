@@ -43,7 +43,9 @@ dismissible notice at the top of the workspace. **View release** opens that
 release in the system browser; download and replace the app manually.
 **FrameNote → Check for Updates…** also starts a check. There is no automatic
 installer or update button in About. Network errors do not interrupt editing.
-Web has no release checker or update notice.
+Web has no release checker or update notice. Update notices share a vertical
+workspace stack with configuration warnings and application errors, below the
+toolbar and native window controls. Each dismissible notice closes independently.
 
 ## Local macOS installation
 
@@ -108,7 +110,9 @@ Manual edits are read and validated only on restart. The last app save wins:
 saving Settings, export preferences or window geometry while the app is running
 may overwrite manual edits. There is no live reload or conflict merging.
 Writes use a temporary file and rename. Invalid/unreadable or unsupported files
-start the app with defaults and a warning without blocking editing. Saving an
+start the app with defaults and a dismissible workspace notification without
+blocking editing. **Open Settings** opens full diagnostics and recovery; closing
+the notification does not remove the warning from Settings. Saving an
 invalid file from Settings requires explicit confirmation and preserves a
 `.backup` copy; newer formats cannot be overwritten by this app.
 
@@ -144,6 +148,8 @@ Automated macOS desktop checks cover configuration creation and quality migratio
 Settings save/cancel/X/Escape, numeric validation, persistence across restarts,
 startup update checks, file reveal, failed saves and invalid-file recovery,
 normal window bounds and maximization, and About once per product version.
+They also check simultaneous configuration/update notifications at 800 and
+1440 px, their position below the toolbar, Open Settings and independent dismissal.
 Unit tests also cover disconnected-display fallback and unavailable profile storage.
 Web visual regression and representative JPG export checks pass with these changes.
 Physical external-monitor removal and native configuration behavior on Windows/Linux

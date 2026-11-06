@@ -4,6 +4,9 @@ Stan: etap 1 wykonany, zweryfikowany i zaakceptowany, 2026-11-06.
 Baza: master `19314e8`, manifesty `0.10.0-beta`.
 Docelowa wersja stabilna: **1.0.0**, wskazana przez użytkownika.
 
+Roboczy opis pełnych możliwości produktu: [FrameNote 1.0.0 — feature overview](../RELEASE_1.0.0.md).
+Dokument jest szkicem do redakcji i nie oznacza rozpoczęcia wydania.
+
 ## Zakres i etapy
 
 1. Autoryzowane: przegląd i aktualizacja wzorców do obecnych komponentów,

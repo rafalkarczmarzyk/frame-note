@@ -1,5 +1,11 @@
 # Zestaw presetów przed 1.0
 
+Aktualny stan wzorców: sześć scen UI i JPG zaktualizowano, zweryfikowano
+i zaakceptowano 2026-11-06; commit `a3896b0`. Starsze opisy różnic i oczekiwania
+na akceptację wzorców poniżej są dowodami historycznymi. Odbiory funkcjonalne
+niewykonane ręcznie zachowują osobny status. Bieżący zakres i kontrole:
+[plan 1.0](release-1.0.md).
+
 Stan: do oceny użytkownika. Data: 2026-11-06.
 Autoryzacja: użytkownik zaakceptował propozycję siedmiu presetów (dodano Digital Date na życzenie użytkownika) i zlecił refaktoryzację.
 Branch: `codex/curated-presets`. Zgoda użytkownika na lokalny commit udzielona 2026-11-06. Bez zgody na push/wydanie.

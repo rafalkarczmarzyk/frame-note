@@ -1,5 +1,11 @@
 # Efekty warstwy: Outline i Shadow/Glow
 
+Aktualny stan wzorców: sześć scen UI i JPG zaktualizowano, zweryfikowano
+i zaakceptowano 2026-11-06; commit `a3896b0`. Starsze opisy różnic i oczekiwania
+na akceptację wzorców poniżej są dowodami historycznymi. Odbiory funkcjonalne
+niewykonane ręcznie zachowują osobny status. Bieżący zakres i kontrole:
+[plan 1.0](release-1.0.md).
+
 Stan: etap 2 — funkcja wdrożona w aplikacji, weryfikacja i odbiór (2026-11-06).
 Autoryzowany zakres: implementacja w aplikacji, usunięcie tymczasowej próbki,
 poprawki listy i precyzji, Blur całej zawartości bez tła, Digital Date ze zrzutu,

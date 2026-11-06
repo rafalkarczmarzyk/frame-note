@@ -30,15 +30,15 @@
   repeated per copy, with Glass sampling the photo and lower layers at each copy.
   Patterns above 2000 intersecting copies require more spacing or a larger motif;
   the app reports the limit and blocks export rather than dropping copies.
-- **Consistent styling.** Choose from 25 Google Fonts families, supported Bold/Italic variants,
-  alignment, line spacing, opacity, quick colors, or a custom HEX color. Size
+- **Consistent styling.** Choose from 25 Google Fonts families and DSEG7 Classic, supported Bold/Italic variants,
+  alignment, line and letter spacing, opacity, quick colors, or a custom HEX color. Size
   content in pixels or as a percentage of the short or long image edge.
 - **Layer backgrounds.** Choose None, Color or Glass in the selected layer inspector.
   Control base color and opacity, four-sided padding and corner radius. Color
   backgrounds support a drop shadow with color, opacity, blur, spread and X/Y
   offsets. Glass blurs the photo and visible lower layers beneath raised shading;
   its base color, opacity and blur are independent of content opacity. Background
-  settings are included in presets and JPG exports.
+  settings are included in presets and JPG/PNG exports.
 - **Precise margins.** Adjust four margins independently, in pairs, or together
   through the visual margin editor or interactive photo rulers.
 - **Inline logos and artwork.** Set each image height relative to the font or in
@@ -46,9 +46,9 @@
   original colors and transparency.
 - **Reusable layout presets.** Save layouts locally, update or duplicate them,
   and import/export `.framenote.json` files with their image assets. Built-in
-  presets include Default, Default dark, Signature, Compact EXIF, Camera & Lens,
-  Focus Stack, EXIF Icons, Astrophotography, and Long Exposure.
-- **Controlled JPG export.** Choose quality from 1–100%, inspect the actual
+  presets are Photo Details, Signature, Focus Stack, Glass Caption,
+  Proof Watermark, Quartz Date and Digital Date.
+- **JPG and PNG export.** Choose JPG quality from 1–100%, inspect the actual
   encoded file size, choose which supported metadata groups to keep, and download
   the prepared result. Preview and export share layout calculations.
 
@@ -92,15 +92,17 @@ presets or exported JPGs.
 
 ## Create your first caption
 
-FrameNote opens into an empty editor with a photo-selection button, JPG/PNG drop
-guidance and a privacy note in the canvas. The application version sits at the bottom; GitHub and Changelog links are in About. On the web, open About using the button beside
-the logo (or the logo itself). On desktop, use FrameNote → About FrameNote in
-the application menu. About shows the version, project links and an offline
-license reader. It does not open automatically at startup.
+FrameNote opens into an empty editor with its logo and a JPG/PNG drop hint;
+use **Add photos** in the toolbar or drop files onto the canvas. The application
+version sits at the bottom; GitHub and Changelog links are in About. On the web,
+open About using the button beside the logo or the logo itself. On desktop,
+use **FrameNote → About FrameNote**. About shows version/build information,
+project links and an offline license reader. Desktop shows it once on the first
+launch of each product version; web opens it only when requested.
 
 1. Choose one or more JPG/PNG photos, or drop them onto the canvas.
 2. Edit the default caption, insert metadata from the tag browser, and add images
-   through **Content → Add image**.
+   through **Content → Add → Graphics**.
 3. Add layers as needed, then adjust typography, margins, stacking, and position.
 4. Save the layout as a preset if you want to reuse it with other photos.
 5. Choose JPG or PNG in **Export settings**, then select **Export JPG** or **Export PNG**. JPG quality is retained when switching formats. **Export all** creates a ZIP of the roll in the selected format.
@@ -114,8 +116,9 @@ A caption can combine plain text and metadata tokens:
 ```
 
 Original metadata is also available through namespaced tokens such as
-`{exif:Artist}` and `{exif:UserComment}`. The Focus Stack preset uses `{heliconStack}`
-for the documented Helicon Focus UserComment format. Missing values are reported
+`{exif:Artist}` and `{exif:UserComment}`. The Focus Stack preset uses `{heliconStackSummary}`
+for a concise count from the documented Helicon Focus UserComment format;
+`{heliconStack}` remains available for the full details. Missing values are reported
 and require confirmation before export for visible layers. Intentional blank
 lines are preserved; lines containing only missing values are omitted.
 
@@ -128,9 +131,8 @@ source precedence, formatting, and missing-data behavior.
 ## Layer blending
 
 The selected layer's **Blending** section sits after Typography; Effects follows Blending.
-Choose Normal, Multiply, Screen, Soft Light or Add with the five icon buttons;
-hover or focus for help. The active mode is named above the buttons. Keyboard
-arrows move between modes; Space selects a mode. **Layer opacity** affects the
+Choose Normal, Multiply, Screen, Soft Light or Add from the **Blend mode**
+dropdown. The selected mode is shown by its full name. **Layer opacity** affects the
 whole layer, including text, artwork, Color/Glass backgrounds and every Tiled
 copy. Typography opacity still controls text/artwork within the layer.
 
@@ -232,7 +234,8 @@ copy lasts until the application closes or reloads; it is not the system clipboa
 Paste requires a copy, and the actions are unavailable while editing is locked.
 
 **Photo actions → Close photo** closes the active photo and selects a neighbor.
-**Dispose roll…** closes all photos after confirmation. Closing the last photo
+**Dispose roll…** closes all photos after confirmation in the shared app dialog;
+Cancel or Escape keeps the roll and edits. Closing the last photo
 keeps its layout in the empty editor. Source files and saved presets are not deleted.
 Export settings and sidebar state are shared across the photo session. Desktop
 also remembers JPG quality and the Remove all metadata choice between launches;
@@ -269,6 +272,16 @@ change the current photo layout or preset selection. Creating and renaming use a
 separate framed form with a full-width name field. Deleting a saved preset asks
 for confirmation; Cancel or Escape keeps it. Deletion leaves the current photo
 layout intact and selects Photo Details when the deleted preset was active.
+
+## Application notifications
+
+Errors and desktop configuration/update notices appear in a shared stack at the
+top of the workspace, below the toolbar. Simultaneous notices remain one below
+another; each dismissible notice closes independently. Long messages wrap and
+the stack scrolls when needed. Configuration warnings offer **Open Settings**
+for full diagnostics and recovery; dismissing the notice leaves those details
+available in Settings. **View release** opens an available desktop release in
+the system browser. Web does not check for desktop releases.
 
 ## Limits and export behavior
 

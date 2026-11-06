@@ -23,10 +23,15 @@ XMP sprawdzane przez URI; nie zmieniają składni oryginalnych tokenów.
 | `{iso}`               | ISO 400                                        | Poprawny zestaw EXIF → poprawny zestaw standardowego XMP; reguły poniżej                                           |
 | `{focalLength}`       | 100 mm                                         | EXIF FocalLength → XMP exif:FocalLength; nie ekwiwalent 35 mm                                                      |
 | `{date}`              | 2026-10-20                                     | EXIF DateTimeOriginal → XMP exif:DateTimeOriginal → IPTC DateCreated → XMP photoshop:DateCreated                   |
+| `{time}`              | 23:30                                          | EXIF DateTimeOriginal → XMP exif:DateTimeOriginal; poprawny timestamp, bez konwersji strefy                        |
 | `{copyright}`         | Treść praw                                     | XMP dc:rights → EXIF Copyright → IPTC Copyright Notice/CopyrightNotice                                             |
 | `{exposure}`          | 1/250 s · f/8 · ISO 400                        | Składa shutter, aperture i iso, pomijając brakujące części i separatory                                            |
 | `{heliconStack}`      | Focus stack · 15 images · Method A · R=8 · S=4 | EXIF UserComment → XMP exif:UserComment                                                                            |
 | `{heliconStackCount}` | 15                                             | Ten sam pełny parser komentarza co heliconStack                                                                    |
+
+`{heliconStackSummary}` daje skrócone `Stacked 15 frames` z tego samego parsera
+co `{heliconStack}`. Starszy `{dateTime}` pozostaje obsługiwany; picker pokazuje
+osobne `{date}` i `{time}`. Szczegóły: [Capture time](#capture-time).
 
 Czas, przysłona, ISO i ogniskowa zawierają jednostki — nie dopisuj ich ponownie.
 Helicon rozpoznaje pełny komentarz `Stacked from N images. Method=A (R=8,S=4)`,

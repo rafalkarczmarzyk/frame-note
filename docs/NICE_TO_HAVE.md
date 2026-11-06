@@ -10,13 +10,12 @@ Aktualny [zakres 1.0](plans/release-1.0.md) jest opisany osobno.
 ### Obrys i cień tekstu
 
 Status: **implementacja w aplikacji, odbiór w toku** — etap 2 dnia 2026-11-06.
-Outline/Shadow/Glow tekstu oraz Blur całej zawartości bez tła.
-Aktualna propozycja i otwarte decyzje: [efekty warstwy](plans/layer-effects.md).
-Pierwotna decyzja: 2026-11-06 podczas dopracowania Digital Date.
-Dodać opcje outline i drop shadow dla tekstu warstwy, inspirowane datownikiem
-wczesnych kompaktów. Osobne od istniejącego cienia tła. Przy powrocie ustalić
-jednostki, kolory, zakres warstwy i zgodność podglądu/eksportu oraz presetów.
-Wpływ: wspólne UI web/desktop, model warstwy, renderowanie i format v1.
+Outline/Shadow/Glow całej zawartości (tekst, ikony, SVG/PNG i separatory)
+oraz Blur zawartości bez tła są wdrożone. Bieżące zachowanie opisuje
+[USER_GUIDE](USER_GUIDE.md#layer-effects); otwarte odbiory i dowody:
+[efekty warstwy](plans/layer-effects.md). Pomysł pochodzi z dopracowania
+Digital Date 2026-11-06; został podjęty do implementacji, nie jest już propozycją
+przyszłego zakresu. Zapis pozostaje w v1 bez migracji, tło i jego cień są osobne.
 
 ### Ramki i polaroidy
 

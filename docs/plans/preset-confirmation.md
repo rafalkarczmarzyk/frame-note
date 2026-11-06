@@ -1,5 +1,11 @@
 # Potwierdzenia i formularz presetów
 
+Aktualny stan wzorców: sześć scen UI i JPG zaktualizowano, zweryfikowano
+i zaakceptowano 2026-11-06; commit `a3896b0`. Starsze opisy różnic i oczekiwania
+na akceptację wzorców poniżej są dowodami historycznymi. Odbiory funkcjonalne
+niewykonane ręcznie zachowują osobny status. Bieżący zakres i kontrole:
+[plan 1.0](release-1.0.md).
+
 Stan: implementacja. Data: 2026-11-06.
 Autoryzowane: potwierdzanie usuwania w Manage presets, wspólny komponent
 ConfirmationDialog dla aplikacji i odrzucania zmian; osobna ramka formularza

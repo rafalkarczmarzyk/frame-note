@@ -102,7 +102,7 @@ UI colors are defined in `packages/editor/src/index.css` and consumed through se
 `pnpm check:tokens` checks this convention. The accessibility addon supports
 component review; it is not a complete accessibility audit.
 
-The caption library offers 25 Google Fonts families, with category
+The caption library offers 25 Google Fonts families plus DSEG7 Classic, with category
 filters and local fonts loaded on demand. See [font delivery and licenses](FONT_LIBRARY.md).
 Montserrat is bundled through `@fontsource-variable/montserrat` and also styles
 interface headings. Font licenses accompany the bundled families.
