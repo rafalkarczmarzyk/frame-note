@@ -11,6 +11,10 @@ see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 
 ## Unreleased
 
+### Changed
+
+- Show the version and build identifier below the empty workspace logo instead of the version footer.
+
 ## [0.11.0-beta] - 2026-11-06
 
 ### Fixed

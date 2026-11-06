@@ -2,7 +2,7 @@ import { Download, Layers, Plus, Scan } from 'lucide-react';
 import { FrameNoteLogo } from '@/components/brand/frame-note-logo';
 import { PhotoDropOverlay } from './photo-drop-overlay';
 import { PhotoLoadingIndicator } from './photo-loading-indicator';
-import { appVersion as version } from '@/lib/build-info';
+import { appVersion as version, appBuild } from '@/lib/build-info';
 import { PhotoIcon } from '@/components/icons/photo-icon';
 import {
   EditorWorkspace,
@@ -96,7 +96,11 @@ export function EmptyPhotoCanvas({
           className="flex max-w-sm flex-col items-center text-center"
           aria-labelledby="empty-workspace-title"
         >
-          <FrameNoteLogo className="mb-6 h-auto w-80 max-w-full text-content-muted" />
+          <FrameNoteLogo className="h-auto w-80 max-w-full text-content-muted" />
+          <p className="mb-6 mt-3 text-[11px] text-content-muted">
+            v{version}
+            <span data-build-info> · build {appBuild}</span>
+          </p>
           <h1
             id="empty-workspace-title"
             className="text-sm font-medium text-content-muted"
@@ -108,9 +112,6 @@ export function EmptyPhotoCanvas({
           </p>
         </section>
       </div>
-      <footer className="flex shrink-0 items-center justify-center px-6 py-4 text-[11px] text-content-muted">
-        <span>FrameNote · v{version}</span>
-      </footer>
     </div>
   );
 }

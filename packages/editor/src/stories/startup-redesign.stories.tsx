@@ -15,7 +15,7 @@ const meta = {
       story: { inline: false, height: '800px' },
       description: {
         component:
-          'Production empty editor. The empty canvas shows a photo import action, drop guidance and privacy note, with version and links at the bottom. Choose a photo or drop a JPG/PNG to enter the editor. No modal, timer or dismiss action. The app logo is passive.',
+          'Production empty editor. The empty canvas shows the logo, version and build identifier above drop guidance pointing to Add photos in the toolbar. Choose a photo or drop a JPG/PNG to enter the editor. No modal, timer or dismiss action. The app logo is passive.',
       },
     },
   },
