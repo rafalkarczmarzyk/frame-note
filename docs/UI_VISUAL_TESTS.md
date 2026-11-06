@@ -1,25 +1,29 @@
 # Regresja wizualna UI — smoke tests
 
-Stan: 5 listopada 2026. Zestaw sprawdza widoki prawdziwej aplikacji w jednym profilu Chromium desktop. Storybook nie jest uruchamiany przez `test:visual`.
+Stan: 6 listopada 2026. Zestaw sprawdza widoki prawdziwej aplikacji w jednym profilu Chromium desktop. Storybook nie jest uruchamiany przez `test:visual`.
 
 ## Sceny
 
-### Źródła i sortowanie fontów — kontrola 2026-11-06
+### Aktualizacja wzorców przed 1.0 — 2026-11-06
 
-Na źródłach 0.10.0-beta (niezacommitowane) sprawdzono w Chromium story
-Pickers/FontPicker/Desktop: App/System, wybór Arial, tooltip wyłącznie po
-najechaniu na badge oraz brak badge źródła i Selected w webie. Typy, lint
-zmienionych komponentów, formatowanie i tokeny — PASS. Natywnego desktopu
-nie uruchamiano; odbiór użytkownika pozostaje otwarty.
+Baza źródeł: `19314e8`, produkt `0.10.0-beta`. Na macOS obejrzano
+expected/actual/diff wszystkich sześciu scen Chromium desktop oraz eksportu
+JPG przed aktualizacją. Wzorce obejmują aktualne komponenty i presety:
 
-Sześć scen wizualnych zgłosiło różnice; obejrzano expected/actual/diff.
-Po dodaniu sortowania A–Z ponownie uruchomiono sześć scen (6 różnic);
-obejrzano expected/actual/diff panelu fontów, potwierdzając kolejność po nazwie.
-Oprócz sortowania i usuniętego Selected w panelu fontów widoczne są zmiany istniejącego
-presetu Photo Details, DSEG7 i inspektora poza zakresem badge. Eksport JPG
-wykonano, lecz porównanie nie przeszło (39651 pikseli różnicy w podpisie).
-Raporty: playwright-visual-report i playwright-report. Wzorców nie zmieniano.
-Podglądy badge: /tmp/framenote-font-source.png i /tmp/framenote-font-system.png.
+- Empty editor: logo i wskazówka Add photos zamiast drugiego choosera.
+- Prepared photo session: Photo Details, ikony ekspozycji i równe akcje warstw.
+- Font panel: alfabetyczna lista z DSEG7 Classic, bez badge Selected;
+  aktualny Content, Letter spacing i ikony krycia.
+- Metadata panel: aktualne helpery, Photo Details i układ inspektora.
+- Graphic settings: wspólna ramka ustawień, trzy pola Typography i akcje warstw.
+- About: zmiany kompozycji edytora za dialogiem; sam dialog bez zmian.
+- JPG: obecny Photo Details oraz efekty uruchamiane przez istniejący test;
+  różnice dotyczą podpisu, fotografia pozostaje niezmieniona.
+
+Zestaw nadal ma sześć scen UI i jeden eksport JPG, bez nowych profili,
+zwiększania tolerancji ani wyłączania porównań. Jest to aktualizacja referencji
+do bieżących komponentów zlecona przez użytkownika, nie zamknięcie otwartych
+odbiorów funkcjonalnych. Stan kontroli przed wydaniem: [plan 1.0](plans/release-1.0.md).
 
 Numer kompilacji (`data-build-info`) jest ukrywany wyłącznie na screenshotach
 przez `tests/visual/screenshot.css`, aby wzorce nie zależały od commita.
