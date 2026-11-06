@@ -11,6 +11,10 @@ see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 
 ## Unreleased
 
+### Changed
+
+- Choose layer blend modes from a dropdown with full text labels.
+
 ## [0.10.0-beta] - 2026-11-05
 
 ### Added

@@ -165,13 +165,20 @@ export const Blending: Story = {
     docs: {
       description: {
         story:
-          'Blend the complete layer with one-click mode buttons. The selected mode has a visible name; icons expose descriptive tooltips and keyboard navigation. Layer opacity includes text, artwork and background.',
+          'Blend the complete layer using a dropdown with full mode names and keyboard navigation. Layer opacity includes text, artwork and background.',
       },
     },
   },
   play: async ({ canvasElement }) => {
     const c = within(canvasElement);
-    await userEvent.click(c.getByRole('radio', { name: 'Multiply' }));
-    await expect(c.getByText('Blend mode · Multiply')).toBeVisible();
+    await userEvent.click(c.getByRole('combobox', { name: 'Blend mode' }));
+    await userEvent.click(
+      within(document.body).getByRole('option', {
+        name: /^Multiply$/,
+      }),
+    );
+    await expect(
+      c.getByRole('combobox', { name: 'Blend mode' }),
+    ).toHaveTextContent('Multiply');
   },
 };

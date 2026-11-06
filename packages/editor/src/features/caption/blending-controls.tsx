@@ -1,12 +1,12 @@
-import { Layers, X, Sun, Eclipse, Plus } from 'lucide-react';
+import { Layers } from 'lucide-react';
 import type { Caption } from '../../../../core/src/document';
 import {
   createLayerBlending,
   type BlendMode,
 } from '../../../../core/src/layer-blending';
 import { InspectorSection } from '@/components/layout/inspector-section';
-import { SegmentedControl } from '@/components/ui/segmented-control';
-import { InlineInputGroup } from '@/components/ui/inline-input-group';
+import { Select } from '@/components/ui/select';
+import { Field } from '@/components/ui/field';
 import { RangeField } from '@/components/ui/range-field';
 
 export function BlendingControls({
@@ -22,55 +22,28 @@ export function BlendingControls({
   return (
     <InspectorSection title="Blending">
       <div className="space-y-2">
-        <p className="text-xs text-content-secondary">
-          Blend mode ·{' '}
-          {blending.mode === 'soft-light'
-            ? 'Soft Light'
-            : blending.mode[0]!.toUpperCase() + blending.mode.slice(1)}
-        </p>
-        <InlineInputGroup label="Layer blending mode">
-          <SegmentedControl<BlendMode>
-            className="w-full"
-            label="Blend mode"
-            value={blending.mode}
-            disabled={disabled}
-            onValueChange={(mode) =>
-              onChange({ ...caption, blending: { ...blending, mode } })
-            }
-            options={[
-              {
-                value: 'normal',
-                label: 'Normal',
-                tooltip: 'Normal · preserve layer colors',
-                content: <Layers aria-hidden="true" />,
-              },
-              {
-                value: 'multiply',
-                label: 'Multiply',
-                tooltip: 'Multiply · darken the photo',
-                content: <X aria-hidden="true" />,
-              },
-              {
-                value: 'screen',
-                label: 'Screen',
-                tooltip: 'Screen · lighten the photo',
-                content: <Sun aria-hidden="true" />,
-              },
-              {
-                value: 'soft-light',
-                label: 'Soft Light',
-                tooltip: 'Soft Light · subtle light and shade',
-                content: <Eclipse aria-hidden="true" />,
-              },
-              {
-                value: 'add',
-                label: 'Add',
-                tooltip: 'Add · brighten by adding color',
-                content: <Plus aria-hidden="true" />,
-              },
-            ]}
-          />
-        </InlineInputGroup>
+        <Field label="Blend mode">
+          {(id) => (
+            <Select
+              id={id}
+              value={blending.mode}
+              disabled={disabled}
+              onValueChange={(mode) =>
+                onChange({
+                  ...caption,
+                  blending: { ...blending, mode: mode as BlendMode },
+                })
+              }
+              options={[
+                { value: 'normal', label: 'Normal' },
+                { value: 'multiply', label: 'Multiply' },
+                { value: 'screen', label: 'Screen' },
+                { value: 'soft-light', label: 'Soft Light' },
+                { value: 'add', label: 'Add' },
+              ]}
+            />
+          )}
+        </Field>
         <RangeField
           label="Layer opacity"
           icon={<Layers className="size-4" aria-hidden="true" />}

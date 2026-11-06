@@ -116,8 +116,8 @@ i kompozycje `Screens/TestPhotos`.
 ### Blending warstwy
 
 `features/caption/blending-controls.tsx` składa InspectorSection, pełnej szerokości
-InlineInputGroup + SegmentedControl z pięcioma ikonami i tooltipami oraz RangeField.
-Nazwa aktywnego trybu jest widoczna nad przyciskami. Sekcja między Typography a
+Field + Select z pięcioma pełnymi nazwami trybów oraz RangeField.
+Nazwa aktywnego trybu jest widoczna w dropdownie. Sekcja między Typography a
 Background dotyczy całej warstwy. Story: **Pickers/CaptionControls/Blending**;
 kompozycja produkcyjna: **Screens/TestPhotos**. Krycie tekstu pozostaje w Typography.
 
