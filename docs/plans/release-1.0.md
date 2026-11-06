@@ -57,6 +57,9 @@ Przegląd referencji opisuje [UI_VISUAL_TESTS](../UI_VISUAL_TESTS.md).
 
 ## Otwarte przed stabilnym wydaniem
 
+- Odbiór stosu powiadomień i akcji Open Settings:
+  [app-notifications](app-notifications.md).
+
 - Odbiór efektów, Blur, zachowania przy zoomie i presetów:
   [layer-effects](layer-effects.md).
 - Odbiór presetów wbudowanych i dialogów:

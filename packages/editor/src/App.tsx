@@ -18,7 +18,11 @@ import {
 } from 'react';
 import { AppHeader } from '@/components/layout/app-header';
 import { EmptyWorkspace } from '@/features/photo/empty-workspace';
-import { Download, X } from 'lucide-react';
+import { Download, TriangleAlert } from 'lucide-react';
+import {
+  AppNotification,
+  AppNotificationStack,
+} from '@/components/ui/app-notification';
 import { PhotoActions } from '@/features/photo/photo-actions';
 import { PhotoSettingsActions } from '@/features/photo/photo-settings-actions';
 import { ToolSidebarFooter } from '@/components/layout/editor-workspace';
@@ -396,14 +400,6 @@ export default function App() {
           }}
         />
       )}
-      {configWarning && (
-        <div
-          role="alert"
-          className="border-b border-panel-border px-6 py-3 text-xs"
-        >
-          {configWarning}
-        </div>
-      )}
       <AppHeader
         historyAction={
           <HistoryControls
@@ -454,63 +450,63 @@ export default function App() {
           event.target.value = '';
         }}
       />
-      {error && (
-        <div
-          role="alert"
-          className="max-h-32 shrink-0 overflow-y-auto border-b px-6 py-3 text-sm whitespace-pre-line"
-        >
-          {error}
-        </div>
-      )}
       <div
         className="relative flex min-h-0 flex-1 flex-col"
         aria-busy={previewLoading}
       >
-        {availableUpdate && (
-          <div
-            className="glass-popover absolute top-3 left-1/2 z-50 flex max-w-[calc(100%-24px)] -translate-x-1/2 items-center gap-3 rounded-xl border border-panel-border px-4 py-3 text-sm shadow-panel"
-            role="status"
-          >
-            <Download
-              className="size-4 shrink-0 text-content-primary"
-              aria-hidden="true"
-            />
-            <span className="whitespace-nowrap">
-              FrameNote {availableUpdate.version} is available
-            </span>
-            <Button
-              size="sm"
-              onClick={() => {
-                const desktop = (
-                  window as Window & {
-                    frameNoteDesktop?: {
-                      openRelease(url: string): Promise<void>;
-                    };
-                  }
-                ).frameNoteDesktop;
-                void desktop?.openRelease(availableUpdate.url);
+        <AppNotificationStack>
+          {error && (
+            <AppNotification
+              role="alert"
+              icon={<TriangleAlert aria-hidden="true" />}
+              dismissLabel="Dismiss error notification"
+              onDismiss={() => setError('')}
+            >
+              <span className="whitespace-pre-line">{error}</span>
+            </AppNotification>
+          )}
+          {configWarning && (
+            <AppNotification
+              role="alert"
+              icon={<TriangleAlert aria-hidden="true" />}
+              action={{
+                label: 'Open Settings',
+                onClick: () =>
+                  window.dispatchEvent(new Event('framenote-open-settings')),
               }}
+              dismissLabel="Dismiss configuration notification"
+              onDismiss={() => setConfigWarning(undefined)}
             >
-              View release
-            </Button>
-            <button
-              type="button"
-              aria-label="Dismiss update notification"
-              className="rounded p-1 text-content-secondary hover:text-content-primary focus-visible:outline-2 focus-visible:outline-input-focus-ring"
-              onClick={() => setAvailableUpdate(null)}
+              Configuration could not be loaded. FrameNote is using defaults.
+              Review Settings for details.
+            </AppNotification>
+          )}
+          {availableUpdate && (
+            <AppNotification
+              icon={<Download aria-hidden="true" />}
+              action={{
+                label: 'View release',
+                onClick: () => {
+                  const desktop = (
+                    window as Window & {
+                      frameNoteDesktop?: {
+                        openRelease(url: string): Promise<void>;
+                      };
+                    }
+                  ).frameNoteDesktop;
+                  void desktop?.openRelease(availableUpdate.url);
+                },
+              }}
+              dismissLabel="Dismiss update notification"
+              onDismiss={() => setAvailableUpdate(null)}
             >
-              <X className="size-4" aria-hidden="true" />
-            </button>
-          </div>
-        )}
-        {updateCheckMessage && !availableUpdate && (
-          <div
-            className="glass-popover absolute top-3 left-1/2 z-50 -translate-x-1/2 rounded-xl border border-panel-border px-4 py-3 text-sm shadow-panel"
-            role="status"
-          >
-            {updateCheckMessage}
-          </div>
-        )}
+              FrameNote {availableUpdate.version} is available
+            </AppNotification>
+          )}
+          {updateCheckMessage && !availableUpdate && (
+            <AppNotification>{updateCheckMessage}</AppNotification>
+          )}
+        </AppNotificationStack>
         <Suspense
           fallback={
             <EmptyWorkspace

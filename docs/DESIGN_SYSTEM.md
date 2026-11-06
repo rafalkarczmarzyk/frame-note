@@ -236,3 +236,13 @@ i zamknięcie podczas zapisu. Modal zapewnia fokus, etykiety i obsługę klawiat
 Feature odpowiada za zapis, błędy i fokus po usunięciu elementu. Używany przy
 usuwaniu presetów i odrzucaniu niezapisanych zmian. Story: Sidebar & panels/ConfirmationDialog.
 Formularz nazwy presetu ma osobną ramkę selected-settings-panel i input pełnej szerokości.
+
+### Powiadomienia aplikacji
+
+`AppNotificationStack` umieszczamy w obszarze pracy pod nagłówkiem.
+`AppNotification` współdzieli wygląd powiadomienia aktualizacji: ikona, treść,
+opcjonalna akcja i zamknięcie. Komunikaty są układane pionowo, zawijają treść
+i przewijają stos przy braku miejsca, bez przesuwania paska tytułu macOS.
+Zamknięcie jednego nie usuwa pozostałych. Ostrzeżenie konfiguracji otwiera
+Settings; zamknięcie komunikatu nie usuwa diagnostyki z ustawień.
+Story: **Selection & feedback/AppNotification** (Stacked, Narrow).

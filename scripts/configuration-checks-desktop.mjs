@@ -328,9 +328,56 @@ export async function checkDesktopConfiguration({ executable, env }) {
       await expect(
         page
           .getByRole('alert')
-          .filter({ hasText: 'original file has been preserved' }),
+          .filter({ hasText: 'Configuration could not be loaded' }),
       ).toBeVisible();
-      await openSettings();
+      // Simultaneous startup warning and update use one stack below native chrome.
+      await app.evaluate(({ ipcMain }) => {
+        ipcMain.removeHandler('updates-check');
+        ipcMain.handle('updates-check', () => ({
+          status: 'available',
+          release: {
+            version: '99.0.0',
+            url: 'https://github.com/rafalkarczmarzyk/frame-note/releases/tag/v99.0.0',
+          },
+        }));
+      });
+      await page.evaluate(() =>
+        window.dispatchEvent(new Event('framenote-check-updates')),
+      );
+      const stack = page.locator('[data-app-notifications]');
+      await expect(stack.getByRole('status')).toContainText('99.0.0');
+      const notification = stack.getByRole('alert');
+      for (const width of [800, 1440]) {
+        await app.evaluate(
+          ({ BrowserWindow }, width) =>
+            BrowserWindow.getAllWindows()[0].setSize(width, 900),
+          width,
+        );
+        await expect.poll(() => page.evaluate(() => innerWidth)).toBe(width);
+        const title = await page
+          .locator('[data-window-titlebar]')
+          .boundingBox();
+        const header = await page
+          .locator('header[data-platform]')
+          .boundingBox();
+        const warning = await notification.boundingBox();
+        const update = await stack.getByRole('status').boundingBox();
+        expect(title.y).toBe(0);
+        expect(warning.y).toBeGreaterThanOrEqual(header.y + header.height);
+        expect(update.y).toBeGreaterThan(warning.y + warning.height);
+        expect(warning.x).toBeGreaterThanOrEqual(0);
+        expect(warning.x + warning.width).toBeLessThanOrEqual(width);
+        if (source === 'broken JSON')
+          await page.screenshot({
+            path: join(tmpdir(), `framenote-notification-stack-${width}.png`),
+          });
+      }
+      await page
+        .getByRole('button', { name: 'Open Settings', exact: true })
+        .click();
+      await expect(
+        page.getByRole('dialog', { name: 'Settings' }),
+      ).toContainText('original file has been preserved');
       await expect(
         page.getByRole('spinbutton', { name: 'Undo steps per photo' }),
       ).toHaveValue('100');
@@ -355,6 +402,17 @@ export async function checkDesktopConfiguration({ executable, env }) {
         await expect(page.getByRole('dialog').getByRole('alert')).toBeVisible();
         await page.keyboard.press('Escape');
       }
+      if (await notification.count()) {
+        await page
+          .getByRole('button', { name: 'Dismiss configuration notification' })
+          .click();
+      }
+      await expect(notification).toHaveCount(0);
+      await expect(stack.getByRole('status')).toContainText('99.0.0');
+      await page
+        .getByRole('button', { name: 'Dismiss update notification' })
+        .click();
+      await expect(stack.getByRole('status')).toHaveCount(0);
       await stop();
       if (source.includes('version'))
         expect(await readFile(file, 'utf8')).toBe(source);

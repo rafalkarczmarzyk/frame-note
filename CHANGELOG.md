@@ -13,6 +13,8 @@ see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 
 ### Fixed
 
+- Stack application notifications below the toolbar so configuration warnings and update notices remain visible together without covering macOS window controls. Configuration warnings open Settings for full details.
+
 - Confirm Dispose roll with the shared in-app dialog on web and desktop instead of a system alert.
 
 - Confirm saved preset deletion with a shared dialog, also used when discarding unsaved preset changes. Deleting the active preset selects Photo Details while preserving the photo layout.

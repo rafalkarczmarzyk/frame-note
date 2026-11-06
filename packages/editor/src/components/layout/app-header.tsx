@@ -29,14 +29,18 @@ export function AppHeader({
   }, [aboutOpen]);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const configuration = platformServices().configuration;
-  useEffect(
-    () =>
-      platformServices().onSettings?.(() => {
-        setAboutOpen(false);
-        setSettingsOpen(true);
-      }),
-    [],
-  );
+  useEffect(() => {
+    const show = () => {
+      setAboutOpen(false);
+      setSettingsOpen(true);
+    };
+    const unsubscribe = platformServices().onSettings?.(show);
+    window.addEventListener('framenote-open-settings', show);
+    return () => {
+      unsubscribe?.();
+      window.removeEventListener('framenote-open-settings', show);
+    };
+  }, []);
   const { platform, isWeb, isMacOS } = usePlatform();
   useEffect(
     () =>
