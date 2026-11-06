@@ -1,9 +1,9 @@
 # FrameNote 1.0.0 — feature overview
 
 **Draft for the planned first stable release.** This document describes the
-current implementation selected for 0.11.0-beta. It does not announce a
+current implementation released as 0.11.0-beta. It does not announce a
 published 1.0.0 release or completion of every platform check. The product
-version is being prepared as 0.11.0-beta. Outstanding acceptance and release work is tracked
+version is 0.11.0-beta. Outstanding acceptance and release work is tracked
 in the [release plan](plans/release-1.0.md).
 
 FrameNote prepares photos for sharing by adding watermarks, author credits,

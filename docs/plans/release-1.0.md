@@ -4,10 +4,11 @@ Stan: etap 1 wykonany, zweryfikowany i zaakceptowany, 2026-11-06.
 Baza: master `19314e8`, manifesty `0.10.0-beta`.
 Docelowa wersja stabilna: **1.0.0**, wskazana przez użytkownika.
 
-Bieżący krok: na osobne polecenie użytkownika przygotowywana jest kolejna beta
-**0.11.0-beta**, przed stabilnym 1.0.0. Wersja obejmuje dotychczasowe Unreleased,
-w tym efekty, presety i stos powiadomień. Nie zamyka niewykonanych kontroli
-ręcznych. Stan przygotowania: [release beta](release-0.11.0-beta.md).
+Wydano **0.11.0-beta** z dotychczasowym Unreleased, w tym efektami,
+presetami i stosem powiadomień. Użytkownik potwierdził, że końcowe testy
+użytkowe są jeszcze niewykonane; ta beta służy ich przeprowadzeniu.
+[Dowody publikacji i kontroli](../UI_VISUAL_TESTS.md#0110-beta--wydanie-do-testów-użytkowych).
+Wydanie bety nie oznacza gotowości do stabilnego 1.0.0.
 
 Roboczy opis pełnych możliwości produktu: [FrameNote 1.0.0 — feature overview](../RELEASE_1.0.0.md).
 Dokument jest szkicem do redakcji i nie oznacza rozpoczęcia wydania.
@@ -91,3 +92,18 @@ letter spacing, helper czasu, formatowanie dat, nowe presety, dialogi i wygląd.
 Aktualne zachowanie: [USER_GUIDE](../USER_GUIDE.md),
 [DESKTOP](../DESKTOP.md), [CHANGELOG](../../CHANGELOG.md).
 Odłożone funkcje, w tym zapisywanie sesji: [NICE_TO_HAVE](../NICE_TO_HAVE.md).
+
+## Proponowane testy użytkowe na 0.11.0-beta
+
+1. Otworzyć kilka własnych JPG/PNG; przełączyć zdjęcia, zastosować preset,
+   użyć Copy/Paste i sprawdzić niezależność późniejszych zmian.
+2. Sprawdzić siedem presetów, datę/czas, własny podpis z logo i brakujące
+   metadane. Zapisać preset, zamknąć aplikację i odczytać go.
+3. Sprawdzić kolejność i widoczność efektów, Fit/100%, Navigator, Manual/Tiled
+   oraz Undo/Redo pisania i przeciągania.
+4. Obejrzeć JPG, PNG i ZIP poza aplikacją: podpis, efekty, wymiary,
+   przezroczystość PNG i wybrane metadane.
+5. Sprawdzić używane fonty, Settings, restart i własny monitor/trackpad.
+   Błędy zapisywać z numerem wersji/buildem i krokami odtworzenia.
+
+To propozycja prób do wykonania, nie zapis zaliczonego odbioru.

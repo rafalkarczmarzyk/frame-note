@@ -6,7 +6,7 @@ Przy przygotowaniu **0.11.0-beta** obejrzano expected/actual/diff i zmieniono
 wyłącznie numer wersji w stopkach scen Empty editor i About. Pozostałe cztery
 sceny oraz JPG zachowały referencje; zwykły przebieg UI 6/6 i JPG 1/1 przeszedł.
 Pełne kontrole i brak końcowych testów użytkowych opisuje
-[przygotowanie bety](plans/release-0.11.0-beta.md).
+[wynik wydania bety](#0110-beta--wydanie-do-testów-użytkowych).
 
 ## Sceny
 
@@ -266,3 +266,23 @@ Wzorców nie aktualizowano. JPG smoke wykonał eksport i dekodowanie, ale
 porównanie obrazu nie przeszło (39651 pikseli różnicy). Raporty pozostają w
 playwright-visual-report oraz playwright-report; aktualizacja wzorców wymaga
 osobnej oceny całości zmian przed 1.0. Natywnego desktopu osobno nie testowano.
+
+## 0.11.0-beta — wydanie do testów użytkowych
+
+Wydano 2026-11-06 z commita `cd7a2ff`, tag `v0.11.0-beta`.
+[GitHub Release](https://github.com/rafalkarczmarzyk/frame-note/releases/tag/v0.11.0-beta)
+zawiera DMG macOS arm64, Windows x64 portable, Linux x64 AppImage, źródła
+oraz SHA256SUMS. [Workflow](https://github.com/rafalkarczmarzyk/frame-note/actions/runs/42269746818)
+zakończył się sukcesem: walidacja, źródła, trzy paczki, testy gotowych aplikacji,
+launcher Windows i publikacja. Zweryfikowano komplet pięciu opublikowanych plików.
+
+Lokalnie przeszły `pnpm check` (547 testów Vitest, JPG 1/1, UI 6/6, build web),
+build Storybooka i desktopu, kontrola 101 plików fontów/licencji i natywny smoke
+macOS obejmujący JPG/ZIP, efekty, konfigurację i stos powiadomień.
+Storybook zbudowano do czystego katalogu tymczasowego po EEXIST podczas kopiowania
+plików do domyślnego katalogu. Buildy zgłaszają ostrzeżenia rozmiarów chunków.
+
+Po obejrzeniu expected/actual/diff zmieniono wyłącznie numer wersji w scenach
+empty editor i About. Pozostałe referencje, tolerancje i zestaw scen bez zmian.
+Format presetów pozostaje v1. Nie wykonano końcowych testów użytkowych;
+przeznaczeniem tej bety jest ich umożliwienie przed decyzją o stabilnym 1.0.0.
