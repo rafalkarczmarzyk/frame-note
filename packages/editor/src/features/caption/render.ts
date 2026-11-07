@@ -1,3 +1,4 @@
+import { dragTimer } from '../photo/drag-diagnostics';
 import { effectBleed } from '../../../../core/src/layer-effects';
 import { renderContentEffects, renderContentBlur } from './effects-render';
 import {
@@ -231,6 +232,7 @@ async function withPhotoStage<T>(
   await Promise.all(
     captions.map(({ caption, text }) => ensureCaptionFont(caption.style, text)),
   );
+  const finishScene = dragTimer('scene-assembly');
   const container = document.createElement('div');
   const stage = new Konva.Stage({
     container,
@@ -387,7 +389,10 @@ async function withPhotoStage<T>(
       layer.add(node);
       compositeLayer();
     }
+    finishScene();
+    const finishDraw = dragTimer('scene-draw');
     layer.draw();
+    finishDraw();
     if (postMatte) {
       // Blend against the original alpha, then flatten for JPG. A white matte
       // below Screen/Add would otherwise change the effect in transparent areas.
@@ -421,7 +426,7 @@ async function withPhotoStage<T>(
   }
 }
 
-async function captionNode(
+export async function captionNode(
   dimensions: ImageDimensions,
   caption: Caption,
   text: string,

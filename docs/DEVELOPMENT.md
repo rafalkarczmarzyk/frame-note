@@ -196,6 +196,15 @@ The suite has six full-window scenes in one Chromium desktop profile. A new brow
   and additional native window transitions when relevant. Native smoke covers
   four-photo JPG/ZIP, frame switching, resizing and fullscreen; other interactions remain manual.
 
+## Drag performance diagnostics
+
+For the opt-in production benchmark comparing full and simplified previews,
+see [layer dragging benchmark](../scripts/drag-benchmark/README.md). It records
+five fixed scenes, traces and videos separately from the regression suite.
+Use a visible browser and check the recorded GPU status; animation callback
+intervals alone do not prove presentation latency or desktop performance.
+Rebuild normally after the benchmark before using or distributing the web bundle.
+
 ## Versioning
 
 The shared product version is authoritative in [package.json](../package.json).

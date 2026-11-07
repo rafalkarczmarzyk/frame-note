@@ -17,6 +17,7 @@ export default defineConfig([
     'playwright-visual-report',
     'visual-test-results',
     'glass-test-results',
+    'drag-benchmark-results',
     '**/renderer/**',
     'apps/desktop/preset-files.cjs',
     'release',
@@ -45,6 +46,10 @@ export default defineConfig([
   },
   {
     files: ['scripts/*desktop.mjs', 'scripts/test-desktop-dev.mjs'],
+    languageOptions: { globals: { ...globals.node, ...globals.browser } },
+  },
+  {
+    files: ['scripts/measure-layer-drag.mjs', 'scripts/drag-benchmark/*.mjs'],
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
   prettier,

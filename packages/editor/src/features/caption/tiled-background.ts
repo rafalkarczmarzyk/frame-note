@@ -1,3 +1,4 @@
+import type { PreviewRasterPool } from './preview-raster-pool';
 import { convertSizing } from '../../../../core/src/sizing';
 import type Konva from 'konva';
 import type { Caption, ImageDimensions } from '../../../../core/src/document';
@@ -10,6 +11,8 @@ export function tiledBackground(
   caption: Caption,
   motif: ImageDimensions,
   center: { x: number; y: number },
+  snapshot?: HTMLCanvasElement,
+  pool?: PreviewRasterPool,
 ) {
   const background = pixelBackground(caption, dimensions);
   if (!background || background.type === 'none') return null;
@@ -51,10 +54,23 @@ export function tiledBackground(
         y = Math.floor(Math.min(...corners.map((p) => p.y)));
       const width = Math.ceil(Math.max(...corners.map((p) => p.x))) - x,
         height = Math.ceil(Math.max(...corners.map((p) => p.y))) - y;
-      const crop = layer.toCanvas({ x, y, width, height, pixelRatio: 1 });
-      const image = document.createElement('canvas');
-      image.width = Math.ceil(sample.width);
-      image.height = Math.ceil(sample.height);
+      const crop = snapshot
+        ? (pool?.canvas(width, height) ?? document.createElement('canvas'))
+        : layer.toCanvas({ x, y, width, height, pixelRatio: 1 });
+      if (snapshot) {
+        if (!pool) {
+          crop.width = width;
+          crop.height = height;
+        }
+        crop.getContext('2d')!.drawImage(snapshot, -x, -y);
+      }
+      const image =
+        pool?.canvas(Math.ceil(sample.width), Math.ceil(sample.height)) ??
+        document.createElement('canvas');
+      if (!pool) {
+        image.width = Math.ceil(sample.width);
+        image.height = Math.ceil(sample.height);
+      }
       const context = image.getContext('2d');
       if (!context) throw Error('Canvas is unavailable.');
       context.translate(-sample.x, -sample.y);
@@ -62,10 +78,11 @@ export function tiledBackground(
       context.rotate(-angle);
       context.translate(-center.x, -center.y);
       context.drawImage(crop, x, y);
-      crop.width = crop.height = 0;
+      if (!pool) crop.width = crop.height = 0;
       return image;
     },
     dimensions,
+    pool,
   );
   return tile && { ...tile, x: tile.x - origin.x, y: tile.y - origin.y };
 }

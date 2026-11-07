@@ -1,6 +1,14 @@
+import { comparePreview } from './compare-preview';
+import { LivePreviewRenderer } from './live-preview-renderer';
+import { LatestPreview } from './latest-preview';
+import {
+  dragSample,
+  dragTimer,
+  liveDragPreview,
+} from '../photo/drag-diagnostics';
 import { hasLayerEffects } from '../../../../core/src/layer-effects';
 import { hasLayerBlending } from '../../../../core/src/layer-blending';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import type { LoadedPhoto } from '../photo/load-photo';
 import { convertSizing } from '../../../../core/src/sizing';
 import {
@@ -20,10 +28,27 @@ export function useGlassPreview(
   resolutionScale: number,
   dragging = false,
 ) {
+  const live = useRef<{
+    photo: LoadedPhoto;
+    source: CanvasImageSource;
+    width: number;
+    height: number;
+    renderer: LivePreviewRenderer;
+    queue: LatestPreview<readonly RenderedCaption[], HTMLCanvasElement>;
+  } | null>(null);
+  useEffect(
+    () => () => {
+      live.current?.queue.dispose();
+      live.current?.renderer.dispose();
+      live.current = null;
+    },
+    [photo, resolutionScale, ready],
+  );
   const [result, setResult] = useState<{
     photo: LoadedPhoto;
     tiles: Map<string, Tile>;
     composition?: Tile;
+    release?: () => void;
   } | null>(null);
   const [failure, setFailure] = useState<{
     photo: LoadedPhoto;
@@ -35,7 +60,8 @@ export function useGlassPreview(
   const enabled =
     ready &&
     !dragging &&
-    (blended ||
+    (liveDragPreview ||
+      blended ||
       captions.some(
         (item) =>
           item.caption.background?.type === 'glass' ||
@@ -59,20 +85,61 @@ export function useGlassPreview(
         ...item,
         caption: convertSizing(item.caption, 'short-edge', original),
       }));
-      void (blended ? renderPhotoComposition : renderPhotoBackgrounds)(
+      const finishRender = dragTimer('preview-render');
+      dragSample('preview-request');
+      const source =
         photo.previewImage &&
-          photo.previewImage.width >= dimensions.width &&
-          photo.previewImage.height >= dimensions.height
+        photo.previewImage.width >= dimensions.width &&
+        photo.previewImage.height >= dimensions.height
           ? photo.previewImage
-          : photo.image,
-        dimensions,
-        scaled,
-      ).then(
+          : photo.image;
+      const useLive = liveDragPreview;
+      if (
+        useLive &&
+        (!live.current ||
+          live.current.photo !== photo ||
+          live.current.source !== source ||
+          live.current.width !== dimensions.width ||
+          live.current.height !== dimensions.height)
+      ) {
+        live.current?.queue.dispose();
+        live.current?.renderer.dispose();
+        const renderer = new LivePreviewRenderer(source, dimensions);
+        live.current = {
+          photo,
+          source,
+          ...dimensions,
+          renderer,
+          queue: new LatestPreview(
+            (items) => renderer.render(items),
+            (canvas) => renderer.release(canvas),
+          ),
+        };
+      }
+      if (useLive)
+        Object.assign(window, {
+          __frameNoteComparePreview: () =>
+            comparePreview(source, dimensions, scaled),
+        });
+      const liveSession = live.current;
+      const request = useLive
+        ? live.current!.queue.request(scaled)
+        : (blended ? renderPhotoComposition : renderPhotoBackgrounds)(
+            source,
+            dimensions,
+            scaled,
+          );
+      void request.then(
         (backgrounds) => {
-          if (cancelled) {
-            if (backgrounds instanceof HTMLCanvasElement)
-              backgrounds.width = backgrounds.height = 0;
-            else
+          finishRender();
+          if (!backgrounds) return;
+          const obsolete = useLive ? live.current !== liveSession : cancelled;
+          dragSample(obsolete ? 'preview-discarded' : 'preview-accepted');
+          if (obsolete) {
+            if (backgrounds instanceof HTMLCanvasElement) {
+              if (useLive) liveSession!.renderer.release(backgrounds);
+              else backgrounds.width = backgrounds.height = 0;
+            } else
               backgrounds.forEach((tile) => {
                 tile.image.width = tile.image.height = 0;
               });
@@ -81,6 +148,9 @@ export function useGlassPreview(
           if (backgrounds instanceof HTMLCanvasElement) {
             setResult({
               photo,
+              release: useLive
+                ? () => liveSession!.renderer.release(backgrounds)
+                : undefined,
               tiles: new Map(),
               composition: {
                 image: backgrounds,
@@ -107,6 +177,8 @@ export function useGlassPreview(
           setFailure(null);
         },
         (error) => {
+          finishRender();
+          dragSample('preview-error');
           if (!cancelled)
             setFailure({
               photo,
@@ -125,22 +197,28 @@ export function useGlassPreview(
       // let its canvas be collected after replacement rather than blanking it.
     };
   }, [photo, captions, enabled, resolutionScale, blended]);
+  useEffect(() => {
+    if (result) dragSample('preview-react-effect');
+  }, [result]);
   // Release results when replaced or unmounted; effects don't clear a canvas
   // while it is still displayed by react-konva.
   useEffect(() => {
     const tiles = result?.tiles;
     const composition = result?.composition;
+    const release = result?.release;
     return () => {
-      if (composition) composition.image.width = composition.image.height = 0;
+      if (release) release();
+      else if (composition)
+        composition.image.width = composition.image.height = 0;
       tiles?.forEach((tile) => {
         tile.image.width = tile.image.height = 0;
       });
     };
   }, [result]);
   return {
-    blended: blended && !dragging,
+    blended: (blended || liveDragPreview) && !dragging,
     composition:
-      enabled && blended && result?.photo === photo
+      enabled && (blended || liveDragPreview) && result?.photo === photo
         ? result.composition
         : undefined,
     tiles: enabled && result?.photo === photo ? result.tiles : null,

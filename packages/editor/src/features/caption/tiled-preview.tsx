@@ -1,4 +1,5 @@
 import { tiledDragPoint } from './tiled-drag-point';
+import { dragSample, dragDiagnosticsEnabled } from '../photo/drag-diagnostics';
 import { useRef, useState, type ReactNode } from 'react';
 import { Group, Rect, Shape, Image as CanvasImage } from 'react-konva';
 import type { Caption, ImageDimensions } from '../../../../core/src/document';
@@ -83,11 +84,13 @@ export function TiledPreview({
       }}
       onDragStart={(event) => {
         pointerStart.current ??= tiledDragPoint(event.currentTarget);
+        dragSample('drag-start');
         start.current = structuredClone(caption.position.tiled!);
         onSelect();
         onDragState(true);
       }}
       onDragMove={(event) => {
+        dragSample('drag-move');
         // React keeps the root at zero; copies move through normalized document offsets.
         const node = event.currentTarget;
         const point = tiledDragPoint(node);
@@ -102,9 +105,17 @@ export function TiledPreview({
           },
           dimensions,
         );
+        if (dragDiagnosticsEnabled)
+          dragSample('tiled-position', undefined, {
+            pointer: node.getStage()?.getPointerPosition(),
+            local: node.position(),
+            offset: tiled.offset,
+            scale,
+          });
         onChange(tiled);
       }}
       onDragEnd={(event) => {
+        dragSample('drag-end');
         pointerStart.current = null;
         event.currentTarget.position({ x: 0, y: 0 });
         onDragState(false);

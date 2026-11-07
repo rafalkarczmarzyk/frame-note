@@ -17,6 +17,19 @@ oraz Blur zawartości bez tła są wdrożone. Bieżące zachowanie opisuje
 Digital Date 2026-11-06; został podjęty do implementacji, nie jest już propozycją
 przyszłego zakresu. Zapis pozostaje w v1 bez migracji, tło i jego cień są osobne.
 
+### Częstotliwość aktualizacji pozycji podczas przeciągania
+
+Status: **odłożone** (decyzja: 2026-11-07, rozmowa o PoC płynnego przeciągania).
+
+Ograniczenie częstotliwości aktualizacji dokumentu/React podczas ruchu, jeśli
+pomiary po optymalizacji renderera wykażą istotny koszt tej ścieżki. Użytkownik
+wymaga żywych wartości inputów; aktualizacja wyłącznie po puszczeniu nie jest
+akceptowana. Ewentualny debounce lub inny sposób ograniczenia częstotliwości
+wymaga osobnego doboru i oceny opóźnienia pól. Obecny
+[plan PoC](plans/live-drag-rendering-poc.md) zachowuje aktualizacje dokumentu
+i pól bez zmian, skupiając się na rendererze. Wpływ: wspólny edytor web/desktop;
+bez zgody na implementację ani ustalonego terminu.
+
 ### Ramki i polaroidy
 
 Decyzja: 2026-11-03, rozmowa o przyszłych funkcjach. Ramki wokół zdjęcia,

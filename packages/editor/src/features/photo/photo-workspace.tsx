@@ -1,3 +1,4 @@
+import { dragSample, fullDragPreview } from './drag-diagnostics';
 import { TiledPreview } from '../caption/tiled-preview';
 import type { ExportFormat } from '../caption/export-settings';
 import type Konva from 'konva';
@@ -276,7 +277,11 @@ function PhotoWorkspaceContent({
       : structuredClone(builtinPresets[0]!.layout),
   );
   const layout = sessionDocument?.layout ?? localLayout;
+  useLayoutEffect(() => {
+    dragSample('workspace-commit');
+  });
   const setLayout = (update: SetStateAction<CaptionLayout>) => {
+    dragSample('document-update');
     if (onDocumentChange)
       onDocumentChange((value) => ({
         ...value,
@@ -620,7 +625,7 @@ function PhotoWorkspaceContent({
     exportCaptions,
     fontReady && iconsReady && !loading,
     Math.min(1, scale * navigation.pixelRatio),
-    draggingId !== null,
+    draggingId !== null && !fullDragPreview,
   );
   const overviewIdentity = useMemo(
     () => ({ photo, composition }),
@@ -881,7 +886,9 @@ function PhotoWorkspaceContent({
                                   key={id}
                                   caption={caption}
                                   hideVisuals={glassPreview.blended}
-                                  simplified={draggingId !== null}
+                                  simplified={
+                                    draggingId !== null && !fullDragPreview
+                                  }
                                   geometry={geometry}
                                   dimensions={{ width, height }}
                                   decoration={glassPreview.tiles?.get(id)}
@@ -976,7 +983,9 @@ function PhotoWorkspaceContent({
                                   ) : (
                                     <BackgroundPreview
                                       content={geometry}
-                                      simplified={draggingId !== null}
+                                      simplified={
+                                        draggingId !== null && !fullDragPreview
+                                      }
                                       caption={caption}
                                       dimensions={{ width, height }}
                                     />
@@ -996,10 +1005,12 @@ function PhotoWorkspaceContent({
                                   listening
                                   draggable={!exporting && !navigation.cursor}
                                   onDragStart={() => {
+                                    dragSample('drag-start');
                                     selectContainer(id);
                                     setDraggingId(id);
                                   }}
                                   onDragMove={(event) => {
+                                    dragSample('drag-move');
                                     const node = event.currentTarget;
                                     const block = {
                                       width: node.width(),
@@ -1039,7 +1050,10 @@ function PhotoWorkspaceContent({
                                       ),
                                     }));
                                   }}
-                                  onDragEnd={() => setDraggingId(null)}
+                                  onDragEnd={() => {
+                                    dragSample('drag-end');
+                                    setDraggingId(null);
+                                  }}
                                   onMouseEnter={() => setHoveredId(id)}
                                   onMouseLeave={() => setHoveredId(null)}
                                   onClick={() => selectContainer(id)}

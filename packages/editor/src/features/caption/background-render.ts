@@ -1,3 +1,4 @@
+import type { PreviewRasterPool } from './preview-raster-pool';
 import { blurBackdrop } from './blur-backdrop';
 import { glassSampleRect } from './glass-geometry';
 import type { Caption, ImageDimensions } from '../../../../core/src/document';
@@ -46,6 +47,8 @@ export function renderBackgroundTile(
   dimensions: ImageDimensions,
   capture?: (rect: ContentRect) => HTMLCanvasElement,
   effectDimensions = dimensions,
+  pool?: PreviewRasterPool,
+  shadowOnly = false,
 ) {
   const background = pixelBackground(caption, dimensions);
   if (
@@ -90,13 +93,40 @@ export function renderBackgroundTile(
     Math.ceil(rect.y + rect.height + bleed),
   );
   if (right <= x || bottom <= y) return null;
-  const image = document.createElement('canvas');
-  image.width = right - x;
-  image.height = bottom - y;
-  const context = image.getContext('2d');
+  const image =
+    pool?.canvas(right - x, bottom - y) ?? document.createElement('canvas');
+  if (!pool) {
+    image.width = right - x;
+    image.height = bottom - y;
+  }
+  const context = image.getContext(
+    '2d',
+    shadowOnly ? { willReadFrequently: true } : undefined,
+  );
   if (!context) throw Error('Canvas is unavailable.');
   context.translate(-x, -y);
-  if (hasShadow) {
+  if (pool && glass && hasShadow) {
+    const cached = pool.decoration(
+      JSON.stringify([
+        content,
+        background,
+        dimensions,
+        effectDimensions,
+        resolvedColor('caption-black'),
+      ]),
+      () =>
+        renderBackgroundTile(
+          content,
+          caption,
+          dimensions,
+          undefined,
+          effectDimensions,
+          undefined,
+          true,
+        )!,
+    );
+    context.drawImage(cached.image, cached.x, cached.y);
+  } else if (hasShadow) {
     const spread = shadow.spread;
     const shape = {
       x: rect.x - spread,
@@ -133,6 +163,8 @@ export function renderBackgroundTile(
       context.restore();
     }
   }
+  if (shadowOnly)
+    return { image, x, y, width: image.width, height: image.height };
   if (glass && capture) {
     const sample = glassSampleRect(rect, background.blur, dimensions);
     if (sample) {
@@ -140,7 +172,9 @@ export function renderBackgroundTile(
       let blurred: HTMLCanvasElement | undefined;
       try {
         if (background.blur > 0) {
-          blurred = blurBackdrop(crop, background.blur);
+          blurred = pool
+            ? pool.blur(crop, background.blur)
+            : blurBackdrop(crop, background.blur);
         }
         context.save();
         path(context, rect, background.radius);
@@ -154,8 +188,10 @@ export function renderBackgroundTile(
         );
         context.restore();
       } finally {
-        crop.width = crop.height = 0;
-        if (blurred) blurred.width = blurred.height = 0;
+        if (!pool) {
+          crop.width = crop.height = 0;
+          if (blurred) blurred.width = blurred.height = 0;
+        }
       }
     }
   }
