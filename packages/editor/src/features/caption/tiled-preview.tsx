@@ -1,3 +1,4 @@
+import { tiledDragPoint } from './tiled-drag-point';
 import { useRef, useState, type ReactNode } from 'react';
 import { Group, Rect, Shape, Image as CanvasImage } from 'react-konva';
 import type { Caption, ImageDimensions } from '../../../../core/src/document';
@@ -43,6 +44,7 @@ export function TiledPreview({
 }) {
   const [hovered, setHovered] = useState(false);
   const start = useRef(caption.position.tiled!);
+  const pointerStart = useRef<{ x: number; y: number } | null>(null);
   const bounds = captionBackgroundRect(
     { x: 0, y: 0, width: geometry.width, height: geometry.height },
     caption,
@@ -73,7 +75,14 @@ export function TiledPreview({
       onMouseLeave={() => setHovered(false)}
       onClick={onSelect}
       onTap={onSelect}
-      onDragStart={() => {
+      onMouseDown={(event) => {
+        pointerStart.current = tiledDragPoint(event.currentTarget);
+      }}
+      onTouchStart={(event) => {
+        pointerStart.current = tiledDragPoint(event.currentTarget);
+      }}
+      onDragStart={(event) => {
+        pointerStart.current ??= tiledDragPoint(event.currentTarget);
         start.current = structuredClone(caption.position.tiled!);
         onSelect();
         onDragState(true);
@@ -81,11 +90,22 @@ export function TiledPreview({
       onDragMove={(event) => {
         // React keeps the root at zero; copies move through normalized document offsets.
         const node = event.currentTarget;
-        const tiled = offsetTiled(start.current, node.position(), dimensions);
+        const point = tiledDragPoint(node);
+        const initial = pointerStart.current;
         node.position({ x: 0, y: 0 });
+        if (!point || !initial) return;
+        const tiled = offsetTiled(
+          start.current,
+          {
+            x: point.x - initial.x,
+            y: point.y - initial.y,
+          },
+          dimensions,
+        );
         onChange(tiled);
       }}
       onDragEnd={(event) => {
+        pointerStart.current = null;
         event.currentTarget.position({ x: 0, y: 0 });
         onDragState(false);
       }}
