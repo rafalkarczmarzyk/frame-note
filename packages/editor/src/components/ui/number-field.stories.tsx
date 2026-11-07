@@ -17,7 +17,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Controlled numeric field. Keeps an editing draft for fractions and empty input; restores a valid value on blur. External values update when unfocused. Optional onKeyDown runs before the built-in input keyboard handling, so modal forms can own Escape.',
+          'Controlled numeric field. Keeps an editing draft for fractions and empty input; restores a valid value on blur. External values update when unfocused. Arrow buttons, keyboard arrows and vertical dragging round results to the decimal precision of step; typing retains precision. Optional onKeyDown runs before the built-in input keyboard handling, so modal forms can own Escape.',
       },
     },
   },
@@ -118,12 +118,12 @@ export const FontSizeStep: Story = {
     await expect(input).toHaveValue(2.2);
     await userEvent.keyboard('{ArrowDown}');
     await expect(input).toHaveValue(2.1);
-    // Values entered by hand retain precision; steppers add rather than snap.
+    // Typing retains precision; the next step rounds to the step precision.
     await userEvent.clear(input);
     await userEvent.type(input, '2.13');
     await expect(input).toBeValid();
     await userEvent.keyboard('{ArrowUp}');
-    await expect(input).toHaveValue(2.23);
+    await expect(input).toHaveValue(2.2);
   },
 };
 export const LineSpacingStep: Story = {

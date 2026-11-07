@@ -9,6 +9,7 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from 'react';
 import { cn } from '@/lib/utils';
+import { adjustNumberInput } from './number-input-value';
 
 export interface NumberInputProps extends Omit<
   ComponentProps<'input'>,
@@ -54,13 +55,7 @@ export function NumberInput({
   const [focused, setFocused] = useState(false);
   useEffect(() => () => activeDragCleanup.current?.(), []);
   const nudge = (direction: number) => {
-    const next = Math.min(
-      max,
-      Math.max(
-        min,
-        Number((value + direction * (step === 'any' ? 1 : step)).toFixed(6)),
-      ),
-    );
+    const next = adjustNumberInput(value, direction, step, min, max);
     setDraft(format(next));
     onValueChange(next);
   };
@@ -99,12 +94,8 @@ export function NumberInput({
       const distance = drag.startY - moveEvent.clientY;
       if (!drag.moved && Math.abs(distance) < 4) return;
       drag.moved = true;
-      const unitStep = step === 'any' ? 1 : step;
       const steps = Math.trunc(distance / 4);
-      const next = Math.min(
-        max,
-        Math.max(min, Number((drag.startValue + steps * unitStep).toFixed(6))),
-      );
+      const next = adjustNumberInput(drag.startValue, steps, step, min, max);
       setDraft(format(next));
       onValueChange(next);
     };

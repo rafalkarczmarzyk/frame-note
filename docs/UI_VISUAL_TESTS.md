@@ -1,12 +1,24 @@
 # Regresja wizualna UI — smoke tests
 
-Stan: 6 listopada 2026. Zestaw sprawdza widoki prawdziwej aplikacji w jednym profilu Chromium desktop. Storybook nie jest uruchamiany przez `test:visual`.
+Stan: 7 listopada 2026. Zestaw sprawdza widoki prawdziwej aplikacji w jednym profilu Chromium desktop.
 
-Przy przygotowaniu **0.11.0-beta** obejrzano expected/actual/diff i zmieniono
-wyłącznie numer wersji w stopkach scen Empty editor i About. Pozostałe cztery
-sceny oraz JPG zachowały referencje; zwykły przebieg UI 6/6 i JPG 1/1 przeszedł.
-Pełne kontrole i brak końcowych testów użytkowych opisuje
-[wynik wydania bety](#0110-beta--wydanie-do-testów-użytkowych).
+## 0.11.1-beta — przygotowanie wydania
+
+Na polecenie użytkownika wybrano PATCH dla całego zgromadzonego zakresu.
+Obejrzano expected/actual/diff sześciu scen macOS/Chromium i zaakceptowano
+aktualizację referencji: pasek eksportu z ikoną, wersja pod logo oraz
+7-Segment zamiast DSEG7 w pickerze. Referencje zawierają numer 0.11.1-beta.
+Zaokrąglanie strzałek i gestu pól liczbowych nie zmienia układu kontrolek;
+wartości wpisane i pozycje z canvasu zachowują precyzję.
+
+Kontrole wydania: 572 testy Vitest, format, wersje, tokeny, lint, typy,
+build web, Storybook i desktop oraz kontrola zasobów desktopu przeszły.
+Zwykły przebieg UI: 6/6 PASS; JPG: 1/1 PASS. W scenie metadata panel
+tryb aktualizacji uchwycił przejściowy stan ikon; dwa zwykłe przebiegi
+zwróciły ten sam stabilny obraz (48 pikseli różnicy). Po obejrzeniu
+expected/actual/diff zapisano stabilny stan zaakceptowanej sceny i cały
+zestaw przeszedł bez zmiany tolerancji. Natywny smoke macOS: PASS (JPG/ZIP, Settings, migracja, trwałość, błędy, odzyskiwanie i geometria).
+Wersja i lokalne kontrole gotowe; publikacja uruchamiana tagiem v0.11.1-beta. Odbiory stabilnego 1.0 pozostają osobne.
 
 ## Sceny
 

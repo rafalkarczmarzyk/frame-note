@@ -11,6 +11,8 @@ see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 
 ## Unreleased
 
+## [0.11.1-beta] - 2026-11-07
+
 ### Added
 
 - Add an experimental retained preview renderer for local web and desktop development, keeping effects and live position fields active while dragging. Release builds retain the existing preview path; dense Tiled Glass remains a performance limitation.
@@ -20,6 +22,8 @@ see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 - Choose numeric, abbreviated or full month names and English/Polish date language per capture-date token; configure 12/24-hour formatting on the separate capture-time token. Settings round-trip in preset v1; existing numeric formats and legacy combined date/time patterns remain readable.
 
 ### Fixed
+
+- Round numeric arrow and drag adjustments to the configured step precision while preserving precision when typing or moving layers on the canvas.
 
 - Keep Tiled watermark dragging stable when pointer coordinates repeat or reverse direction, without resetting the pattern to its starting offset.
 
