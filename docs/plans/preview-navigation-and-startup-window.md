@@ -12,12 +12,12 @@ Stan: wdrożone, do oceny na urządzeniu, 2026-11-11. Zakres autoryzowany: wszys
   korzystają z istniejącej skali logarytmicznej i stanu widoku zdjęcia.
   Pasek jest dostępny przy zwiniętym Navigatorze. Bez gotowego zdjęcia
   suwak jest nieaktywny.
-- Desktop macOS: limit 85% szerokości i 85% wysokości dostępnego obszaru
+- Desktop macOS, Windows i Linux: limit 85% szerokości i 85% wysokości dostępnego obszaru
   roboczego każdego ekranu. Obejmuje okno domyślne i zapisane, także po
   odłączeniu monitora. Mniejsza zapisana geometria zostaje przywrócona.
   Ponadwymiarowe okno jest zmniejszane i centrowane. Start jest w trybie okna.
-- Obecna wersja to `0.11.1-beta`. Samodzielne wydanie tych poprawek
-  kwalifikuje się jako patch `0.11.2-beta`. Formaty presetów i konfiguracji
+- Poprawki wchodzą do przygotowywanego wydania `0.11.2-beta` jako patch.
+  Formaty presetów i konfiguracji
   desktopowej pozostają zgodne.
 
 ## Kryteria odbioru
@@ -41,5 +41,5 @@ Stan: wdrożone, do oceny na urządzeniu, 2026-11-11. Zakres autoryzowany: wszys
 - Odbiór: uruchomić `pnpm desktop:preview`, sprawdzić przeciągnięcie zdjęcia
   z Findera na ekranie wbudowanym, odruchową czułość trackpada i kółka oraz
   dostępność suwaka przy małej szerokości okna. Porównać start na monitorze 4K.
-- Zmiany robocze na `master`. Środowisko blokuje zapis referencji Git,
-  więc utworzenie `codex/preview-navigation` się nie powiodło.
+- Odbiór na Windows i Linux: sprawdzić start przy zapisanym zmaksymalizowanym
+  oknie oraz po zmianie monitora.

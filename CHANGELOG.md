@@ -11,12 +11,17 @@ see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 
 ## Unreleased
 
+## [0.11.2-beta] - 2026-11-11
+
 ### Changed
 
-- Let the zoom slider reach exact Fit when Fit is the minimum scale.
+- Show a zoom slider, an editable percentage field with draggable arrows, and a menu for Fit and 100% in the editor toolbar, including when the Navigator is collapsed.
 - Make trackpad pinch zoom and two-finger panning more responsive in the photo preview. The same sensitivity applies to wheel input.
-- Show a zoom slider, a draggable percentage field and a menu for Fit and 100% in the editor toolbar, including when the Navigator is collapsed.
-- Limit the startup window on macOS to 85% of the display’s usable width and height, including when restoring a saved window.
+- Open desktop windows at up to 85% of the display’s usable width and height on macOS, Windows and Linux. Reduce and center oversized saved windows and open in windowed mode at startup.
+
+### Fixed
+
+- Let both zoom sliders reach exact Fit when Fit is the minimum scale.
 
 ## [0.11.1-beta] - 2026-11-07
 

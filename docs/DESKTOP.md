@@ -132,11 +132,10 @@ Enable window restoration in Settings to restore the last normal position and
 size. It is off by default. The app uses the saved display, or the primary
 display if it was disconnected. Without saved bounds, it opens a centered
 window on the pointer display targeting 2240 × 1560 logical units. On macOS,
-both default and restored windows are capped at 85% of the display's work
-area on each axis. Oversized saved windows are reduced and centered, and saved
-maximization is skipped on startup. Windows and Linux restore maximization
-and cap bounds to the full work area. Changing the option applies on the next
-startup.
+Windows and Linux, both default and restored windows are capped at 85% of the
+display's work area on each axis. Oversized saved windows are reduced and
+centered. The app opens in windowed mode and can be maximized after startup.
+Changing the option applies on the next startup.
 Native macOS window controls sit above the editor toolbar; About and Settings
 are in the application menu.
 

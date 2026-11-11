@@ -56,28 +56,16 @@ it('uses default geometry when remembering is disabled or there is no saved wind
   ).toEqual(fallback);
 });
 
-it('leaves room around the window on Mac displays', () => {
+it('limits the default window to 85% of the pointer display work area', () => {
+  expect(startupWindowGeometry(undefined, [primary], primary, primary)).toEqual(
+    { x: 108, y: 91, width: 1224, height: 743 },
+  );
   expect(
-    startupWindowGeometry(undefined, [primary], primary, primary, true),
-  ).toEqual({
-    bounds: { x: 108, y: 91, width: 1224, height: 743 },
-    maximized: false,
-  });
-  expect(
-    startupWindowGeometry(undefined, [primary], primary, primary, false).bounds,
-  ).toEqual(primary.workArea);
-  expect(
-    startupWindowGeometry(
-      undefined,
-      [primary, secondary],
-      primary,
-      secondary,
-      true,
-    ).bounds,
+    startupWindowGeometry(undefined, [primary, secondary], primary, secondary),
   ).toEqual({ x: -1776, y: 81, width: 1632, height: 918 });
 });
 
-it('limits saved windows on connected and disconnected Mac displays', () => {
+it('limits saved windows on connected and disconnected displays', () => {
   const saved = {
     x: -1800,
     y: 0,
@@ -87,20 +75,17 @@ it('limits saved windows on connected and disconnected Mac displays', () => {
     maximized: true,
   };
   expect(
-    startupWindowGeometry(saved, [primary, secondary], primary, primary, true),
-  ).toEqual({
-    bounds: { x: -1776, y: 81, width: 1632, height: 918 },
-    maximized: false,
-  });
-  expect(
-    startupWindowGeometry(saved, [primary], primary, primary, true),
-  ).toEqual({
-    bounds: { x: 108, y: 91, width: 1224, height: 743 },
-    maximized: false,
+    startupWindowGeometry(saved, [primary, secondary], primary, primary),
+  ).toEqual({ x: -1776, y: 81, width: 1632, height: 918 });
+  expect(startupWindowGeometry(saved, [primary], primary, primary)).toEqual({
+    x: 108,
+    y: 91,
+    width: 1224,
+    height: 743,
   });
 });
 
-it('preserves smaller saved Mac bounds and applies the limit even on tiny work areas', () => {
+it('preserves smaller saved bounds and applies the limit even on tiny work areas', () => {
   const saved = {
     x: 100,
     y: 50,
@@ -109,14 +94,17 @@ it('preserves smaller saved Mac bounds and applies the limit even on tiny work a
     displayId: 1,
     maximized: true,
   };
-  expect(
-    startupWindowGeometry(saved, [primary], primary, primary, true),
-  ).toEqual({
-    bounds: { x: 100, y: 50, width: 900, height: 650 },
-    maximized: false,
+  expect(startupWindowGeometry(saved, [primary], primary, primary)).toEqual({
+    x: 100,
+    y: 50,
+    width: 900,
+    height: 650,
   });
   const tiny = { id: 3, workArea: { x: 0, y: 0, width: 640, height: 480 } };
-  expect(
-    startupWindowGeometry(undefined, [tiny], tiny, tiny, true).bounds,
-  ).toEqual({ x: 48, y: 36, width: 544, height: 408 });
+  expect(startupWindowGeometry(undefined, [tiny], tiny, tiny)).toEqual({
+    x: 48,
+    y: 36,
+    width: 544,
+    height: 408,
+  });
 });

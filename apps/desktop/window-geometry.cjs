@@ -22,17 +22,13 @@ function centeredBounds(area, width, height) {
   };
 }
 
-function startupWindowGeometry(saved, displays, primary, current, isMacOS) {
+function startupWindowGeometry(saved, displays, primary, current) {
   const display = saved
     ? displays.find(({ id }) => id === saved.displayId) || primary
     : current;
   const area = display.workArea;
-  const maxWidth = isMacOS
-    ? Math.max(1, Math.floor(area.width * 0.85))
-    : area.width;
-  const maxHeight = isMacOS
-    ? Math.max(1, Math.floor(area.height * 0.85))
-    : area.height;
+  const maxWidth = Math.max(1, Math.floor(area.width * 0.85));
+  const maxHeight = Math.max(1, Math.floor(area.height * 0.85));
   const fallback = centeredBounds(
     area,
     Math.min(2240, maxWidth),
@@ -40,16 +36,13 @@ function startupWindowGeometry(saved, displays, primary, current, isMacOS) {
   );
   const bounds = restoreWindowGeometry(saved, displays, primary, fallback);
   if (bounds.width > maxWidth || bounds.height > maxHeight) {
-    return {
-      bounds: centeredBounds(
-        area,
-        Math.min(bounds.width, maxWidth),
-        Math.min(bounds.height, maxHeight),
-      ),
-      maximized: false,
-    };
+    return centeredBounds(
+      area,
+      Math.min(bounds.width, maxWidth),
+      Math.min(bounds.height, maxHeight),
+    );
   }
-  return { bounds, maximized: !isMacOS && Boolean(saved?.maximized) };
+  return bounds;
 }
 
 module.exports = { restoreWindowGeometry, startupWindowGeometry };

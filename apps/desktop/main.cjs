@@ -263,12 +263,11 @@ app.whenReady().then(async () => {
     screen.getCursorScreenPoint(),
   );
   const startupConfig = configuration.snapshot().config;
-  const { bounds: geometry, maximized } = startupWindowGeometry(
+  const geometry = startupWindowGeometry(
     startupConfig.rememberWindow ? startupConfig.window : undefined,
     screen.getAllDisplays(),
     screen.getPrimaryDisplay(),
     currentDisplay,
-    process.platform === 'darwin',
   );
   window = new BrowserWindow({
     ...geometry,
@@ -284,10 +283,7 @@ app.whenReady().then(async () => {
       nodeIntegration: false,
     },
   });
-  window.once('ready-to-show', () => {
-    if (maximized) window.maximize();
-    window.show();
-  });
+  window.once('ready-to-show', () => window.show());
   let geometryTimer;
   let closing = false;
   const saveGeometry = () => {
