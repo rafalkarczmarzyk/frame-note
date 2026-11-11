@@ -36,6 +36,7 @@ const PhotoWorkspace = lazy(() =>
 );
 
 export default function App() {
+  const [zoomHost, setZoomHost] = useState<HTMLDivElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [pendingDisposeRoll, setPendingDisposeRoll] = useState(false);
   const [configWarning, setConfigWarning] = useState(() =>
@@ -401,6 +402,7 @@ export default function App() {
         />
       )}
       <AppHeader
+        zoomAction={<div ref={setZoomHost} />}
         historyAction={
           <HistoryControls
             status={historyStatus}
@@ -517,6 +519,7 @@ export default function App() {
           }
         >
           <PhotoWorkspace
+            zoomHost={zoomHost}
             photo={photo}
             sessionDocument={editorDocument}
             onDocumentChange={updateDocument}

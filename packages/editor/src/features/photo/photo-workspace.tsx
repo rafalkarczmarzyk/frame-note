@@ -3,6 +3,7 @@ import { TiledPreview } from '../caption/tiled-preview';
 import type { ExportFormat } from '../caption/export-settings';
 import type Konva from 'konva';
 import { PhotoNavigator } from './photo-navigator';
+import { PhotoZoomSlider } from './photo-zoom-slider';
 import { usePhotoView } from './use-photo-view';
 import { useCompositionOverview } from './use-composition-overview';
 import {
@@ -172,6 +173,7 @@ function PhotoWorkspaceContent({
   sidebarFooter,
   settingsFeedback,
   historyActions,
+  zoomHost,
 }: {
   photo: LoadedPhoto | null;
   loading?: boolean;
@@ -196,6 +198,7 @@ function PhotoWorkspaceContent({
   sidebarFooter?: ReactNode;
   settingsFeedback?: string;
   historyActions?: HistoryActions;
+  zoomHost?: HTMLElement | null;
 }) {
   const dimensions = photo?.document.photo.dimensions ?? emptyDimensions;
   const fields = photo?.document.photo.metadata ?? emptyMetadata;
@@ -605,20 +608,25 @@ function PhotoWorkspaceContent({
     }),
     [size.width, size.height],
   );
+  const navigationDisabled =
+    !photo ||
+    loading ||
+    exporting ||
+    !previewReady ||
+    !!assetError ||
+    !!fontError;
   const navigation = usePhotoView({
     host,
     photo: dimensions,
     viewport,
     documentKey: documentKey ?? photo?.image.src ?? 'empty',
-    disabled:
-      !photo ||
-      loading ||
-      exporting ||
-      !previewReady ||
-      !!assetError ||
-      !!fontError,
+    disabled: navigationDisabled,
     liveKeys: viewKeys,
   });
+  const zoomPhoto: typeof navigation.zoom = (setting, manual) => {
+    if (!navigationDisabled && !draggingId && !navigation.editingDrag.current)
+      navigation.zoom(setting, manual);
+  };
   const { scale, x: viewX, y: viewY } = navigation.state.view;
   const glassPreview = useGlassPreview(
     photo,
@@ -690,6 +698,20 @@ function PhotoWorkspaceContent({
           : `Export ${format.toUpperCase()}`;
   return (
     <EditorWorkspace>
+      {zoomHost &&
+        createPortal(
+          <PhotoZoomSlider
+            compact
+            label="Toolbar zoom"
+            fit={navigation.state.setting === 'fit'}
+            scale={scale}
+            photo={dimensions}
+            viewport={viewport}
+            disabled={navigationDisabled || !!draggingId}
+            onZoom={zoomPhoto}
+          />,
+          zoomHost,
+        )}
       {exportTarget &&
         createPortal(
           <span data-export-live className="inline-flex">
@@ -1393,10 +1415,7 @@ function PhotoWorkspaceContent({
                     ? 'busy'
                     : 'ready'
             }
-            onZoom={(setting, manual) => {
-              if (!draggingId && !navigation.editingDrag.current)
-                navigation.zoom(setting, manual);
-            }}
+            onZoom={zoomPhoto}
             onPan={navigation.session.pan}
             onPanStart={() => {
               navigation.beginOverviewPan();

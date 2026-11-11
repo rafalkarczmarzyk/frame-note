@@ -1,17 +1,12 @@
 import { useId, useRef, useLayoutEffect, useEffect } from 'react';
-import { ShipWheel, ZoomIn, ZoomOut } from 'lucide-react';
+import { ShipWheel } from 'lucide-react';
 import { SidebarSection } from '@/components/layout/sidebar-section';
 import { Button } from '@/components/ui/button';
-import { IconButton } from '@/components/ui/icon-button';
 import { InlineInputGroup } from '@/components/ui/inline-input-group';
-import { NumberField } from '@/components/ui/number-field';
-import { Slider } from '@/components/ui/slider';
+import { PhotoZoomField, PhotoZoomSlider } from './photo-zoom-slider';
 import {
   constrainView,
-  minimumScale,
-  manualMinimumScale,
   visiblePhoto,
-  zoomLevels,
   type Size,
   type View,
 } from './navigator-geometry';
@@ -84,23 +79,8 @@ export function PhotoNavigator({
     };
   }, [onPanCancel]);
   const disabled = status !== 'ready';
-  const minimum = minimumScale(photo, viewport);
-  const manualMinimum = manualMinimumScale(photo, viewport);
   const thumbScale = Math.min(260 / photo.width, 160 / photo.height);
   const area = visiblePhoto(view, photo, viewport);
-  const levels = [
-    ...new Set([
-      manualMinimum,
-      ...zoomLevels.filter((n) => n >= manualMinimum),
-    ]),
-  ];
-  const step = (direction: number) => {
-    const next =
-      direction > 0
-        ? levels.find((n) => n > view.scale + 1e-8)
-        : levels.findLast((n) => n < view.scale - 1e-8);
-    if (next !== undefined) onZoom(next, true);
-  };
   return (
     <div data-photo-view-controls>
       <SidebarSection
@@ -225,78 +205,24 @@ export function PhotoNavigator({
             >
               100%
             </Button>
-            <NumberField
+            <PhotoZoomField
               label="Zoom percentage"
               className="flex-[1.5]"
-              hideLabel
-              unit="%"
-              value={Number((view.scale * 100).toFixed(2))}
-              min={
-                view.scale < manualMinimum
-                  ? Number((view.scale * 100).toFixed(2))
-                  : manualMinimum * 100
-              }
-              max={800}
-              step={1}
+              scale={view.scale}
+              photo={photo}
+              viewport={viewport}
+              fit={mode === 'fit'}
               disabled={disabled}
-              onValueChange={(value) => {
-                if (
-                  mode === 'fit' &&
-                  view.scale < manualMinimum &&
-                  value <= Number((view.scale * 100).toFixed(2))
-                )
-                  return;
-                onZoom(value / 100, true);
-              }}
+              onZoom={onZoom}
             />
           </InlineInputGroup>
-          <div className="flex items-center gap-2">
-            <IconButton
-              label="Zoom out"
-              disabled={disabled || view.scale <= manualMinimum + 1e-8}
-              onClick={() => step(-1)}
-            >
-              <ZoomOut className="size-4" />
-            </IconButton>
-            <Slider
-              label="Photo zoom"
-              onKeyDown={(event) => {
-                const direction = ['ArrowRight', 'ArrowUp', 'PageUp'].includes(
-                  event.key,
-                )
-                  ? 1
-                  : ['ArrowLeft', 'ArrowDown', 'PageDown'].includes(event.key)
-                    ? -1
-                    : 0;
-                if (event.key === 'Home' || event.key === 'End' || direction) {
-                  event.preventDefault();
-                  const step =
-                    event.key.startsWith('Page') || event.shiftKey ? 10 : 1;
-                  const next =
-                    event.key === 'Home'
-                      ? manualMinimum
-                      : event.key === 'End'
-                        ? 8
-                        : view.scale + (direction * step) / 100;
-                  onZoom(next, true);
-                }
-              }}
-              valueText={`${Number((view.scale * 100).toFixed(2))}%`}
-              value={Math.log(view.scale)}
-              min={Math.log(minimum)}
-              max={Math.log(8)}
-              step={0.001}
-              disabled={disabled}
-              onValueChange={(value) => onZoom(Math.exp(value), true)}
-            />
-            <IconButton
-              label="Zoom in"
-              disabled={disabled || view.scale >= 8}
-              onClick={() => step(1)}
-            >
-              <ZoomIn className="size-4" />
-            </IconButton>
-          </div>
+          <PhotoZoomSlider
+            scale={view.scale}
+            photo={photo}
+            viewport={viewport}
+            disabled={disabled}
+            onZoom={onZoom}
+          />
         </div>
       </SidebarSection>
     </div>

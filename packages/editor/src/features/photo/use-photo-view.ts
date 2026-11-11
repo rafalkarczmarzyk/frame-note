@@ -215,7 +215,7 @@ export function usePhotoView({
           Math.min(
             8,
             (prior?.snapshot === state ? prior.raw : state.view.scale) *
-              Math.exp(-intent.y * 0.002),
+              Math.exp(-intent.y * 0.006),
           ),
         );
         session.zoom(raw, true, {
@@ -225,7 +225,10 @@ export function usePhotoView({
         wheelZoom.current = { raw, snapshot: session.getSnapshot() };
       } else {
         wheelZoom.current = null;
-        session.pan(state.view.x - intent.x, state.view.y - intent.y);
+        session.pan(
+          state.view.x - intent.x * 1.2,
+          state.view.y - intent.y * 1.2,
+        );
       }
     };
     const pointerDown = (event: PointerEvent) => {

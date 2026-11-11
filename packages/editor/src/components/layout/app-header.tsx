@@ -16,10 +16,12 @@ export function AppHeader({
   children,
   photoAction,
   historyAction,
+  zoomAction,
 }: {
   children?: ReactNode;
   photoAction?: ReactNode;
   historyAction?: ReactNode;
+  zoomAction?: ReactNode;
 }) {
   const [aboutOpen, setAboutOpen] = useState(
     () => platformServices().startupAbout?.show ?? false,
@@ -65,8 +67,8 @@ export function AppHeader({
       <header
         data-platform={platform}
         className={cn(
-          'flex shrink-0 items-center gap-2 border-b border-border-subtle bg-header-base text-content-primary sm:gap-4',
-          isWeb ? 'h-12 px-3 sm:px-5' : 'p-1.5',
+          '@container flex shrink-0 flex-wrap items-center gap-2 border-b border-border-subtle bg-header-base text-content-primary sm:gap-4',
+          isWeb ? 'min-h-12 px-3 sm:px-5' : 'p-1.5',
         )}
       >
         {isWeb && (
@@ -98,6 +100,11 @@ export function AppHeader({
           <div className="flex shrink-0 items-center gap-1">
             {photoAction}
             {historyAction}
+          </div>
+        )}
+        {zoomAction && (
+          <div className="order-last basis-full @min-[1120px]:order-none @min-[1120px]:basis-80">
+            {zoomAction}
           </div>
         )}
         <div className="min-w-0 flex-1" />

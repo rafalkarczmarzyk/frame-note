@@ -4,11 +4,54 @@ import { graphicPreset } from './fixtures/graphics.js';
 
 test('empty editor', async ({ page }) => {
   await page.goto('/');
+  await expect(
+    page.getByRole('slider', { name: 'Toolbar zoom' }),
+  ).toBeDisabled();
   await shot(page, 'window');
 });
 
 test('prepared photo session', async ({ page }) => {
   await openPhoto(page);
+  const toolbarZoom = page.getByRole('slider', { name: 'Toolbar zoom' });
+  const navigatorZoom = page.getByRole('slider', {
+    name: 'Photo zoom',
+    exact: true,
+  });
+  const zoomPresets = page.getByRole('button', {
+    name: 'Zoom presets',
+    exact: true,
+  });
+  await zoomPresets.click();
+  await page.getByRole('menuitem', { name: '100%', exact: true }).click();
+  await expect(toolbarZoom).toHaveAttribute('aria-valuetext', '100%');
+  await toolbarZoom.press('ArrowRight');
+  await expect(navigatorZoom).toHaveAttribute('aria-valuetext', '101%');
+  await page.getByRole('button', { name: '100%', exact: true }).click();
+  await page.locator('[data-photo-canvas]').dispatchEvent('wheel', {
+    ctrlKey: true,
+    deltaY: -50,
+  });
+  await expect(toolbarZoom).toHaveAttribute('aria-valuetext', '135%');
+  await toolbarZoom.press('Home');
+  await expect(page.locator('[data-photo-canvas]')).toHaveAttribute(
+    'data-view-mode',
+    'fit',
+  );
+  await toolbarZoom.press('ArrowRight');
+  const thumb = (await toolbarZoom.boundingBox())!;
+  const track = (await page
+    .locator('.control-slider')
+    .filter({ has: toolbarZoom })
+    .boundingBox())!;
+  const thumbY = thumb.y + thumb.height / 2;
+  await page.mouse.move(thumb.x + thumb.width / 2, thumbY);
+  await page.mouse.down();
+  await page.mouse.move(track.x - 4, thumbY);
+  await page.mouse.up();
+  await expect(page.locator('[data-photo-canvas]')).toHaveAttribute(
+    'data-view-mode',
+    'fit',
+  );
   // Confirm/cancel deletion and retain the current composition in the existing scene.
   await page
     .getByRole('button', { name: 'Preset actions', exact: true })
@@ -146,7 +189,10 @@ test('prepared photo session', async ({ page }) => {
     if (document.activeElement instanceof HTMLElement)
       document.activeElement.blur();
   });
-  await page.locator('[data-photo-view-controls]').scrollIntoViewIfNeeded();
+  await page
+    .locator('[data-photo-view-controls]')
+    .filter({ has: navigatorZoom })
+    .scrollIntoViewIfNeeded();
   await ready(page);
   await shot(page, 'window');
   const blendMode = page.getByRole('combobox', {

@@ -65,9 +65,13 @@ on that point. Empty space around the overview does nothing.
   arrows change zoom by one percentage point. Fit and 100% highlight their
   active states; these controls share one input group.
 - Manual changes from the slider, percentage field or scrolling round to whole
-  percentages. Fit keeps its exact fractional scale. Tiny wheel/pinch deltas
+  percentages. When Fit is at or below 25%, the slider’s left endpoint
+  and Home select exact Fit. Tiny wheel/pinch deltas
   accumulate until the next whole percentage instead of being discarded.
-- The slider uses a logarithmic scale. The zoom buttons step through fixed levels,
+- The toolbar next to Undo and Redo has a zoom slider, an editable percentage
+  field with draggable stepper arrows, and a menu for Fit and 100%. These
+  controls stay accessible when Navigator is collapsed. Both sliders use the same logarithmic
+  scale. The Navigator zoom buttons step through fixed levels,
   up to 800%. The manual minimum rounds the smaller of Fit/25% up to a whole
   percentage; Fit can sit just below that manual minimum.
 - **Z** switches between the last two zoom settings. Consecutive numeric-field, slider, wheel

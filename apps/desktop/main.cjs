@@ -16,7 +16,7 @@ const fs = require('node:fs');
 const { execFile } = require('node:child_process');
 const runFile = require('node:util').promisify(execFile);
 const { requestUpdate } = require('./update-check.cjs');
-const { restoreWindowGeometry } = require('./window-geometry.cjs');
+const { startupWindowGeometry } = require('./window-geometry.cjs');
 let systemFonts;
 app.setName('FrameNote');
 const profile = app.commandLine.getSwitchValue('user-data-dir');
@@ -259,22 +259,16 @@ app.whenReady().then(async () => {
       await fs.promises.rm(temporary, { force: true }).catch(() => {});
     }
   });
-  const { workArea } = screen.getDisplayNearestPoint(
+  const currentDisplay = screen.getDisplayNearestPoint(
     screen.getCursorScreenPoint(),
   );
-  const width = Math.min(2240, workArea.width);
-  const height = Math.min(1560, workArea.height);
   const startupConfig = configuration.snapshot().config;
-  const geometry = restoreWindowGeometry(
+  const { bounds: geometry, maximized } = startupWindowGeometry(
     startupConfig.rememberWindow ? startupConfig.window : undefined,
     screen.getAllDisplays(),
     screen.getPrimaryDisplay(),
-    {
-      width,
-      height,
-      x: workArea.x + Math.floor((workArea.width - width) / 2),
-      y: workArea.y + Math.floor((workArea.height - height) / 2),
-    },
+    currentDisplay,
+    process.platform === 'darwin',
   );
   window = new BrowserWindow({
     ...geometry,
@@ -291,8 +285,7 @@ app.whenReady().then(async () => {
     },
   });
   window.once('ready-to-show', () => {
-    if (startupConfig.rememberWindow && startupConfig.window?.maximized)
-      window.maximize();
+    if (maximized) window.maximize();
     window.show();
   });
   let geometryTimer;

@@ -1,3 +1,5 @@
+import type { ZoomSetting } from '@/features/photo/navigator-state';
+import { PhotoZoomSlider } from '@/features/photo/photo-zoom-slider';
 import { HistoryControls } from '@/features/photo/history-controls';
 import { Download } from 'lucide-react';
 import { PhotoActions } from '@/features/photo/photo-actions';
@@ -23,6 +25,7 @@ function HeaderPreview({
 }) {
   const [toolbarHost, setToolbarHost] = useState<HTMLElement | null>(null);
   const [panelHost, setPanelHost] = useState<HTMLDivElement | null>(null);
+  const [zoomSetting, setZoomSetting] = useState<ZoomSetting>(1);
   const [hasPhoto, setHasPhoto] = useState(true);
   const [open, setOpen] = useState(false);
   const [layout, setLayout] = useState(() =>
@@ -39,6 +42,18 @@ function HeaderPreview({
         ref={attach}
       >
         <AppHeader
+          zoomAction={
+            <PhotoZoomSlider
+              compact
+              label="Toolbar zoom"
+              scale={zoomSetting === 'fit' ? 0.5 : zoomSetting}
+              fit={zoomSetting === 'fit'}
+              photo={{ width: 1200, height: 800 }}
+              viewport={{ width: 600, height: 400 }}
+              disabled={!hasPhoto}
+              onZoom={setZoomSetting}
+            />
+          }
           historyAction={
             <HistoryControls
               status={{
@@ -120,7 +135,36 @@ export const MacOSMinimum: Story = {
 /** UI preparation only; packaging and native behavior require verification on each OS. */
 export const Windows: Story = { args: { width: 1440, platform: 'windows' } };
 export const Linux: Story = { args: { width: 1440, platform: 'linux' } };
-export const Narrow: Story = { args: { width: 640 } };
+export const Narrow: Story = {
+  args: { width: 640 },
+  play: async ({ canvasElement }) => {
+    const zoom = within(canvasElement).getByRole('slider', {
+      name: 'Toolbar zoom',
+    });
+    zoom.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(zoom).toHaveAttribute('aria-valuetext', '101%');
+    await expect(
+      within(canvasElement).queryByRole('button', { name: /^Zoom (in|out)$/ }),
+    ).not.toBeInTheDocument();
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('spinbutton', {
+      name: 'Toolbar zoom percentage',
+    });
+    await userEvent.clear(input);
+    await userEvent.type(input, '125');
+    await userEvent.keyboard('{Enter}');
+    await expect(zoom).toHaveAttribute('aria-valuetext', '125%');
+    const presets = canvas.getByRole('button', { name: 'Zoom presets' });
+    const page = within(canvasElement.ownerDocument.body);
+    await userEvent.click(presets);
+    await userEvent.click(await page.findByRole('menuitem', { name: 'Fit' }));
+    await expect(zoom).toHaveAttribute('aria-valuetext', '50%');
+    await userEvent.click(presets);
+    await userEvent.click(await page.findByRole('menuitem', { name: '100%' }));
+    await expect(zoom).toHaveAttribute('aria-valuetext', '100%');
+  },
+};
 
 export const LongNameAndModified: Story = {
   play: async ({ canvasElement }) => {

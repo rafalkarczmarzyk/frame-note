@@ -1,8 +1,8 @@
 import { createRequire } from 'node:module';
 import { expect, it } from 'vitest';
-const { restoreWindowGeometry } = createRequire(import.meta.url)(
-  '../apps/desktop/window-geometry.cjs',
-);
+const { restoreWindowGeometry, startupWindowGeometry } = createRequire(
+  import.meta.url,
+)('../apps/desktop/window-geometry.cjs');
 const primary = { id: 1, workArea: { x: 0, y: 25, width: 1440, height: 875 } };
 const secondary = {
   id: 2,
@@ -54,4 +54,69 @@ it('uses default geometry when remembering is disabled or there is no saved wind
   expect(
     restoreWindowGeometry(undefined, [primary], primary, fallback),
   ).toEqual(fallback);
+});
+
+it('leaves room around the window on Mac displays', () => {
+  expect(
+    startupWindowGeometry(undefined, [primary], primary, primary, true),
+  ).toEqual({
+    bounds: { x: 108, y: 91, width: 1224, height: 743 },
+    maximized: false,
+  });
+  expect(
+    startupWindowGeometry(undefined, [primary], primary, primary, false).bounds,
+  ).toEqual(primary.workArea);
+  expect(
+    startupWindowGeometry(
+      undefined,
+      [primary, secondary],
+      primary,
+      secondary,
+      true,
+    ).bounds,
+  ).toEqual({ x: -1776, y: 81, width: 1632, height: 918 });
+});
+
+it('limits saved windows on connected and disconnected Mac displays', () => {
+  const saved = {
+    x: -1800,
+    y: 0,
+    width: 1800,
+    height: 1000,
+    displayId: 2,
+    maximized: true,
+  };
+  expect(
+    startupWindowGeometry(saved, [primary, secondary], primary, primary, true),
+  ).toEqual({
+    bounds: { x: -1776, y: 81, width: 1632, height: 918 },
+    maximized: false,
+  });
+  expect(
+    startupWindowGeometry(saved, [primary], primary, primary, true),
+  ).toEqual({
+    bounds: { x: 108, y: 91, width: 1224, height: 743 },
+    maximized: false,
+  });
+});
+
+it('preserves smaller saved Mac bounds and applies the limit even on tiny work areas', () => {
+  const saved = {
+    x: 100,
+    y: 50,
+    width: 900,
+    height: 650,
+    displayId: 1,
+    maximized: true,
+  };
+  expect(
+    startupWindowGeometry(saved, [primary], primary, primary, true),
+  ).toEqual({
+    bounds: { x: 100, y: 50, width: 900, height: 650 },
+    maximized: false,
+  });
+  const tiny = { id: 3, workArea: { x: 0, y: 0, width: 640, height: 480 } };
+  expect(
+    startupWindowGeometry(undefined, [tiny], tiny, tiny, true).bounds,
+  ).toEqual({ x: 48, y: 36, width: 544, height: 408 });
 });
