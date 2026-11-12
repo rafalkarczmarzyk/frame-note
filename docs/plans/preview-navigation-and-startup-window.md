@@ -33,11 +33,13 @@ Stan: wdrożone, do oceny na urządzeniu, 2026-11-11. Zakres autoryzowany: wszys
 - Kompilacja web, desktop i Storybook, TypeScript, ESLint, tokeny, wersje oraz
   575 testów Vitest przeszły. Testy geometrii obejmują mały i duży obszar
   roboczy oraz zapisane okna przed odłączeniem monitora i po nim (AC-03).
-- W istniejących scenach Chromium dodano asercje stanu pustego, synchronizacji
-  suwaków, klawiatury i przyspieszonego zoomu (AC-01, AC-02). Testy wizualne
-  i JPG zatrzymał zakaz nasłuchu na lokalnych portach. Bezpośredni start
-  Chromium również zatrzymało ograniczenie uprawnień macOS. Test desktopowy
-  nie wystartował, ponieważ polityka środowiska odrzuca wymaganą eskalację.
+- Kontrola wydania 2026-11-12: eksport JPG 1/1 i sześć scen Chromium 6/6
+  przeszły. Obejrzano expected/actual/diff i zaktualizowano wzorce paska
+  zoomu oraz numeru wersji. Styl screenshotów usuwa identyfikator buildu
+  z układu, aby długość hasha i dirty nie przesuwała wersji.
+- Natywny smoke macOS przeszedł, w tym konfiguracja, trwałość, odzyskiwanie
+  i geometria. Asercja restartu sprawdza start bez maksymalizacji zgodnie
+  z aktualnym zachowaniem. Kontrola 100 fontów i plików licencji przeszła.
 - Odbiór: uruchomić `pnpm desktop:preview`, sprawdzić przeciągnięcie zdjęcia
   z Findera na ekranie wbudowanym, odruchową czułość trackpada i kółka oraz
   dostępność suwaka przy małej szerokości okna. Porównać start na monitorze 4K.

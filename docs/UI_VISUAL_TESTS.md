@@ -1,6 +1,19 @@
 # Regresja wizualna UI — smoke tests
 
-Stan: 7 listopada 2026. Zestaw sprawdza widoki prawdziwej aplikacji w jednym profilu Chromium desktop.
+Stan: 12 listopada 2026. Zestaw sprawdza widoki prawdziwej aplikacji w jednym profilu Chromium desktop.
+
+## 0.11.2-beta — przygotowanie wydania
+
+Na macOS obejrzano expected/actual/diff sześciu scen Chromium desktop.
+Zaktualizowane wzorce obejmują pasek zoomu i numer wersji 0.11.2-beta.
+Styl screenshotów usuwa identyfikator buildu z układu, aby jego długość
+nie przesuwała numeru wersji. Obejrzano również wynikową zmianę pustego
+ekranu i About. Zwykły przebieg po aktualizacji przeszedł 6/6 scen.
+Eksport JPG przeszedł 1/1, a Vitest 575/575 testów. Format, wersje,
+tokeny, lint, TypeScript, build web i desktop oraz kontrola 100 plików
+fontów i licencji przeszły. Natywny smoke macOS przeszedł, w tym
+konfiguracja, trwałość, odzyskiwanie i geometria. Asercja restartu sprawdza
+start w trybie okna zgodnie z zachowaniem 0.11.2-beta.
 
 ## 0.11.1-beta — przygotowanie wydania
 

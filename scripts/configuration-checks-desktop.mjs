@@ -310,7 +310,7 @@ export async function checkDesktopConfiguration({ executable, env }) {
           BrowserWindow.getAllWindows()[0].isMaximized(),
         ),
       )
-      .toBe(true);
+      .toBe(false);
     await page.evaluate(() =>
       window.frameNoteDesktop.writeConfiguration({ rememberWindow: false }),
     );

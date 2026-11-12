@@ -11,7 +11,7 @@ see the [release preparation skill](.agents/skills/prepare-release/SKILL.md).
 
 ## Unreleased
 
-## [0.11.2-beta] - 2026-11-11
+## [0.11.2-beta] - 2026-11-12
 
 ### Changed
 
